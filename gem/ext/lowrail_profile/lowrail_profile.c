@@ -21,7 +21,7 @@
 #define KINDS 4
 /* Lowrail::Profile::API: lowrail/profile refuses an extension built from
  * other sources (an older cache) before it hooks anything. */
-#define API 2
+#define API 3
 
 typedef struct {
     uint64_t key;      /* via << 63 | kind << 61 | path id << 35 | line << 5 | ruby type; 0 = empty */
@@ -44,8 +44,9 @@ static size_t path_index_cap;
 static struct { VALUE str; size_t id; } path_cache[1024];
 
 /* Per window name (kind, name id + 1; 0 = no name): windows, objects
- * ObjectSpace can see, and those of its first window in this process. */
-typedef struct { uint64_t kind, name, windows, objects, first; } action_t;
+ * ObjectSpace can see, those of its first window in this process, and those
+ * allocated inside a network connect, which objects leaves out. */
+typedef struct { uint64_t kind, name, windows, objects, first, net; } action_t;
 static action_t *actions;
 static size_t actions_cap, actions_len;
 
@@ -71,8 +72,8 @@ static size_t app_root_len;
 typedef struct { uint64_t key, count; } seen_t;
 typedef struct {
     VALUE thread, fiber; /* fiber 0 = free slot */
-    int depth;
-    uint64_t id, kind, name, objects;
+    int depth, connect; /* connect: inside Socket.tcp (Lowrail::Profile.connect) */
+    uint64_t id, kind, name, objects, net;
     seen_t *seen;
     size_t seen_cap, seen_len;
     pend_t *pend;
@@ -330,6 +331,9 @@ newobj(VALUE tpval, void *data)
     }
     objects[w->kind]++;
     int seen = visible(obj);
+    /* A connect's objects follow timing (Happy Eyeballs races its attempts on
+     * threads and timers): counted apart, in no line. */
+    if (w->connect) { if (seen) w->net++; return; }
     if (seen) w->objects++;
     size_t id = RB_TYPE_P(path, T_STRING) ? path_id(path) : 0;
     if (id == SIZE_MAX || line >= (1ULL << 30) || id + 1 >= (1ULL << 26)) { dropped++; return; }
@@ -411,6 +415,7 @@ close_window(win_t *w)
         a->windows++;
         a->objects += w->objects;
         if (first) a->first += w->objects;
+        a->net += w->net;
     }
     for (size_t j = 0; w->seen_len && j < w->seen_cap; j++) {
         seen_t *e = &w->seen[j];
@@ -471,6 +476,8 @@ profile_enter(VALUE self, VALUE k)
     w->kind = (FIXNUM_P(k) ? (uint64_t)FIX2LONG(k) : 0) % KINDS;
     w->name = 0;
     w->objects = 0;
+    w->net = 0;
+    w->connect = 0;
     wins_open++;
     windows[w->kind]++;
     return Qtrue;
@@ -523,6 +530,18 @@ profile_attribute(VALUE self, VALUE root)
     app_root = copy;
     app_root_len = RSTRING_LEN(root);
     attributing = 1;
+    return Qnil;
+}
+
+/* Lowrail::Profile.connect(inside): the current fiber's window enters
+ * (true) or leaves (false) a network connect. Allocates nothing. */
+static VALUE
+profile_connect(VALUE self, VALUE inside)
+{
+    win_t *w = current_window();
+    if (!w) return Qnil;
+    if (RTEST(inside)) w->connect++;
+    else if (w->connect > 0) w->connect--;
     return Qnil;
 }
 
@@ -587,7 +606,7 @@ counts(uint64_t *values)
 
 /* [windows per kind, objects per kind, dropped,
  *  [[path or nil, line, type, count, windows, first, via, kind], ...],
- *  [[kind, name or nil, windows, objects, first], ...],
+ *  [[kind, name or nil, windows, objects, first, network objects], ...],
  *  [[kind, name or nil, path, line, caller path or nil, caller line, count, first], ...]] */
 static VALUE
 profile_snapshot(VALUE self)
@@ -616,8 +635,8 @@ profile_snapshot(VALUE self)
     VALUE arows = rb_ary_new_capa(na);
     for (size_t j = 0; j < na; j++) {
         action_t a = acopy[j];
-        rb_ary_push(arows, rb_ary_new_from_args(5, INT2FIX(a.kind), interned(a.name), ULL2NUM(a.windows),
-            ULL2NUM(a.objects), ULL2NUM(a.first)));
+        rb_ary_push(arows, rb_ary_new_from_args(6, INT2FIX(a.kind), interned(a.name), ULL2NUM(a.windows),
+            ULL2NUM(a.objects), ULL2NUM(a.first), ULL2NUM(a.net)));
     }
     VALUE trows = rb_ary_new_capa(nt);
     for (size_t j = 0; j < nt; j++) {
@@ -647,4 +666,5 @@ Init_lowrail_profile(void)
     rb_define_singleton_method(profile, "reset", profile_reset, 0);
     rb_define_singleton_method(profile, "snapshot", profile_snapshot, 0);
     rb_define_singleton_method(profile, "attribute", profile_attribute, 1);
+    rb_define_singleton_method(profile, "connect", profile_connect, 1);
 }

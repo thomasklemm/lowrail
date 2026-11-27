@@ -222,6 +222,12 @@ module Lowrail
       Array(list).to_h { [_1["name"] || "(no name)", _1["warm"]] }
     end
 
+    # Objects allocated inside Socket.tcp per kind, by run: the counter leaves
+    # them out of every action and line, since how many follows timing.
+    def network(report)
+      KINDS.to_h { |kind| [kind, Array(report["summary"]).map { _1.is_a?(Hash) && _1["network"].is_a?(Hash) ? _1["network"][kind].to_i : 0 }] }
+    end
+
     # Actions left out, with why: filled as the changes are computed.
     def not_compared = (changes; @not_compared)
 
@@ -289,6 +295,14 @@ module Lowrail
         out << "**Not compared: #{not_compared.size} of #{actions} actions** (#{reasons}), so a change in them is not " \
           "checked; they are listed at the end.\n\n"
       end
+      connects = KINDS.filter_map do |kind|
+        b, h = network(@base)[kind], network(@head)[kind]
+        "#{kind}s base #{b.join(" / ")}, head #{h.join(" / ")}" if (b + h).any?(&:positive?)
+      end
+      unless connects.empty?
+        out << "Not compared: objects allocated inside `Socket.tcp`, which every action and line leaves out (it races its " \
+          "connection attempts on threads and timers, so how many follows timing); by run: #{connects.join("; ")}.\n\n"
+      end
       out << "**A report, not a gate (exit 0).** What it lists is a place to look: a listed change can be noise, and a " \
         "small one can be missing (README-profile.md, *Compare*).#{" Without an A/A pair the floor is the spread inside one " \
         "capture, which misses how much invocations differ; profile the base twice and pass the second with `--aa`." unless aa?}\n\n"
@@ -320,7 +334,8 @@ module Lowrail
     def to_h
       row = ->(c) { { kind: c.kind, what: c.what, name: c.name, base: c.base, head: c.head, delta: c.delta, noise_floor: c.threshold(@min) } }
       { status: status, aa: aa?, problems: problems, min: @min, compared: valid? ? kinds : [], regressions: regressions.map(&row),
-        improvements: improvements.map(&row), not_compared: not_compared }
+        improvements: improvements.map(&row), not_compared: not_compared,
+        network: valid? ? { base: network(@base), head: network(@head) } : nil }
     end
   end
 end

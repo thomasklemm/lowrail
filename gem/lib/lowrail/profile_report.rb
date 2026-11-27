@@ -45,7 +45,8 @@ module Lowrail
 
     KINDS = %w[request job mail cable].freeze
     # report.json's format; compare reads only its own. 3: app and path-gem keys of 8e36ae06, timed_out.
-    FORMAT = 3
+    # 4: objects allocated inside Socket.tcp left out of actions and lines, counted apart (network).
+    FORMAT = 4
     KIND_TITLES = { "job" => "Jobs", "mail" => "Mails", "cable" => "Action Cable" }.freeze
 
     # App middleware that hands the request on is the nearest app frame of
@@ -83,11 +84,11 @@ module Lowrail
     def load_run(path)
       run = { name: File.basename(path), requests: 0, objects: 0, dropped: 0, controller_tests: 0, processes: 0, roots: [],
         windows: Hash.new(0), sites: Hash.new { |h, k| h[k] = [0, 0, 0, 0] },
-        actions: Hash.new { |h, k| h[k] = [0, 0, 0, 0] },
+        actions: Hash.new { |h, k| h[k] = [0, 0, 0, 0, 0] }, net: Hash.new(0),
         attrib: { index: {}, name: [], loc: [], caller: [], count: [], first: [] } }
       Dir.children(path).grep(/\.tsv\z/).sort.map { File.join(path, _1) }.each do |file|
         header = File.open(file, &:gets)&.chomp
-        raise "#{file} is from an older lowrail-profile; run it again" unless header&.start_with?("# lowrail-profile 3\t")
+        raise "#{file} is from an older lowrail-profile; run it again" unless header&.start_with?("# lowrail-profile 4\t")
         meta = header.split("\t").drop(1).to_h { _1.split("=", 2) }
         run[:processes] += 1
         %i[requests objects dropped].each { run[_1] += Integer(meta.fetch(_1.to_s)) }
@@ -109,12 +110,14 @@ module Lowrail
           when "P"
             paths[fields[1]] = path_id(fields[2])
           when "A"
-            _, kind, name, windows, objects, first = fields
+            _, kind, name, windows, objects, first, net = fields
             action = run[:actions][[kind, name]]
             action[0] += Integer(windows)
             action[1] += Integer(objects)
             action[2] += Integer(first)
             action[3] += 1
+            action[4] += Integer(net)
+            run[:net][kind] += Integer(net)
           when "G"
             _, name, gem_dir = fields
             (run[:path_gems] ||= {})[name] = gem_dir
@@ -329,7 +332,8 @@ module Lowrail
           windows: KINDS.to_h { [_1, run[:windows][_1]] },
           # Windows that finished (were merged into an action); fewer than
           # windows means some were still open when the process wrote.
-          completed: KINDS.to_h { |kind| [kind, run[:actions].sum { |(k, _), (n, *)| k == kind ? n : 0 }] } }
+          completed: KINDS.to_h { |kind| [kind, run[:actions].sum { |(k, _), (n, *)| k == kind ? n : 0 }] },
+          network: KINDS.to_h { [_1, run[:net][_1]] } }
       end
     end
 
@@ -471,7 +475,8 @@ module Lowrail
           known = warm.compact
           { name: name == "-" ? nil : name, windows: windows, warm: warm.map { _1&.round(1) }, all: all.map { _1&.round(1) },
             noise: known.size > 1 && warm.first && warm.last ? (warm.last - warm.first).round(1) : nil,
-            sort: known.empty? ? all.compact.max.to_f : mean(known), sites: top.(a[:sites]), apps: top.(a[:apps]) }
+            sort: known.empty? ? all.compact.max.to_f : mean(known), sites: top.(a[:sites]), apps: top.(a[:apps]),
+            network: stats.map { _1 ? _1[4] : 0 } }
         end.sort_by { [_1[:warm].compact.empty? ? 1 : 0, -_1[:sort], _1[:name].to_s] }
       end
     end
@@ -526,8 +531,8 @@ module Lowrail
       command_file = File.join(dir, "command.txt")
       command = File.exist?(command_file) ? File.read(command_file).lines.first.strip : "?"
       first = summary.first
-      counted = { "request" => "requests", "job" => "jobs", "mail" => "mail windows", "cable" => "Cable actions" }
-        .filter_map { |kind, label| "#{first[:windows][kind]} #{label}" if first[:windows][kind] > 0 }
+      labels = { "request" => "requests", "job" => "jobs", "mail" => "mail windows", "cable" => "Cable actions" }
+      counted = labels.filter_map { |kind, label| "#{first[:windows][kind]} #{label}" if first[:windows][kind] > 0 }
       rails = @runs.filter_map { _1[:rails] }.first
       out = +"# lowrail-profile report\n\n"
       if (stopped = meta[:timed_out]).any?
@@ -545,6 +550,15 @@ module Lowrail
         out << "* Not counted in run 1: #{first[:controller_tests]} request#{"s" if first[:controller_tests] != 1} made by " \
           "controller tests (`ActionController::TestCase`, rspec-rails controller specs), which call the controller directly, " \
           "without the app's middleware and routing\n"
+      end
+      connects = KINDS.filter_map do |kind|
+        per_run = summary.map { _1[:network][kind] }
+        "#{per_run.join(" / ")} in #{labels[kind]}" if per_run.any?(&:positive?)
+      end
+      unless connects.empty?
+        out << "* Left out: objects allocated inside `Socket.tcp`, by run #{connects.join(", ")}. It races its connection " \
+          "attempts on threads and timers, so how many follows timing; in a suite usually a probe for a server that is not " \
+          "running. Every action and line leaves them out\n"
       end
       out << "* Ledger: #{ledger_date ? "upstream pull requests as of #{ledger_date}" : "off"}\n"
       out << "* lowrail-profile #{Lowrail::Profile::VERSION}\n"

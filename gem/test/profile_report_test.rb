@@ -24,10 +24,10 @@ class ProfileReportTest < Minitest::Test
     realpath_tmpdir do |dir|
       names, callers = 400, 200
       write_runs(dir, lambda do |run, pid|
-        rows = ["# lowrail-profile 3\trequests=#{names}\tobjects=1\tdropped=0\twindows=#{names},0,0,0\tpid=#{pid}\troot=/app",
+        rows = ["# lowrail-profile 4\trequests=#{names}\tobjects=1\tdropped=0\twindows=#{names},0,0,0\tpid=#{pid}\troot=/app",
           "P\t0\t/gems/foo-1.0/lib/foo.rb", "P\t1\t/app/app/controllers/c.rb", "0\t1\tString\t#{names}\t#{names}\t1\t0\trequest"]
         names.times do |n|
-          rows << "A\trequest\tC#a#{n}\t1\t9\t1"
+          rows << "A\trequest\tC#a#{n}\t1\t9\t1\t0"
           next if run == "run1"
           callers.times { |line| rows << "@\trequest\tC#a#{n}\t0\t1\t1\t#{line + 1}\t#{n + line + 1}\t1" }
         end
@@ -51,10 +51,10 @@ class ProfileReportTest < Minitest::Test
   def test_a_path_gem_inside_the_app_root_is_a_gem
     realpath_tmpdir do |dir|
       write_runs(dir, lambda do |_, pid|
-        ["# lowrail-profile 3\trequests=4\tobjects=44\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=/app\tapp_root=/app",
+        ["# lowrail-profile 4\trequests=4\tobjects=44\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=/app\tapp_root=/app",
           "P\t0\t/app/gems/foo/lib/foo.rb", "P\t1\t/app/vendor/gems/bar/lib/bar.rb", "P\t2\t/app/app/models/m.rb", "P\t3\t/app/app/views/gems/index.html.erb", "3\t9\tString\t4\t4\t0\t0\trequest",
           "0\t3\tString\t20\t4\t0\t0\trequest", "1\t5\tString\t12\t4\t0\t0\trequest", "2\t7\tString\t8\t4\t0\t0\trequest",
-          "A\trequest\tC#a\t4\t44\t0", "G\tfoo\t/app/gems/foo", "G\tbar\t/app/vendor/gems/bar"]
+          "A\trequest\tC#a\t4\t44\t0\t0", "G\tfoo\t/app/gems/foo", "G\tbar\t/app/vendor/gems/bar"]
       end)
       sites = Lowrail::ProfileReport.new(dir).sites.to_h { ["#{_1.key}:#{_1.line}", _1.group] }
       assert_equal({ "GEM/foo/lib/foo.rb:3" => "gem: foo", "GEM/bar/lib/bar.rb:5" => "gem: bar", "APP/app/models/m.rb:7" => "app",
@@ -69,10 +69,10 @@ class ProfileReportTest < Minitest::Test
     { "/engine" => "/engine", "/src/gems/engine/spec/dummy" => "/src/gems/engine" }.each do |root, engine|
       realpath_tmpdir do |dir|
         write_runs(dir, lambda do |_, pid|
-          ["# lowrail-profile 3\trequests=4\tobjects=32\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=#{root}\tapp_root=#{root}",
+          ["# lowrail-profile 4\trequests=4\tobjects=32\tdropped=0\twindows=4,0,0,0\tpid=#{pid}\troot=#{root}\tapp_root=#{root}",
             "P\t0\t#{root}/app/views/gems/index.html.erb", "P\t1\t#{root}/app/models/m.rb",
             "0\t5\tString\t12\t4\t0\t0\trequest", "1\t9\tString\t20\t4\t0\t0\trequest",
-            "A\trequest\tGemsController#index\t4\t32\t0", "G\tmy_engine\t#{engine}"]
+            "A\trequest\tGemsController#index\t4\t32\t0\t0", "G\tmy_engine\t#{engine}"]
         end)
         sites = Lowrail::ProfileReport.new(dir).sites.to_h { ["#{_1.key}:#{_1.line}", _1.group] }
         assert_equal({ "APP/app/views/gems/index.html.erb:5" => "app", "APP/app/models/m.rb:9" => "app" }, sites, root)

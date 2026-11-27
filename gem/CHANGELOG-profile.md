@@ -16,6 +16,17 @@
   at the end. A missing warm value names the report that lacks it.
 * README: the `--workloads` production example needs the production database, with the records the file names, and
   compiled assets, and on a new Rails 7.2 app a production database path; the README says so.
+* Network connects are counted apart: what `Socket.tcp` allocates while it connects follows timing, not code (it
+  races its attempts on threads and timers). On Hackatime in one process ViteRuby probes its dev server at most once
+  a second, so which request paid about 400 objects for it changed from run to run, and compare listed
+  `Admin::AdminUsersController#index` and `RUBY/socket.rb:72` on unchanged code. Objects allocated inside a
+  `Socket.tcp` call without a block (a module prepended to `Socket` once the app has loaded it) are left out of their
+  action and lines; the report and compare say how many by kind and run (`network` per action and run, `network` in
+  compare's `--json`). Reads and writes on a socket, and `Socket.tcp` with a block, are still counted and compared.
+  report.json is format 4 and the raw counts `# lowrail-profile 4`: profile again.
+* README: reset the test database before every capture (the CI job now runs `db:test:prepare` before base2 too).
+  CASA's `ChecklistItemsController#new` read 3,511 warm objects per request with record IDs from 9,000 and 3,494
+  from 100,000, so captures that continue each other's IDs differ.
 * Tests: `QUIT` reaches the command under `--timeout`, a signal that comes before the command is started reaches it
   once it runs, and `profile_test.rb` is split into `profile_test.rb`, `profile_record_test.rb` and
   `profile_cli_test.rb`.

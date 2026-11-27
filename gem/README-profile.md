@@ -133,6 +133,22 @@ about 1% per action on the same code (Forem, half an hour apart with nothing cha
 four by 0.1% to 0.25% and `ResponseTemplatesController#update` 15,028 → 15,154, +0.8%), so a small listed change is
 a hint, not proof.
 
+**Network connects are left out.** What `Socket.tcp` allocates while it connects follows timing, not code: it races
+its connection attempts on threads and timers. On Hackatime ViteRuby probes its dev server at most once a second,
+and whichever request came first after each second paid about 400 objects for it. Objects allocated inside a
+`Socket.tcp` call without a block, in the thread or fiber of the request, job, mail or Cable action, are left out of
+its action and its lines, and the report and compare say how many by run (*Left out* in the report's header,
+`network` per action and run). Only the connect is left out: a read or write on the socket is compared like any
+other line, and `Socket.tcp` with a block is counted whole, since the block is the app's own work. The hook is a
+module prepended to `Socket` once the app has loaded it; one object per call, allocated before it marks the connect,
+stays in the action.
+
+**Reset the test database before every capture** (`bin/rails db:test:prepare`, as the CI job below does). Record IDs
+grow across runs, and their digits change what Rails and Rack allocate to encode them: on CASA,
+`ChecklistItemsController#new` read 3,511 warm objects per request with IDs from 9,000 and 3,494 from 100,000, all of
+it in `uri/common.rb:456`, with the same code. A capture after another one without a reset starts where the last one
+stopped.
+
 An action is compared only under the same name in every report: a renamed or new action, or one that ran in base
 only, is listed under *Not compared* with the reason, and nothing about its own cost is listed; how many and why is
 said above the tables. Lines outside the app it reaches are still compared.
@@ -155,6 +171,7 @@ lowrail-profile:
         git checkout ${{ github.event.pull_request.base.sha }}
         bin/rails db:test:prepare
         bundle exec lowrail-profile --out tmp/base -- bin/rails test
+        bin/rails db:test:prepare # every capture starts at the same record IDs
         bundle exec lowrail-profile --out tmp/base2 -- bin/rails test
     - name: Profile head
       run: |

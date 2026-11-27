@@ -17,7 +17,7 @@ class ProfileCompareTest < Minitest::Test
   # default one without a name or warm value, which compare does not compare).
   def report(warm, runs: 2, exit: [0] * runs, actions: [{ "name" => nil, "warm" => [nil] * runs }])
     actions = actions.map.with_index { |a, i| { "windows" => [i.zero? ? 10 : 0] * runs }.merge(a) }
-    meta = { "format" => 3, "identity" => { "mode" => "command", "argv" => %w[bin/rails test] }, "argv" => %w[bin/rails test],
+    meta = { "format" => 4, "identity" => { "mode" => "command", "argv" => %w[bin/rails test] }, "argv" => %w[bin/rails test],
       "seed" => "1234", "exit" => exit, "runs" => runs, "ruby" => ["ruby 4"], "rails_env" => ["test"], "dropped" => [0] * runs,
       # 76be8b58's fields, so a case that must be refused is not refused only for lacking them there
       "command" => "bin/rails test", "workloads" => nil }
@@ -132,6 +132,29 @@ class ProfileCompareTest < Minitest::Test
     end
   end
 
+  # Found on unchanged one-process captures in the census field test: on
+  # Hackatime, ViteRuby probes its dev server (Socket.tcp, at most once a
+  # second), so which requests pay a probe follows timing. The counter leaves
+  # those objects out of every action and line, and compare says how many;
+  # socket.rb's other lines, such as a read, are the app's work and compared.
+  def test_compare_compares_socket_reads_and_shows_what_connects_left_out
+    realpath_tmpdir do |dir|
+      capture = lambda do |read, connects|
+        report([5.0, 5.0]).tap do |r|
+          r["ranked"] << { "site" => "RUBY/socket.rb:384", "warm" => read }
+          r["summary"].each_with_index { |run, i| run["network"] = { "request" => connects[i], "job" => 0, "mail" => 0, "cable" => 0 } }
+        end
+      end
+      status, result = compare(dir, capture.([1.0, 1.0], [400, 0]), capture.([200.0, 200.0], [0, 800]))
+      assert_equal 0, status, result
+      assert_equal ["RUBY/socket.rb:384"], result["regressions"].map { _1["name"] }
+      assert_equal({ "request" => [400, 0], "job" => [0, 0], "mail" => [0, 0], "cable" => [0, 0] }, result["network"]["base"])
+      out, = Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "base.json", "head.json", chdir: dir)
+      assert_includes out, "Not compared: objects allocated inside `Socket.tcp`"
+      assert_includes out, "requests base 400 / 0, head 0 / 800"
+    end
+  end
+
   # openstreetmap-website with 8 parallel workers, the same code in every
   # capture: NotesController#index read 8,063/8,272 warm in base, 7,624/8,362
   # in the A/A report and 26,106/28,029 in head, by which of its 19 requests
@@ -159,9 +182,9 @@ class ProfileCompareTest < Minitest::Test
         json, err, status = Open3.capture3("tar", "-xJOf", archive, "#{capture}/report.json")
         assert status.success?, err
         report = JSON.parse(json)
-        # rc1's format 2 differs from 3 only in line keys, the same in all three; actions are keyed by name in both.
+        # rc1's format 2 differs from 4 in line keys, the same in all three, and in network counts, which it lacks; actions are keyed by name in all.
         assert_equal 2, report["meta"]["format"]
-        report["meta"]["format"] = 3
+        report["meta"]["format"] = 4
         File.write(File.join(dir, "#{capture}.json"), JSON.generate(report))
       end
       run = ->(*args) { Open3.capture3(CLEAN_ENV, RUBY, PROFILE, "compare", "u1.json", "planted.json", "--aa", "u2.json", *args, chdir: dir) }
@@ -206,7 +229,7 @@ class ProfileCompareTest < Minitest::Test
       old = ->(r) { r.merge("meta" => r["meta"].merge("format" => 2)) }
       status, result = compare(dir, old.(report([10.0, 10.0])), report([10.0, 10.0]), aa: nil)
       assert_equal 2, status
-      assert_match(/base is a report.json of format 2, this lowrail-profile reads 3/, result["problems"].join)
+      assert_match(/base is a report.json of format 2, this lowrail-profile reads 4/, result["problems"].join)
       jobs = report([10.0, 10.0]).merge("summary" => [run_windows("job" => 3)] * 2)
       status, result = compare(dir, report([10.0, 10.0]), jobs)
       assert_equal 2, status, "nothing comparable: #{result}"

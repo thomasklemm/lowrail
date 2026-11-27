@@ -143,6 +143,115 @@ class ProfileTest < Minitest::Test
     end
   end
 
+  # Found on Hackatime in one process: ViteRuby probes its dev server
+  # (Socket.tcp, at most once a second), so which requests pay a probe follows
+  # timing. What Socket.tcp allocates while it connects is counted apart, in
+  # every kind and run; a socket read, and the block Socket.tcp yields to, are
+  # the app's own work and stay in its action and lines.
+  def test_socket_connects_are_counted_apart_and_socket_reads_are_not
+    skip "Rails, sqlite3 and bcrypt are not installed" unless LowrailTest.rails_installed?
+    realpath_tmpdir do |dir|
+      LowrailTest.write_rails_app(dir,
+        "config/routes.rb" => <<~'RUBY',
+          Rails.application.routes.draw do
+            get "net/ready" => "net#ready"
+            get "net/plain" => "net#plain"
+            get "net/probe" => "net#probe"
+            get "net/reads" => "net#reads"
+            get "net/block" => "net#block"
+          end
+        RUBY
+        "app/controllers/net_controller.rb" => <<~'RUBY',
+          class NetController < ApplicationController
+            def ready = (Connect.call; PAIR[0].recv_nonblock(1); head :ok)
+            def plain = (@a = [String.new, String.new]; head :ok)
+            def probe = (@a = [String.new, String.new]; Connect.call; head :ok)
+            def reads = (@a = [String.new, String.new]; 10.times { PAIR[0].recv_nonblock(1) }; head :ok)
+            def block = (@a = [String.new, String.new]; Socket.tcp("127.0.0.1", PORT) { 50.times { String.new } }; head :ok)
+          end
+        RUBY
+        "app/jobs/probe_job.rb" => "class ProbeJob < ActiveJob::Base\n  def perform = Refused.call\nend\n",
+        # The profiler starts before RubyGems does.
+        "boot.rb" => "require \"rubygems\"\nrequire_relative \"requests\"\n",
+        "requests.rb" => <<~'RUBY')
+          require "socket"
+          require "active_job/railtie"
+          require_relative "config/environment"
+          require "rack/mock"
+          # A server that is not running, as ViteRuby's dev server is in a suite, and one that is.
+          Refused = -> { Socket.tcp("127.0.0.1", 1, connect_timeout: 1).close rescue nil }
+          SERVER = TCPServer.new("127.0.0.1", 0)
+          PORT = SERVER.addr[1]
+          Connect = -> { Socket.tcp("127.0.0.1", PORT, connect_timeout: 1).close }
+          PAIR = Socket.pair(:UNIX, :STREAM)
+          PAIR[1].write("x" * 1000)
+          get = lambda do |action|
+            status, = Rails.application.call(Rack::MockRequest.env_for("http://localhost/net/#{action}"))
+            raise "HTTP #{status}" unless status == 200
+          end
+          # The app's one-time work goes to an action not compared here.
+          4.times { get.("ready") }
+          4.times { %w[plain probe reads block].each(&get) }
+          3.times { ProbeJob.perform_now }
+        RUBY
+      env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"), "RAILS_ENV" => "test")
+      out, err, status = Open3.capture3(env, RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "--out", "profile", "--top", "500",
+        "--no-ledger", "--", RUBY, "--disable-gems", "boot.rb", chdir: dir)
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+
+      report = JSON.parse(File.read(File.join(dir, "profile/report.json")))
+      actions = report["actions"].to_h { [_1["name"], _1] }
+      plain, probe, reads, block = actions.values_at(*%w[plain probe reads block].map { "NetController##{_1}" })
+      # The same objects with and without a probe, and the probe's counted apart: but one, which the
+      # call allocates before the hook marks the connect.
+      probe["warm"].zip(plain["warm"]) { |p, q| assert_includes [q, q + 1], p, probe["warm"].inspect }
+      assert probe["network"].all?(&:positive?), probe["network"].inspect
+      assert_equal [[0, 0], [0, 0], [0, 0]], [plain["network"], reads["network"], block["network"]]
+      assert_equal report["summary"].map { _1["network"]["request"] }, report["actions"].map { _1["network"] }.transpose.map(&:sum)
+      jobs = report["summary"].map { _1["network"]["job"] }
+      assert jobs.all?(&:positive?), jobs.inspect
+      # Ten one-byte reads: a String each, in its action and on a socket.rb line.
+      reads["warm"].zip(plain["warm"]) { |r, p| assert_operator r, :>=, p + 10 }
+      assert reads["sites"].any? { _1["name"].start_with?("RUBY/socket.rb:") && _1["warm"] == 10.0 }, reads["sites"].inspect
+      assert report["ranked"].any? { _1["site"].start_with?("RUBY/socket.rb:") }
+      # With a block, Socket.tcp is counted whole: the connect and the block's 50 Strings.
+      block["warm"].zip(probe["warm"]) { |b, p| assert_operator b, :>=, p + 50 }
+      md = File.read(File.join(dir, "profile/report.md"))
+      requests = report["summary"].map { _1["network"]["request"] }
+      assert_includes md, "inside `Socket.tcp`, by run #{requests.join(" / ")} in requests, #{jobs.join(" / ")} in jobs"
+    end
+  end
+
+  # The Socket.tcp hook waits for the app to load socket: a window does not
+  # resolve an autoload of Socket (invariant 7), and once the app loads it a
+  # later window hooks it; another Ractor's connects are left alone.
+  def test_the_socket_hook_resolves_no_autoload
+    realpath_tmpdir do |dir|
+      File.write(File.join(dir, "windows.rb"), <<~'RUBY')
+        autoload :Socket, "socket"
+        2.times { Lowrail::Profile.close(Lowrail::Profile.open(0)) }
+        puts "autoload: #{Object.autoload?(:Socket).inspect}, loaded: #{$LOADED_FEATURES.any? { _1.end_with?("/socket.rb") }}"
+        Socket.tcp("127.0.0.1", 1, connect_timeout: 1) rescue nil
+        Lowrail::Profile.close(Lowrail::Profile.open(0))
+        puts "hooked: #{Socket.singleton_class.ancestors.first == Lowrail::Profile::Connect}"
+        # Outside the main Ractor the hook stays out of the way (the counter is the main Ractor's).
+        server = TCPServer.new("127.0.0.1", 0)
+        Warning[:experimental] = false
+        ractor = Ractor.new(server.addr[1]) do |port|
+          [port, 1].map { |p| (Socket.tcp("127.0.0.1", p, connect_timeout: 1).close; "connected") rescue $!.class.name }
+        end
+        puts "ractor: #{(ractor.respond_to?(:value) ? ractor.value : ractor.take).join(", ")}"
+      RUBY
+      env = CLEAN_ENV.merge("XDG_CACHE_HOME" => File.join(dir, "cache"))
+      out, err, status = Open3.capture3(env, RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "--out", "profile", "--no-ledger",
+        "--", RUBY, "windows.rb", chdir: dir)
+      assert status.success?, "lowrail-profile failed:\n#{err}\n#{out}"
+      assert_equal 2, out.scan(%(autoload: "socket", loaded: false)).size, out
+      assert_equal 2, out.scan("hooked: true").size, out
+      assert_equal 2, out.scan("ractor: connected, Errno::ECONNREFUSED").size, out
+    end
+  end
+
   # An engine's suite: run from the engine (api/), its dummy app's Rails.root
   # below it, a sibling gem from a path (core/, as Bundler's path: loads it)
   # and a file in no gem. Path-gem lines rank as that gem's, the engine's lines are

@@ -24,7 +24,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
     ext = ENV.fetch("LOWRAIL_PROFILE_EXT")
     require ext
     api = (Lowrail::Profile::API if defined?(Lowrail::Profile::API))
-    raise LoadError, "#{ext} is not this lowrail-profile's counter (API #{api.inspect}, expected 2); run lowrail-profile again" unless api == 2
+    raise LoadError, "#{ext} is not this lowrail-profile's counter (API #{api.inspect}, expected 3); run lowrail-profile again" unless api == 3
     require_relative "load_hooks"
 
     module Lowrail
@@ -147,6 +147,21 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
           end
         end
 
+        # What Socket.tcp allocates while it connects follows timing (Happy
+        # Eyeballs races its attempts on threads and timers): windows count it
+        # apart. With a block, the block is the app's own work and is counted.
+        module Connect
+          def tcp(...)
+            return super if block_given? || !Profile.main?
+            Profile.connect(true)
+            begin
+              super
+            ensure
+              Profile.connect(false)
+            end
+          end
+        end
+
         # A forked worker (parallel tests, a preforking server) starts from
         # zero, so the parent's requests are not counted twice.
         module Fork
@@ -171,9 +186,18 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
 
           # Each returns quietly when the profiler cannot do its part.
           def open(kind)
-            main? && enter(kind)
+            return false unless main?
+            connects unless @connects
+            enter(kind)
           rescue StandardError
             false
+          end
+
+          # Hooked once the app has loaded socket, before a window opens.
+          def connects
+            socket = Lowrail.loaded_constant("Socket") or return
+            @connects = true
+            install("Socket.tcp") { socket.singleton_class.prepend(Connect) unless socket.singleton_class < Connect }
           end
 
           def close(open, env = nil)
@@ -375,7 +399,7 @@ if (dir = ENV["LOWRAIL_PROFILE"]) && !dir.empty?
             windows, objects, dropped, rows, actions, attributed = snapshot
             return if windows.sum == 0 && controller_tests == 0
             root = (Rails.root.to_s if defined?(Rails) && Rails.respond_to?(:root) && Rails.root)
-            lines = [["# lowrail-profile 3", "requests=#{windows[0]}", "objects=#{objects[0]}", "dropped=#{dropped}",
+            lines = [["# lowrail-profile 4", "requests=#{windows[0]}", "objects=#{objects[0]}", "dropped=#{dropped}",
               "windows=#{windows.join(",")}", "kind_objects=#{objects.join(",")}", "controller_tests=#{controller_tests}",
               "pid=#{Process.pid}", "root=#{root || Dir.pwd}", "app_root=#{APP_ROOT || Dir.pwd}",
               "ruby=#{RUBY_DESCRIPTION}",
