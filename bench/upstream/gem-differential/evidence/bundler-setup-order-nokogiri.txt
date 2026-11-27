@@ -1,0 +1,14 @@
+# nokogiri TestVersionInfo on master: command-line -rjson runs before bundler/setup (BX1). 2026-11-27T21:18:24Z
+# lock: json 2.21.2; default json: 4.0.10 2.18.3, master 3.2.0. Command run inside 'bundle exec ruby -e system(...)' in nokogiri v1.19.7.
+## v4.0.10 flags=[]: ruby -rjson -e 'puts JSON::VERSION'
+2.21.2
+## v4.0.10 flags=[--disable-error_highlight --disable-did_you_mean --disable-syntax_suggest]: ruby -rjson -e 'puts JSON::VERSION'
+2.21.2
+## v4.0.10: bundle exec ruby -Ilib -Itest test/test_version.rb
+8 runs, 70 assertions, 0 failures, 0 errors, 2 skips
+## master-a1a9f45587 flags=[]: ruby -rjson -e 'puts JSON::VERSION'
+~/rdiff/rubies/master-a1a9f45587/lib/ruby/gems/4.1.0+7/gems/bundler-4.0.20/lib/bundler/runtime.rb:328:in 'Bundler::Runtime#check_for_activated_spec!': You have already activated json 3.2.0, but your Gemfile requires json
+## master-a1a9f45587 flags=[--disable-error_highlight --disable-did_you_mean --disable-syntax_suggest]: ruby -rjson -e 'puts JSON::VERSION'
+2.21.2
+## master-a1a9f45587: bundle exec ruby -Ilib -Itest test/test_version.rb
+8 runs, 24 assertions, 0 failures, 4 errors, 2 skips

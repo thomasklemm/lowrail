@@ -7,7 +7,17 @@ Harness: [`script/gem-differential`](../../script/gem-differential) with the rec
 [`gemrec.rb`](../../bench/upstream/gem-differential/gemrec.rb) (Minitest, RSpec and test-unit, in every process of
 a run). Nothing was posted, filed or pushed outside Lowrail.
 
-**State: in progress.** The matrix is still running; this page is updated as it finishes.
+**State: done (2026-11-27).** 150 gems ran on both Rubies; 89 were skipped. Every master-only difference was rerun
+on both sides and classified below. None needs a new upstream change from us: each one is already fixed upstream
+(often unreleased), already owned (MO1), already declined (SEP1, BX1), a niche gem (RT1, held) or environment. No
+new Ruby regression. Nothing was opened.
+
+Coverage: of the 150, 9 do not install on 4.0.10 either, so they compare nothing (capybara, digest-crc,
+faraday-excon, octokit, rack-cors, rainbow and terminal-table: the bundle does not resolve; highline: its extension
+does not build; rest-client: its Windows gemspec does not load). Of the 141 that install, 104 recorded per-test
+outcomes (143,567 tests on 4.0.10). For the other 37 the recorder saw no tests (not investigated per gem), so only
+install and exit status count for them. byebug hangs on 4.0.10 (killed after 1,500 s) and fails
+to install on master (SEP1).
 
 ## Pins and method
 
@@ -38,9 +48,21 @@ sass-rails, old Faraday adapters). Every skip and its reason is in `gems.json`.
 | Active Support 8.0.x: `JSON.generate(..., quirks_mode: true)` raises `ArgumentError: unknown keyword` (globalid: 34 tests) | every Rails 8.0 app on 4.1 whose lock does not pin json 2.x | json 3.0.0 makes unknown options raise; master ships json 3.2.0 (`3ade997abe`) | intended (json NEWS) | Rails: fixed on 7-2-stable (released 7.2.4) and 8-0-stable ([`2786de26c6`](https://github.com/rails/rails/commit/2786de26c6), 2026-08-12), not in 8.0.5.2; record only |
 | eventmachine 1.2.7 does not compile (`Data_Wrap_Struct` removed); websocket-driver's suite cannot install | 339M downloads, 1,158 reverse dependencies | [`a26f528b3b`](https://github.com/ruby/ruby/commit/a26f528b3b) (Feature #21768) | intended (NEWS, C API) | fixed on eventmachine master (#1027), unreleased; release asked in eventmachine/eventmachine#1032 (open); record only |
 | pry: `syntax_checking_spec.rb[1:15]` fails on master with seed 11703, deterministic | test only | error_highlight now uses `Ruby::Prism`, so top-level `Prism` is no longer loaded by a NameError message; the spec helper counts errors with `Prism` only when it happens to be loaded | intended (Bug #22379); order-dependent spec | pry's ruby-head CI is green in its order; record only |
+| nokogiri 1.19.7: 4 `TestVersionInfo` errors (`JSON::ParserError`; the child `ruby -rjson` dies with `You have already activated json 3.2.0, but your Gemfile requires json 2.21.2`) | any `bundle exec ruby -rGEM` whose lock pins another version of GEM than the newest installed one; nokogiri 1.3B downloads | [`c3c0e280d0`](https://github.com/ruby/ruby/commit/c3c0e280d0) (Bug #22123) on top of `cadf8e7933` (Feature #21951): `BUNDLER_SETUP` is no longer consumed while RubyGems loads, so command-line `-r` runs before RUBYOPT's `-rbundler/setup` | intended: our BX1 restore, ruby/ruby#19919, was closed by hsbt on 2026-11-17 ("intentional"; put `-rbundler/setup` first or require in the script) | nokogiri: fixed on main in sparklemotion/nokogiri#3687 (2026-09-06, requires json after bundler/setup), not in 1.19.7; test-only; record only. Reproduces under plain `bundle exec` without the recorder; passes with `--disable-error_highlight --disable-did_you_mean --disable-syntax_suggest` ([evidence](../../bench/upstream/gem-differential/evidence/bundler-setup-order-nokogiri.txt)) |
+| net-ssh 8.2.0: 3 `TestHostbased` tests raise `Ractor::IsolationError` from `ENV.stubs(:[])` | Mocha users that stub `ENV`; net-ssh 402M downloads | `73055acd57` (Bug #22291, `ENV` shareable) | intended Ruby change, fix in Mocha | **already owned: MO1**, freerange/mocha#809 (open); rerun identical |
+| Untyped Data API removed: dev-dependency extensions no longer compile, so the suite cannot install | multi_json via yajl-ruby 1.4.3 (112M downloads), rspec-rails via redcarpet 3.5.1, httparty via mongrel 1.2.0.pre2, execjs via duktape 2.7.0.0, eventmachine via bluecloth 2.2.0, webmock and websocket-driver via eventmachine | [`a26f528b3b`](https://github.com/ruby/ruby/commit/a26f528b3b) (Feature #21768) | intended (NEWS) | yajl-ruby: fixed on master (#232), release asked in brianmario/yajl-ruby#233 (open, last comment 2026-11-18); duktape: fixed on master (#50, 2026-06-05), unreleased; redcarpet: fixed in 3.6.1 (rspec-rails' lock is old); mongrel and bluecloth: unmaintained since 2010/2011, test-only; record only |
+| sidekiq 8.1.7: bundle fails on ratatui_ruby 1.5.2 (optional `:tui` group): rb-sys 0.9.123 bindgen, incomplete `struct rb_matchext_struct` | ratatui_ruby 77k downloads, 11 reverse dependencies | Ruby 4.1 struct change; rb-sys ≥ 0.9.128 handles it ([ecosystem](ruby-4.1-ecosystem.md)) | gem: Cargo.lock pins old rb-sys | niche gem: queued as held [RT1](../../bench/upstream/pr-queue/items/RT1.md), not built |
+| SEP1 install failures (see the first row) | also marcel, factory_bot, faker, responders, devise, factory_bot_rails, pry-byebug, byebug | as above | as above | held |
 
-Checked and not a Ruby difference: excon's master run stopped at `Errno::EADDRINUSE` on its own test server port 9292
-(free afterwards; rerun queued), diff-lcs and others fail the same tests on both Rubies.
+Checked and not a Ruby difference, each rerun on both sides:
+
+* **rspec-core:** identical totals (4,764 pass, 50 fail, 80 error, 42 skip) on both; the 3 "newly failing" and 2
+  "fixed" are different examples in each run: nested sandbox examples that the recorder keys by duplicate ids. Harness.
+* **pg:** both Rubies die with `NoMemoryError` partway through (in the rerun 4.0.10 too: 162 vs 75 examples), so the
+  missing tests are the orb's 4 GB limit. Environment.
+* **excon:** the first master run hit `Errno::EADDRINUSE` on port 9292; in the clean rerun compare finds no
+  newly failing test (1,315 pass on both). Environment.
+* **globalid**, **pry**, **simplecov**: rows above or record only; diff-lcs and others fail the same tests on both.
 
 ## SEP1: Pathname::SEPARATOR_PAT
 

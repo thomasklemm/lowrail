@@ -1,0 +1,237 @@
+{
+  "net-ssh": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 2032
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 2029,
+        "error": 3
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [
+      {
+        "id": "Authentication::Methods::TestHostbased#test_authenticate_should_return_true_if_any_key_can_authenticate",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "Ractor::IsolationError",
+          "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+        ]
+      },
+      {
+        "id": "Authentication::Methods::TestHostbased#test_debug_log_uses_sha256_fingerprint_when_md5_is_unavailable",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "Ractor::IsolationError",
+          "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+        ]
+      },
+      {
+        "id": "Authentication::Methods::TestHostbased#test_authenticate_should_return_false_if_no_keys_can_authenticate",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "Ractor::IsolationError",
+          "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+        ]
+      }
+    ],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "nokogiri": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 6789,
+        "skip": 27
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 6789,
+        "skip": 27,
+        "error": 4
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [
+      {
+        "id": "TestVersionInfo::RequireNokogiri#test_version_info_for_libxslt",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "JSON::ParserError",
+          "JSON::ParserError: unexpected end of input at line 1 column 1"
+        ]
+      },
+      {
+        "id": "TestVersionInfo::RequireNokogiri#test_version_info_for_libxml",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "JSON::ParserError",
+          "JSON::ParserError: unexpected end of input at line 1 column 1"
+        ]
+      },
+      {
+        "id": "TestVersionInfo::RequireVersionFileOnly#test_version_info_for_libxslt",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "JSON::ParserError",
+          "JSON::ParserError: unexpected end of input at line 1 column 1"
+        ]
+      },
+      {
+        "id": "TestVersionInfo::RequireVersionFileOnly#test_version_info_for_libxml",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "JSON::ParserError",
+          "JSON::ParserError: unexpected end of input at line 1 column 1"
+        ]
+      }
+    ],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "pg": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 159,
+        "skip": 2
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 72,
+        "skip": 2
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 133,
+    "missing_sample": [
+      "./spec/pg/exceptions_spec.rb[1:3]",
+      "./spec/pg/exceptions_spec.rb[1:1]",
+      "./spec/pg/exceptions_spec.rb[1:2]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:1]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:3]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:2]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:4:3]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:4:1]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:4:2]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:5:1]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:5:2]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:6:1]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:6:3]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:6:2]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:7:3]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:7:2]",
+      "./spec/pg/type_map_in_ruby_spec.rb[1:7:1]",
+      "./spec/pg/result_spec.rb[1:20]",
+      "./spec/pg/result_spec.rb[1:36]",
+      "./spec/pg/result_spec.rb[1:24]"
+    ],
+    "fixed": []
+  },
+  "rspec-core": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 4764,
+        "skip": 42,
+        "fail": 50,
+        "error": 80
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "error": 80,
+        "pass": 4764,
+        "fail": 50,
+        "skip": 42
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [
+      {
+        "id": "./spec/example_spec.rb[1:1]",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "RuntimeError"
+        ]
+      },
+      {
+        "id": "./spec/example_spec.rb[1:1] #2",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "RuntimeError"
+        ]
+      },
+      {
+        "id": "./spec/rspec/core/formatters/json_formatter_spec.rb[1:1] #2",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "RuntimeError",
+          "eek"
+        ]
+      }
+    ],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": [
+      "./spec/rspec/core/example_group_spec.rb[1:1]",
+      "./spec/rspec/core/runner_spec.rb[2:1]"
+    ]
+  }
+}
