@@ -30,6 +30,7 @@ passes:
   - {reviewer: thermos-sol, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: approve, open: none}
   - {reviewer: astra, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: changes, open: "R1 replace the proposed PR body with the approved 121-word text in the Astra ready review; no code must-fixes"}
   - {reviewer: astra, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: approve, open: none}
+  - {reviewer: thermos-sol, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: approve, open: "none; exact posted 121-word body approved, identified in Thermos-sol body confirm below"}
 ---
 
 # Add Duel performance regression guards
@@ -444,3 +445,16 @@ Fresh probe, bundle/suite logs, reconciliation script/output and exact replaceme
 ### Astra confirm — 2026-11-27 (be311bb, ready)
 
 **Verdict: approve; no open must-fixes.** Read the posted description with `gh pr view 659 -R hashie/hashie --json body,headRefOid,isDraft` and verified it is byte-for-byte identical to the approved 121-word replacement above. GitHub still reports exact head `be311bbf4b0571d71481579f5c4e7aa27e704a01`, so the earlier full code review and executed checks apply unchanged. R1 is closed; this approving pass supersedes the preceding body-only `changes` verdict. No suite or calibration rerun is needed for a description-only correction. The PR remains draft at this check; the coordinator will perform the queue's ready step under Thomas's reported authorization. This confirm changes only the review record and pass entry, not HD1's state, head or body, and performs no upstream write.
+
+### Thermos-sol body confirm — 2026-11-27 (be311bb, exact posted description)
+
+**Verdict: approve; no open must-fixes or replacement text.** Personally checked all ten sentences under both Thermos rubrics, without delegation. `gh pr view 659 -R hashie/hashie --json body,headRefOid,isDraft` confirms the unchanged approved head `be311bbf4b0571d71481579f5c4e7aa27e704a01` and draft state. GitHub's 121-word, 834-byte body exactly equals the stored body above plus its final LF; SHA-256 of those bytes is `84e9c45ee2da522380cbdde7cea394f8266238aef8009b6a49a75c62dd3af0b2`.
+
+* **Sentences 1–2:** #658 asks for this port; merged `ruby-grape/grape#3077` is its direct provenance, not an unrelated comparison.
+* **Sentences 3–5:** the `lib/**` trigger, target-branch selection, Ruby 4.0/YJIT inputs, CPU/allocation metrics, read-only measurement permissions, separate no-PR-checkout reporting job and accept-label behavior match Hashie's workflows and pinned Duel 0.3.1 source.
+* **Sentences 6–7:** counted 27 registered scenarios across Mash, Dash, Trash and extensions and four deleted benchmark-ips scripts. Duel is isolated in the optional Gemfile; the unchanged gemspec still requires Ruby >=3.0.
+* **Sentences 8–10:** the archived comment-only comparisons substantiate false classifications at 1.02 without establishing their cause. Configuration and `Across.limit` give 1.05 and 1.0125, versus defaults 1.02 and 1.005. The body states the sensitivity tradeoff, not a universal failure threshold or elimination of false alarms. Allocation checking retains its 0.5-object/iteration allowance.
+
+**DECISIONS:** the closing line plus three short prose paragraphs fit the usual length/shape and stay below the approximate 150-word ceiling. These numbers describe guard settings and scenario coverage, not an application-speed claim needing a before/after table. No run counts, commands, pins, calibration methodology, internal IDs, review history or Lowrail references leak upstream. `#658` is local; the sole cross-repository PR reference includes owner/repo. Fresh GitHub/RubyGems checks reconfirm Hashie, Grape and Duel are unarchived, recently pushed and on the current releases recorded in Astra's currency check above. Grape is relevant requested provenance; Duel names the installed tool, not a niche impact example. No branch name or caller-version citation needs a permalink.
+
+Earlier exact-head code approval and executed checks stand; no suite or timing rerun is needed for this body-only confirmation. Preserved the state, live head, public body and prior reports. No PR edit, comment, Hashie push or workflow rerun was performed.
