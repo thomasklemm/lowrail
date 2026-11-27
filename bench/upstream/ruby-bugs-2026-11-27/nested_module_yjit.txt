@@ -1,0 +1,9 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux] [] bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb:5:in 'N#foo': undefined method 'foo' for an instance
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux] [--yjit-call-threshold=1] bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb:5: [BUG] Segmentation fault at 0x0000000000000001
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux] [--zjit-call-threshold=1] bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb:5:in 'N#foo': undefined method 'foo' for an instance
+ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRISM [x86_64- [] bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb:5:in 'N#foo': undefined method 'foo' for an instance
+ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRISM [x86_64- [--yjit-call-threshold=1] bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb:5: [BUG] Segmentation fault at 0x0000000000000000
+ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRISM [x86_64- [--zjit-call-threshold=1] bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb:5:in 'N#foo': undefined method 'foo' for an instance
+ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-defined-class c7 [] bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb:5:in 'N#foo': undefined method 'foo' for an instance
+ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-defined-class c7 [--yjit-call-threshold=1] bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb:5: [BUG] Segmentation fault at 0x0000000000000000
+ruby 4.1.0dev (2026-11-27T22:04:26Z fix-refined-undef-defined-class c7 [--zjit-call-threshold=1] bench/upstream/ruby-bugs-2026-11-27/nested_module_yjit.rb:5:in 'N#foo': undefined method 'foo' for an instance

@@ -2,7 +2,7 @@
 
 Status, 2026-11-27: **draft, nothing opened.** Path: **PR** (DECISIONS, A clear PR before a ticket). A `[BUG]` abort
 and a result that depends on call order are wrong whatever `send` should return; with this fix `send` matches the
-direct call for module methods. Whether `send` and reflection should honor such an undef in general is RUD1's question
+direct call in the reproducer below. Whether `send` and reflection should honor such an undef in general is RUD1's question
 ([ruby-bug-active-refinement-undef.md](ruby-bug-active-refinement-undef.md)). The fix is three lines, one concern and
 verified. No existing report or fix was found (bugs.ruby-lang.org search for "unsupported method type",
 "undef_method" refine, "undef" refinement send; GitHub issues and PRs in ruby/ruby; master has no newer change to
@@ -100,3 +100,7 @@ returned.
   2148/2148 with and without ZJIT. ruby/spec: core refinement, module, main/using_spec.rb, kernel and basicobject
   3577/0 in the interpreter; the ZJIT run (`-T --zjit-call-threshold=2 --repeat 2`) used the same selection without
   main/using_spec.rb, 3567 examples twice, 7134/0.
+* Not fixed here, found by the Astra review: `nested_module_yjit.rb` (C includes M, M includes N, an active refinement
+  of M defines and undefines `foo`, `N#foo` calls `super`, then `send(:foo)`) segfaults with
+  `--yjit-call-threshold=1` on 4.0.10, master and the head; the interpreter and ZJIT raise NoMethodError from `N#foo`'s
+  `super` (`nested_module_yjit.txt`). Pre-existing and unchanged by this fix; a separate lead, not investigated.

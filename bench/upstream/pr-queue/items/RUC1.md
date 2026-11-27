@@ -47,6 +47,12 @@ passes:
     date: 2026-11-27
     verdict: approve
     open: "Re-check at lowrail f52c3bc8: title, PR and queue bodies, commit message and exact head approved; RUD1 report and held-ticket path approved (ruby/ruby#NNNNN must be filled or the clause dropped before posting). Must-fix 3 withdrawn: versions sentence stays per A clear PR before a ticket. One reviewer applied both rubrics."
+  - reviewer: astra
+    orb: T-01a21f31-1607-72af-8002-0e1f13682595
+    head: "6bd87c87b9"
+    date: 2026-11-27
+    verdict: approve
+    open: "Fresh Astra pass with a neutral brief after OpenAI's safety check stopped T-01a21eca-63e1-76f7-b473-ee3433ea1051 (archived); Fable not needed. Code, test, combination with #20267 (test_refinement 201/0 in all engines), PR texts, sequencing and RUD1 approved; 2,016 cases x 3 engines x 3 builds, all 162 master-to-head differences active-undef module cache cases. One record-only status fix applied. Found a pre-existing YJIT segfault (nested_module_yjit.rb), separate lead."
 ---
 
 # Keep defined_class when an active refinement undefines a module method
