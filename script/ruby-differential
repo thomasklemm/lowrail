@@ -38,8 +38,9 @@ module RubyDifferential
   RECORDER = File.join(DIR, "recorder.rb")
   RSPEC_FIX = File.join(DIR, "rspec_rails_fix.rb")
   HOME = ENV.fetch("RDIFF_HOME", File.expand_path("~/rdiff"))
-  RAILS = "cf0325a832a1594f01d866da1e4ad23d962d886b"
-  CORPUS = "censusrd" # .corpus/censusrd-APP; script/census's harness accepts copies named census*-APP
+  # RDIFF_RAILS and RDIFF_CORPUS let another round reuse the setup on its own Rails pin and app copies.
+  RAILS = ENV.fetch("RDIFF_RAILS", "cf0325a832a1594f01d866da1e4ad23d962d886b")
+  CORPUS = ENV.fetch("RDIFF_CORPUS", "censusrd") # .corpus/CORPUS-APP; script/census's harness accepts copies named census*-APP
   SEED = "41231"
   MODES = { "interp" => "", "yjit" => "--yjit", "yjit1" => "--yjit --yjit-call-threshold=1",
     "zjit" => "--zjit", "zjit1" => "--zjit --zjit-call-threshold=1" }.freeze
@@ -159,9 +160,13 @@ module RubyDifferential
   def gemfile(app, bin)
     dir = base(app)
     return File.join(dir, "Gemfile") if APPS.fetch(app)[:source] == "r82"
+    # script/census names a release Ruby's variant without the revision suffix.
+    release = File.join(dir, "Gemfile.census-#{RAILS[0, 12]}")
+    return release if capture(File.join(bin, "ruby"), "-e", "print RUBY_PATCHLEVEL") != "-1" && File.exist?(release)
     want = File.join(dir, "Gemfile.census-#{RAILS[0, 12]}-ruby-#{revision(bin)}")
     unless File.exist?(want)
       from = Dir[File.join(dir, "Gemfile.census-#{RAILS[0, 12]}-ruby-*")].grep_v(/\.lock\z/).max_by { File.mtime(_1) }
+      from ||= release if File.exist?(release)
       raise "#{app}: no census Gemfile variant; run setup" unless from
       FileUtils.cp(from, want)
       FileUtils.cp(from + ".lock", want + ".lock")
