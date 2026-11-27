@@ -47,14 +47,24 @@ Ruby 4.0.10 with YJIT, a1.xxlarge (16 vCPUs, suites run serially), 12 rounds, ea
 | Hackatime | 45.8 s | +0.2% | **−3.4%** | −6.1% to −2.1% |
 | Fizzy (own pin) | 80.0 s | −3.0% | **−14.7%** | −17.1% to −13.9% |
 
-Every A/A interval contains 0 and every change interval excludes it, so all four count. CPU time moves the same way
-(Campfire −26.9%). The info arm drops all debug logging, not only the SQL chain (Active Job, Action View, Active
+Master `0d399335b7` with ZJIT, the same setup
+([summary](../../bench/upstream/test_overhead/wall/ruby-master-0d399335-zjit/summary.md)):
+
+| App | Suite wall, debug | A/A | Info against debug | 95% |
+| --- | ---: | ---: | ---: | --- |
+| CodeTriage | 7.3 s | +1.1% | **−8.6%** | −10.2% to −4.1% |
+| Campfire | 46.6 s | −0.0% | **−18.8%** | −20.3% to −17.6% |
+| Hackatime | 47.1 s | −1.4% | **−5.2%** | −8.0% to −3.7% |
+| Fizzy (own pin) | 84.7 s | −0.1% | **−11.9%** | −13.7% to −9.2% |
+
+On both Rubies every A/A interval contains 0 and every change interval excludes it, so all eight cells count. CPU
+time moves the same way (Campfire −26.9% YJIT, −24.9% ZJIT). The info arm drops all debug logging, not only the SQL chain (Active Job, Action View, Active
 Storage and the app's own `logger.debug` lines too), so this is the price of the test environment's debug level, the
 upper bound for what the SQL path alone could give back; it is larger than the sampled SQL-chain shares above
 (Campfire 5.4%), and the difference is not attributed. Fizzy's info arm also fails 13 tests in every round that
 assert on debug log lines (`ActiveRecordSqlRedactionTest`, `ActionMailerDeliveredEventWithoutMailTest`), so it
-does slightly less work there. Test counts and exit statuses otherwise match in all 144 runs. Master with ZJIT:
-pending on the second a1.xxlarge orb.
+does slightly less work there (1.6 s over 12 ZJIT runs, far too little to explain the drop). Test counts and exit
+statuses otherwise match in all 288 runs.
 
 ## The ranking, per app
 
