@@ -1,0 +1,80 @@
+PATH
+  remote: .
+  specs:
+    rack (3.2.0)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    ast (2.4.3)
+    cgi (0.5.2)
+    date (3.6.0)
+    erb (4.0.4.1)
+      cgi (>= 0.3.3)
+    json (3.2.0)
+    language_server-protocol (3.17.0.6)
+    lint_roller (1.1.0)
+    logger (1.7.0)
+    minitest (5.26.1)
+    minitest-global_expectations (1.0.2)
+      minitest (> 5)
+    parallel (1.28.0)
+    parser (3.3.14.0)
+      ast (~> 2.4.1)
+      racc
+    prism (2.1.0)
+    psych (5.5.0)
+      date
+      stringio
+    racc (1.8.1)
+    rainbow (3.1.1)
+    rake (13.4.2)
+    rdoc (7.2.0)
+      erb
+      psych (>= 4.0.0)
+      tsort
+    regexp_parser (2.13.4)
+    rubocop (1.93.0)
+      json (>= 2.3)
+      language_server-protocol (~> 3.17.0.2)
+      lint_roller (~> 1.1.0)
+      parallel (>= 1.10)
+      parser (>= 3.3.0.2)
+      rainbow (>= 2.2.2, < 4.0)
+      regexp_parser (>= 2.11.3, < 3.0)
+      rubocop-ast (>= 1.54.0, < 2.0)
+      ruby-progressbar (~> 1.7)
+      unicode-display_width (>= 2.4.0, < 4.0)
+    rubocop-ast (1.54.0)
+      ast (~> 2.4)
+      parser (>= 3.3.7.2)
+      prism (>= 1.7)
+      racc
+    rubocop-packaging (0.6.0)
+      lint_roller (~> 1.1.0)
+      rubocop (>= 1.72.1, < 2.0)
+    ruby-progressbar (1.13.0)
+    stringio (3.2.0)
+    tsort (0.2.0)
+    unicode-display_width (3.3.0)
+      unicode-emoji (~> 4.3)
+    unicode-emoji (4.3.0)
+    webrick (1.9.2)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  bundler
+  logger
+  minitest (> 5)
+  minitest-global_expectations
+  rack!
+  rake
+  rdoc
+  rubocop
+  rubocop-packaging
+  webrick
+
+BUNDLED WITH
+   2.4.22
