@@ -391,6 +391,9 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   (Thomas, 2026-11-25, keeping #59617 and #59611 open).
 * **rails/rails opens as draft** (Thomas, 2026-11-05), preferably in small batches grouped by theme and likely
   reviewer. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
+  **Since 2026-11-26 drafts count too:** rafaelfranca enabled draft counting on rails/rails ("it should not allow
+  any PR past 15 to be open. I just enabled that."), so 15 open PRs in total, drafts included; `script/pr-queue`
+  uses open: 15. He also asked us not to open PRs that aren't ready, because drafts notify him.
 * **Every upstream PR opens as a draft, and only Thomas marks it ready** (Thomas, 2026-11-05 night; replaces the
   coordinator marking Rails drafts ready). Agents may open reviewed items as drafts in any repo with room, with every
   pass on the exact head; neither the coordinator nor W1 runs `script/pr-queue ready`.
