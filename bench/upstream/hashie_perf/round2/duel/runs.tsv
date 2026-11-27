@@ -3,3 +3,7 @@ run	fork PR	branch	head	candidate
 46067773112	28	perfz2/quiet	f7596e9	HM4 first head c28e722 on perf-base-zjit (module included for keyed classes too)
 46068675920	29	perfz2/th	0ad0c2c	HM5 lib of 39db98d on perf-base-zjit
 46071221821	32	perfz2/quiet2	a32fa70	HM4 f41c3b2 on perf-base-zjit (final module head)
+46077588957	33	thomasklemm/to-hash-read-once	6b6f67b	HM5 exact head 6b6f67b against perf-base = upstream master 277e88e
+46077591328	34	perfz3/quiet-reorder	98b110c	HM4 reorder only (probes/held-conflict-check-reorder.patch) on 277e88e, with the new benchmark
+46077594232	35	perfz3/quiet-flag	f0e0f8c	HM4 flag first on 277e88e: same lib and benchmark blobs as 0ded81e
+46079366956	36	perfz4/quiet-exact	10a9303	HM4 exact head 10a9303 against perf-base = upstream master 277e88e

@@ -1,13 +1,16 @@
 # hashie, round 2: what else can be made better (2026-11-27)
 
 A deeper look after dblock's four leads ([round 1](../README.md)): which hashie classes the popular dependents use,
-where a realistic API workload spends objects and time, and which exact changes follow. Three candidates were built
-(HM3, HM4, HM5); the rest are held with their numbers.
+where a realistic API workload spends objects and time, and which exact changes follow. Three candidates were built:
+HM5 and HM4 went to review, HM3 is held after review (not exact); the rest are held with their numbers.
 
 Setup: hashie master `9e313f3`. Rubies 4.0.10 `a704b7cd95` and master `0d399335b7`, both built with YJIT and ZJIT;
 suites also on 3.0.7 and 3.4.7. Duel ran on fork PRs (thomasklemm/hashie #27–#29, #32) against `perf-base-zjit`
 (master plus the ZJIT job), on GitHub's runners with Ruby 4.0.10; run IDs in `duel/runs.tsv`, summaries in
-`duel/*.summary.txt`, full logs in `duel/logs.tar.gz`. Local runs used this orb (8 CPUs, not a1.xxlarge), so local
+`duel/*.summary.txt`, full logs in `duel/logs.tar.gz`. After the ZJIT job and the suffix change merged upstream
+(master `277e88e`), HM5 and HM4 were rebuilt on it and Duel ran again on fork PRs #33–#36 against `perf-base` =
+`277e88e`; the local HM4 cohorts named `10a9303` and `body/HM4` use that base too. Fork measurement PRs are closed
+and their branches deleted once recorded ([fork-cleanup](../../hashie_duel/fork-cleanup/README.md)). Local runs used this orb (8 CPUs, not a1.xxlarge), so local
 wall time supports the record only; **bodies cite Duel**. Local wall time is `script/upstream-bench --wall` (fresh
 base / candidate / base processes per round, one pinned core, A/A in every cohort); `probes/quick.rb` is a
 screening loop without A/A and decides nothing.
@@ -71,8 +74,8 @@ built: it is a fix in another repository; lead for the coordinator.
 | # | Idea | Reach | Gain | State |
 |---|---|---|---|---|
 | 1 | HM4: skip the conflict check when a subclass disabled warnings | omniauth, elasticsearch-model, zendesk_api now; restforce and chef-zero once they allow hashie 6 | quiet `Mash.new` CPU 0.43 (YJIT) and 0.64 (ZJIT) in Duel; `[]=`, `dup`, `merge` alike | see [HM4](#hm4-skip-the-conflict-check-when-warnings-are-disabled) |
-| 2 | HM3: `method_missing` without the arguments Array | every Mash, Ruby ≥ 4.0 | 1 object per method-style read; reads CPU 0.91–0.95 in Duel; setters 1.01–1.02 | built, in review |
-| 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.86 (YJIT) and 0.69 (ZJIT) in Duel | built, queued behind the first two |
+| 2 | HM3: `method_missing` without the arguments Array | every Mash, Ruby ≥ 4.0 | 1 object per method-style read; reads CPU 0.91–0.95 in Duel; setters 1.01–1.02 | **held after review**: a forwarded keyword Hash is stored with its keyword flag ([below](#hm3-method_missing-without-the-arguments-array)) |
+| 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.84 (YJIT) and 0.69 (ZJIT) in Duel | rebuilt on `277e88e`, in review |
 | 4 | `Hash#dup` before `self.class.new(val)` in `convert_value` | every nested hash in `Mash.new` | 101 of 774 objects; time not measured | held: a subclass `initialize` would receive the caller's Hash instead of a copy |
 | 5 | Literal suffixes instead of `end_with?(*ALLOWED_SUFFIXES)` | every key written, every suffixed call | helper alone 113 → 61 ns under YJIT, 134 → 121 ns interpreted (`out/suffix-micro.txt`) | held: the win is how JITs compile a splat call, and it duplicates the constant; ZJIT lead |
 | 6 | `initialize` → `deep_update`'s splat Array | every Mash | 131 of 774 objects | held: `deep_update` is public and subclasses call or override it; no exact form found |
@@ -85,6 +88,19 @@ built: it is a fix in another repository; lead for the coordinator.
 `out/held-quick.txt` holds the screening runs for 8 and 9; `probes/held-*.patch` the prototypes.
 
 ## HM3: `method_missing` without the arguments Array
+
+**Held, not exact (2026-11-27).** Astra and thermos-sol both returned "changes" on `282ebcb` (their sections below):
+an optional parameter receives a keyword-flagged Hash as it is, where the rest Array received an unflagged copy. A
+value set through `SimpleDelegator` (Ruby 3.3 and later), or through a subclass whose `ruby2_keywords`
+`method_missing` calls `super` (3.2 and later), is then splatted as keywords by a later `receive(*[value])`. The
+differential below never looked at that flag. `probes/mm_anonymous_rest.rb` (`out/mm-anonymous-rest.txt`) repeats
+their repro on 4.0.10 and master: master `[[{a: 13}], {}]`, HM3 `[[], {a: 13}]`. The same probe shows the form that
+would be exact: keep an anonymous rest and read `[*].first` in the setter (the repro matches master; 5 reads allocate
+2 objects instead of 7; 5 setters allocate 5 more, 44 against 39). But `[*]` is Ruby 3.2 syntax and hashie supports
+3.0 (`ruby -c` on 3.0.7 fails), so it is not built and not reviewed. Reopen when hashie requires Ruby 3.2. Both
+reviewers also found the impact too broad (snaky_hash 2.0.9 and restforce 8.0.1 exclude hashie 6; DefineAccessors
+reads don't reach `method_missing`) and the body silent on the ZJIT-on-master losses recorded below. Nothing was
+opened or posted. The record below is as it stood before review.
 
 Branch `thomasklemm/method-missing-rest`, head `282ebcb` on `9e313f3`:
 `def method_missing(method_name, value = nil, *, &blk)`, and the setter passes `value`. Since Ruby 4.0
@@ -170,7 +186,14 @@ result tested and its second converted. A stored key never reaches a default pro
 Out loud: for each key, pick the output key, read the value once, and convert it, element by element when it is an
 Array. `to_hash` metrics: ABC 20.15 → 18.84, cyclomatic 8 → 8, perceived 10 → 10. L0.
 
-Queued, not opened: at most two new hashie PRs at a time.
+Rebuilt on master `277e88e` as `6b6f67b` (2026-11-27): the CHANGELOG line conflicted with the two entries merged
+since; the code diff and the message are unchanged, the CHANGELOG line is now #662. Duel judged the exact head (fork
+#33, run 46077588957): `Mash#to_hash` 0.838 [0.833, 0.842] under YJIT and 0.688 [0.680, 0.694] under ZJIT, 27
+benchmarks, 0 regressed, 0 unsettled under both. Rerun on `6b6f67b`: 4.0.10 `rake spec` 1,076/0, rubocop clean,
+`docs:examples` 359/0; 3.0.7 1,072/0; 3.4.7 1,076/0; the differential against `277e88e` on 4.0.10, 4.0.10 with YJIT
+and master with ZJIT has the same 2,340 identical rows and the same two expected differences
+(`to_hash/differential-6b6f67b.tar.gz`). The Callgrind and wall cells above are from `e10dce0` on `9e313f3`; the
+`to_hash` code is the same on both bases.
 
 ## Astra: changes on 282ebcbb8248ae3ef379bc7254ad69fd0422d7b4
 

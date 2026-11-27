@@ -1,0 +1,12 @@
+== master 9e313f3 (*args)
+ruby 4.0.10: delegated setter then receive(*[value]): [[{a: 13}], {}];5 reads: 7 objects; 5 setters: 39 objects;no argument: nil; two arguments: 1;
+ruby master: delegated setter then receive(*[value]): [[{a: 13}], {}];5 reads: 7 objects; 5 setters: 29 objects;no argument: nil; two arguments: 1;
+== HM3 282ebcb (value = nil, *)
+ruby 4.0.10: delegated setter then receive(*[value]): [[], {a: 13}];5 reads: 2 objects; 5 setters: 39 objects;no argument: nil; two arguments: 1;
+ruby master: delegated setter then receive(*[value]): [[], {a: 13}];5 reads: 2 objects; 5 setters: 29 objects;no argument: nil; two arguments: 1;
+== anonymous rest, [*].first in the setter (Ruby 3.2 syntax; not reviewed)
+ruby 4.0.10: delegated setter then receive(*[value]): [[{a: 13}], {}];5 reads: 2 objects; 5 setters: 44 objects;no argument: nil; two arguments: 1;
+ruby master: delegated setter then receive(*[value]): [[{a: 13}], {}];5 reads: 2 objects; 5 setters: 34 objects;no argument: nil; two arguments: 1;
+== Ruby 3.0.7 parses the anonymous rest form?
+/tmp/h32/lib/hashie/mash.rb:506: syntax error, unexpected ']'
+...      assign_property(name, [*].first)
