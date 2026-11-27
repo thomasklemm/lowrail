@@ -1,0 +1,338 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/solid_stack/sc1_body.rb",
+  "at": "2026-11-27T20:42:01Z",
+  "n": 500,
+  "warmup": 500,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/rubies/master-0d399335b7/bin/ruby",
+      "tree": "/home/user/w/main/solid_cable",
+      "description": "ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "40dd29ffdc4ff76f27f0bbef1de1606fdd21cfee",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/rubies/master-0d399335b7/bin/ruby",
+      "tree": "/home/user/w/cand/solid_cable",
+      "description": "ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "ef534cc9414375d5c97339a4c05bb8f3c50fe81a",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "zjit listener poll, idle": {
+      "base": 229.999,
+      "base1": 229.999,
+      "base2": 229.999,
+      "candidate": 226.999,
+      "change": -0.013043534971891146,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit listener poll, one message": {
+      "base": 430.96400000000006,
+      "base1": 430.946,
+      "base2": 430.982,
+      "candidate": 428.036,
+      "change": -0.0067940709664845444,
+      "aa": 0.00008353365942399216,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "zjit listener poll, idle": {
+      "base": 939463.704,
+      "base1": 939631.78,
+      "base2": 939295.628,
+      "candidate": 716730.462,
+      "change": -0.23708552129439153,
+      "aa": 0.00035781265265358444,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1077,
+                1077
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                19211,
+                19211
+              ],
+              "invalidation_time_ns": [
+                116250861,
+                116250861
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                1077,
+                1077
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                19211,
+                19211
+              ],
+              "invalidation_time_ns": [
+                117240563,
+                117240563
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1065,
+                1065
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                19061,
+                19061
+              ],
+              "invalidation_time_ns": [
+                119953619,
+                119953619
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                1065,
+                1065
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                19061,
+                19061
+              ],
+              "invalidation_time_ns": [
+                112928119,
+                112928119
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1077,
+                1077
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                19211,
+                19211
+              ],
+              "invalidation_time_ns": [
+                108853389,
+                108853389
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                1077,
+                1077
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                19211,
+                19211
+              ],
+              "invalidation_time_ns": [
+                109004652,
+                109004652
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit listener poll, one message": {
+      "base": 1596072.757,
+      "base1": 1595906.496,
+      "base2": 1596239.018,
+      "candidate": 1373826.484,
+      "change": -0.13924570294510707,
+      "aa": 0.00020833762028799592,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1322,
+                1322
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                23862,
+                23862
+              ],
+              "invalidation_time_ns": [
+                109740891,
+                109740891
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                1322,
+                1322
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                23862,
+                23862
+              ],
+              "invalidation_time_ns": [
+                109873859,
+                109873859
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1312,
+                1312
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                23740,
+                23740
+              ],
+              "invalidation_time_ns": [
+                113849690,
+                113849690
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                1312,
+                1312
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                23740,
+                23740
+              ],
+              "invalidation_time_ns": [
+                117257846,
+                117257846
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1322,
+                1322
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                23862,
+                23862
+              ],
+              "invalidation_time_ns": [
+                113182253,
+                113182253
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                1322,
+                1322
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                23862,
+                23862
+              ],
+              "invalidation_time_ns": [
+                113690973,
+                113690973
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

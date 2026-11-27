@@ -12,7 +12,7 @@ built_on: "40dd29ffdc"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "Every process with Solid Cable (the Rails 8 default cable adapter, 24.7 M downloads) polls every 0.1 s by default, idle or not. With 20 subscribed streams an idle poll runs -14.5% instructions without a JIT and -23.2% under YJIT (A/A <= 0.03%), 3 fewer objects; benchmark-ips under YJIT +14.8% (A/A 0.5%, a1.large; a1.xxlarge timing pending). The saving grows with the number of streams (one bind per stream in the cache key). Path runs on Ruby master and Rails main."
+impact: "Every process with Solid Cable (the Rails 8 default cable adapter, 24.7 M downloads) polls every 0.1 s by default, idle or not. With 20 subscribed streams an idle poll runs -14.5% instructions without a JIT and -23.2% under YJIT (A/A <= 0.03%), 3 fewer objects; benchmark-ips under YJIT +14.8% (A/A 0.5%, a1.large; a1.xxlarge timing pending). The saving grows with the number of streams (one bind per stream in the cache key). Path runs on Ruby master and Rails main; ZJIT on master 0d399335b7: idle poll -23.7% instructions, one message -13.9% (A/A <= 0.04%, JIT-flat)."
 evidence: [bench/upstream/solid_stack/body/SC1, bench/upstream/solid_stack/body/SC1-zjit, bench/upstream/solid_stack/raw/probes-p1-p2.tar.gz, bench/upstream/solid_stack/sc1_differential.rb]
 rank: 1
 risky: true
