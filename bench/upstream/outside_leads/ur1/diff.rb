@@ -2,14 +2,16 @@
 # against the shipped body (BASE below, ruby/uri 48cda77's _decode_uri_component). Compares the result's class,
 # encoding, bytes, frozenness, validity, instance variables and singleton methods, the input afterwards,
 # conversion calls on the encoding argument, and the class and message of any exception. SINGLETON_B=1 also gives
-# 5% of the inputs a singleton #b, which the branch no longer calls (the expected boundary).
+# 5% of the inputs a singleton #b. METHOD=decode_uri_component compares that method instead (base keeps "+").
 require "uri"
-abort "branch not loaded" unless URI.method(:decode_www_form_component).source_location[0].start_with?(File.expand_path($:.first))
+METHOD = ENV.fetch("METHOD", "decode_www_form_component").to_sym
+abort "branch not loaded" unless URI.method(METHOD).source_location[0].start_with?(File.expand_path($:.first))
 
 module BASE
+  REGEXP = METHOD == :decode_uri_component ? /%\h\h/ : /\+|%\h\h/
   def self.decode(str, enc = Encoding::UTF_8)
     raise ArgumentError, "invalid %-encoding (#{str})" if /%(?!\h\h)/.match?(str)
-    str.b.gsub(/\+|%\h\h/, URI::TBLDECWWWCOMP_).force_encoding(enc)
+    str.b.gsub(REGEXP, URI::TBLDECWWWCOMP_).force_encoding(enc)
   end
 end
 
@@ -49,7 +51,8 @@ TARGETS = [[], [Encoding::UTF_8], [Encoding::BINARY], [Encoding::Shift_JIS], [En
 def make(rng)
   s = String.new
   rng.rand(0..8).times { s << PIECES.sample(random: rng).b }
-  s = s.dup.force_encoding(ENCS.sample(random: rng))
+  # TruffleRuby refuses some byte/encoding pairs (odd-length UTF-16); draw again there.
+  s = begin s.dup.force_encoding(ENCS.sample(random: rng)) rescue ArgumentError; retry end
   s = Sub.new(s) if rng.rand < 0.1
   s.instance_variable_set(:@tag, 1) if rng.rand < 0.1
   s.define_singleton_method(:b) { "singleton" } if ENV["SINGLETON_B"] && rng.rand < 0.05
@@ -67,7 +70,7 @@ def compare(input, target, diffs, label = nil)
   da = target == [:duck] ? [EncDuck.new("UTF-8")] : target
   db = target == [:duck] ? [EncDuck.new("UTF-8")] : target
   base = run(BASE.method(:decode), a_in, da)
-  head = run(URI.method(:decode_www_form_component), b_in, db)
+  head = run(URI.method(METHOD), b_in, db)
   base << snap(a_in) << (da[0].calls if EncDuck === da[0])
   head << snap(b_in) << (db[0].calls if EncDuck === db[0])
   diffs << [label || input.inspect, target, base, head] unless base == head
@@ -87,7 +90,7 @@ def bs.to_str = "a%41"
 compare(bs, [], diffs, "BasicObject with to_str")
 chilled = eval('"a%41+b"') # a chilled literal on 3.4+
 compare(chilled, [], diffs, "chilled literal")
-puts "#{RUBY_DESCRIPTION}: #{n} random + #{(fixed.size + 1) * TARGETS.size + 2} fixed cases, #{diffs.size} differences"
+puts "#{RUBY_DESCRIPTION} #{METHOD}: #{n} random + #{(fixed.size + 1) * TARGETS.size + 2} fixed cases, #{diffs.size} differences"
 diffs.group_by { [_1[2][0], _1[3][0], _1[2][1].to_s[0, 40], _1[3][1].to_s[0, 40]] }.first(20).each do |k, v|
   puts "  #{v.size}x e.g. #{v[0][0][0, 60]} #{v[0][1].inspect}\n    base #{v[0][2].inspect[0, 300]}\n    head #{v[0][3].inspect[0, 300]}"
 end
