@@ -1,4 +1,4 @@
-From 07c745a4ab0ccf857539de0f8ffe2f011ef767a8 Mon Sep 17 00:00:00 2001
+From 151bebd34d0b5eb78aea88a849d8ba11177cfbf6 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Fri, 27 Nov 2026 20:40:40 +0000
 Subject: [PATCH] Skip an unused module refinement from the include's
@@ -19,9 +19,8 @@ because BasicObject#!= calls #== with rb_funcall.
 
 Continue from the superclass of the class where the refined entry was
 found, as search_refined_method in vm_insnhelper.c already does for
-direct calls, and have every caller in vm_method.c pass that class.
-An undef in an active refinement keeps resolving from the owner as
-before.
+direct calls. The method-defined, alias and undef lookups also pass that
+class. An undef in an active refinement keeps the existing fallback.
 ---
  test/ruby/test_refinement.rb | 44 ++++++++++++++++++++++++++++++++++++
  vm_method.c                  | 18 ++++++++++-----

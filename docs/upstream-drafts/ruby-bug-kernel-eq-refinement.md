@@ -4,7 +4,7 @@ Status, 2026-11-27: **draft, nothing posted.** Thomas posts the report (or appro
 PR. The PR cites the Redmine ticket, so the ticket goes first; replace `NNNNN` with its number in the PR body and add
 `[Bug #NNNNN]` to the commit subject before opening.
 
-Fix head: [`07c745a4ab`](https://github.com/thomasklemm/ruby/commit/07c745a4ab) on
+Fix head: [`151bebd34d`](https://github.com/thomasklemm/ruby/commit/151bebd34d) on
 `thomasklemm/ruby:fix-unused-module-refinement-funcall`, one commit on ruby/ruby master `0d399335b7`. Raw data, repros
 and probes: [bench/upstream/ruby-bugs-2026-11-27](../../bench/upstream/ruby-bugs-2026-11-27/).
 
@@ -74,9 +74,8 @@ the module itself, so they did not: `send` and C calls raised NoMethodError, `me
 refinement of `Kernel#==` made `Object.new != 1` raise, since `BasicObject#!=` calls `==` from C.
 
 This continues from the superclass of the class where the refined entry was found, as `search_refined_method` already
-does for direct calls ([Bug #14068](https://bugs.ruby-lang.org/issues/14068)), and has every caller in vm_method.c
-pass that class. Active refinements, including an `undef_method` in one, and refinements of classes resolve as
-before.
+does for direct calls ([Bug #14068](https://bugs.ruby-lang.org/issues/14068)). The method-defined, alias and undef
+lookups also pass that class. An undef in an active refinement keeps the existing fallback.
 
 **Commit message** (subject gets `[Bug #NNNNN]` once the ticket exists):
 
@@ -98,9 +97,8 @@ because BasicObject#!= calls #== with rb_funcall.
 
 Continue from the superclass of the class where the refined entry was
 found, as search_refined_method in vm_insnhelper.c already does for
-direct calls, and have every caller in vm_method.c pass that class.
-An undef in an active refinement keeps resolving from the owner as
-before.
+direct calls. The method-defined, alias and undef lookups also pass that
+class. An undef in an active refinement keeps the existing fallback.
 ```
 
 **Diff:** `vm_method.c` (+12/-6: `resolve_refined_method` continues after the class the entry was found in instead of
@@ -108,7 +106,7 @@ before.
 `method_entry_resolve_refinement`, `rb_undef` and `rb_add_alias` pass that class) and two tests in
 `test/ruby/test_refinement.rb`, `test_unused_refinement_for_module_method_in_superclass` and
 `test_undef_in_active_refinement_for_module_method_in_superclass`
-([patch](../../bench/upstream/ruby-bugs-2026-11-27/07c745a4ab.patch)).
+([patch](../../bench/upstream/ruby-bugs-2026-11-27/151bebd34d.patch)).
 
 ## Evidence
 
@@ -119,7 +117,7 @@ before.
 | 3.4.13 | NoMethodError | NoMethodError | no ZJIT |
 | 4.0.10 | NoMethodError | NoMethodError | NoMethodError |
 | master `0d399335b7` | NoMethodError | NoMethodError | `true` |
-| head `07c745a4ab` | `true` | `true` | `true` |
+| head `151bebd34d` | `true` | `true` | `true` |
 
 Ruby 3.4.13 is mise's build; 4.0.10 and master were built from source (`a704b7cd95` and `0d399335b7`) with
 `--enable-yjit --enable-zjit`. On both, `RbConfig::CONFIG["ZJIT_SUPPORT"]` is `"yes"` and
@@ -154,7 +152,9 @@ module owner, and `send` raised. With only the superclass fix it reached `P#foo`
 direct call raises NoMethodError in all four shapes of
 [active_undef_shapes.rb](../../bench/upstream/ruby-bugs-2026-11-27/active_undef_shapes.rb), but `send`, `method` and
 `respond_to?` ignore the undef when the refined module defines the method itself or when a class is refined. The head
-keeps master's result in all 16 cases (4 shapes, 4 lookups); honoring the undef everywhere would be a separate change
+keeps master's result in all 16 cases (4 shapes, 4 lookups). After `remove_method` in an active refinement, `send`,
+`method` and `respond_to?` now find the superclass method as a direct call does, where master raised or returned
+false; honoring the undef everywhere would be a separate change
 for active refinements, so it stays out of this PR.
 
 **Fix probe** ([refine_probe.rb](../../bench/upstream/ruby-bugs-2026-11-27/refine_probe.rb), base and head outputs in
@@ -165,12 +165,14 @@ private methods, instance_method, method_defined?, `&:sym`; real direct calls ar
 reviewers' probes), plus
 refinements of Kernel and Comparable and alias/undef. All 349 lines are identical between base and head except the
 unused-module-refinement rows that raised or returned false on base and now find the method, and the alias and undef
-rows, which raised NameError and now succeed; the probe's active-refinement and refined-class rows are unchanged. A script
+rows, which raised NameError and now succeed; active dispatch and refined-class rows in this probe are unchanged; `method_defined?` also becomes true in five
+active-module rows. A script
 with `method_defined?`, `public_method_defined?`, `private_method_defined?`, `alias_method` on the inherited method,
 `undef_method`, and the same calls on a method nobody defines prints the same lines on the head with the unused
 refinement as on master without it ([alias_undef_probe.rb](../../bench/upstream/ruby-bugs-2026-11-27/alias_undef_probe.rb)).
 
-**Tests on the head** (build with `--enable-yjit --enable-zjit`):
+**Tests on the head** (build with `--enable-yjit --enable-zjit`; run on `07c745a4ab`, the same tree with an earlier
+commit message):
 
 * `test_unused_refinement_for_module_method_in_superclass` fails on master (`NoMethodError: undefined method 'foo' for
   an instance of D`) and with only the `resolve_refined_method` change (`Expected D.method_defined?(:foo) to return
