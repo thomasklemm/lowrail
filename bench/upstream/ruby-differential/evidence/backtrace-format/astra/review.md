@@ -327,3 +327,15 @@ The project-format table with the complete spread and A/A is allowed by the curr
 rule. This is a raw-evidence audit, not an independent rerun of the large-orb measurements. No build, suite,
 oracle or GC.stress rerun was needed for the unchanged code. Prior exact-head validation still applies;
 the caption is the only body blocker. No upstream post or Ruby-fork push.
+
+## Representative-run caption confirm, 2026-11-27
+
+Verdict: **approve**, no remaining body findings. At Lowrail `1682d8a9`, verified outgoing body SHA-256
+`05fff894a630389800fcccad1b1f94521e8bb3a82f755f5485e27885c8041909`, byte-identical to `body-proposed.md`.
+An exact string comparison against the previous reviewed body confirms that the only change is
+"median of 10 runs" to "one representative run". This resolves the sole body blocker without changing
+the measured table, version lines or full-spread claims already checked against all 50 raw logs.
+Head remains `5fc1871eec45270a068d2ecba6654eef979c5f6e`; prior exact-head runtime verification applies.
+No rebuild, test rerun or new measurements for this caption-only confirm. No ZJIT sentence is present or
+approved in advance; a later addition needs its own evidence/text confirm. The earlier internal README
+rounding nit is not a finding against this body. No upstream post or Ruby-fork push.

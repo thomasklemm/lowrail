@@ -242,6 +242,20 @@ passes:
       exact-head correctness/parser/differential approval applies. No new measurements or test reruns
       for this text-only review. Arithmetic and source paths: evidence/backtrace-format/thermos-sol/results.txt.
       Probe script stays in this orb backup. No upstream post or Ruby fork push.
+  - reviewer: astra
+    orb: T-01a21dcc-1fab-7104-9ca4-c62537a6cf82
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None against this body. Caption-only confirm at Lowrail 1682d8a9: exact outgoing body SHA-256
+      05fff894a630389800fcccad1b1f94521e8bb3a82f755f5485e27885c8041909 equals body-proposed.md.
+      Verified the only change from 411777fb5b is 'median of 10 runs' to 'one representative run', resolving
+      the sole body blocker. The table, both version lines, full spread and release comparison retain the
+      prior 50-log arithmetic audit. Unchanged head retains prior runtime verification; no new measurement,
+      build or test rerun for this text delta. No ZJIT sentence is present or pre-approved. The internal
+      README rounding nit does not block this body. Details: evidence/backtrace-format/astra/review.md,
+      Representative-run caption confirm. No upstream action.
 ---
 
 # Append backtrace location strings by length
