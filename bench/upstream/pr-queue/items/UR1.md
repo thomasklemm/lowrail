@@ -6,7 +6,7 @@ kind: perf
 area: URI.decode_www_form_component
 reviewer: hsbt
 branch: thomasklemm/decode-www-form-component-cgi
-head: "545506abb5d4e12b5d148c3dd5e3814762120d2d"
+head: "7da6979b27b2aba69c4076d8f01939e5a8c0f1f6"
 base: master
 built_on: "48cda77031"
 depends_on: []
@@ -84,7 +84,18 @@ note: >-
   on it), fork branch moved with a lease from 7da6979. diff.rb with SINGLETON_B=1: 0 differences on 4.0.10 and master
   (300k), 3.4.12 pure CGI (100k); suite 94 green on 4.0.10. Not run here: JRuby 9.4 (reviewer's probe). Per-call
   rerun on the exact tree: body/UR1-052cf07-{4010,master} (052cf07 = 545506a's tree). Astra's approval on 7da6979
-  predates this change. Reviewer's worst size-sweep row: 8 MiB plain, -13.6% instructions. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  predates this change. Reviewer's worst size-sweep row: 8 MiB plain, -13.6% instructions.
+  2026-11-27 (Astra confirm on 545506a: changes): `.to_s` does not normalize ActiveSupport::SafeBuffer (its to_s
+  returns self) on JRuby 9.4.16.0, and on that runtime a subclass overriding to_s could newly change the bytes or
+  raise. Decision (coordinator): back to 7da6979 (cecaed1's tree), fork branch moved back with a lease from 545506a;
+  the 052cf07 benchmark runs were stopped and deleted. Every variant differs only on JRuby 9.4 and only for String
+  subclass inputs with nothing to decode: JRuby 9.4's String#b keeps the subclass, unlike MRI's since 2.x (the
+  Ruby 3.0 String-subclass change JRuby 9.4 claims), and CGI's no-escape branch dups it. The bytes and encoding
+  stay the same, and an html-unsafe SafeBuffer stays unsafe (Astra: html_safe? nil, ERB still escapes). JRuby 9.4
+  is not in ruby/uri's CI ("jruby" is 10.x). Request input reaches the method as plain Strings from Rack and
+  Rails. `String.new(str, encoding: BINARY)` would fix the class but changes the exceptions for nil, Symbols and
+  Integers and skips `b`. So: accepted, one sentence in the body. Both reviewers are asked for a confirm on
+  7da6979 with this sentence. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes:
   - reviewer: astra
@@ -179,7 +190,7 @@ passes:
 
 `URI.decode_www_form_component` copies the string with `b` and then runs `gsub` with a regexp and a hash table, so every `+` and `%XX` is matched and looked up in Ruby. Rack decodes query strings and cookies with it ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes query parameters and URL-encoded form fields with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
 
-This replaces only the `gsub` with `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C. The check for an invalid `%`, the `b` copy and the final `force_encoding` stay, so the result has the same class, bytes and encoding as before.
+This replaces only the `gsub` with `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C. The check for an invalid `%`, the `b` copy and the final `force_encoding` stay, so the result has the same class, bytes and encoding as before. The one exception is JRuby 9.4, whose `String#b` keeps a String subclass: there, a subclass with nothing to decode comes back as that subclass.
 
 | Objects and instructions per call, Ruby 4.0.10 | Before | After |
 | --- | ---: | ---: |
