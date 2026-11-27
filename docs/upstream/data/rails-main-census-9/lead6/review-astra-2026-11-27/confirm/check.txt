@@ -1,0 +1,15 @@
+ips-r1-base.log 49724.0 [('compiled_iseq_count', '860', '860'), ('compiled_block_count', '12299', '12299'), ('invalidation_count', '301', '301')]
+ips-r1-base2.log 48254.0 [('compiled_iseq_count', '860', '860'), ('compiled_block_count', '12301', '12301'), ('invalidation_count', '301', '301')]
+ips-r1-candidate.log 52253.0 [('compiled_iseq_count', '860', '860'), ('compiled_block_count', '12308', '12308'), ('invalidation_count', '301', '301')]
+ips-r2-base.log 50195.0 [('compiled_iseq_count', '860', '860'), ('compiled_block_count', '12299', '12299'), ('invalidation_count', '301', '301')]
+ips-r2-base2.log 50013.0 [('compiled_iseq_count', '860', '860'), ('compiled_block_count', '12299', '12299'), ('invalidation_count', '301', '301')]
+ips-r2-candidate.log 49213.0 [('compiled_iseq_count', '860', '860'), ('compiled_block_count', '12310', '12310'), ('invalidation_count', '301', '301')]
+ips-r3-base.log 48067.0 [('compiled_iseq_count', '860', '860'), ('compiled_block_count', '12299', '12299'), ('invalidation_count', '301', '301')]
+ips-r3-base2.log 50576.0 [('compiled_iseq_count', '860', '860'), ('compiled_block_count', '12301', '12301'), ('invalidation_count', '301', '301')]
+ips-r3-candidate.log 50448.0 [('compiled_iseq_count', '860', '860'), ('compiled_block_count', '12308', '12308'), ('invalidation_count', '301', '301')]
+Body output matched exactly: ips-r2-base.log serializable_hash     50.195k (± 7.9%) i/s   (19.92 μs/i) -    250.992k in   5.000357s
+Body output matched exactly: ips-r1-candidate.log serializable_hash     52.253k (± 7.5%) i/s   (19.14 μs/i) -    261.406k in   5.002670s
+Best base/base2/head: 50195.0 50576.0 52253.0
+All 9 IPS windows have present, unchanged JIT counters; body output matches retained logs.
+Lowrail: cbbdb9f1ef22bf66d096af10af556e2ed91a2594
+Body SHA256: c4c10132fe3c855442d317878739d227ee1cc36ad49e6165fca6cf8b73c67fea

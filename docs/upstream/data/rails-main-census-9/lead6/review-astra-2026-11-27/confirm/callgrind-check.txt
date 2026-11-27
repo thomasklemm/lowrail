@@ -1,0 +1,108 @@
+
+RUN L6-2026-11-27 n= 200
+PINS {'base': {'ruby': '/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby', 'tree': '/home/user/w/main', 'description': 'ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]', 'zjit': False, 'head': '088fc0cf61e4ba0c7987decafacc69adb3e22eec', 'dirty': False}, 'candidate': {'ruby': '/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby', 'tree': '/home/user/w/l6', 'description': 'ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]', 'zjit': False, 'head': '8b1c6428ea056b3c5983372d85b85615ae3d3f45', 'dirty': False}}
+interp update! of one column {'base': 1456028.4, 'base2': 1456243.765, 'candidate': 1395418.325} mean= 1456136.0825 change%=  -4.1698 AA%= 0.0148
+interp find, then changed? {'base': 711899.93, 'base2': 712176.74, 'candidate': 681893.445} mean= 712038.335 change%=  -4.2336 AA%= 0.0389
+interp serializable_hash {'base': 191496.055, 'base2': 191304.055, 'candidate': 178770.565} mean= 191400.055 change%=  -6.5985 AA%= 0.1003
+yjit update! of one column {'base': 686369.38, 'base2': 684922.435, 'candidate': 670800.675} mean= 685645.9075 change%=  -2.1651 AA%= 0.211
+  ir-yjit-1-update_of_one_column-base-n0.log [('compiled_iseq_count', '1122', '1122'), ('compiled_block_count', '15715', '15715'), ('invalidation_count', '306', '306')]
+  ir-yjit-1-update_of_one_column-base-n200.log [('compiled_iseq_count', '1123', '1123'), ('compiled_block_count', '15709', '15709'), ('invalidation_count', '306', '306')]
+  ir-yjit-1-update_of_one_column-base2-n0.log [('compiled_iseq_count', '1122', '1122'), ('compiled_block_count', '15700', '15700'), ('invalidation_count', '306', '306')]
+  ir-yjit-1-update_of_one_column-base2-n200.log [('compiled_iseq_count', '1122', '1122'), ('compiled_block_count', '15697', '15697'), ('invalidation_count', '306', '306')]
+  ir-yjit-1-update_of_one_column-candidate-n0.log [('compiled_iseq_count', '1122', '1122'), ('compiled_block_count', '15709', '15709'), ('invalidation_count', '306', '306')]
+  ir-yjit-1-update_of_one_column-candidate-n200.log [('compiled_iseq_count', '1122', '1122'), ('compiled_block_count', '15712', '15712'), ('invalidation_count', '306', '306')]
+yjit find, then changed? {'base': 360074.47, 'base2': 359534.715, 'candidate': 351096.305} mean= 359804.5925 change%=  -2.4203 AA%= 0.15
+  ir-yjit-2-find_then_changed_-base-n0.log [('compiled_iseq_count', '936', '936'), ('compiled_block_count', '13485', '13485'), ('invalidation_count', '304', '304')]
+  ir-yjit-2-find_then_changed_-base-n200.log [('compiled_iseq_count', '936', '936'), ('compiled_block_count', '13496', '13496'), ('invalidation_count', '304', '304')]
+  ir-yjit-2-find_then_changed_-base2-n0.log [('compiled_iseq_count', '936', '936'), ('compiled_block_count', '13499', '13499'), ('invalidation_count', '304', '304')]
+  ir-yjit-2-find_then_changed_-base2-n200.log [('compiled_iseq_count', '936', '936'), ('compiled_block_count', '13499', '13499'), ('invalidation_count', '304', '304')]
+  ir-yjit-2-find_then_changed_-candidate-n0.log [('compiled_iseq_count', '936', '936'), ('compiled_block_count', '13511', '13511'), ('invalidation_count', '304', '304')]
+  ir-yjit-2-find_then_changed_-candidate-n200.log [('compiled_iseq_count', '936', '936'), ('compiled_block_count', '13499', '13499'), ('invalidation_count', '304', '304')]
+yjit serializable_hash {'base': 196390.67, 'base2': 193990.855, 'candidate': 191767.99} mean= 195190.7625 change%=  -1.7536 AA%= 1.2295
+  ir-yjit-3-serializable_hash-base-n0.log [('compiled_iseq_count', '849', '849'), ('compiled_block_count', '12172', '12172'), ('invalidation_count', '301', '301')]
+  ir-yjit-3-serializable_hash-base-n200.log [('compiled_iseq_count', '849', '849'), ('compiled_block_count', '12193', '12193'), ('invalidation_count', '301', '301')]
+  ir-yjit-3-serializable_hash-base2-n0.log [('compiled_iseq_count', '849', '849'), ('compiled_block_count', '12184', '12184'), ('invalidation_count', '301', '301')]
+  ir-yjit-3-serializable_hash-base2-n200.log [('compiled_iseq_count', '849', '849'), ('compiled_block_count', '12184', '12184'), ('invalidation_count', '301', '301')]
+  ir-yjit-3-serializable_hash-candidate-n0.log [('compiled_iseq_count', '849', '849'), ('compiled_block_count', '12181', '12181'), ('invalidation_count', '301', '301')]
+  ir-yjit-3-serializable_hash-candidate-n200.log [('compiled_iseq_count', '849', '849'), ('compiled_block_count', '12181', '12181'), ('invalidation_count', '301', '301')]
+objects-interp-base.log objects update! of one column	207.987
+objects find, then changed?	90.0
+objects serializable_hash	32.0
+objects-interp-base2.log objects update! of one column	207.999
+objects find, then changed?	90.0
+objects serializable_hash	32.0
+objects-interp-candidate.log objects update! of one column	207.987
+objects find, then changed?	90.0
+objects serializable_hash	32.0
+objects-yjit-base.log objects update! of one column	209.963
+objects find, then changed?	90.0
+objects serializable_hash	32.0
+objects-yjit-base2.log objects update! of one column	209.999
+objects find, then changed?	90.0
+objects serializable_hash	32.0
+objects-yjit-candidate.log objects update! of one column	209.999
+objects find, then changed?	90.0
+objects serializable_hash	32.0
+
+RUN L6-master-zjit-2026-11-27 n= 200
+PINS {'base': {'ruby': '/home/user/w/ruby-master/bin/ruby', 'tree': '/home/user/w/main', 'description': 'ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]', 'zjit': True, 'head': '088fc0cf61e4ba0c7987decafacc69adb3e22eec', 'dirty': False}, 'candidate': {'ruby': '/home/user/w/ruby-master/bin/ruby', 'tree': '/home/user/w/l6', 'description': 'ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]', 'zjit': True, 'head': '8b1c6428ea056b3c5983372d85b85615ae3d3f45', 'dirty': False}}
+zjit update! of one column {'base': 665124.105, 'base2': 664982.36, 'candidate': 652541.99} mean= 665053.2324999999 change%=  -1.8812 AA%= 0.0213
+  ir-zjit-1-update_of_one_column-base-n0.log [('compiled_iseq_count', '976', '976'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '17387', '17387'), ('invalidation_count', '', '')]
+  ir-zjit-1-update_of_one_column-base-n200.log [('compiled_iseq_count', '972', '972'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '17349', '17349'), ('invalidation_count', '', '')]
+  ir-zjit-1-update_of_one_column-base2-n0.log [('compiled_iseq_count', '976', '976'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '17387', '17387'), ('invalidation_count', '', '')]
+  ir-zjit-1-update_of_one_column-base2-n200.log [('compiled_iseq_count', '976', '976'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '17387', '17387'), ('invalidation_count', '', '')]
+  ir-zjit-1-update_of_one_column-candidate-n0.log [('compiled_iseq_count', '978', '978'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '17319', '17319'), ('invalidation_count', '', '')]
+  ir-zjit-1-update_of_one_column-candidate-n200.log [('compiled_iseq_count', '977', '977'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '17311', '17311'), ('invalidation_count', '', '')]
+zjit find, then changed? {'base': 281738.88, 'base2': 281082.185, 'candidate': 277680.755} mean= 281410.5325 change%=  -1.3254 AA%= 0.2334
+  ir-zjit-2-find_then_changed_-base-n0.log [('compiled_iseq_count', '731', '731'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '12817', '12817'), ('invalidation_count', '', '')]
+  ir-zjit-2-find_then_changed_-base-n200.log [('compiled_iseq_count', '731', '731'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '12817', '12817'), ('invalidation_count', '', '')]
+  ir-zjit-2-find_then_changed_-base2-n0.log [('compiled_iseq_count', '731', '731'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '12817', '12817'), ('invalidation_count', '', '')]
+  ir-zjit-2-find_then_changed_-base2-n200.log [('compiled_iseq_count', '731', '731'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '12817', '12817'), ('invalidation_count', '', '')]
+  ir-zjit-2-find_then_changed_-candidate-n0.log [('compiled_iseq_count', '731', '731'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '12769', '12769'), ('invalidation_count', '', '')]
+  ir-zjit-2-find_then_changed_-candidate-n200.log [('compiled_iseq_count', '731', '731'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '12769', '12769'), ('invalidation_count', '', '')]
+zjit serializable_hash {'base': 124742.595, 'base2': 123937.32, 'candidate': 126140.68} mean= 124339.9575 change%=  1.4482 AA%= 0.6476
+  ir-zjit-3-serializable_hash-base-n0.log [('compiled_iseq_count', '598', '598'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10198', '10198'), ('invalidation_count', '', '')]
+  ir-zjit-3-serializable_hash-base-n200.log [('compiled_iseq_count', '598', '598'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10198', '10198'), ('invalidation_count', '', '')]
+  ir-zjit-3-serializable_hash-base2-n0.log [('compiled_iseq_count', '598', '598'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10198', '10198'), ('invalidation_count', '', '')]
+  ir-zjit-3-serializable_hash-base2-n200.log [('compiled_iseq_count', '598', '598'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10198', '10198'), ('invalidation_count', '', '')]
+  ir-zjit-3-serializable_hash-candidate-n0.log [('compiled_iseq_count', '597', '597'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10140', '10140'), ('invalidation_count', '', '')]
+  ir-zjit-3-serializable_hash-candidate-n200.log [('compiled_iseq_count', '597', '597'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10140', '10140'), ('invalidation_count', '', '')]
+objects-zjit-base.log objects update! of one column	209.975
+objects find, then changed?	88.0
+objects serializable_hash	32.0
+objects-zjit-base2.log objects update! of one column	210.011
+objects find, then changed?	88.0
+objects serializable_hash	32.0
+objects-zjit-candidate.log objects update! of one column	209.987
+objects find, then changed?	88.0
+objects serializable_hash	32.0
+
+RUN L6-master-zjit-serializable-hash-2026-11-27 n= 1000
+PINS {'base': {'ruby': '/home/user/w/ruby-master/bin/ruby', 'tree': '/home/user/w/main', 'description': 'ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]', 'zjit': True, 'head': '088fc0cf61e4ba0c7987decafacc69adb3e22eec', 'dirty': False}, 'candidate': {'ruby': '/home/user/w/ruby-master/bin/ruby', 'tree': '/home/user/w/l6', 'description': 'ruby 4.1.0dev (2026-11-27T09:42:55Z master f3e180b5eb) +PRISM [x86_64-linux]', 'zjit': True, 'head': '8b1c6428ea056b3c5983372d85b85615ae3d3f45', 'dirty': False}}
+zjit serializable_hash {'base': 125194.052, 'base2': 125111.31, 'candidate': 123884.114} mean= 125152.681 change%=  -1.0136 AA%= 0.0661
+  ir-zjit-1-serializable_hash-base-n0.log [('compiled_iseq_count', '599', '599'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10202', '10202'), ('invalidation_count', '', '')]
+  ir-zjit-1-serializable_hash-base-n1000.log [('compiled_iseq_count', '599', '599'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10202', '10202'), ('invalidation_count', '', '')]
+  ir-zjit-1-serializable_hash-base2-n0.log [('compiled_iseq_count', '599', '599'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10202', '10202'), ('invalidation_count', '', '')]
+  ir-zjit-1-serializable_hash-base2-n1000.log [('compiled_iseq_count', '599', '599'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10202', '10202'), ('invalidation_count', '', '')]
+  ir-zjit-1-serializable_hash-candidate-n0.log [('compiled_iseq_count', '598', '598'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10145', '10145'), ('invalidation_count', '', '')]
+  ir-zjit-1-serializable_hash-candidate-n1000.log [('compiled_iseq_count', '598', '598'), ('failed_iseq_count', '0', '0'), ('compiled_side_exit_count', '10145', '10145'), ('invalidation_count', '', '')]
+objects-zjit-base.log objects serializable_hash	31.999
+objects-zjit-base2.log objects serializable_hash	31.999
+objects-zjit-candidate.log objects serializable_hash	31.999
+
+RUN L6-w102-2026-11-27 n= 100
+PINS {'base': {'ruby': '/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby', 'tree': '/home/user/w/main', 'description': 'ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]', 'zjit': False, 'head': '088fc0cf61e4ba0c7987decafacc69adb3e22eec', 'dirty': False}, 'candidate': {'ruby': '/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby', 'tree': '/home/user/w/l6', 'description': 'ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]', 'zjit': False, 'head': '8b1c6428ea056b3c5983372d85b85615ae3d3f45', 'dirty': False}}
+interp update! of one column {'base': 2460519.08, 'base2': 2460159.33, 'candidate': 2269275.57} mean= 2460339.205 change%=  -7.7657 AA%= 0.0146
+interp find, then changed? {'base': 1832221.32, 'base2': 1832822.67, 'candidate': 1731696.84} mean= 1832521.995 change%=  -5.502 AA%= 0.0328
+interp serializable_hash {'base': 642848.81, 'base2': 643025.72, 'candidate': 601182.6} mean= 642937.265 change%=  -6.4944 AA%= 0.0275
+objects-interp-base.log objects update! of one column	279.987
+objects find, then changed?	186.0
+objects serializable_hash	104.0
+objects-interp-base2.log objects update! of one column	279.975
+objects find, then changed?	186.0
+objects serializable_hash	104.0
+objects-interp-candidate.log objects update! of one column	279.975
+objects find, then changed?	186.0
+objects serializable_hash	104.0
+
+All archived instruction totals match results.json; all recorded present JIT counters are flat.
