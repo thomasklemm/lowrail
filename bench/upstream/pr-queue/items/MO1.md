@@ -33,6 +33,6 @@ ENV.stubs(:[]).with("API_KEY").returns("secret")
 # Ractor::IsolationError: can't modify instance variables of a shareable Object
 ```
 
-Ruby 4.1 no longer allows instance variables on objects that are Ractor-shareable but not frozen ([Bug #22291](https://bugs.ruby-lang.org/issues/22291)), and `ENV` is one. Mocha keeps a stubbed object's mock in `@mocha`, so every `ENV.stubs` and `ENV.expects` fails. Tests in [Capistrano](https://github.com/capistrano/capistrano/blob/f40817b449c113a4fce039a318b92e63e1d10c85/spec/lib/capistrano/configuration/servers_spec.rb#L275-L276) and [Sure](https://github.com/we-promise/sure/blob/c241a66da7634118b485a9ee561f7c94bbe4efc3/test/models/provider/jev_test.rb#L359-L360) do this.
+Ruby 4.1 no longer allows instance variables on objects that are Ractor-shareable but not frozen ([Bug #22291](https://bugs.ruby-lang.org/issues/22291)), and `ENV` is one. Mocha keeps a stubbed object's mock in `@mocha`, so every `ENV.stubs` and `ENV.expects` fails. Tests in [Capistrano 3.20.1](https://github.com/capistrano/capistrano/blob/f40817b449c113a4fce039a318b92e63e1d10c85/spec/lib/capistrano/configuration/servers_spec.rb#L275-L276) and [Sure v0.7.6-hotfix.2](https://github.com/we-promise/sure/blob/c241a66da7634118b485a9ee561f7c94bbe4efc3/test/models/provider/jev_test.rb#L359-L360) do this.
 
 For such objects the mock now lives in a Hash keyed by identity, set and cleared where `@mocha` was. Classes and modules are shareable but still take instance variables, so they keep `@mocha`, as does every other object.
