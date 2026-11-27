@@ -139,3 +139,47 @@ Replacing 'median of 10 runs' with 'one representative run' in reviewed body 411
 The caption finding is fixed; no table, figure, range or other text changed. The preceding evidence audit applies.
 Exact local Ruby head remains 5fc1871eec with a clean worktree. No rebuild, new measurement or test rerun for this delta.
 Approval does not cover the later separate ZJIT sentence. No upstream post or Ruby fork push.
+
+JIT-sentence delta confirm, 2026-11-27
+Reviewer thermos-sol, orb T-01a21dd5-050e-70b3-9097-842e5d974661
+Head remains 5fc1871eec45270a068d2ecba6654eef979c5f6e; reviewed at Lowrail 4a889cf6.
+PrQueue.parse outgoing body SHA-256 a692d5851fda15e4eb9b1249146198a95a6b9ef1f27c5dce087d0d83922bb879.
+Verified it equals body-proposed.md byte for byte, and that the only delta from posted body
+05fff894a630389800fcccad1b1f94521e8bb3a82f755f5485e27885c8041909 is the supplied JIT sentence.
+
+Verdict changes: one presentation must-fix, no source or measurement defect found in this delta.
+DECISIONS, Evidence and measurement, asks for a master x ZJIT micro with A/A and a body sentence when useful.
+DECISIONS, Correctness fixes, specifically requires timing figures in this regression-fix body to carry their
+full spread and A/A. The added 18-19% is only the range of six central estimates, not their uncertainty or A/A.
+The interpreter benchmark's earlier A/A does not cover either JIT timing cohort. Smallest fix: replace
+'take about 18–19% less time than on master' with 'are faster than on master'. No remeasurement is needed.
+If numeric timing figures remain, their own change spread and A/A must accompany them; no such revision is
+pre-approved here. This does not reopen the settled permission to show this performance regression's numbers.
+
+Read jit-wall-2026-11-27/bt_wall.rb, both copied scripts, both tables, both results.json files and both commands.sh
+files. Read the timing worker and estimator in script/upstream-bench and docs/upstream/body-numbers.md.
+The three cases measure caller capture/formatting, raise/rescue plus Exception#backtrace, and formatting every
+captured Location in a 50-level backtrace, respectively. They are not per-single-location times or whole requests.
+The estimator uses each process's 10th-percentile thread CPU window with GC off; monotonic time is also retained.
+Commands use the specified JIT flag, core 1, fixed heap, 3000 warm-up calls, no LD_PRELOAD, six process orders.
+Base/head descriptions are 274cfe719a/5fc1871eec. All three script copies are byte-identical.
+
+Ran the independent checker in .amp/in/orb-backup/bt1-jit-confirm/check.rb with Ruby 4.0.9; full output stays there.
+It parsed every raw wall-r log: 90 processes per mode, 30 windows x 3 cases per process (16200 timed windows total).
+Every CPU and wall array matches results.json; no process/window is missing. Every required JIT counter is present,
+has zero summed absolute delta, and matches the results index. Recomputed all estimates and all seeded 95% bootstrap
+intervals over 30 whole rounds from those raw arrays; they match the stored values to 1e-12. Results, percentages:
+  ZJIT caller:       -18.391 [-19.463, -17.721]; A/A -0.814 [-7.989, +0.329]
+  ZJIT backtrace:    -17.832 [-19.644, -17.365]; A/A -1.091 [-8.718, +0.416]
+  ZJIT locations:    -18.586 [-19.758, -18.071]; A/A -0.556 [-6.634, +0.298]
+  YJIT caller:       -19.337 [-19.783, -18.871]; A/A +0.371 [-0.370, +3.633]
+  YJIT backtrace:    -18.484 [-19.449, -17.851]; A/A +0.370 [-0.438, +3.315]
+  YJIT locations:    -18.522 [-18.990, -18.044]; A/A +0.472 [-0.549, +1.765]
+Each A/A interval contains zero and every change interval lies wholly beyond its A/A interval, including the noisy
+ZJIT control. Thus 'about 18-19% less time' is a reasonable summary of the central estimates, not proof of a 1% control
+or a claim about GC-inclusive application latency. Raw individual-round ratios are much wider than these intervals;
+none was dropped. No counter movement or numerical discrepancy was found.
+
+Exact local Ruby head still 5fc1871eec, worktree clean. Prior code/parser/differential approval remains unchanged.
+No new runtime build, measurements or test rerun for this text-only audit. Applied both loaded Thermos rubrics
+personally, without delegation as requested. No upstream post or Ruby fork push; outgoing body left unchanged.

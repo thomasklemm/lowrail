@@ -288,6 +288,28 @@ passes:
       short JIT sentence. Raw-evidence audit only, not a fresh JIT run; prior exact-head correctness evidence
       remains applicable. Details: evidence/backtrace-format/astra/review.md, ZJIT/YJIT sentence confirm.
       No upstream action or Ruby-fork push.
+  - reviewer: thermos-sol
+    orb: T-01a21dd5-050e-70b3-9097-842e5d974661
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      One text-only must-fix against Lowrail 4a889cf6, parsed/copied body SHA-256
+      a692d5851fda15e4eb9b1249146198a95a6b9ef1f27c5dce087d0d83922bb879. The sole added JIT sentence's
+      about 18-19% point estimate is supported, but it omits that timing cohort's spread and A/A, required
+      by DECISIONS, Correctness fixes. The preceding interpreter benchmark's A/A is not its JIT control.
+      Smallest fix: replace 'take about 18–19% less time than on master' with 'are faster than on master';
+      this preserves the required one-sentence JIT result without an unqualified presentation of a
+      timing figure. No remeasurement or source change needed. Independently parsed all 180 raw process
+      logs (30 rounds per mode, 90 processes per mode, 16200 timed windows total), matched their samples
+      and JIT counters to results.json, checked core 1 and all six process orders, and recomputed every
+      point estimate and 95% bootstrap interval. ZJIT medians -18.4%, -17.8%, -18.6%; YJIT -19.3%, -18.5%,
+      -18.5%. All six A/A intervals contain zero and every change interval is separate from its A/A;
+      ZJIT A/A reaches -8.7%, so do not imply a 1% control. All measured JIT counters are flat. The harness
+      estimates thread CPU time with GC off, not GC-inclusive request latency. Prior source/runtime approval
+      remains unchanged; no new build, measurements or test rerun for this body-only confirm. Evidence and
+      detailed interval audit: evidence/backtrace-format/thermos-sol/results.txt. Probe script and output stay
+      in this orb backup. No upstream post or Ruby fork push.
 ---
 
 # Append backtrace location strings by length
