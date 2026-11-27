@@ -1,0 +1,18 @@
+ruby: ruby 4.1.0dev (2026-11-27T14:39:46Z HEAD 80343e1cf5) +PRISM [x86_64-linux]
+bundler: 4.1.1
+settings.rb default: 91:      "BUNDLE_VERSION" => "lockfile",
+== BUNDLED WITH 4.0.11: bundle install
+Bundler 4.1.1 is running, but your lockfile was generated with 4.0.11. Installing Bundler 4.0.11 and restarting using that version.
+NameError: uninitialized constant Pathname::SEPARATOR_PAT
+  exit=1
+  bundle -v inside: 4.0.11
+== BUNDLED WITH 2.6.9: bundle install
+Bundler 4.1.1 is running, but your lockfile was generated with 2.6.9. Installing Bundler 2.6.9 and restarting using that version.
+NameError: uninitialized constant Pathname::SEPARATOR_PAT
+  exit=1
+  bundle -v inside: Bundler version 2.6.9
+== BUNDLED WITH 4.0.12: bundle install
+Bundler 4.1.1 is running, but your lockfile was generated with 4.0.12. Installing Bundler 4.0.12 and restarting using that version.
+Bundle complete! 1 Gemfile dependency, 1 gem now installed.
+  exit=0
+  bundle -v inside: 4.0.12

@@ -34,7 +34,7 @@ sass-rails, old Faraday adapters). Every skip and its reason is in `gems.json`.
 
 | Finding | Reach | Cause (first bad commit) | Class | Owner, state |
 | --- | --- | --- | --- | --- |
-| SEP1: `bundle install` fails with `NameError: uninitialized constant Pathname::SEPARATOR_PAT` | every lockfile from Bundler < 4.0.12 with a PATH or GIT section; here parallel 2.3.0 (866M downloads), ruby-progressbar 1.13.0 (784M), rails-dom-testing 2.3.0 (714M) | [`4e243c709e`](https://github.com/ruby/ruby/commit/4e243c709e) made it private, `a5996718f3` removed it | deliberate Ruby change that breaks old Bundlers | decision for Thomas (below) |
+| SEP1: `bundle install` fails with `NameError: uninitialized constant Pathname::SEPARATOR_PAT` | every lockfile from Bundler < 4.0.12 with a PATH or GIT section; here parallel 2.3.0 (866M downloads), ruby-progressbar 1.13.0 (784M), rails-dom-testing 2.3.0 (714M) | [`4e243c709e`](https://github.com/ruby/ruby/commit/4e243c709e) made it private, `a5996718f3` removed it | deliberate Ruby change that breaks old Bundlers | held: restore declined twice in ruby/ruby#16909 (2026-05, 2026-11-06); open question only on autoswitch |
 | Active Support 8.0.x: `JSON.generate(..., quirks_mode: true)` raises `ArgumentError: unknown keyword` (globalid: 34 tests) | every Rails 8.0 app on 4.1 whose lock does not pin json 2.x | json 3.0.0 makes unknown options raise; master ships json 3.2.0 (`3ade997abe`) | intended (json NEWS) | Rails: fixed on 7-2-stable (released 7.2.4) and 8-0-stable ([`2786de26c6`](https://github.com/rails/rails/commit/2786de26c6), 2026-08-12), not in 8.0.5.2; record only |
 | eventmachine 1.2.7 does not compile (`Data_Wrap_Struct` removed); websocket-driver's suite cannot install | 339M downloads, 1,158 reverse dependencies | [`a26f528b3b`](https://github.com/ruby/ruby/commit/a26f528b3b) (Feature #21768) | intended (NEWS, C API) | fixed on eventmachine master (#1027), unreleased; release asked in eventmachine/eventmachine#1032 (open); record only |
 | pry: `syntax_checking_spec.rb[1:15]` fails on master with seed 11703, deterministic | test only | error_highlight now uses `Ruby::Prism`, so top-level `Prism` is no longer loaded by a NameError message; the spec helper counts errors with `Prism` only when it happens to be loaded | intended (Bug #22379); order-dependent spec | pry's ruby-head CI is green in its order; record only |
@@ -55,8 +55,23 @@ BUNDLED WITH 2.4.2, 2.6.9, 4.0.7, 4.0.11 and 4.0.12 on 4.0.10, master and master
 * da3b7d5ee3 (2025-12-06, in 4.0.10) meant to make `SEPARATOR_LIST` and `SEPARATOR_PAT` private but wrote
   `private_constant :SEPARATOR_LIST, :SEPARATOR_LIST`. ruby/rubygems#9529 (nobu, merged 2026-05-07, released in
   Bundler 4.0.12 on 2026-05-20) switched Bundler to `Pathname#absolute?` because "bundler will break by fixing the
-  typo". 4e243c709e (2026-05-01) fixed the typo; a5996718f3 (2026-05-07) removed the constant. That older lockfiles
-  reinstall the older Bundler is not discussed in either place; no Redmine ticket or rubygems issue covers it.
+  typo". 4e243c709e (2026-05-01) fixed the typo; a5996718f3 (2026-05-07) removed the constant.
+* **Correction (2026-11-27): this was already known and declined twice; this round's ownership check missed it.**
+  [ruby/ruby#16909](https://github.com/ruby/ruby/pull/16909) (Earlopain, 2026-05-09) proposed exactly this
+  `deprecate_constant` restore; nobu approved it, hsbt closed it on 2026-05-28 ("Bundler 4.0.12 is already released.
+  We don't need to restore this constant."). Thomas commented there on 2026-11-03 with our branch
+  `thomasklemm/ruby@6c8385cd3f`; nobu declined again on 2026-11-06
+  ([comment](https://github.com/ruby/ruby/pull/16909#issuecomment-6687729119)): apps pinned to Bundler ≤ 4.0.11 will
+  regenerate `BUNDLED WITH` when upgrading, and, decisively, "Bundler 4.1 no longer performs the version autoswitch
+  based on `BUNDLED WITH`". eregon asked for a link and pointed out that `settings.rb` still defaults `version` to
+  `lockfile`; nobody has answered. Our own records already had this: [ruby-4.1-ecosystem.md §2](ruby-4.1-ecosystem.md)
+  and the #16909 entry in [contributions.md](contributions.md). The earlier sentence here ("not discussed … no ticket
+  covers it") was wrong. SEP1 is held. The only new fact: master `80343e1cf5` (Bundler 4.1.1, `settings.rb` default `lockfile`) still
+  switches to `BUNDLED WITH` (4.0.11, 2.6.9 and 4.0.12 all switch;
+  [`autoswitch-80343e1cf5.txt`](../../bench/upstream/gem-differential/evidence/separator-pat/autoswitch-80343e1cf5.txt)),
+  and no ruby/rubygems PR, issue or CHANGELOG entry (4.1.0, 4.1.1) turns it off; `settings.rb` has the same default at
+  rubygems v4.1.0.beta3, v4.1.1 and master. Draft reply answering eregon's question, not posted:
+  [`reply-16909.md`](../../bench/upstream/gem-differential/evidence/separator-pat/reply-16909.md).
 * Reach: in this differential every committed lock with Bundler < 4.0.12 and a PATH section fails, and no other lock
   does. Apps with git gems have the same shape, e.g. forem's main lock (BUNDLED WITH 2.4.17, two GIT/PATH sections).
   The fix per repository is `bundle _4.1.1_ update --bundler` outside frozen or deployment mode, or `BUNDLE_VERSION=system bundle install` with Bundler 4.1; plain `bundle update --bundler` can rerun the old Bundler and fail. The affected versions are not one interval (2.2.34 and 2.6.9 fail only on master; 2.3.0 and 2.0 to 2.2.33 already fail on 4.0.10), and only gems that list files hit the read.
@@ -90,7 +105,9 @@ $ bundle install          # Ruby master: NameError: uninitialized constant Pathn
 **Warum sie sicher ist.** Es kommt nur ein Name zurück, den 4.0 schon hatte; sonst ändert sich nichts, und eine
 Warnung gibt es nur mit `-W:deprecated`.
 
-**Zu entscheiden.** (a) Diesen PR auf ruby/ruby, (b) ein Redmine-Bug mit dem Repro, ohne Patch, oder (c) nichts
+**Nachtrag (2026-11-27):** Das gab es schon: ruby/ruby#16909 schlug genau diesen Restore vor und wurde geschlossen; nobu lehnte am 2026-11-06 auch unseren Vorschlag ab. SEP1 ist gehalten, der Abschnitt unten ist überholt.
+
+**Zu entscheiden (überholt).** (a) Diesen PR auf ruby/ruby, (b) ein Redmine-Bug mit dem Repro, ohne Patch, oder (c) nichts
 upstream: Die Änderung war gewollt, Bundler 4.0.12 hat den Fix, und jedes betroffene Repo kann `bundle _4.1.1_ update
 --bundler` ausführen (ein einfaches `bundle update --bundler` startet den alten Bundler und scheitert genauso). Empfehlung: (b), weil nobu den Bruch von Bundler selbst kannte und die Wahl zwischen
 Rückkehr der Konstante und einer Bundler-seitigen Lösung (z. B. beim Umschalten auf eine alte Version) bei den
