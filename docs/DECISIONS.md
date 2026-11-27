@@ -211,6 +211,12 @@ column, row, link and sentence: would the reader miss it? If not, drop it. Bodie
 * **Maintainers can edit our branches** (2026-11-06): "Allow edits by maintainers" on (`script/pr-queue open` sets
   it); our forks hold no Actions secrets.
 * **Few, clean commits; the reasoning goes in their messages** (2026-11-06).
+* **Code shape maintainers changed before merging** (merged-PR audit, 2026-11-27): guard a nil once before a loop
+  instead of `&.` per iteration; name a compound guard as private predicates, with one why-line where a reader would
+  otherwise delete the condition (the comment rule below still applies); no conditional modifier inside a literal or
+  argument list, hoist the value to a local; between frameworks use a load hook in the framework that depends on the
+  other, not `rescue LoadError` or `defined?`, and document hook and behaviour; in Rails write `to_s` on Symbols. In
+  gems follow the maintainer's taste (allocation tests, CHANGELOG with credit) seen in earlier merges.
 * **Do less work, don't inline helpers** (Thomas, 2026-11-27, after rails#60016): no performance PR that only
   inlines small helper methods at their call sites to save method calls; that moves logic into the wrong layer and
   makes the code worse for a gain JITs mostly remove. Doing it in one place makes no sense, and doing it everywhere
@@ -475,7 +481,8 @@ Every orb runs this against its candidate with a differential harness before rev
 
 1. Singleton methods on arguments and intermediate results, private ones too, `extend`, prepended modules,
    `method_missing`/`respond_to_missing?`; `instance_of?` doesn't exclude them.
-2. Subclasses of Hash, Array and String with their own `to_a`, `each`, `map`, `merge`, `[]=`, `include?`, `gsub!`.
+2. Subclasses of Hash, Array and String with their own `to_a`, `each`, `map`, `merge`, `[]=`, `include?`, `gsub!`;
+   `Arel::Nodes::SqlLiteral` is such a String, with Arel's own `count`.
 3. Implicit conversions (`to_ary`, `to_a`, `to_s`, `to_hash`), public and private, with call counts.
 4. Every call the change adds on a user-supplied object (even `equal?`, `force_encoding`) and every call base made that
    it skips (e.g. a `gsub!` that raises on a frozen String).
