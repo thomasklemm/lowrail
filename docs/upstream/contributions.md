@@ -27,8 +27,8 @@ superseded PRs are omitted except for the notes under [Closed](#closed).
 
 ## Counts (2026-11-27)
 
-Every pull request by `thomasklemm` outside `argos-ri/argos` and his own repositories, read on 2026-11-27 at 13:00 UTC
-through GraphQL search (633 PRs, paginated; [Lowrail-era list](data/contributions-2026-11-27.tsv)):
+Every pull request by `thomasklemm` outside `argos-ri/argos` and his own repositories, read on 2026-11-27 at 19:11 UTC
+through GraphQL search (641 PRs, paginated; [Lowrail-era list](data/contributions-2026-11-27.tsv)):
 
 ```sh
 gh api graphql -f q='author:thomasklemm is:pr -repo:argos-ri/argos -user:thomasklemm' -f query='
@@ -47,25 +47,30 @@ out: all 16 were created between 2026-05-10 and 2026-10-06, before Lowrail, and 
 2026-10-19 are not in the ledger. Merged means GitHub's `mergedAt`; ankane/blind_index#62 counts as closed although
 its change landed as ankane's commit. Draft is an open draft; Open is open and ready.
 
-**All time, rails/rails:** 85 merged (84 since 2026-10-19 plus #7260 from 2012), 6 open, 23 closed unmerged; 21 of
-them merged on 2026-11-26 alone. ruby/ruby has no PR from before 2026-10-19.
+**All time, rails/rails:** 92 merged (91 since 2026-10-19 plus #7260 from 2012), 1 open, 26 closed unmerged; 21 of
+them merged on 2026-11-26 and 7 on 2026-11-27. ruby/ruby has no PR from before 2026-10-19.
 
-**Since 2026-10-19:** 226 PRs in 38 repositories: 130 merged, 42 open, 5 drafts, 49 closed. Opened after this count
-and listed in the ledger: rails/rails#60013 (AM4) and sferik/duel-ruby#9 (DUEL2), both ready, at 13:04–13:05 UTC.
+**Since 2026-10-19:** 234 PRs in 40 repositories: 137 merged, 44 open, 0 drafts, 53 closed. Since the 13:00 UTC count:
+rails/rails#60008 (SQ37), #60013 (AM4), #59662 (OP8), #60007 (SP1), #59671 (E2), #60006 (ATF1) and #60020 (L3) merged;
+#60005 (UG82D), #60016 (L6), #60017 (TSP1) and ruby/ruby-bench#579 (RBCG1) closed unmerged; freerange/mocha#809 (MO1),
+sferik/duel-ruby#9 (DUEL2), rails/rails#60013, #60016, #60017, #60020 and ruby/ruby#20261 (BT1) opened; the five drafts
+(ruby/ruby#20169 and #20208, coorasse/cancancan#941, hashie/hashie#659, inertiajs/inertia-rails#449) were marked
+ready. Also closed today, before Lowrail and not counted: kane50613/takumi#1973 (2026-10-15; #1974 stays open),
+aws/aws-sdk-ruby#3041 and croaky/recipient_interceptor#8. ruby/rubygems#10017 is an issue, not a PR.
 
 | Repository | Opened | Merged | Open | Draft | Closed |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| rails/rails | 113 | 84 | 6 | 0 | 23 |
-| ruby/ruby | 43 | 17 | 5 | 2 | 19 |
-| ruby/ruby-bench | 12 | 5 | 6 | 0 | 1 |
-| inertiajs/inertia-rails | 7 | 6 | 0 | 1 | 0 |
+| rails/rails | 118 | 91 | 1 | 0 | 26 |
+| ruby/ruby | 44 | 17 | 8 | 0 | 19 |
+| ruby/ruby-bench | 12 | 5 | 5 | 0 | 2 |
+| inertiajs/inertia-rails | 7 | 6 | 1 | 0 | 0 |
 | rmosolgo/graphql-ruby | 4 | 3 | 1 | 0 | 0 |
 | ruby-i18n/i18n | 4 | 0 | 4 | 0 | 0 |
 | sparklemotion/sqlite3-ruby | 4 | 2 | 2 | 0 | 0 |
 | rubocop/rubocop-performance | 3 | 0 | 3 | 0 | 0 |
 | activerecord-hackery/ransack | 2 | 2 | 0 | 0 | 0 |
 | basecamp/once-campfire | 2 | 0 | 1 | 0 | 1 |
-| hashie/hashie | 2 | 1 | 0 | 1 | 0 |
+| hashie/hashie | 2 | 1 | 1 | 0 | 0 |
 | rack/rack | 2 | 0 | 2 | 0 | 0 |
 | rubycdp/ferrum | 2 | 1 | 0 | 0 | 1 |
 | tzinfo/tzinfo | 2 | 0 | 2 | 0 | 0 |
@@ -77,8 +82,9 @@ and listed in the ledger: rails/rails#60013 (AM4) and sferik/duel-ruby#9 (DUEL2)
 | ankane/blind_index | 1 | 0 | 0 | 0 | 1 |
 | cabo/cbor-ruby | 1 | 0 | 0 | 0 | 1 |
 | caxlsx/caxlsx | 1 | 1 | 0 | 0 | 0 |
-| coorasse/cancancan | 1 | 0 | 0 | 1 | 0 |
+| coorasse/cancancan | 1 | 0 | 1 | 0 | 0 |
 | discourse/discourse | 1 | 0 | 1 | 0 | 0 |
+| freerange/mocha | 1 | 0 | 1 | 0 | 0 |
 | getlago/lago-expression | 1 | 0 | 1 | 0 | 0 |
 | mperham/connection_pool | 1 | 1 | 0 | 0 | 0 |
 | pond/scimitar | 1 | 0 | 0 | 0 | 1 |
@@ -89,11 +95,12 @@ and listed in the ledger: rails/rails#60013 (AM4) and sferik/duel-ruby#9 (DUEL2)
 | ruby/date | 1 | 1 | 0 | 0 | 0 |
 | ruby/prism | 1 | 1 | 0 | 0 | 0 |
 | rubycdp/cuprite | 1 | 1 | 0 | 0 | 0 |
+| sferik/duel-ruby | 1 | 0 | 1 | 0 | 0 |
 | skryukov/rails_vite | 1 | 1 | 0 | 0 | 0 |
 | sparklemotion/nokogiri | 1 | 0 | 1 | 0 | 0 |
 | trailblazer/cells-rails | 1 | 0 | 1 | 0 | 0 |
 | whomwah/rqrcode_core | 1 | 1 | 0 | 0 | 0 |
-| **38 repositories** | **226** | **130** | **42** | **5** | **49** |
+| **40 repositories** | **234** | **137** | **44** | **0** | **53** |
 
 **Reconciled on 2026-11-27** against this ledger, the PR queue (`script/pr-queue sync` and `status`) and
 [contributions-index.json](contributions-index.json):
@@ -110,66 +117,59 @@ and listed in the ledger: rails/rails#60013 (AM4) and sferik/duel-ruby#9 (DUEL2)
   `coorasse/cancancan#941` (open draft). Fixed; every other item with a PR matches GitHub after `sync`.
 * contributions-index.json (2026-11-25) listed 17 merged rails/rails PRs as open and lacked 16 PRs; regenerated.
 
-### Open upstream (2026-11-27)
+### Open upstream (2026-11-27, 19:11 UTC)
 
-46 open PRs (41 ready, 5 drafts; ruby/ruby-bench#579 closed 13:32 UTC). "Waiting on us" means the next step is ours or Thomas's; "maintainers" means a
-review, answer or merge from them, with every comment of theirs answered. Age in days since opening.
+44 open PRs, all ready, none a draft; each PR's head matches its queue item. Every open PR now waits on its
+maintainers: none waits on a step of ours or Thomas's, and no maintainer comment or review thread is unanswered
+(GraphQL `reviewThreads`, 19:15 UTC). "Waits on" names the maintainer who last acted (approved, asked or promised a
+review), otherwise "maintainers". Age in days since opening.
 
-**Waiting on us (4):**
-
-| PR | Opened | Age | State | Status |
+| PR | Opened | Age | Waits on | Status |
 | --- | --- | ---: | --- | --- |
-| [ruby/ruby#20169](https://github.com/ruby/ruby/pull/20169) | 2026-11-25 | 2 d | draft | draft; ready when a ruby/ruby slot frees (Thomas marks ready) |
-| [coorasse/cancancan#941](https://github.com/coorasse/cancancan/pull/941) | 2026-11-25 | 2 d | draft | draft; Thomas marks ready |
-| [ruby/ruby#20208](https://github.com/ruby/ruby/pull/20208) | 2026-11-26 | 1 d | draft | draft; ready when a ruby/ruby slot frees (Thomas marks ready) |
-| [inertiajs/inertia-rails#449](https://github.com/inertiajs/inertia-rails/pull/449) | 2026-11-26 | 1 d | draft | draft; Astra pass on the head missing, then Thomas marks ready |
-
-**Waiting on maintainers (42):**
-
-| PR | Opened | Age | State | Status |
-| --- | --- | ---: | --- | --- |
-| [Shopify/tapioca#2748](https://github.com/Shopify/tapioca/pull/2748) | 2026-10-20 | 38 d | ready | no response |
-| [rails/importmap-rails#336](https://github.com/rails/importmap-rails/pull/336) | 2026-10-22 | 36 d | ready | no response |
-| [rubocop/rubocop-performance#550](https://github.com/rubocop/rubocop-performance/pull/550) | 2026-10-22 | 36 d | ready | no response (repo at its cap) |
-| [ruby/ruby#19487](https://github.com/ruby/ruby/pull/19487) | 2026-10-22 | 36 d | ready | approved by k0kubun 2026-10-22, not merged |
-| [ruby/ruby#19492](https://github.com/ruby/ruby/pull/19492) | 2026-10-22 | 36 d | ready | approved by k0kubun 2026-10-22, not merged; red jobs were master breakage |
-| [rubocop/rubocop-performance#551](https://github.com/rubocop/rubocop-performance/pull/551) | 2026-10-22 | 36 d | ready | no response (repo at its cap) |
-| [tzinfo/tzinfo#171](https://github.com/tzinfo/tzinfo/pull/171) | 2026-10-22 | 36 d | ready | no response (repo at its cap) |
-| [rubocop/rubocop-performance#552](https://github.com/rubocop/rubocop-performance/pull/552) | 2026-10-22 | 36 d | ready | no response (repo at its cap) |
-| [basecamp/once-campfire#417](https://github.com/basecamp/once-campfire/pull/417) | 2026-10-26 | 32 d | ready | no response; stacked on #346 |
-| [ruby/ruby#19659](https://github.com/ruby/ruby/pull/19659) | 2026-11-02 | 25 d | ready | XrXr's changes request (2026-11-24) answered with the redesign; rebased 2026-11-26 |
-| [rails/rails#59565](https://github.com/rails/rails/pull/59565) | 2026-11-03 | 24 d | ready | no response |
-| [ruby-i18n/i18n#763](https://github.com/ruby-i18n/i18n/pull/763) | 2026-11-03 | 24 d | ready | no response (repo at its cap) |
-| [ruby-i18n/i18n#764](https://github.com/ruby-i18n/i18n/pull/764) | 2026-11-03 | 24 d | ready | no response (repo at its cap) |
-| [ruby-i18n/i18n#765](https://github.com/ruby-i18n/i18n/pull/765) | 2026-11-03 | 24 d | ready | no response (repo at its cap) |
-| [getlago/lago-expression#91](https://github.com/getlago/lago-expression/pull/91) | 2026-11-03 | 24 d | ready | no response |
-| [ruby/ruby#19681](https://github.com/ruby/ruby/pull/19681) | 2026-11-03 | 24 d | ready | k0kubun's lobsters question (2026-11-25) answered the same day |
-| [ruby-i18n/i18n#766](https://github.com/ruby-i18n/i18n/pull/766) | 2026-11-03 | 24 d | ready | no response (repo at its cap) |
-| [rails/propshaft#289](https://github.com/rails/propshaft/pull/289) | 2026-11-03 | 24 d | ready | no response |
-| [MiniProfiler/rack-mini-profiler#670](https://github.com/MiniProfiler/rack-mini-profiler/pull/670) | 2026-11-03 | 24 d | ready | no response |
-| [rack/rack#2550](https://github.com/rack/rack/pull/2550) | 2026-11-04 | 23 d | ready | approved by jeremyevans 2026-11-04 |
-| [sparklemotion/nokogiri#3759](https://github.com/sparklemotion/nokogiri/pull/3759) | 2026-11-04 | 23 d | ready | flavorjones: "I'll review today or tomorrow" (2026-11-05) |
-| [discourse/discourse#45658](https://github.com/discourse/discourse/pull/45658) | 2026-11-05 | 22 d | ready | no response; one red plugins system job |
-| [trailblazer/cells-rails#75](https://github.com/trailblazer/cells-rails/pull/75) | 2026-11-05 | 22 d | ready | apotonick's question answered 2026-11-05; red jobs are dependency drift; gem barely maintained |
-| [ClosureTree/with_advisory_lock#150](https://github.com/ClosureTree/with_advisory_lock/pull/150) | 2026-11-05 | 22 d | ready | no response |
-| [rails/rails#59662](https://github.com/rails/rails/pull/59662) | 2026-11-05 | 22 d | ready | rafaelfranca's review (2026-11-26) answered and pushed 2026-11-27 |
-| [ruby/ruby-bench#569](https://github.com/ruby/ruby-bench/pull/569) | 2026-11-05 | 22 d | ready | no response |
-| [ruby/ruby-bench#570](https://github.com/ruby/ruby-bench/pull/570) | 2026-11-05 | 22 d | ready | no response |
-| [ruby/ruby-bench#571](https://github.com/ruby/ruby-bench/pull/571) | 2026-11-05 | 22 d | ready | no response |
-| [rails/rails#59671](https://github.com/rails/rails/pull/59671) | 2026-11-05 | 22 d | ready | marked ready 2026-11-27 on Thomas's decision |
-| [tzinfo/tzinfo#175](https://github.com/tzinfo/tzinfo/pull/175) | 2026-11-05 | 22 d | ready | no response (repo at its cap) |
-| [sparklemotion/sqlite3-ruby#769](https://github.com/sparklemotion/sqlite3-ruby/pull/769) | 2026-11-06 | 21 d | ready | flavorjones: will review (2026-11-13) |
-| [sparklemotion/sqlite3-ruby#770](https://github.com/sparklemotion/sqlite3-ruby/pull/770) | 2026-11-06 | 21 d | ready | flavorjones: will review (2026-11-12) |
-| [ruby/ruby-bench#574](https://github.com/ruby/ruby-bench/pull/574) | 2026-11-06 | 21 d | ready | no response |
-| [ruby/ruby-bench#575](https://github.com/ruby/ruby-bench/pull/575) | 2026-11-06 | 21 d | ready | no response |
-| [ruby/ruby#19912](https://github.com/ruby/ruby/pull/19912) | 2026-11-15 | 12 d | ready | approved by k0kubun 2026-11-25; XrXr's older changes request still shows |
-| [rack/rack#2557](https://github.com/rack/rack/pull/2557) | 2026-11-18 | 9 d | ready | approved by jeremyevans 2026-11-26 after our follow-up commit |
-| [rmosolgo/graphql-ruby#5908](https://github.com/rmosolgo/graphql-ruby/pull/5908) | 2026-11-18 | 9 d | ready | no response |
-| [PostHog/posthog-ruby#395](https://github.com/PostHog/posthog-ruby/pull/395) | 2026-11-26 | 1 d | ready | no response |
-| [hashie/hashie#659](https://github.com/hashie/hashie/pull/659) | 2026-11-26 | 1 d | draft | draft; dblock's 2026-11-26 question answered 2026-11-27 |
-| [rails/rails#60005](https://github.com/rails/rails/pull/60005) | 2026-11-27 | 0 d | draft | opened today; converted to draft by Thomas 2026-11-27 13:24 UTC |
-| [rails/rails#60006](https://github.com/rails/rails/pull/60006) | 2026-11-27 | 0 d | ready | opened today |
-| [rails/rails#60007](https://github.com/rails/rails/pull/60007) | 2026-11-27 | 0 d | ready | opened today |
+| [Shopify/tapioca#2748](https://github.com/Shopify/tapioca/pull/2748) | 2026-10-20 | 38 d | maintainers | no response |
+| [rails/importmap-rails#336](https://github.com/rails/importmap-rails/pull/336) | 2026-10-22 | 36 d | maintainers | no response; CI green on the head (45 checks, 2026-11-18) |
+| [rubocop/rubocop-performance#550](https://github.com/rubocop/rubocop-performance/pull/550) | 2026-10-22 | 36 d | maintainers | no response (repo at its cap) |
+| [rubocop/rubocop-performance#551](https://github.com/rubocop/rubocop-performance/pull/551) | 2026-10-22 | 36 d | maintainers | no response (repo at its cap) |
+| [rubocop/rubocop-performance#552](https://github.com/rubocop/rubocop-performance/pull/552) | 2026-10-22 | 36 d | maintainers | no response (repo at its cap) |
+| [ruby/ruby#19487](https://github.com/ruby/ruby/pull/19487) | 2026-10-22 | 36 d | k0kubun | approved 2026-10-22, not merged |
+| [ruby/ruby#19492](https://github.com/ruby/ruby/pull/19492) | 2026-10-22 | 36 d | k0kubun | approved 2026-10-22, not merged; the red Windows 11-arm jobs are not from this change |
+| [tzinfo/tzinfo#171](https://github.com/tzinfo/tzinfo/pull/171) | 2026-10-22 | 36 d | maintainers | no response (repo at its cap) |
+| [basecamp/once-campfire#417](https://github.com/basecamp/once-campfire/pull/417) | 2026-10-26 | 32 d | maintainers | no response; stacked on #346 (pre-Lowrail, open) |
+| [ruby/ruby#19659](https://github.com/ruby/ruby/pull/19659) | 2026-11-02 | 25 d | XrXr | his 2026-11-24 changes request answered with the redesign 2026-11-25, rebased 2026-11-26; the request still shows |
+| [MiniProfiler/rack-mini-profiler#670](https://github.com/MiniProfiler/rack-mini-profiler/pull/670) | 2026-11-03 | 24 d | maintainers | no response |
+| [getlago/lago-expression#91](https://github.com/getlago/lago-expression/pull/91) | 2026-11-03 | 24 d | maintainers | no response |
+| [rails/propshaft#289](https://github.com/rails/propshaft/pull/289) | 2026-11-03 | 24 d | maintainers | no response |
+| [rails/rails#59565](https://github.com/rails/rails/pull/59565) | 2026-11-03 | 24 d | maintainers | no response; our only open rails/rails PR |
+| [ruby-i18n/i18n#763](https://github.com/ruby-i18n/i18n/pull/763) | 2026-11-03 | 24 d | maintainers | no response (repo at its cap) |
+| [ruby-i18n/i18n#764](https://github.com/ruby-i18n/i18n/pull/764) | 2026-11-03 | 24 d | maintainers | no response (repo at its cap) |
+| [ruby-i18n/i18n#765](https://github.com/ruby-i18n/i18n/pull/765) | 2026-11-03 | 24 d | maintainers | no response (repo at its cap) |
+| [ruby-i18n/i18n#766](https://github.com/ruby-i18n/i18n/pull/766) | 2026-11-03 | 24 d | maintainers | no response (repo at its cap) |
+| [ruby/ruby#19681](https://github.com/ruby/ruby/pull/19681) | 2026-11-03 | 24 d | k0kubun | his lobsters question (2026-11-25) answered the same day |
+| [rack/rack#2550](https://github.com/rack/rack/pull/2550) | 2026-11-04 | 23 d | jeremyevans | approved 2026-11-04, not merged |
+| [sparklemotion/nokogiri#3759](https://github.com/sparklemotion/nokogiri/pull/3759) | 2026-11-04 | 23 d | flavorjones | "I'll review today or tomorrow" (2026-11-05) |
+| [ClosureTree/with_advisory_lock#150](https://github.com/ClosureTree/with_advisory_lock/pull/150) | 2026-11-05 | 22 d | maintainers | no response; ready since 2026-11-26 (Thomas's exception to the 8.2 freeze) |
+| [discourse/discourse#45658](https://github.com/discourse/discourse/pull/45658) | 2026-11-05 | 22 d | maintainers | no response; one red plugins system job |
+| [ruby/ruby-bench#569](https://github.com/ruby/ruby-bench/pull/569) | 2026-11-05 | 22 d | maintainers | no response |
+| [ruby/ruby-bench#570](https://github.com/ruby/ruby-bench/pull/570) | 2026-11-05 | 22 d | maintainers | no response |
+| [ruby/ruby-bench#571](https://github.com/ruby/ruby-bench/pull/571) | 2026-11-05 | 22 d | maintainers | no response |
+| [trailblazer/cells-rails#75](https://github.com/trailblazer/cells-rails/pull/75) | 2026-11-05 | 22 d | apotonick | his question answered 2026-11-05; red jobs are dependency drift; gem barely maintained |
+| [tzinfo/tzinfo#175](https://github.com/tzinfo/tzinfo/pull/175) | 2026-11-05 | 22 d | maintainers | no response (repo at its cap) |
+| [ruby/ruby-bench#574](https://github.com/ruby/ruby-bench/pull/574) | 2026-11-06 | 21 d | maintainers | no response |
+| [ruby/ruby-bench#575](https://github.com/ruby/ruby-bench/pull/575) | 2026-11-06 | 21 d | maintainers | no response |
+| [sparklemotion/sqlite3-ruby#769](https://github.com/sparklemotion/sqlite3-ruby/pull/769) | 2026-11-06 | 21 d | flavorjones | "Thanks, I'll review!" (2026-11-13) |
+| [sparklemotion/sqlite3-ruby#770](https://github.com/sparklemotion/sqlite3-ruby/pull/770) | 2026-11-06 | 21 d | flavorjones | "Thanks, I'll review!" (2026-11-12) |
+| [ruby/ruby#19912](https://github.com/ruby/ruby/pull/19912) | 2026-11-15 | 12 d | k0kubun, XrXr | approved by k0kubun 2026-11-25; XrXr's 2026-11-24 changes request still shows |
+| [rack/rack#2557](https://github.com/rack/rack/pull/2557) | 2026-11-18 | 9 d | jeremyevans | approved 2026-11-26; our follow-up commit (standalone `Rack::Unescape`, head `e3d53cfdb2`) pushed 2026-11-27 13:27 UTC |
+| [rmosolgo/graphql-ruby#5908](https://github.com/rmosolgo/graphql-ruby/pull/5908) | 2026-11-18 | 9 d | maintainers | no response |
+| [coorasse/cancancan#941](https://github.com/coorasse/cancancan/pull/941) | 2026-11-25 | 2 d | maintainers | marked ready 2026-11-27 13:44 UTC; workflow runs wait for approval |
+| [ruby/ruby#20169](https://github.com/ruby/ruby/pull/20169) | 2026-11-25 | 2 d | maintainers | marked ready 2026-11-27 15:01 UTC; the one red job (Windows `TestIO` timeout) is not from this change |
+| [PostHog/posthog-ruby#395](https://github.com/PostHog/posthog-ruby/pull/395) | 2026-11-26 | 1 d | maintainers | no response |
+| [hashie/hashie#659](https://github.com/hashie/hashie/pull/659) | 2026-11-26 | 1 d | dblock | his six nits answered 2026-11-27 15:42 UTC: five applied (head `ef3b274bda`), constants left unnamespaced as he suggested |
+| [inertiajs/inertia-rails#449](https://github.com/inertiajs/inertia-rails/pull/449) | 2026-11-26 | 1 d | maintainers | marked ready 2026-11-27 13:50 UTC; CI green |
+| [ruby/ruby#20208](https://github.com/ruby/ruby/pull/20208) | 2026-11-26 | 1 d | maintainers | marked ready 2026-11-27 13:30 UTC; CI green |
+| [freerange/mocha#809](https://github.com/freerange/mocha/pull/809) | 2026-11-27 | 0 d | maintainers | opened 2026-11-27; the red JRuby job is red on mocha's main too |
+| [ruby/ruby#20261](https://github.com/ruby/ruby/pull/20261) | 2026-11-27 | 0 d | maintainers | opened 2026-11-27 17:12 UTC, body updated 18:55 UTC; CI green |
+| [sferik/duel-ruby#9](https://github.com/sferik/duel-ruby/pull/9) | 2026-11-27 | 0 d | maintainers | opened 2026-11-27 13:04 UTC |
 
 
 ## Counts (2026-11-17)
@@ -204,6 +204,7 @@ The merge links use GitHub's `mergeCommit`, not the contributor's pre-merge comm
 - [rails/rails#60006](https://github.com/rails/rails/pull/60006) (ATF1), `ActionText::Attachment.from_node` again receives `nil` for attachables the bulk lookup didn't locate, so an app's override of it applies again (unreleased regression from #58173; Campfire's `ContentFiltersTest` fails 6 of 19 tests on main). Correctness fix, no performance claim ([evidence](../../bench/upstream/rails_main_hotlines/atf1), [item](../../bench/upstream/pr-queue/items/ATF1.md)). **Ready**, opened 2026-11-27 12:28 UTC, head `9c1378eab6`; thermos-sol and Astra approve. **Merged 2026-11-27 15:59 UTC** by rafaelfranca ([f63b1f8933](https://github.com/rails/rails/commit/f63b1f8933)).
 - [rails/rails#60007](https://github.com/rails/rails/pull/60007) (SP1), upgrade-guide note that `default_url_options` is a frozen `{}` unless configured (#58483), which breaks code setting a host in place, as Spree's mailers do. Docs only ([evidence](../../bench/upstream/sp1), [item](../../bench/upstream/pr-queue/items/SP1.md)). **Ready**, opened 2026-11-27 12:28 UTC, head `d41b93d147`; thermos-sol and Astra approve. **Merged 2026-11-27 15:34 UTC** by rafaelfranca ([0609fa47b5](https://github.com/rails/rails/commit/0609fa47b5)).
 - [rails/rails#60013](https://github.com/rails/rails/pull/60013) (AM4), `action_mailer/test_helper` loads without Active Job: since #59820 (unreleased) Action Mailer doesn't depend on activejob, but its test helper still requires it, so an app without activejob raises `LoadError` once `ActionDispatch::IntegrationTest` or `ActionMailer::TestCase` loads (Discourse). Correctness fix, no performance claim ([evidence](../../bench/upstream/rails_main_hotlines/am4), [item](../../bench/upstream/pr-queue/items/AM4.md)). **Ready**, opened 2026-11-27 13:05 UTC, head `35b7671119`. **Merged 2026-11-27 15:26 UTC** by rafaelfranca ([b66e2349a7](https://github.com/rails/rails/commit/b66e2349a7)).
+- [rails/rails#60020](https://github.com/rails/rails/pull/60020) (L3, census 9 lead 3), `attributes_for_database` and `attributes_before_type_cast` build their Hash without first copying the lazy row into a new `IndexedRow::Mutable` (unreleased since #59141; `Marshal.dump` of a record and the MessagePack cache coder call it once per record). Opened ready 2026-11-27 16:49 UTC at `319e55a661` after thermos-sol and Astra approved ([record](../../bench/upstream/l3/README.md), [item](../../bench/upstream/pr-queue/items/L3.md)). rafaelfranca force-pushed his own edit at 17:13 and 17:15 UTC: an early `return hash unless snapshot` replaces `snapshot&.[]` in the shared helper (+2 lines, tests unchanged), head `8a0d3a4c37`, Thomas still author. **Merged 2026-11-27 17:21 UTC** by rafaelfranca after approving ([9c28399099](https://github.com/rails/rails/commit/9c28399099)). The item's head and passes name `319e55a661`; the merged head was not reviewed by us.
 - [rails/rails#60008](https://github.com/rails/rails/pull/60008) (SQ37), bump the minimum supported SQLite version to 3.37.0. Opened ready 2026-11-27, head `e7a17ff01b`. **Merged 2026-11-27 15:07 UTC** by rafaelfranca ([28a848a06b](https://github.com/rails/rails/commit/28a848a06b)).
 - [rails/rails#59627](https://github.com/rails/rails/pull/59627) (AR-2 from the [API regression audit](api-regressions.md)), restores `ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED` as a public constant pointing at `BCryptPassword`'s limit. #56041 moved it before release, and Spree's `maximum_password_length` default and open-build-service's `User` validation raise `NameError` at load on main. Compatibility fix, no performance claim; identical to 8-1-stable on interpreter, YJIT and ZJIT; load order unchanged (same 228 files, bcrypt gem not loaded). Subagent review, then Sol "open with nits" (applied). L0. Head `08be5191db` on main `8b06b0eb98`. Opened 2026-11-04 16:13 UTC by the coordinator as Thomas, ready for review ([body](../../bench/upstream/api_regressions/bodies/max-password-length.md)). Initial CI pending. Watched report-only every 3 hours from the census-backlog thread. **Merged 2026-11-26 21:49 UTC** by rafaelfranca ([86c23bed6c](https://github.com/rails/rails/commit/86c23bed6c)), last head `08be5191db`.
 - [rails/rails#59976](https://github.com/rails/rails/pull/59976) (IX1, census 11), brings back the five `IndexDefinition` readers (`lengths`, `opclasses`, `type`, `include`, `nulls_not_distinct`) that rails#59850 moved into the adapters; unreleased regression that breaks GitLab's and Mastodon's index-recreating helpers, online_migrations and active_record_doctor. **Opened as draft 2026-11-25**, head `30368145ec`; thermos-sol approves the exact head. **Merged 2026-11-26 22:50 UTC** by rafaelfranca ([e1e3937797](https://github.com/rails/rails/commit/e1e3937797)), last head `30368145ec`.
@@ -1101,6 +1102,7 @@ Callgrind on the PR itself), #19492, #19620 (backport requested in review), #196
 - [coorasse/cancancan#941](https://github.com/coorasse/cancancan/pull/941) (CC1, OSS profile sweep 1), `Rule#initialize` reads its attributes and conditions directly instead of through a temporary array: an ability with five rules goes from 57 to 52 objects, −3.9% instructions without JIT and −3.5% with YJIT; benchmark-ips too noisy to show a wall-time change. Opened as a **draft** 2026-11-25 at `cb5768e493`. **Ready 2026-11-27 13:44 UTC** (Thomas), head `cd1f37066b`; workflows `action_required` (wait for maintainer approval).
 - [hashie/hashie#659](https://github.com/hashie/hashie/pull/659), Duel perf guards (follow-up to hashie#656, dblock's #658). **Draft**, head `be311bbf4b` (2026-11-27), maintainer edits allowed. dblock 2026-11-26 12:46 UTC: "Let's figure out a way to combine duel and existing benchmarks?" We answered on 2026-11-27 with six more scenarios; stays a draft. **2026-11-27 14:02 UTC:** dblock posted six optional nits (Gemfile path trigger, `require 'hashie'` in the helper, namespaced constants, deep-frozen fixture, lint `gemfiles/*.gemfile`, `Perf Comment` title); head `be311bbf4b`, ready, CI 16/16 green.
 - [PostHog/posthog-ruby#395](https://github.com/PostHog/posthog-ruby/pull/395) (PHR1, OSS profile sweep 1), posthog-rails's `TracingHeaders.extract_header` skips env keys that can't match a tracing header: a request without PostHog tracing headers allocates 276 objects fewer in `RequestContext` (369 → 93 with a Rails 8.1 app's 73 env keys), −39.1% instructions without JIT and −51.1% with YJIT; Dawarich's request specs 341.8 → 28.9 objects per request on that line ([evidence](../../bench/upstream/oss_profile_sweep_1/body/PHR1), [item](../../bench/upstream/pr-queue/items/PHR1.md)). **Ready**, opened 2026-11-26 12:18 UTC, head `0404d1413a`; no maintainer response yet.
+- [freerange/mocha#809](https://github.com/freerange/mocha/pull/809) (MO1), keep the mock of a shareable object such as `ENV` out of instance variables: on Ruby master `ENV.stubs` and `ENV.expects` raise `Ractor::IsolationError` in every Mocha suite (Bug #22291), found by the 4.0.9-versus-master census differential in Sure ([evidence](../../bench/upstream/ruby-differential/evidence/mocha-env), [item](../../bench/upstream/pr-queue/items/MO1.md)). **Ready**, opened 2026-11-27 12:48 UTC, head `a3134958dc`, after thermos-sol and Astra approved. CircleCI's `build-jruby:latest-Gemfile` is red; it is red on mocha's main (`99da677165`) and on #807 too.
 - [sferik/duel-ruby#9](https://github.com/sferik/duel-ruby/pull/9) (DUEL2), Duel reads the Linux performance counter with `read(2)` instead of `pread(2)`, which failed with ESPIPE, so the instructions metric errored on every benchmark (GitHub ARM and AWS Xeon runners) ([evidence](../../bench/upstream/duel_pread), [item](../../bench/upstream/pr-queue/items/DUEL2.md)). **Ready**, opened 2026-11-27 13:04 UTC, head `90bf2a5188`.
 
 ### Ruby — ruby/ruby
@@ -1129,6 +1131,7 @@ Callgrind on the PR itself), #19492, #19620 (backport requested in review), #196
 - [#19681](https://github.com/ruby/ruby/pull/19681), ZJIT finds caller-saved survivors with one binary-search pass instead of scanning every interval per CCall (stopgap, no interval splitting); fixes Shopify/ruby#1065. `compile_time_ns`: railsbench −2.9%, lobsters −5.4%, shipit +0.3% (within A/A); `handle_caller_saved_regs` Ir on railsbench 558 M → 328 M. Generated code unchanged. Head `bb2c44dc10` (force-pushed 2026-11-05 00:27 UTC, was `dea97c3afa`). Opened 2026-11-03. **2026-11-15 (red-PR sweep):** red from master breakage at run time, not ours: `test_newhash_eq_and_hash_redefinition` (01bace6fce, reverted by f4ec3e4cb1) and Windows `TestGemSafeYAML#test_roundtrip_block_scalar_indicators` (3dad454ab0, fixed by 40a3c88341). Rebased onto master `3be2b028a7` without conflict, head [`2e5b70847b`](https://github.com/thomasklemm/ruby/commit/2e5b70847ba095e8509a150e084b569a1d1df49c); local ZJIT `zjit-test` 1,991/1,992 (the same SIGPROF test, which also fails on master in 2 of 3 orb runs), `test_optimization`, `test_zjit_cli` and btest with `--zjit-call-threshold=1` pass. Exact-head CI 132 pass; the two Windows 11-arm jobs failed on an MSVC internal compiler error in `thread_sync.c:446` (master hit it on 88ea6fd282, not on 3be2b028a7), but they are `continue-on-error` and Windows result passed. Not pushed again. **2026-11-18 ([rules review](rules-review-2026-11-18-rails-ruby.md)):** comment-only candidate `-lean` 5df7fefa50; proposed body 362 -> 208 words (SHA, command, method, ranges cut) in the item; neither pushed nor PATCHed. Windows 11-arm red is setup, not ours. **2026-11-18 (rules review, thermos-sol approve):** lease-pushed head [`5df7fefa50`](https://github.com/thomasklemm/ruby/commit/5df7fefa50) (comments only); body updated. **2026-11-25 (k0kubun asked for real workloads):** on master `f63048e942`, 10 interleaved `run_benchmarks.rb` rounds with an A/A: `compile_time` lobsters −6.7% (LIR −11.2%), shipit −3.1% (LIR −4.9%), railsbench within noise; run time unchanged; Callgrind compile Ir −11.8%/−5.1%/−4.1%, all in `handle_caller_saved_regs`. The body's "less than run-to-run noise" sentence was wrong; corrected in the item, reply drafted ([record](zjit-compile-speed.md#7-real-workloads-on-master-f63048e942-ruby19681-2026-11-25)); neither posted. **2026-11-25:** k0kubun asked for real-workload impact. Measured: compile time −6.7% lobsters, −3.1% shipit (median of 10 interleaved rounds), railsbench inconclusive, no run-time improvement; Callgrind −11.8% compilation instructions on lobsters. Body corrected and [reply](https://github.com/ruby/ruby/pull/19681#issuecomment-7158191014) posted.
 - Issue [Shopify/ruby#1133](https://github.com/Shopify/ruby/issues/1133) (opened 2026-11-25 with Thomas's OK, Ruby 4.1 differential 1): on k0kubun's zjit-headline2/3, a zsuper from a method with keyword parameters into a `(...)` method raises once ZJIT specializes it (bisected to 58b019f6fe; master unaffected); breaks 16,871 of 22,126 Discourse examples. Fix on fork branch [`zjit-zsuper-forwardable`](https://github.com/thomasklemm/ruby/tree/zjit-zsuper-forwardable) ([`2dc14101c3`](https://github.com/thomasklemm/ruby/commit/2dc14101c3c62b4555e6efaa471ad5e63e5a6ac5), on headline2): a forwardable callee keeps the keyword splat, so the zsuper stays dynamic; also applies unchanged to headline3. Not posted ([record](zjit-zsuper-forwardable.md)).
 - [#20169](https://github.com/ruby/ruby/pull/20169) (ZSV1), ZJIT profiles the real class, not the singleton class, for `setinstancevariable` on ordinary objects (Shopify/ruby#1122, after tekknolagi's #19858 for `getinstancevariable`); lobsters −584 generic ivar writes per iteration, A/A flat. **Opened as draft 2026-11-25** (Thomas), head `ca3ea90482` on master `3b188d0dd5`; thermos-sol and Astra approve the exact head. **Ready 2026-11-27 15:01 UTC** (Thomas), head `d0f0dc2da5` (force-pushed 14:15 UTC); CI: 139/140 green, only `Windows 2025-vs2026 (check)` red on a `TestIO#test_copy_stream_socket6` timeout (IO socket test, unrelated; that job is green on master).
+- [ruby/ruby#20261](https://github.com/ruby/ruby/pull/20261) (BT1), append backtrace location strings by length: a Ruby 4.1 regression makes formatting a backtrace location about 26% more instructions than 4.0.9, and a file path containing NUL makes `Exception#backtrace`, `caller` and `caller_locations#to_s` raise `ArgumentError` ([evidence](../../bench/upstream/ruby-differential/evidence/backtrace-format), [item](../../bench/upstream/pr-queue/items/BT1.md)). **Ready**, opened 2026-11-27 17:12 UTC (Thomas named the item), head `5fc1871eec`; body with the `make benchmark` table and a JIT sentence PATCHed 18:55 UTC after thermos-sol and Astra approved, read back byte-identical. CI green, no review yet.
 - [ruby/ruby#20208](https://github.com/ruby/ruby/pull/20208), [Bug #21301] normalize month-mday in `Time.new` before every zone path (follow-up to TN2; includes khasinski's commit "Fix Time.new month-mday normalization with UTC zone"). **Draft**, maintainer edits allowed.
 - [#19912](https://github.com/ruby/ruby/pull/19912) (ZS1, [record](zjit-symbol-block.md)), ZJIT sends a static Symbol block argument (`foo(&:sym)`) directly to ISEQ and C callees; first commit extracts `rb_vm_symbol_block_handler()` (VM only), second is the Symbol part of Rafael Mendonça França's Shopify/ruby `zjit-perf/blockarg-direct-send` (his authorship, Thomas co-author), third the tests; answers skipkayhil's close of rails/rails#59803. attr-read 1.20× and symbol-block micro 1.21× (`run_benchmarks.rb`), apps within A/A; `send_block_arg_not_nil` railsbench 2,880,681 → 2,068,088 over 25 iterations; whole-program Callgrind railsbench −0.49% instructions per iteration against an A/A of 0.059%. **Ready since 2026-11-15 (Thomas); opened as draft** 2026-11-15, head `fbbb9cee7b`, maintainer edits allowed. Passes on the head: claude-code approve, opus approve, fable (adversarial) nits; arm64 green on the same tree (ARM1); thermos waived by the coordinator. Opened without the planned comment on Shopify/ruby#1014 (Thomas, 2026-11-15); the body references it. **2026-11-17 (Thomas):** rebased onto master `b4ade67ba5` for a merge conflict in one HIR snapshot (master's stack maps in side exits); head `aa36fa0ea4`, force-pushed with a lease on `fbbb9cee7b`. Code unchanged (range-diff: commits 1 and 3 identical, commit 2 only the `Array#zip` snapshot); Rafael's authorship and the Co-authored-by trailer kept. arm64: zjit-test 2,272/2,272, test_zjit_cli 34/34, btest at threshold 2 all 2,148. **2026-11-18 ([rules review](rules-review-2026-11-18-rails-ruby.md)):** no change. **2026-11-24:** XrXr requested changes: the Symbol#to_proc check as a HIR speculation, the refinements check speculated away with a cref guard. **2026-11-25 (Thomas):** head `7b03404bd7` (two commits on master `a43519979c`; the VM commit is gone): `MethodRedefined` plus a HIR basic-flag guard on the `Symbol#to_proc` entry, `GetCref` with a nil-refinements guard, and after that guard exits the ISEQ's next version leaves the send dynamic (new `IseqPayload` bool, set under the VM lock). Pushed with a lease on `aa36fa0ea4`, body updated, both review comments answered; thermos-sol, thermos-opus and Astra approve the exact head. 2026-11-25: **approved by k0kubun** ([review](https://github.com/ruby/ruby/pull/19912#pullrequestreview-6063800539)) on `7b03404bd7`; his payload-size question answered in [r4700119229](https://github.com/ruby/ruby/pull/19912#discussion_r4700119229) (still 152 bytes, last free byte used; [record](zjit-symbol-block.md)).
 - Issue [Shopify/ruby#1128](https://github.com/Shopify/ruby/issues/1128): ZJIT `super` in a refined method also calls another refinement of the same method once compiled (wrong result at default settings; 71 of 100 calls with `--zjit`, interpreter and YJIT right; `test_super_not_chained` fails at threshold 2). Found by the ZNE1 fable pass; filed 2026-11-15 with Thomas's OK, cause not traced ([record](zjit-not-equal.md#leads-on-master-not-part-of-this-change)). **Closed as completed 2026-11-25 02:24 UTC** by k0kubun, fixed by ruby/ruby#19976.

@@ -11,18 +11,19 @@ basecamp/once-campfire	374	closed	2026-10-20T11:03:39Z	2026-11-18T14:22:02Z	Pars
 basecamp/once-campfire	417	open	2026-10-26T15:52:34Z		Retry interrupted jobs that are safe to run again
 cabo/cbor-ruby	43	closed	2026-11-03T15:01:30Z	2026-11-03T15:32:21Z	Use TypedData for Buffer, Packer and Unpacker
 caxlsx/caxlsx	550	merged	2026-10-22T21:02:31Z	2026-11-03T17:55:11Z	Avoid string allocation when inferring Integer cell types
-coorasse/cancancan	941	draft	2026-11-25T23:05:20Z		Allocate less when a rule is defined
+coorasse/cancancan	941	open	2026-11-25T23:05:20Z		Allocate less when a rule is defined
 discourse/discourse	45658	open	2026-11-05T11:11:18Z		FIX: Scope Category#category_channels to the category's channels
+freerange/mocha	809	open	2026-11-27T12:48:59Z		Keep mocks of shareable objects such as ENV out of instance variables
 getlago/lago-expression	91	open	2026-11-03T15:06:02Z		fix(ruby): allow building on Ruby 4.1
 hashie/hashie	656	merged	2026-11-26T00:29:31Z	2026-11-26T12:47:44Z	Write new Mash keys without allocating in respond_to_missing?
-hashie/hashie	659	draft	2026-11-26T12:42:18Z		Add Duel performance regression guards
+hashie/hashie	659	open	2026-11-26T12:42:18Z		Add Duel performance regression guards
 inertiajs/inertia-rails	435	merged	2026-10-20T13:15:52Z	2026-11-17T10:48:20Z	Apply DevTools URL redaction to fragment parameters
 inertiajs/inertia-rails	436	merged	2026-10-20T13:15:53Z	2026-11-20T19:35:18Z	Resolve nested serializers returned by prop types
 inertiajs/inertia-rails	437	merged	2026-10-20T13:47:55Z	2026-11-18T09:07:51Z	Reduce configuration binding and plain-data prop scan overhead
 inertiajs/inertia-rails	441	merged	2026-11-03T03:41:13Z	2026-11-17T10:44:40Z	Read Inertia headers by env key in the renderer
 inertiajs/inertia-rails	442	merged	2026-11-03T03:59:51Z	2026-11-18T08:59:00Z	Treat plain prop values as data in the props resolver
 inertiajs/inertia-rails	444	merged	2026-11-17T10:01:27Z	2026-11-17T10:12:32Z	Ignore the Vary values Rails adds itself in the specs
-inertiajs/inertia-rails	449	draft	2026-11-26T14:38:57Z		Ask prop types for their flags without `try`
+inertiajs/inertia-rails	449	open	2026-11-26T14:38:57Z		Ask prop types for their flags without `try`
 mperham/connection_pool	225	merged	2026-11-03T08:57:33Z	2026-11-03T17:56:35Z	Reuse frozen interrupt masks in ConnectionPool#with
 pond/scimitar	172	closed	2026-11-05T22:31:28Z	2026-11-27T11:58:23Z	Register the SCIM parser through the parameter parser writer
 rack/rack	2550	open	2026-11-04T10:00:35Z		Escape a single cookie value without wrapping it in an Array
@@ -108,11 +109,11 @@ rails/rails	59644	closed	2026-11-05T09:53:59Z	2026-11-18T22:57:13Z	Call a custom
 rails/rails	59659	closed	2026-11-05T17:56:12Z	2026-11-05T18:05:07Z	Remove the implementation comment above Array#index_with
 rails/rails	59660	closed	2026-11-05T18:27:14Z	2026-11-06T18:31:32Z	Restore the private `validation_context=` writer
 rails/rails	59661	merged	2026-11-05T18:47:46Z	2026-11-26T22:32:16Z	Allow registering parameter parsers in place during boot
-rails/rails	59662	open	2026-11-05T18:47:51Z		Don't freeze serialized column defaults
+rails/rails	59662	merged	2026-11-05T18:47:51Z	2026-11-27T15:27:50Z	Don't freeze serialized column defaults
 rails/rails	59663	closed	2026-11-05T18:47:56Z	2026-11-06T09:05:17Z	Accept a column name in build_bind_attribute again, deprecated
 rails/rails	59667	closed	2026-11-05T20:10:29Z	2026-11-09T14:02:03Z	Keep token_tag and method_tag where FormTagHelper can reach them
 rails/rails	59668	merged	2026-11-05T20:10:33Z	2026-11-26T23:10:26Z	Let a temporary SQLite table or view hide a permanent one in the schema readers
-rails/rails	59671	open	2026-11-05T21:53:42Z		Find SQLite tables by any ASCII case of their name in the schema readers
+rails/rails	59671	merged	2026-11-05T21:53:42Z	2026-11-27T15:57:50Z	Find SQLite tables by any ASCII case of their name in the schema readers
 rails/rails	59672	closed	2026-11-05T21:53:54Z	2026-11-05T23:02:12Z	Read each SQLite index from its own schema in the schema readers
 rails/rails	59673	closed	2026-11-05T21:53:58Z	2026-11-05T23:00:20Z	Keep QueryIntent's background session and mutex together
 rails/rails	59674	closed	2026-11-05T21:54:01Z	2026-11-05T23:01:10Z	Read the logger once in EventReporter::LogSubscriber#emit and #consumes?
@@ -139,9 +140,14 @@ rails/rails	59984	merged	2026-11-25T22:23:08Z	2026-11-26T22:06:25Z	Note in the u
 rails/rails	59985	merged	2026-11-25T22:27:27Z	2026-11-26T22:07:11Z	Note in the upgrade guide that Rack::Sendfile is omitted when x_sendfile_header is unset
 rails/rails	59986	merged	2026-11-25T22:27:30Z	2026-11-26T22:38:11Z	Note in the upgrade guide that Action Mailer no longer loads Active Job
 rails/rails	59987	merged	2026-11-26T00:19:11Z	2026-11-26T22:28:18Z	Stop setting the Action Mailer delivery job in `load_defaults`
-rails/rails	60005	open	2026-11-27T12:01:46Z		Note in the upgrade guide that models can't define a `default_order` scope
-rails/rails	60006	open	2026-11-27T12:28:38Z		Let Attachment.from_node pick attachables the bulk lookup didn't locate
-rails/rails	60007	open	2026-11-27T12:28:41Z		Note in the upgrade guide that default_url_options is frozen by default
+rails/rails	60005	closed	2026-11-27T12:01:46Z	2026-11-27T15:59:35Z	Note in the upgrade guide that models can't define a `default_order` scope
+rails/rails	60006	merged	2026-11-27T12:28:38Z	2026-11-27T15:59:10Z	Let Attachment.from_node pick attachables the bulk lookup didn't locate
+rails/rails	60007	merged	2026-11-27T12:28:41Z	2026-11-27T15:34:13Z	Note in the upgrade guide that default_url_options is frozen by default
+rails/rails	60008	merged	2026-11-27T12:50:13Z	2026-11-27T15:07:14Z	Bump the minimum supported SQLite version to 3.37.0
+rails/rails	60013	merged	2026-11-27T13:05:00Z	2026-11-27T15:26:56Z	Let the Action Mailer test helper load without Active Job
+rails/rails	60016	closed	2026-11-27T13:23:03Z	2026-11-27T13:32:36Z	Look up indexes inline in LazyIndexedAttributeSet#[] and #keys
+rails/rails	60017	closed	2026-11-27T15:09:01Z	2026-11-27T15:33:23Z	Keep `timestamp_attributes_for_create` and `_for_update` private
+rails/rails	60020	merged	2026-11-27T16:49:16Z	2026-11-27T17:21:59Z	Build attribute Hashes without copying the lazy row
 rmosolgo/graphql-ruby	5877	merged	2026-11-05T13:46:37Z	2026-11-05T15:54:11Z	Fix graphql-c_parser compilation on Windows (MinGW)
 rmosolgo/graphql-ruby	5880	merged	2026-11-05T18:00:33Z	2026-11-05T20:39:10Z	Skip comments in the Ruby lexer without `loop`
 rmosolgo/graphql-ruby	5881	merged	2026-11-05T18:00:44Z	2026-11-05T20:42:02Z	Match byte order marks with their own rule in the C lexer
@@ -197,9 +203,10 @@ ruby/ruby	19912	open	2026-11-15T22:27:58Z		ZJIT: Send Symbol block arguments dir
 ruby/ruby	19919	closed	2026-11-16T10:11:55Z	2026-11-17T02:55:58Z	Set up Bundler before command-line -r libraries again
 ruby/ruby	19976	merged	2026-11-18T09:30:22Z	2026-11-25T02:24:25Z	ZJIT: Don't specialize super from a refined method
 ruby/ruby	19982	merged	2026-11-18T13:46:09Z	2026-11-25T03:00:18Z	ZJIT: Recompile when an objtostring String guard fails
-ruby/ruby	20169	draft	2026-11-25T12:29:48Z		ZJIT: Profile the real class for setinstancevariable
+ruby/ruby	20169	open	2026-11-25T12:29:48Z		ZJIT: Profile the real class for setinstancevariable
 ruby/ruby	20172	merged	2026-11-25T12:43:31Z	2026-11-26T13:29:27Z	Fix Time.new with a zone object that converts to "UTC"
-ruby/ruby	20208	draft	2026-11-26T14:36:01Z		[Bug #21301] Normalize month-mday in Time.new before every zone path
+ruby/ruby	20208	open	2026-11-26T14:36:01Z		[Bug #21301] Normalize month-mday in Time.new before every zone path
+ruby/ruby	20261	open	2026-11-27T17:12:31Z		Append backtrace location strings by length
 ruby/ruby-bench	564	merged	2026-11-04T07:01:45Z	2026-11-05T00:48:25Z	Keep the lobsters and shipit caches in memory
 ruby/ruby-bench	565	merged	2026-11-05T08:05:33Z	2026-11-05T18:53:04Z	Run ANALYZE on the lobsters in-memory database
 ruby/ruby-bench	566	merged	2026-11-05T09:13:47Z	2026-11-05T18:50:25Z	Bump nokogiri to 1.19.7 in shipit
@@ -211,10 +218,11 @@ ruby/ruby-bench	571	open	2026-11-05T19:53:21Z		Run lobsters with a fixed clock
 ruby/ruby-bench	572	closed	2026-11-05T19:55:46Z	2026-11-18T06:34:28Z	Run lobsters with a fixed clock next to its fixture
 ruby/ruby-bench	574	open	2026-11-06T17:27:50Z		Test significance across processes with --runs
 ruby/ruby-bench	575	open	2026-11-06T21:14:31Z		Add a blog benchmark that writes
-ruby/ruby-bench	579	open	2026-11-14T18:11:30Z		Make the Callgrind profile's summary line match its totals
+ruby/ruby-bench	579	closed	2026-11-14T18:11:30Z	2026-11-27T13:32:04Z	Make the Callgrind profile's summary line match its totals
 rubycdp/cuprite	360	merged	2026-11-03T23:11:42Z	2026-11-08T07:06:23Z	Raise ObsoleteNode when a node is detached before the click hit test
 rubycdp/ferrum	696	merged	2026-11-04T09:10:14Z	2026-11-07T07:50:40Z	fix(node): click the center of a transformed node's bounding rect when content quads fail
 rubycdp/ferrum	697	closed	2026-11-04T09:53:35Z	2026-11-05T10:51:01Z	test(contexts): check in Chrome that no browser_ui target stays attached
+sferik/duel-ruby	9	open	2026-11-27T13:04:32Z		Read the Linux counter with read(2), not pread(2)
 skryukov/rails_vite	57	merged	2026-10-20T05:39:11Z	2026-11-12T20:40:15Z	Memoize manifest digest outside local environments
 sparklemotion/nokogiri	3759	open	2026-11-04T10:00:40Z		Call `children` once in `DocumentFragment#css`
 sparklemotion/sqlite3-ruby	758	merged	2026-10-22T18:01:02Z	2026-10-26T17:08:19Z	Avoid allocating a row array when a statement is done
