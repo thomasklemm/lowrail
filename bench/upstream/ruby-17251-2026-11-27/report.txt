@@ -1,0 +1,120 @@
+## shipit, rounds 1-6 (median (min-max) over rounds; 40 measured iterations after 15 warmups)
+| mode | build | n | majors | minors | GC ms | sampled peak RSS MiB | end RSS MiB | wall s |
+|---|---|---:|---:|---:|---:|---:|---:|---:|
+| interp | base f6278067b6 | 6 | 6 (6–7) | 204 (197–225) | 2294 (2201–2414) | 150 (148–152) | 150 (148–152) | 73.1 (70.4–74.5) |
+| interp | base (A/A copy) | 6 | 6 (6–6) | 206 (198–209) | 2415 (2170–2489) | 150 (148–151) | 150 (148–151) | 74.6 (71.4–77.0) |
+| interp | head 9715d0224e | 6 | 8 (8–9) | 168 (147–189) | 2385 (2170–2486) | 148 (144–151) | 148 (144–151) | 73.2 (69.8–76.7) |
+| yjit | base f6278067b6 | 6 | 6 (6–6) | 199 (192–211) | 2326 (2250–2456) | 199 (196–199) | 199 (196–199) | 34.0 (33.5–34.8) |
+| yjit | base (A/A copy) | 6 | 6 (6–7) | 208 (202–231) | 2289 (2235–2513) | 197 (194–198) | 197 (194–198) | 33.6 (32.8–35.9) |
+| yjit | head 9715d0224e | 6 | 9 (8–9) | 164 (151–176) | 2496 (2369–2574) | 196 (195–198) | 196 (195–198) | 34.3 (33.5–35.0) |
+| zjit | base f6278067b6 | 6 | 7 (7–8) | 222 (219–233) | 2576 (2467–2661) | 180 (178–181) | 180 (178–181) | 42.6 (41.6–43.7) |
+| zjit | base (A/A copy) | 6 | 6 (6–8) | 212 (199–234) | 2534 (2364–2874) | 181 (176–182) | 181 (176–182) | 42.9 (41.0–44.0) |
+| zjit | head 9715d0224e | 6 | 8 (8–9) | 150 (145–152) | 2376 (2084–2506) | 181 (181–183) | 181 (181–183) | 42.4 (39.2–43.8) |
+
+shipit paired by round: diff median (min-max), rounds where the first build is lower
+  interp head - base: GC ms +47.0 (-31.0–+123.0) lower 2/6; peak RSS MiB -2.8 (-6.3–+1.4) lower 5/6; majors +2.0 (+1.0–+3.0) lower 0/6
+  interp base2 - base: GC ms +65.0 (-31.0–+196.0) lower 2/6; peak RSS MiB -0.7 (-1.7–+2.5) lower 4/6; majors +0.0 (-1.0–+0.0) lower 1/6
+  interp head - base2: GC ms -1.5 (-166.0–+111.0) lower 3/6; peak RSS MiB -2.7 (-5.1–+0.7) lower 5/6; majors +2.0 (+2.0–+3.0) lower 0/6
+  yjit head - base: GC ms +139.0 (+49.0–+304.0) lower 0/6; peak RSS MiB -2.2 (-3.6–+1.2) lower 5/6; majors +3.0 (+2.0–+3.0) lower 0/6
+  yjit base2 - base: GC ms -7.0 (-132.0–+140.0) lower 4/6; peak RSS MiB -1.0 (-5.2–+0.5) lower 4/6; majors +0.0 (+0.0–+1.0) lower 0/6
+  yjit head - base2: GC ms +150.5 (-91.0–+329.0) lower 1/6; peak RSS MiB -0.5 (-2.6–+1.6) lower 3/6; majors +3.0 (+2.0–+3.0) lower 0/6
+  zjit head - base: GC ms -166.0 (-504.0–-115.0) lower 6/6; peak RSS MiB +1.2 (+0.2–+3.8) lower 0/6; majors +1.0 (+0.0–+2.0) lower 0/6
+  zjit base2 - base: GC ms +1.5 (-224.0–+230.0) lower 3/6; peak RSS MiB +1.1 (-2.1–+2.2) lower 1/6; majors -0.5 (-2.0–+1.0) lower 3/6
+  zjit head - base2: GC ms -193.0 (-368.0–-100.0) lower 6/6; peak RSS MiB +0.6 (-1.6–+4.2) lower 2/6; majors +1.5 (+1.0–+3.0) lower 0/6
+
+## shipit attribution, rounds h1-h3 (per-GC records; attrib.sh)
+| mode | build | completed majors by reason | limit factor after majors | ms per major | major ms per round | minor ms per round | GC ms per round (stat) | majors per round (stat) |
+|---|---|---|---|---:|---:|---:|---:|---:|
+| interp | base f6278067b6 | nofree 18 | 2.0x 18 | 61 | 365 | 1733 | 2253 | 6, 6, 6 |
+| interp | head 9715d0224e | nofree 1, oldgen 24 | 1.25x 25 | 63 | 526 | 1776 | 2448 | 9, 9, 9 |
+| yjit | base f6278067b6 | nofree 18 | 2.0x 18 | 79 | 475 | 1645 | 2262 | 6, 6, 6 |
+| yjit | head 9715d0224e | oldgen 25 | 1.25x 25 | 78 | 653 | 1548 | 2318 | 9, 9, 8 |
+| zjit | base f6278067b6 | nofree 21 | 2.0x 21 | 64 | 450 | 1277 | 2502 | 7, 7, 7 |
+| zjit | head 9715d0224e | oldgen 27 | 1.25x 27 | 64 | 575 | 1028 | 2366 | 9, 9, 9 |
+
+## census, rounds 1-5 (median (min-max) over rounds; RSS at end and peak are summed over the three apps)
+| mode | app | build | n | majors (nofree) | minors | GC ms | RSS at end of app MiB | peak RSS MiB |
+|---|---|---|---:|---:|---:|---:|---:|---:|
+| interp | blog | base f6278067b6 | 5 | 0 (0–1) (0 (0–1)) | 94 (85–115) | 607 (547–671) | 167 (163–175) | 167 (163–175) |
+| interp | blog | base (A/A copy) | 5 | 0 (0–1) (0 (0–1)) | 106 (104–142) | 623 (461–770) | 165 (158–168) | 165 (158–168) |
+| interp | blog | head 9715d0224e | 5 | 0 (0–1) (0 (0–1)) | 153 (103–162) | 620 (495–717) | 158 (157–170) | 158 (157–170) |
+| interp | fizzy | base f6278067b6 | 5 | 0 (0–0) (0 (0–0)) | 258 (256–264) | 4740 (4399–4952) | 275 (266–281) | 275 (270–285) |
+| interp | fizzy | base (A/A copy) | 5 | 0 (0–1) (0 (0–0)) | 259 (255–317) | 4797 (4733–5127) | 273 (250–285) | 276 (250–285) |
+| interp | fizzy | head 9715d0224e | 5 | 0 (0–0) (0 (0–0)) | 259 (255–262) | 4712 (4185–4916) | 277 (264–282) | 282 (268–282) |
+| interp | lobsters | base f6278067b6 | 5 | 0 (0–0) (0 (0–0)) | 279 (255–438) | 3719 (3617–4121) | 232 (220–235) | 232 (220–235) |
+| interp | lobsters | base (A/A copy) | 5 | 0 (0–0) (0 (0–0)) | 257 (250–293) | 3834 (3423–4046) | 235 (229–236) | 235 (229–236) |
+| interp | lobsters | head 9715d0224e | 5 | 0 (0–0) (0 (0–0)) | 281 (260–327) | 3666 (3574–3726) | 231 (226–234) | 231 (226–234) |
+| interp | all | base f6278067b6 | 5 | 0 (0–1) (0 (0–1)) | 656 (601–796) | 8998 (8780–9667) | 677 (660–684) | 680 (660–684) |
+  (workloads per round: 35; major_by: [{}, {"nofree" => 1}, {}, {}, {"nofree" => 1}])
+| interp | all | base (A/A copy) | 5 | 0 (0–1) (0 (0–1)) | 622 (616–752) | 9304 (8821–9731) | 675 (638–683) | 679 (638–683) |
+  (workloads per round: 35; major_by: [{}, {}, {"nofree" => 1}, {}, {"oldmalloc" => 1}])
+| interp | all | head 9715d0224e | 5 | 0 (0–1) (0 (0–1)) | 701 (630–729) | 9005 (8406–9202) | 666 (662–673) | 671 (662–673) |
+  (workloads per round: 35; major_by: [{"nofree" => 1}, {}, {}, {}, {}])
+| yjit | blog | base f6278067b6 | 5 | 0 (0–1) (0 (0–1)) | 90 (84–91) | 488 (441–571) | 218 (217–223) | 218 (217–223) |
+| yjit | blog | base (A/A copy) | 5 | 0 (0–1) (0 (0–1)) | 90 (86–109) | 509 (471–575) | 214 (211–222) | 214 (211–222) |
+| yjit | blog | head 9715d0224e | 5 | 0 (0–2) (0 (0–2)) | 118 (99–153) | 464 (434–586) | 207 (207–218) | 207 (207–218) |
+| yjit | fizzy | base f6278067b6 | 5 | 0 (0–1) (0 (0–0)) | 260 (258–267) | 4829 (4767–5036) | 362 (361–368) | 362 (361–368) |
+| yjit | fizzy | base (A/A copy) | 5 | 0 (0–0) (0 (0–0)) | 264 (255–324) | 4786 (4366–5115) | 367 (338–372) | 367 (338–372) |
+| yjit | fizzy | head 9715d0224e | 5 | 0 (0–1) (0 (0–0)) | 258 (256–259) | 4890 (4536–4986) | 368 (360–371) | 368 (360–371) |
+| yjit | lobsters | base f6278067b6 | 5 | 0 (0–0) (0 (0–0)) | 286 (197–416) | 3553 (3287–3609) | 299 (290–314) | 299 (290–314) |
+| yjit | lobsters | base (A/A copy) | 5 | 0 (0–0) (0 (0–0)) | 215 (200–435) | 3500 (3317–3718) | 309 (289–313) | 309 (289–313) |
+| yjit | lobsters | head 9715d0224e | 5 | 0 (0–0) (0 (0–0)) | 438 (211–456) | 3513 (3301–4177) | 287 (285–309) | 287 (285–309) |
+| yjit | all | base f6278067b6 | 5 | 1 (0–1) (0 (0–1)) | 628 (546–766) | 8817 (8604–9182) | 883 (876–892) | 883 (876–892) |
+  (workloads per round: 35; major_by: [{"oldmalloc" => 1}, {"nofree" => 1}, {"oldmalloc" => 1}, {}, {}])
+| yjit | all | base (A/A copy) | 5 | 0 (0–1) (0 (0–1)) | 646 (550–787) | 8978 (8154–9190) | 873 (858–898) | 873 (858–898) |
+  (workloads per round: 35; major_by: [{}, {}, {}, {"nofree" => 1}, {}])
+| yjit | all | head 9715d0224e | 5 | 0 (0–2) (0 (0–2)) | 812 (591–820) | 8997 (8464–9678) | 866 (865–883) | 866 (865–883) |
+  (workloads per round: 35; major_by: [{"oldmalloc" => 1}, {"nofree" => 2}, {}, {}, {}])
+| zjit | blog | base f6278067b6 | 5 | 0 (0–0) (0 (0–0)) | 120 (119–122) | 643 (582–841) | 204 (203–204) | 204 (203–204) |
+| zjit | blog | base (A/A copy) | 5 | 0 (0–0) (0 (0–0)) | 120 (108–123) | 692 (570–822) | 203 (202–205) | 203 (202–205) |
+| zjit | blog | head 9715d0224e | 5 | 1 (0–2) (1 (0–2)) | 106 (103–137) | 680 (654–768) | 209 (201–212) | 209 (201–212) |
+| zjit | fizzy | base f6278067b6 | 5 | 2 (2–3) (0 (0–0)) | 246 (240–251) | 5243 (5169–5391) | 365 (358–380) | 365 (358–380) |
+| zjit | fizzy | base (A/A copy) | 5 | 2 (0–2) (0 (0–0)) | 247 (243–367) | 5182 (5084–5654) | 367 (324–377) | 367 (324–377) |
+| zjit | fizzy | head 9715d0224e | 5 | 2 (2–3) (0 (0–0)) | 243 (238–250) | 5202 (4982–5356) | 372 (364–373) | 372 (364–373) |
+| zjit | lobsters | base f6278067b6 | 5 | 0 (0–0) (0 (0–0)) | 277 (276–281) | 4010 (3761–4148) | 296 (295–297) | 296 (295–297) |
+| zjit | lobsters | base (A/A copy) | 5 | 0 (0–0) (0 (0–0)) | 283 (275–423) | 3912 (3600–4300) | 297 (288–297) | 297 (288–297) |
+| zjit | lobsters | head 9715d0224e | 5 | 0 (0–0) (0 (0–0)) | 255 (207–288) | 3843 (3669–4303) | 297 (293–307) | 297 (293–307) |
+| zjit | all | base f6278067b6 | 5 | 2 (2–3) (0 (0–0)) | 645 (641–650) | 9899 (9685–10094) | 867 (858–879) | 867 (858–879) |
+  (workloads per round: 35; major_by: [{"oldmalloc" => 2}, {"oldmalloc" => 2}, {"oldmalloc" => 2}, {"oldmalloc" => 2}, {"oldmalloc" => 3}])
+| zjit | all | base (A/A copy) | 5 | 2 (0–2) (0 (0–0)) | 649 (642–782) | 9586 (9412–10557) | 865 (825–876) | 865 (825–876) |
+  (workloads per round: 35; major_by: [{}, {"oldmalloc" => 2}, {"oldmalloc" => 2}, {"oldmalloc" => 2}, {"oldmalloc" => 2}])
+| zjit | all | head 9715d0224e | 5 | 3 (3–4) (1 (0–2)) | 614 (555–663) | 9961 (9331–10231) | 878 (860–890) | 878 (860–890) |
+  (workloads per round: 35; major_by: [{"oldmalloc" => 3}, {"nofree" => 2, "oldmalloc" => 2}, {"nofree" => 1, "oldmalloc" => 3}, {"nofree" => 1, "oldmalloc" => 2}, {"nofree" => 1, "oldmalloc" => 2}])
+
+Census paired by round: diff median (min-max), rounds where the first build is lower
+  interpreter blog head - base: majors +0.0 (-1.0–+1.0) lower 2/5; time +11.0 (-52.0–+108.0) lower 2/5; rss_end -9.6 (-17.8–+7.1) lower 4/5; hwm -9.6 (-17.8–+7.1) lower 4/5
+  interpreter blog base2 - base: majors +0.0 (-1.0–+1.0) lower 2/5; time +38.0 (-86.0–+99.0) lower 2/5; rss_end -5.1 (-12.1–+1.6) lower 3/5; hwm -5.1 (-12.1–+1.6) lower 3/5
+  interpreter blog head - base2: majors +0.0 (-1.0–+1.0) lower 1/5; time +34.0 (-96.0–+70.0) lower 2/5; rss_end -8.1 (-10.5–+12.1) lower 4/5; hwm -8.1 (-10.5–+12.1) lower 4/5
+  interpreter fizzy head - base: majors +0.0 (+0.0–+0.0) lower 0/5; time -57.0 (-214.0–+42.0) lower 4/5; rss_end -0.6 (-2.3–+8.5) lower 3/5; hwm -0.6 (-3.7–+8.5) lower 3/5
+  interpreter fizzy base2 - base: majors +0.0 (+0.0–+1.0) lower 0/5; time +63.0 (-17.0–+398.0) lower 1/5; rss_end -3.2 (-15.7–+4.9) lower 4/5; hwm +0.2 (-20.0–+2.9) lower 2/5
+  interpreter fizzy head - base2: majors +0.0 (-1.0–+0.0) lower 1/5; time -92.0 (-612.0–-6.0) lower 5/5; rss_end +2.7 (-3.9–+13.4) lower 1/5; hwm +3.5 (-3.9–+17.6) lower 2/5
+  interpreter lobsters head - base: majors +0.0 (+0.0–+0.0) lower 0/5; time -108.0 (-455.0–+99.0) lower 4/5; rss_end +0.7 (-4.7–+13.7) lower 2/5; hwm +0.7 (-4.7–+13.7) lower 2/5
+  interpreter lobsters base2 - base: majors +0.0 (+0.0–+0.0) lower 0/5; time +178.0 (-298.0–+217.0) lower 2/5; rss_end +0.5 (-3.0–+15.3) lower 2/5; hwm +0.5 (-3.0–+15.3) lower 2/5
+  interpreter lobsters head - base2: majors +0.0 (+0.0–+0.0) lower 0/5; time -157.0 (-321.0–+151.0) lower 4/5; rss_end -2.9 (-9.0–+3.8) lower 4/5; hwm -2.9 (-9.0–+3.8) lower 4/5
+  interpreter all head - base: majors +0.0 (-1.0–+1.0) lower 2/5; time -164.0 (-465.0–+7.0) lower 4/5; rss_end -10.7 (-22.5–+12.5) lower 3/5; hwm -9.1 (-22.5–+12.5) lower 3/5
+  interpreter all base2 - base: majors +0.0 (-1.0–+1.0) lower 1/5; time +279.0 (-337.0–+524.0) lower 2/5; rss_end -2.4 (-23.8–+15.7) lower 3/5; hwm -1.6 (-28.1–+19.0) lower 3/5
+  interpreter all head - base2: majors +0.0 (-1.0–+1.0) lower 2/5; time -272.0 (-898.0–-37.0) lower 5/5; rss_end -8.3 (-18.6–+29.3) lower 4/5; hwm -7.4 (-18.6–+33.5) lower 4/5
+  yjit blog head - base: majors +0.0 (+0.0–+1.0) lower 0/5; time -7.0 (-69.0–+15.0) lower 3/5; rss_end -9.9 (-11.6–-4.6) lower 5/5; hwm -9.9 (-11.6–-4.6) lower 5/5
+  yjit blog base2 - base: majors +0.0 (-1.0–+1.0) lower 1/5; time +8.0 (-48.0–+68.0) lower 2/5; rss_end -6.0 (-8.6–+4.2) lower 4/5; hwm -6.0 (-8.6–+4.2) lower 4/5
+  yjit blog head - base2: majors +0.0 (-1.0–+2.0) lower 1/5; time -58.0 (-77.0–+63.0) lower 4/5; rss_end -3.9 (-14.7–+4.0) lower 4/5; hwm -3.9 (-14.7–+4.0) lower 4/5
+  yjit fizzy head - base: majors +0.0 (-1.0–+0.0) lower 1/5; time +24.0 (-293.0–+104.0) lower 2/5; rss_end +0.6 (-0.3–+10.0) lower 1/5; hwm +0.6 (-0.3–+10.0) lower 1/5
+  yjit fizzy base2 - base: majors +0.0 (-1.0–+0.0) lower 2/5; time -35.0 (-463.0–+285.0) lower 3/5; rss_end +2.1 (-23.0–+5.7) lower 1/5; hwm +2.1 (-23.0–+5.7) lower 1/5
+  yjit fizzy head - base2: majors +0.0 (+0.0–+1.0) lower 0/5; time +129.0 (-261.0–+170.0) lower 2/5; rss_end +0.2 (-5.1–+22.6) lower 2/5; hwm -0.0 (-5.1–+22.6) lower 3/5
+  yjit lobsters head - base: majors +0.0 (+0.0–+0.0) lower 0/5; time +128.0 (-308.0–+602.0) lower 1/5; rss_end -12.8 (-15.2–+18.4) lower 4/5; hwm -12.8 (-15.2–+18.4) lower 4/5
+  yjit lobsters base2 - base: majors +0.0 (+0.0–+0.0) lower 0/5; time +30.0 (-115.0–+165.0) lower 2/5; rss_end -5.1 (-10.0–+20.1) lower 3/5; hwm -5.1 (-10.0–+20.1) lower 3/5
+  yjit lobsters head - base2: majors +0.0 (+0.0–+0.0) lower 0/5; time +13.0 (-295.0–+717.0) lower 2/5; rss_end -3.2 (-26.4–-0.2) lower 5/5; hwm -3.2 (-26.4–-0.2) lower 5/5
+  yjit all head - base: majors +0.0 (-1.0–+1.0) lower 1/5; time +41.0 (-291.0–+496.0) lower 2/5; rss_end -15.7 (-18.7–+7.0) lower 4/5; hwm -15.7 (-18.6–+7.0) lower 4/5
+  yjit all base2 - base: majors -1.0 (-1.0–+1.0) lower 3/5; time +198.0 (-450.0–+337.0) lower 2/5; rss_end -10.3 (-34.0–+20.0) lower 3/5; hwm -10.3 (-34.0–+20.1) lower 3/5
+  yjit all head - base2: majors +0.0 (-1.0–+2.0) lower 1/5; time +44.0 (-628.0–+909.0) lower 2/5; rss_end -8.4 (-33.2–+18.5) lower 4/5; hwm -8.3 (-33.2–+18.5) lower 4/5
+  zjit blog head - base: majors +1.0 (+0.0–+2.0) lower 0/5; time +45.0 (-96.0–+72.0) lower 1/5; rss_end +5.6 (-3.3–+8.5) lower 1/5; hwm +5.6 (-3.3–+8.5) lower 1/5
+  zjit blog base2 - base: majors +0.0 (+0.0–+0.0) lower 0/5; time -19.0 (-72.0–+179.0) lower 4/5; rss_end -0.6 (-1.6–+1.3) lower 3/5; hwm -0.6 (-1.6–+1.5) lower 3/5
+  zjit blog head - base2: majors +1.0 (+0.0–+2.0) lower 0/5; time +64.0 (-148.0–+84.0) lower 2/5; rss_end +6.0 (-2.6–+7.6) lower 1/5; hwm +6.0 (-2.6–+7.6) lower 1/5
+  zjit fizzy head - base: majors +0.0 (-1.0–+1.0) lower 1/5; time -41.0 (-307.0–+139.0) lower 3/5; rss_end +3.3 (-7.2–+8.2) lower 1/5; hwm +3.3 (-7.2–+8.2) lower 1/5
+  zjit fizzy base2 - base: majors +0.0 (-2.0–+0.0) lower 2/5; time -79.0 (-271.0–+411.0) lower 4/5; rss_end -0.1 (-33.9–+3.3) lower 3/5; hwm -0.1 (-33.9–+3.3) lower 3/5
+  zjit fizzy head - base2: majors +0.0 (+0.0–+3.0) lower 0/5; time +118.0 (-471.0–+230.0) lower 2/5; rss_end +1.0 (-5.0–+41.8) lower 2/5; hwm +1.0 (-5.0–+41.8) lower 2/5
+  zjit lobsters head - base: majors +0.0 (+0.0–+0.0) lower 0/5; time -19.0 (-295.0–+293.0) lower 3/5; rss_end +0.6 (-2.9–+11.3) lower 2/5; hwm +0.6 (-2.9–+11.3) lower 2/5
+  zjit lobsters base2 - base: majors +0.0 (+0.0–+0.0) lower 0/5; time -1.0 (-236.0–+187.0) lower 3/5; rss_end -0.3 (-7.8–+1.6) lower 3/5; hwm -0.3 (-7.8–+1.6) lower 3/5
+  zjit lobsters head - base2: majors +0.0 (+0.0–+0.0) lower 0/5; time +169.0 (-482.0–+243.0) lower 2/5; rss_end +1.0 (-3.8–+19.2) lower 2/5; hwm +1.0 (-3.8–+19.2) lower 2/5
+  zjit all head - base: majors +1.0 (+0.0–+2.0) lower 0/5; time +68.0 (-354.0–+137.0) lower 2/5; rss_end +9.8 (-0.9–+22.3) lower 1/5; hwm +9.8 (-0.9–+22.3) lower 1/5
+  zjit all base2 - base: majors +0.0 (-2.0–+0.0) lower 2/5; time -99.0 (-481.0–+463.0) lower 3/5; rss_end -3.2 (-33.0–+4.6) lower 4/5; hwm -3.2 (-33.0–+4.6) lower 4/5
+  zjit all head - base2: majors +2.0 (+1.0–+3.0) lower 0/5; time -255.0 (-456.0–+549.0) lower 3/5; rss_end +17.7 (+2.2–+35.5) lower 0/5; hwm +17.7 (+2.2–+35.5) lower 0/5
