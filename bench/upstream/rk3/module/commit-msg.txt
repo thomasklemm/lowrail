@@ -1,0 +1,13 @@
+Share unescape between Utils and QueryParser
+
+Rack::Utils.unescape and QueryParser#unescape had the same body. Utils
+requires query_parser, so QueryParser cannot take the method from Utils.
+Move unescape into a module in query_parser.rb that both include. Utils
+makes it a module function as before, so Rack::Utils.unescape still
+works and including Utils still gives a private unescape, and
+QueryParser subclasses can still override it.
+
+utils.rb is a binary source file, so the ArgumentError that
+Utils.unescape raised for an invalid %-encoding of an ASCII-only string
+had a binary message. It now has the encoding of URI's message, as
+QueryParser#unescape's already did.

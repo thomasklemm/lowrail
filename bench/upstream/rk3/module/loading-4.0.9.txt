@@ -1,0 +1,8 @@
+1c1
+< {entry: "rack", loaded: ["rack.rb", "rack/constants.rb", "rack/version.rb"]}
+---
+> {entry: "rack", loaded: ["rack/lib/rack.rb", "rack/constants.rb", "rack/version.rb"]}
+rack/query_parser: identical
+rack/utils: identical
+rack/request: identical
+rack/mock_request: identical
