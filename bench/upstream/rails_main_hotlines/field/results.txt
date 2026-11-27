@@ -1,0 +1,28 @@
+== r81 3f290b759c
+rails 8.1.4.1 ruby 4.0.9
+csp build with nonce        51.0
+Time#change(hour: 0) utc    6.0
+Time#change(day: 1) utc     7.0
+TWZ#change(hour: 0)         11.0
+beginning_of_day utc        6.0
+== main 088fc0cf61
+rails 8.2.0.alpha ruby 4.0.9
+csp build with nonce        32.0
+Time#change(hour: 0) utc    2.0
+Time#change(day: 1) utc     3.0
+TWZ#change(hour: 0)         7.0
+beginning_of_day utc        2.0
+== r81 3f290b759c
+rails 8.1.4.1 ruby 4.0.9
+csp build with nonce        51.0
+Time#change(hour: 0) utc    6.0
+Time#change(day: 1) utc     7.0
+TWZ#change(hour: 0)         11.0
+beginning_of_day utc        6.0
+== main 088fc0cf61
+rails 8.2.0.alpha ruby 4.0.9
+csp build with nonce        32.0
+Time#change(hour: 0) utc    2.0
+Time#change(day: 1) utc     3.0
+TWZ#change(hour: 0)         7.0
+beginning_of_day utc        2.0

@@ -1,0 +1,22 @@
+Could not load Rails: uninitialized constant Faker::Name
+/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker.rb:152:in 'Module#const_get'
+/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker.rb:152:in 'block in Faker::Base.parse'
+/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker.rb:149:in 'Array#map'
+/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker.rb:149:in 'Faker::Base.parse'
+/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker/default/company.rb:18:in 'Faker::Company.name'
+
+While loading ./spec/deliveries/proposal_delivery_spec.rb an `exit` / `raise SystemExit` occurred, RSpec will now quit.
+Failure/Error: exit(1)
+
+SystemExit:
+  exit
+# ./spec/rails_helper.rb:9:in 'Kernel#exit'
+# ./spec/rails_helper.rb:9:in '<top (required)>'
+# ./spec/deliveries/proposal_delivery_spec.rb:1:in '<top (required)>'
+# ------------------
+# --- Caused by: ---
+# NameError:
+#   uninitialized constant Faker::Name
+#   /home/user/workspace/repo/bench/upstream/rails_main_hotlines/field/debug_page_count.rb:5:in 'block in <top (required)>'
+
+All examples were filtered out; ignoring {}

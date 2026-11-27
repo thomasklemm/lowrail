@@ -1,0 +1,2 @@
+pid=243021 exception=0 blocked_host=0
+app=campfire tree=main exit=1 wall=9.955177747

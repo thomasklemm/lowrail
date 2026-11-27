@@ -1,0 +1,2 @@
+pid=243556 exception=0 blocked_host=0
+app=pingcrm tree=main exit=1 wall=4.548033647

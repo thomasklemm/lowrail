@@ -1,0 +1,3 @@
+pid=242926 exception=0 blocked_host=0
+app=blog tree=main exit=0 wall=6.548014683
+21 runs, 54 assertions, 0 failures, 0 errors, 0 skips

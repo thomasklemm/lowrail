@@ -1,0 +1,2 @@
+pid=244077 exception=0 blocked_host=0
+app=writebook tree=main exit=1 wall=7.800069381
