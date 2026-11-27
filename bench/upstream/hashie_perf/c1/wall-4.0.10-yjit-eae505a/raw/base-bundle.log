@@ -1,0 +1,5 @@
+Waiting for another process to let go of lock: /home/user/rubies/4.0.10-a704b7cd95/lib/ruby/gems/4.0.0/bundler.lock
+Resolving dependencies...
+Fetching gem metadata from https://rubygems.org/.
+Bundle complete! 1 Gemfile dependency, 2 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.

@@ -1,0 +1,185 @@
+# callgrind format
+version: 1
+creator: callgrind-3.19.0
+pid: 129832
+cmd:  /home/user/rubies/4.0.10-a704b7cd95/bin/ruby -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/hashie_perf/suffix_body.rb read keys with suffixes 0
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 161943018
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 54
+
+
+ob=(10) /home/user/rubies/4.0.10-a704b7cd95/bin/ruby
+fl=(248) /home/user/src/ruby-4.0.10/build/../eval.c
+fn=(12468) rb_ec_exec_node
+cfi=(247) /home/user/src/ruby-4.0.10/build/../vm.c
+cfn=(12472) rb_iseq_eval_main
+calls=1 3086 
+294 54
+
+fn=(6088) rb_block_given_p
+1028 1
+fi=(258) /home/user/src/ruby-4.0.10/build/../vm_core.h
+2108 3
++20 1
+fe=(248)
+1029 2
+cfi=(247)
+cfn=(2758) rb_vm_frame_block_handler
+calls=5723 219 
+* 12
+* 2
++6 1
+-6 1
++6 1
+
+fn=(12466) ruby_run_node
+cfn=(12468)
+calls=1 287 
+332 54
+
+fl=(168) ???
+fn=(656) (below main)
+cob=(2) /usr/lib/x86_64-linux-gnu/libc.so.6
+cfi=(169) ./csu/../csu/libc-start.c
+cfn=(658) __libc_start_main@@GLIBC_2.34
+calls=1 242 
+0 54
+
+fl=(327) /home/user/src/ruby-4.0.10/build/../array.c
+fn=(13502) rb_ary_cycle
+7074 6
+fi=(358) /home/user/src/ruby-4.0.10/build/../include/ruby/internal/intern/error.h
+286 4
+fe=(327)
+7079 1
+cfi=(248)
+cfn=(6088)
+calls=1 1028 
+* 24
+* 2
++1 5
+fi=(378) /home/user/src/ruby-4.0.10/build/../include/ruby/internal/arithmetic/long.h
+269 2
+-72 1
+fe=(327)
+7085 2
++9 7
+
+fl=(307) /home/user/src/ruby-4.0.10/build/../vm_exec.c
+fn=(1264) vm_exec_core
+fi=(496) /home/user/src/ruby-4.0.10/build/../insns.def
+cfi=(284) /home/user/src/ruby-4.0.10/build/../vm_insnhelper.c
+cfn=(5440) vm_sendish.constprop.0
+calls=3017 6119 
+859 54
+fe=(307)
+
+fl=(284)
+fn=(5440)
+cfn=(5078) vm_call_general
+calls=83 5076 
+6142 54
+
+fn=(5084) vm_call_method_each_type
+cfn=(5088) vm_call_cfunc
+calls=74 4055 
+4906 54
+
+fn=(5088)
+cfn=(5092) vm_call_cfunc_other
+calls=75 3969 
+4072 54
+
+fn=(5092)
+cfn=(5100) vm_call_cfunc_with_frame_
+calls=50 3889 
+3964 54
+
+fn=(2778) ractor_safe_call_cfunc_m1
+cfi=(327)
+cfn=(13502)
+calls=1 7074 
+3727 54
+
+fn=(5100)
+cfn=(2778)
+calls=42038 3725 
+3918 54
+
+fn=(5078)
+cfn=(5080) vm_call_method
+calls=13291 5023 
+5076 54
+
+fn=(5080)
+cfn=(5084)
+calls=160 4884 
+5043 54
+
+fl=(247)
+fn=(2758)
+219 1
+fi=(258)
+1453 1
++2 2
+1590 4
+fe=(247)
+74 2
+fi=(258)
+1602 2
+fe=(247)
+
+fn=(12472)
+cfn=(5000) rb_vm_exec
+calls=1 2799 
+3090 54
+
+fn=(5000)
+cfi=(307)
+cfn=(1264)
+calls=27 46 
+2851 54
+
+fl=(176) /home/user/src/ruby-4.0.10/build/../main.c
+fn=(690) main
+cfi=(248)
+cfn=(12466)
+calls=1 325 
+42 54
+
+ob=(2)
+fl=(172) ./csu/../sysdeps/nptl/libc_start_call_main.h
+fn=(682) (below main)
+cob=(10)
+cfi=(176)
+cfn=(690)
+calls=1 53 
+58 54
+
+fl=(169)
+fn=(658)
+cfi=(172)
+cfn=(682)
+calls=1 29 
+360 54
+
+ob=(1) /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+fl=(1) ???
+fn=(0) 0x000000000001d300
+cob=(10)
+cfi=(168)
+cfn=(656)
+calls=1 0 
+0 54
+
+totals: 54

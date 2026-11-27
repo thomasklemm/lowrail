@@ -1,0 +1,73 @@
+==134860== Callgrind, a call-graph generating cache profiler
+==134860== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==134860== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==134860== Command: /home/user/rubies/4.0.10-a704b7cd95/bin/ruby --yjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/hashie_perf/suffix_body.rb write\ a\ new\ key\ as\ a\ method 2000
+==134860== Parent PID: 129429
+==134860== 
+--134860-- 
+--134860-- Valgrind options:
+--134860--    --verbose
+--134860--    --tool=callgrind
+--134860--    --collect-atstart=no
+--134860--    --toggle-collect=rb_ary_cycle
+--134860--    --smc-check=all
+--134860--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/hashie_perf/body/HM2-eae505a/raw/ir-yjit-2-write_a_new_key_as_a_method-base2-n2000.callgrind
+--134860--    --log-file=/home/user/workspace/repo/bench/upstream/hashie_perf/body/HM2-eae505a/raw/ir-yjit-2-write_a_new_key_as_a_method-base2-n2000.valgrind.log
+--134860-- Contents of /proc/version:
+--134860--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--134860-- 
+--134860-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--134860-- Page sizes: currently 4096, max supported 4096
+--134860-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==134860== For interactive control, run 'callgrind_control -h'.
+--134860-- Reading syms from /home/user/rubies/4.0.10-a704b7cd95/bin/ruby
+--134860-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--134860--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--134860--   .. build-id is valid
+--134860-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--134860--    object doesn't have a dynamic symbol table
+--134860-- Scheduler: using generic scheduler lock implementation.
+==134860== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-134860-by-user-on-???
+==134860== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-134860-by-user-on-???
+==134860== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-134860-by-user-on-???
+==134860== 
+==134860== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==134860== don't want to do, unless you know exactly what you're doing,
+==134860== or are doing some strange experiment):
+==134860==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=134860 ...command...
+==134860== 
+==134860== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==134860==   /path/to/gdb /home/user/rubies/4.0.10-a704b7cd95/bin/ruby
+==134860== and then give GDB the following command
+==134860==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=134860
+==134860== --pid is optional if only one valgrind process is running
+==134860== 
+--134860-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--134860-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--134860--    object doesn't have a symbol table
+--134860-- Reading syms from /usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0
+--134860--    object doesn't have a symbol table
+--134860-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
+--134860--    object doesn't have a symbol table
+--134860-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--134860--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--134860--   .. build-id is valid
+--134860-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--134860--    object doesn't have a symbol table
+--134860-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--134860--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--134860--   .. build-id is valid
+--134860-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--134860-- Reading syms from /home/user/rubies/4.0.10-a704b7cd95/lib/ruby/4.0.0/x86_64-linux/enc/encdb.so
+--134860-- Reading syms from /home/user/rubies/4.0.10-a704b7cd95/lib/ruby/4.0.0/x86_64-linux/enc/trans/transdb.so
+--134860-- Reading syms from /home/user/rubies/4.0.10-a704b7cd95/lib/ruby/4.0.0/x86_64-linux/monitor.so
+--134860-- Reading syms from /home/user/rubies/4.0.10-a704b7cd95/lib/ruby/4.0.0/x86_64-linux/json/ext/parser.so
+--134860-- Reading syms from /home/user/rubies/4.0.10-a704b7cd95/lib/ruby/4.0.0/x86_64-linux/json/ext/generator.so
+==134860== 
+--134860-- Start dumping at BB 238837984 (Prg.Term.)...
+--134860-- Dump to /home/user/workspace/repo/bench/upstream/hashie_perf/body/HM2-eae505a/raw/ir-yjit-2-write_a_new_key_as_a_method-base2-n2000.callgrind
+--134860-- Dumping done.
+==134860== Events    : Ir
+==134860== Collected : 21548521
+==134860== 
+==134860== I   refs:      21,548,521

@@ -118,9 +118,9 @@ No open hashie PRs except our HD2 (#660). Open issues #450 and #229 are unrelate
 `method_name_and_suffix`, suffix allocations, deep_merge or dup performance, Mash#dig and Mash.new found only closed
 2015–2019 issues about other behaviour.
 
-## Reply draft to dblock (issuecomment-7226612359)
+## Reply to dblock (issuecomment-7226612359)
 
-For both reviewers' approval of the exact text; `#661` is HM2's number if nothing opens before it.
+Posted 2026-11-27 as issuecomment-7227673119 after thermos-sol and Astra approved these exact words; HM2 opened as #661.
 
 ```text
 Thanks for digging these up. I measured each one on master with Duel (YJIT and ZJIT) and locally:

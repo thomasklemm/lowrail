@@ -1,0 +1,326 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/hashie_perf/suffix_body.rb",
+  "at": "2026-11-27T20:26:46Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/rubies/4.0.10-a704b7cd95/bin/ruby",
+      "tree": "/home/user/workspace/repo/.amp/in/orb-backup/hashie-perf/hashie-base",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "9e313f308f3270995c2c978e92f0f216b861861b",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/rubies/4.0.10-a704b7cd95/bin/ruby",
+      "tree": "/home/user/workspace/repo/.amp/in/orb-backup/hashie-perf/hashie-c1",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "eae505a846f162e743b65261a7cda01d32e84f85",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp read keys with suffixes": {
+      "base": 15.999,
+      "base1": 15.999,
+      "base2": 15.999,
+      "candidate": 12.999,
+      "change": -0.1875117194824677,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp write a new key as a method": {
+      "base": 6.0,
+      "base1": 6.0,
+      "base2": 6.0,
+      "candidate": 5.0,
+      "change": -0.16666666666666663,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit read keys with suffixes": {
+      "base": 15.999,
+      "base1": 15.999,
+      "base2": 15.999,
+      "candidate": 12.999,
+      "change": -0.1875117194824677,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit write a new key as a method": {
+      "base": 6.0,
+      "base1": 6.0,
+      "base2": 6.0,
+      "candidate": 5.0,
+      "change": -0.16666666666666663,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp read keys with suffixes": {
+      "base": 34949.6235,
+      "base1": 34927.6235,
+      "base2": 34971.6235,
+      "candidate": 35142.0445,
+      "change": 0.005505667321423324,
+      "aa": 0.0012589549069105135,
+      "claim": true
+    },
+    "interp write a new key as a method": {
+      "base": 19668.6255,
+      "base1": 19668.6255,
+      "base2": 19668.6255,
+      "candidate": 19706.4855,
+      "change": 0.0019248930231550165,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit read keys with suffixes": {
+      "base": 20032.1605,
+      "base1": 20051.1605,
+      "base2": 20013.1605,
+      "candidate": 19283.3965,
+      "change": -0.0373780950886452,
+      "aa": 0.001896949657526955,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2953,
+                2953
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2953,
+                2953
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2960,
+                2960
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2960,
+                2960
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2953,
+                2953
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                196,
+                196
+              ],
+              "compiled_block_count": [
+                2953,
+                2953
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit write a new key as a method": {
+      "base": 10775.2335,
+      "base1": 10776.2335,
+      "base2": 10774.2335,
+      "candidate": 10531.0165,
+      "change": -0.022664659656795427,
+      "aa": 0.0001856108269022662,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2934,
+                2934
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2934,
+                2934
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2941,
+                2941
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2941,
+                2941
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2934,
+                2934
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                195,
+                195
+              ],
+              "compiled_block_count": [
+                2934,
+                2934
+              ],
+              "invalidation_count": [
+                45,
+                45
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}
