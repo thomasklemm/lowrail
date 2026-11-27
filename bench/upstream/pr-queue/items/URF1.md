@@ -38,7 +38,7 @@ passes:
 
 # Continue the method search after an unused module refinement in resolve_refined_method
 
-A refinement of a module that is never activated with `using` hides the methods after that module from every lookup except a direct call:
+An unused refinement of a method absent from an included module can hide the inherited method from `send` and other lookups:
 
 ```ruby
 class C; def foo = :C; end
@@ -49,6 +49,6 @@ p D.new.foo        # :C
 p D.new.send(:foo) # expected :C, actual NoMethodError
 ```
 
-`public_send` and calls from C raise the same way, `method`, `alias_method` and `undef_method` raise NameError, and `respond_to?` and `method_defined?` return false. Since `Kernel` is a module, an unused refinement of `Kernel#==` makes `Object.new != 1` raise, because `BasicObject#!=` calls `==` from C. This happens in the interpreter and with `--yjit` on 3.4.13, 4.0.10 and master; with `--zjit` master prints `true`, since ZJIT defines `BasicObject#!=` in Ruby. Per doc/syntax/refinements.rdoc a refinement only takes effect after `using`, and [Bug #14068](https://bugs.ruby-lang.org/issues/14068) fixed the same case for direct calls, so `true` is right.
+Since `Kernel` is a module, an unused refinement of `Kernel#==` makes `Object.new != 1` raise, because `BasicObject#!=` calls `==` from C. This happens in the interpreter and with `--yjit` on 3.4.13, 4.0.10 and master; with `--zjit` master prints `true`, since ZJIT defines `BasicObject#!=` in Ruby. Per doc/syntax/refinements.rdoc a refinement only takes effect after `using`, and [Bug #14068](https://bugs.ruby-lang.org/issues/14068) fixed the same case for direct calls, so `true` is right.
 
 `resolve_refined_method` continued from the superclass of the module itself, which is usually empty. This continues from the superclass of the class where the refined entry was found, as `search_refined_method` already does for direct calls. The method-defined, alias and undef lookups also pass that class. An undef in an active refinement keeps the existing fallback.

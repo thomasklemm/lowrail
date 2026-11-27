@@ -39,7 +39,7 @@ passes:
 
 # Fix shareable constant hash literals with keys after `**` in prism
 
-With prism, a hash literal in a shareable constant raises NoMethodError for an internal method when a key follows a double splat:
+On master with prism, a hash literal in a shareable constant raises NoMethodError for an internal method when a key follows a double splat:
 
 ```ruby
 # shareable_constant_value: experimental_everything
