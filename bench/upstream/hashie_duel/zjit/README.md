@@ -34,3 +34,18 @@ Follow-up PR, after #659 merges: the second job as above, `report: zjit`. Open q
 the YJIT job then also needs `report: yjit` (Duel's docs name every call), which would rename its check from
 `duel / Duel` to `duel / Duel (yjit)`; Perf Comment's handling of two reports wasn't exercised on the fork (it runs
 only from the default branch).
+
+## Perf Comment with two reports (2026-11-27)
+
+The open question above, answered on the fork. The follow-up commit (`yjit` job with `report: yjit`, `zjit` job with
+`report: zjit`) became the fork's default branch for the test, so Perf Comment ran from it; afterwards the default was
+restored to `master` and the test PRs and branches removed. Run IDs in `comment-test/runs.tsv`.
+
+* CPU plant PR (fork #19, `key?` three times in `method_missing`): Perf failed; Perf Comment posted **one** comment with
+  a `## yjit` and a `## zjit` section, each "4 benchmarks failed" (`comment-test/plant-cpu-comment.md`). Checks are
+  named `yjit / Duel (yjit)` and `zjit / Duel (zjit)`.
+* A/A PR (fork #18, comment-only): Perf passed, Perf Comment succeeded and posted nothing (default
+  `comment = :failures`).
+
+So two reports need no change to Perf Comment. The follow-up renames the job key `duel` to `yjit`; keeping `duel` would
+name the check `duel / Duel (yjit)`. Either way the YJIT check's name changes, which branch protection would notice.
