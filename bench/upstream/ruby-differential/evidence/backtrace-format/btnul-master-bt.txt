@@ -1,0 +1,8 @@
+[:raise_backtrace, "a\u0000b.rb:1:in 'block in <main>'"]
+[:raise_message, "boom"]
+[:full_message, "a\x00b.rb:1:in 'block in <main>': boom (RuntimeError)\n\tfrom bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:9:in 'Kernel#eval'\n\tfrom bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:9:in 'block in <main>'\n\tfrom bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:2:in 'Object#t'\n\tfrom bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:9:in '<main>'\n"]
+[:reraise, [RuntimeError, "again"]]
+[:locations, "a\u0000b.rb:1:in 'block in <main>'"]
+[:nul_method_alias, "bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:13:in 'm'"]
+[:nul_method_def, "bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:16:in 'block in <main>'"]
+[:nul_method_raise_bt, "bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:18:in 'block (2 levels) in <main>'"]

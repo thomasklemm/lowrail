@@ -1,0 +1,88 @@
+commit afb18cccd9da322700048f40467a1c6780123f8e
+Author: Thomas Klemm <github@tklemm.eu>
+Date:   Fri Nov 27 16:14:03 2026 +0000
+
+    Append backtrace location strings by length
+    
+    Formatting a backtrace location through "%"PRIsVALUE runs each file
+    and method name through rb_obj_as_string, an encoding check and
+    StringValueCStr in ruby__sfvextra. That makes Exception#backtrace and
+    Kernel#caller about 25% slower than 4.0 on a 150-frame stack, and
+    StringValueCStr raises ArgumentError for a path that contains a NUL
+    byte, so the backtrace of code evaluated with such a path cannot be
+    built at all.
+    
+    Append both strings by their length instead, choosing the encoding
+    the same way ruby__sfvextra does.
+
+diff --git a/benchmark/vm_backtrace_to_s.yml b/benchmark/vm_backtrace_to_s.yml
+new file mode 100644
+index 0000000000..1c284efa00
+--- /dev/null
++++ b/benchmark/vm_backtrace_to_s.yml
+@@ -0,0 +1,6 @@
++prelude: |
++  def deep(n) = n.zero? ? caller_locations : deep(n - 1)
++  locations = deep(50)
++benchmark:
++  vm_backtrace_to_s: locations.each(&:to_s)
++loop_count: 20000
+diff --git a/test/ruby/test_backtrace.rb b/test/ruby/test_backtrace.rb
+index 3691eb8ec5..5338477cdd 100644
+--- a/test/ruby/test_backtrace.rb
++++ b/test/ruby/test_backtrace.rb
+@@ -536,6 +536,11 @@ def test_backtrace_internal_frame
+     assert_equal("Kernel#tap", backtrace[1].label)
+   end
+ 
++  def test_backtrace_with_nul_in_path
++    assert_equal("a\0b.rb:1:in 'TestBacktrace#test_backtrace_with_nul_in_path'",
++                 eval("caller(0, 1)[0]", nil, "a\0b.rb"))
++  end
++
+   def test_backtrace_on_argument_error
+     lineno = __LINE__; [1, 2].inject(:tap)
+   rescue ArgumentError
+diff --git a/vm_backtrace.c b/vm_backtrace.c
+index 10eda6facf..4de49ef812 100644
+--- a/vm_backtrace.c
++++ b/vm_backtrace.c
+@@ -716,10 +716,26 @@ location_absolute_path_m(VALUE self)
+     return location_realpath(location_ptr(self));
+ }
+ 
++static void
++location_cat_str(VALUE s, VALUE str)
++{
++    rb_encoding *enc = rb_enc_compatible(s, str);
++    if (enc && rb_enc_asciicompat(enc)) {
++        rb_enc_associate(s, enc);
++    }
++    else {
++        str = rb_str_conv_enc_opts(str, rb_enc_get(str), rb_enc_get(s),
++                                   ECONV_UNDEF_REPLACE|ECONV_INVALID_REPLACE, Qnil);
++    }
++    rb_str_cat(s, RSTRING_PTR(str), RSTRING_LEN(str));
++    RB_GC_GUARD(str);
++}
++
+ static VALUE
+ location_format(VALUE file, int lineno, VALUE name)
+ {
+-    VALUE s = rb_enc_sprintf(rb_enc_compatible(file, name), "%"PRIsVALUE, file);
++    VALUE s = rb_enc_sprintf(rb_enc_compatible(file, name), "");
++    location_cat_str(s, file);
+     if (lineno != 0) {
+         rb_str_catf(s, ":%d", lineno);
+     }
+@@ -728,7 +744,9 @@ location_format(VALUE file, int lineno, VALUE name)
+         rb_str_cat_cstr(s, "unknown method");
+     }
+     else {
+-        rb_str_catf(s, "'%"PRIsVALUE"'", name);
++        rb_str_cat_cstr(s, "'");
++        location_cat_str(s, name);
++        rb_str_cat_cstr(s, "'");
+     }
+     RB_GC_GUARD(name);
+     return s;

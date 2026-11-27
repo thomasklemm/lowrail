@@ -1,0 +1,8 @@
+[:raise_backtrace, :raised, ArgumentError, "string contains null byte"]
+[:raise_message, "boom"]
+[:full_message, :raised, ArgumentError, "string contains null byte"]
+[:reraise, [RuntimeError, "again"]]
+[:locations, :raised, ArgumentError, "string contains null byte"]
+[:nul_method_alias, "bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:13:in 'm'"]
+[:nul_method_def, "bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:16:in 'block in <main>'"]
+[:nul_method_raise_bt, "bench/upstream/ruby-differential/evidence/backtrace-format/btnul.rb:18:in 'block (2 levels) in <main>'"]
