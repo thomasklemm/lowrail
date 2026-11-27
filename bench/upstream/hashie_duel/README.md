@@ -87,3 +87,9 @@ Calibration on the fork, same PRs #1–#8 rebased each time:
 | 6 | `bcf21e7`, rebased on master `812c48c` (#656 merged), `mash_new_keys.rb` deleted, CONTRIBUTING wording | **0/15**, none re-measured, 45/315 unsettled | — (#656 is the baseline; fork PR #8 closed) | 13 / 5 | 81–91 s |
 
 Both false failures occurred with two benchmarks at a time. Cross-benchmark CPU contention is a hypothesis, not a demonstrated cause. With one at a time, round 5 had no A/A remeasurement and a median job time of 84 s versus round 4's 76 s. The earlier 13-scenario cohorts had 0/35 failures at two at a time; these different cohorts do not isolate the cause or establish a negligible false-alarm rate. Raw: `calibration-3`, `-4`, `-5`; `round.sh` reruns and collects them.
+
+## On the PR branch (2026-11-27)
+
+`bcf21e7` force-pushed to `thomasklemm/duel` (master still `812c48c`). Upstream checks ran without a maintainer's
+approval and all 15 passed. Perf run 45983825333: 21 benchmarks in 69 s, 0 regressed, 4 unsettled (Dash read/write,
+both KeepOriginalKeys reads, PermissiveRespondTo `Mash.new`), job 105 s.
