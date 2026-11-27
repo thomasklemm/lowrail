@@ -1,0 +1,20 @@
+profiled exit 0 wall 118.297275459 at 11:57:59 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 773 distinct outcomes, 1546 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 125.554300862 at 12:08:38 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 773 distinct outcomes, 1546 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 113.727409616 at 12:18:37 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 773 distinct outcomes, 1546 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 117.184518555 at 12:28:29 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 773 distinct outcomes, 1546 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 119.609129276 at 12:38:40 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 773 distinct outcomes, 1546 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 120.290563677 at 12:48:46 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 773 distinct outcomes, 1546 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 128.559718328 at 13:01:04 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 773 distinct outcomes, 1546 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 1540.938556109 at 13:35:45 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 773 distinct outcomes, 1546 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 143.348395145 at 14:15:27 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 774 distinct outcomes, 1547 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 363.692431777 at 14:34:06 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 773 distinct outcomes, 1546 lines; 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips | 794 runs, 3541 assertions, 0 failures, 0 errors, 0 skips

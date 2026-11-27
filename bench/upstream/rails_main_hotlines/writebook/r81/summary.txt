@@ -1,0 +1,20 @@
+profiled exit 0 wall 62.777300715 at 11:50:43 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 64.759864893 at 12:02:50 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 62.631979097 at 12:13:11 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 64.144326127 at 12:23:03 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 62.904984719 at 12:33:01 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 64.998240499 at 12:43:07 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 70.943489079 at 12:53:41 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 63.677091264 at 13:06:23 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 1786.681773101 at 14:09:02 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips
+profiled exit 0 wall 69.086810286 at 14:20:34 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 119 distinct outcomes, 238 lines; 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips | 119 runs, 381 assertions, 0 failures, 0 errors, 0 skips

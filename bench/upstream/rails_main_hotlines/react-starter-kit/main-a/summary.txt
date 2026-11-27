@@ -1,0 +1,20 @@
+profiled exit 0 wall 5.061116626 at 11:53:45 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures
+profiled exit 0 wall 4.494457323 at 12:04:29 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures
+profiled exit 0 wall 4.627566442 at 12:14:50 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures
+profiled exit 0 wall 4.426826417 at 12:24:40 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures
+profiled exit 0 wall 4.731460081 at 12:34:40 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures
+profiled exit 0 wall 4.423912297 at 12:44:47 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures
+profiled exit 0 wall 4.262984208 at 12:56:44 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures
+profiled exit 0 wall 4.598765791 at 13:08:03 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures
+profiled exit 0 wall 5.392378900 at 14:10:50 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures
+profiled exit 0 wall 7.784348629 at 14:23:14 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 59 distinct outcomes, 138 lines; 35 examples, 0 failures | 35 examples, 0 failures

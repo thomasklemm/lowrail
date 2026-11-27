@@ -1,0 +1,4 @@
+profiled exit 0 wall 11.511576030 at 11:09:51 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 70 distinct outcomes, 180 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 11.731580215 at 11:38:41 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 70 distinct outcomes, 180 lines; 50 examples, 0 failures | 50 examples, 0 failures

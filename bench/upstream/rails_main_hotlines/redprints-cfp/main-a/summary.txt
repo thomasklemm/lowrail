@@ -1,0 +1,20 @@
+profiled exit 0 wall 13.810345531 at 11:53:14 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 9.974620223 at 12:04:18 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 10.303566722 at 12:14:39 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 10.006209897 at 12:24:30 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 9.956400158 at 12:34:29 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 9.750030982 at 12:44:37 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 9.013818350 at 12:56:34 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 9.791759113 at 13:07:53 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 11.830311033 at 14:10:37 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
+profiled exit 0 wall 13.964000633 at 14:22:55 rails 8.2.0.alpha 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+profiled.log: 79 distinct outcomes, 360 lines; 50 examples, 0 failures | 50 examples, 0 failures
