@@ -94,7 +94,7 @@ Known reds that are not ours (don't report):
 ## Current watch (2026-11-27)
 
 Ours, open (watch CI, comments, state):
-- rails/rails: #60020 (L3, 319e55a661; first Buildkite build failed on agent disk space, infra), #59565.
+- rails/rails: #60024 (ASC1, head ed1b28c5b9, opened ready 2026-11-27 21:38 UTC), #59565. (#60020 merged 2026-11-27, removed.)
 - ruby/uri#276 (UR1, head c43954f, opened ready 2026-11-27 20:56 UTC).
 - ruby/ruby: #20261 (BT1, e75b1f0109), #20208 (TN1, 2e061793aa; khasinski's commit is intended), #20169 (ZSV1,
   d0f0dc2da5), #19912 (ZS1; Rafael França's ported commit is intended).
