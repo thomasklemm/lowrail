@@ -1,0 +1,13 @@
+diff --git a/app/models/concerns/good_job/advisory_lockable.rb b/app/models/concerns/good_job/advisory_lockable.rb
+index 4403495..406db5e 100644
+--- a/app/models/concerns/good_job/advisory_lockable.rb
++++ b/app/models/concerns/good_job/advisory_lockable.rb
+@@ -355,7 +355,7 @@ module GoodJob
+       def advisory_lock(column: _advisory_lockable_column, function: advisory_lockable_function, select_limit: nil, connection: nil, unlock_session: false, &block)
+         if block
+           connection_pool.with_connection do |conn|
+-            records = advisory_lock(column: column, function: function, select_limit: select_limit, connection: conn).to_a
++            records = uncached { advisory_lock(column: column, function: function, select_limit: select_limit, connection: conn).to_a }
+             records.each { |record| record_advisory_lock(conn, record.lockable_column_key(column: column), cte: true) }
+ 
+             begin

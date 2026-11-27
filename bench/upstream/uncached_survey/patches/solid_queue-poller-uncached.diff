@@ -1,0 +1,21 @@
+diff --git a/lib/solid_queue/processes/poller.rb b/lib/solid_queue/processes/poller.rb
+index 75df610..1ad2087 100644
+--- a/lib/solid_queue/processes/poller.rb
++++ b/lib/solid_queue/processes/poller.rb
+@@ -43,10 +43,12 @@ module SolidQueue::Processes
+ 
+       def with_polling_volume
+         SolidQueue.instrument(:polling) do
+-          if SolidQueue.silence_polling? && ActiveRecord::Base.logger
+-            ActiveRecord::Base.logger.silence { yield }
+-          else
+-            yield
++          SolidQueue::Record.uncached do
++            if SolidQueue.silence_polling? && ActiveRecord::Base.logger
++              ActiveRecord::Base.logger.silence { yield }
++            else
++              yield
++            end
+           end
+         end
+       end
