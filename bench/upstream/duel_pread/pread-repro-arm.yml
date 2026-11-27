@@ -1,0 +1,63 @@
+name: pread repro
+on:
+  push:
+    branches: [pread/repro]
+permissions: {}
+jobs:
+  counter:
+    strategy:
+      fail-fast: false
+      matrix:
+        n: [1, 2]
+        os: [ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+      - run: |
+          grep -m1 -E 'model name|CPU part' /proc/cpuinfo; uname -rm
+          cat /proc/sys/kernel/perf_event_paranoid
+          git clone -q https://github.com/thomasklemm/duel-ruby /tmp/duel
+          cat > /tmp/read.rb <<'RB'
+          require "duel/native"
+          counter = Duel::Native::Counter.open
+          puts "#{ARGV[0]}: Counter.open -> #{counter.class}"
+          if counter.is_a?(Duel::Native::Linux)
+            begin
+              counts = Array.new(8) do
+                a = counter.read
+                x = 0
+                100_000.times { |i| x = (x * 31 + i) & 0xffff }
+                counter.read - a
+              end
+              puts "#{ARGV[0]}: instructions per loop: #{counts.inspect}"
+            rescue SystemCallError => e
+              puts "#{ARGV[0]}: read raised #{e.class}: #{e.message}"
+            end
+          end
+          RB
+          for rev in a09111e 738d9ba; do
+            git -C /tmp/duel checkout -q $rev
+            ruby -I/tmp/duel/lib /tmp/read.rb $rev
+          done
+      - run: |
+          sudo sysctl -w kernel.perf_event_paranoid=2
+          mkdir -p /tmp/p/lib /tmp/p/duel
+          cat > /tmp/p/lib/sample.rb <<'RB'
+          module Sample
+            def self.work
+              x = 0
+              3000.times { |i| x = ((x * 31) + i) & 0xffff }
+              x
+            end
+          end
+          RB
+          printf 'require "sample"\n\nduel("work") { Sample.work }\n' > /tmp/p/duel/sample_duel.rb
+          cp -r /tmp/p /tmp/base
+          cd /tmp/p
+          for rev in a09111e 738d9ba; do
+            git -C /tmp/duel checkout -q $rev
+            echo "== duel at $rev"
+            ruby -I/tmp/duel/lib /tmp/duel/exe/duel --base /tmp/base --jobs 1 --processes 4 2>&1 | tail -15 || true
+          done

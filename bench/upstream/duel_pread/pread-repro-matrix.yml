@@ -1,0 +1,48 @@
+name: pread repro
+on:
+  push:
+    branches: [pread/repro]
+permissions: {}
+jobs:
+  counter:
+    strategy:
+      fail-fast: false
+      matrix:
+        n: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
+        os: [ubuntu-latest]
+        include:
+          - {n: 25, os: ubuntu-24.04-arm}
+          - {n: 26, os: ubuntu-24.04-arm}
+          - {n: 27, os: ubuntu-24.04-arm}
+          - {n: 28, os: ubuntu-24.04-arm}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0"
+      - run: |
+          grep -m1 -E 'model name|CPU part' /proc/cpuinfo; uname -rm
+          sudo sysctl -w kernel.perf_event_paranoid=2
+          git clone -q https://github.com/thomasklemm/duel-ruby /tmp/duel
+          cat > /tmp/read.rb <<'RB'
+          require "duel/native"
+          counter = Duel::Native::Counter.open
+          puts "#{ARGV[0]}: Counter.open -> #{counter.class}"
+          if counter.is_a?(Duel::Native::Linux)
+            begin
+              counts = Array.new(8) do
+                a = counter.read
+                x = 0
+                100_000.times { |i| x = (x * 31 + i) & 0xffff }
+                counter.read - a
+              end
+              puts "#{ARGV[0]}: instructions per loop: #{counts.inspect}"
+            rescue SystemCallError => e
+              puts "#{ARGV[0]}: read raised #{e.class}: #{e.message}"
+            end
+          end
+          RB
+          for rev in a09111e 738d9ba; do
+            git -C /tmp/duel checkout -q $rev
+            ruby -I/tmp/duel/lib /tmp/read.rb $rev
+          done
