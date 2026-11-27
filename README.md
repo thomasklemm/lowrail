@@ -111,7 +111,8 @@ its pinned Valgrind once with `script/bench-valgrind PREFIX`.
 
 The Rust core in `src/` (Prism via `ruby-prism`, Rubydex) and the lowering runtime in `gem/` (`lowrail.gemspec`,
 `lowrail/setup`) boot an app, learn what is fixed after boot, and install guarded, specialized Ruby for what they can
-prove equivalent. The default build lowers nothing, and no whole-request YJIT gain was established, so Lowrail turned
+prove equivalent. The default build lowers nothing; the opt-in sealed tier's results stayed scoped to single endpoints (the one
+real-Puma YJIT throughput gain came with higher p99), never a default or production-admission gain. So Lowrail turned
 to upstream fixes on 2026-11-02, and the engine has been paused since 2026-11-27: it stays in the tree unchanged and
 is not developed. Its plan and contract are in [docs/PLAN.md](docs/PLAN.md), its results, commands and reference in
 [docs/prototype.md](docs/prototype.md), its decisions in [decisions-prototype.md](docs/decisions-prototype.md).

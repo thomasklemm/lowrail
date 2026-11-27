@@ -45,8 +45,8 @@ block forwarding) over single-app hotspots. App numbers are breadth evidence, no
 * **No new compatibility PRs for Rails main** (Rails or gems) until the Rails 8.2 beta, since the internal design can
   still change; findings go into an inventory with callers and proposed fixes. Exception: WAL150 (Thomas, 2026-11-26).
 * **Only PRs with large relevance open:** the effect reaches many apps or a widely used gem, or a whole request, test
-  run or ruby-bench benchmark moves measurably. Small per-call wins, rare paths and niche gems are recorded as `held`
-  items ("parked idea") and not opened later as they are. Every item states its reach in `impact` before review.
+  run or ruby-bench benchmark moves measurably. Small per-call wins in niche gems or rare paths, and fixes for niche gems, are
+  recorded as `held` items ("parked idea") and not opened later as they are. Every item states its reach in `impact` before review.
 * **Rails, central gems and Ruby; no ecosystem fixing** (2026-11-06): no fixes in individual apps or niche gems for
   Rails-main breakage (recorded in [contributions](upstream/contributions.md)). Upstream work goes where it reaches
   every Rails app: Rails, central gems (Rack, drivers, Puma and the like), Ruby, ruby-bench.
@@ -157,7 +157,7 @@ Orbs bill per running minute by size; a paused orb costs nothing.
 * **Rails doesn't take JIT workarounds** (skipkayhil, 2026-11-15): a Rails change whose win comes mainly from how a
   JIT compiles a construct goes to the JIT; Rails perf PRs need a win in the interpreter or in allocations on their
   own. Such a pattern becomes a ZJIT PR on ruby/ruby citing the closed Rails PR and the maintainer's comment; it
-  builds on an existing branch with its commits, authorship and credit kept. No comment on the Rails PR.
+  builds on an existing branch with its commits and authorship kept and credits them in the body. No comment on the Rails PR.
 * **YJIT is in maintenance mode** (XrXr, k0kubun): JIT performance and allocation-parity work targets ZJIT; YJIT gets
   correctness fixes only; YJIT findings go to [yjit-leads](upstream/yjit-leads.md), not built. Our open YJIT PRs stay
   open and maintained.
@@ -275,8 +275,8 @@ Superfluous comments read as AI slop (byroot on #59555). For every upstream PR, 
 
 Every caller cited in a body, issue or ledger record links to the exact line at a **commit SHA**, never `blob/main`.
 For a gem, the commit behind its **latest released version's** tag, version named in the link text (no tag: the
-release's "Bump to x.y.z" commit or its rubygems.org source); for an app, the default branch's current SHA, branch
-named. If the default branch already fixed the call, say "fixed on main, unreleased". Quote the line exactly (or mark
+release's "Bump to x.y.z" commit or its rubygems.org source); for an app without releases, the default branch's current SHA,
+branch named. Also check a gem's default branch: if it already fixed the call, say "fixed on main, unreleased". Quote the line exactly (or mark
 it shortened), and before posting fetch each file at that SHA and confirm the line.
 
 ## When Rails restores a private API, and other open calls (decided 2026-11-04 at Thomas's request)
@@ -289,12 +289,12 @@ it shortened), and before posting fetch each file at that SHA and confirm the li
   one large one breaks silently or wrongly, and (3) the restore is small and keeps the change's purpose. The PR says
   the API is private and names the callers. Otherwise record-only, or a fix in the gem or app when small and its
   maintainers are active.
-* **rspec-rails release:** no issue until a Rails 8.2 beta is out.
+* **rspec-rails release:** no issue for now; ask once a Rails 8.2 beta is out.
 
 ## Submission queue (2026-11-03)
 
 Every candidate gets one file in [bench/upstream/pr-queue/items](../bench/upstream/pr-queue/items) once its branch and
-body exist ([format](../bench/upstream/pr-queue/README.md)): title, body exactly as posted, impact, rank, and every
+body exist ([format](../bench/upstream/pr-queue/README.md)): title, body exactly as posted, impact, rank by effect and breadth, and every
 pass with the head it reviewed. It opens when its repo has room, strongest first, through `script/pr-queue open`,
 which refuses unless the gates pass on the current head. A candidate made moot upstream becomes `superseded` or
 `closed` with a note.
@@ -330,7 +330,7 @@ which refuses unless the gates pass on the current head. A candidate made moot u
 ## Evidence and measurement
 
 * **Ruby pin 4.0.9** (2026-11-03) for census and Rails PR evidence. Never compare across pins; every A/A and
-  main-versus-branch pair runs on one pin. Open bodies with older numbers stay; they name their Ruby.
+  main-versus-branch pair runs on one pin. Open bodies with 4.0.7 numbers stay; they name their Ruby.
 * **4.1 is measured on pinned Ruby master, SHA recorded**, not previews: boot, interpreter, YJIT and ZJIT allocations
   with A/A on the ZJIT pass's build; the routine cell moves to 4.1 when 4.1.0 ships
   ([measurement-matrix](upstream/measurement-matrix.md)).
@@ -391,7 +391,7 @@ upstream is unchanged.
 Every upstream PR, issue or comment draft gets as many rounds as it needs on its **current head**. Each confirmed
 finding is fixed and re-reviewed; a round ends with a pass without must-fix; a head change means another pass. An item
 is `reviewed` only when its required passes approve the current `head`; `script/pr-queue open` and `ready` refuse
-otherwise.
+otherwise. Items enter the queue at `built`; these passes gate `reviewed`, and nothing opens before them.
 
 * **thermos-sol on every head** (Thomas, 2026-11-18): `thermos` in its own GPT-6.1 Sol thread (`openai/gpt-6.1-sol`,
   effort `xhigh`), correctness/security and maintainability in parallel, plus body, comments and commit message
@@ -406,14 +406,14 @@ otherwise.
   threads, reloading and error paths, run them, report only demonstrated differences. Ready only after both.
 * **Anthropic models where OpenAI's checks stop a review:** crash and memory-safety fixes get `thermos-opus`; reviews
   of our own safety guards (`guard_review: true`) run as `thermos-opus` or `thermos-fable`, framed as checking each fix
-  against the original repro, and there stand in for Sol and Astra (2026-11-25). `thermos-fable` counts where
+  against the original repro, with plain reports and repro detail kept in the reviewing thread; there stand in for Sol and Astra (2026-11-25). `thermos-fable` counts where
   `thermos-opus` does.
 * **Replies to a maintainer's review comments:** an intensive `thermos-opus` next to `thermos-sol` on the same head;
   Thomas sees the drafts first (2026-11-18).
 * **A second reviewer where it helps:** an Opus pass for claims-heavy bodies and measurements. `opus` and `fable`
   passes still stand in for a Sol or Astra slot (2026-11-14, until Thomas ends it), only with the orb's thread ID in
   `orb`, different from the detailed review's and any other stand-in's.
-* **Adapter changes run `script/min-versions` before review** (2026-11-25): oldest supported SQLite (and a middle
+* **Active Record adapter or schema changes run `script/min-versions` before review** (2026-11-25): their tests on the oldest supported SQLite (and a middle
   one), PostgreSQL, MySQL and Ruby, base versus head ([usage](upstream/ar-adapter-suite.md#oldest-supported-versions-2026-11-25)).
 
 Models (Thomas, 2026-11-17 to 11-25): Sol is GPT-6.1 Sol, not 6.2, always `xhigh`; Astra is GPT-6 Astra. Build and

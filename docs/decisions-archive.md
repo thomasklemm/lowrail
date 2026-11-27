@@ -345,7 +345,8 @@ shortened; they are in the verbatim copy below.
    thermos-sol as the default and detailed review (2026-11-18). Recorded claude-code passes keep counting, as before.
 6. **"Primary review": Sol Thermos for Rails and gems, Astra Thermos for ruby/ruby, before the queue** (2026-11-03,
    updated 2026-11-25). Merged into "Required passes": thermos-sol on every head, Astra in addition on every ruby/ruby
-   head and on `risky` items.
+   head and on `risky` items. "Before the queue" predates the queue format of 2026-11-05, where items enter at `built`
+   and the passes gate `reviewed`; nothing opens before them, as before.
 7. **"Extra adversarial Astra round for critical changes": Astra for Rails and gems, Sol for ruby/ruby** (2026-11-03).
    Merged: critical changes are `risky`, so Astra runs after the detailed review with the adversarial brief. For
    ruby/ruby, where Sol was the second round, thermos-sol and Astra both run on every head, so both reviewers still

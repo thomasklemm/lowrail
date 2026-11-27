@@ -12,7 +12,8 @@ holds the rules for upstream work, and its first section lists what needs Thomas
 2. **Upstream PRs go through the queue.** One file per candidate in `bench/upstream/pr-queue/items/`; open only with
    `script/pr-queue open ID`, which checks caps, ownership and review passes on the exact head. Never work around a
    refusal.
-3. **Claims need evidence you ran.** Every number in a body or record comes from a kept run with an A/A control
+3. **Claims need evidence you ran.** Every measured number (allocations, instructions, time) in a body or record comes from a kept
+   run with an A/A control
    (`script/upstream-bench`, `script/census`, [docs/bench.md](docs/bench.md)), on one Ruby pin per comparison.
    Commit the raw data, or an archive of it, before reporting done. Allocation and instruction counts are not time.
 4. **Exact means exact.** An upstream change behaves as before for every caller the contract covers: run the
