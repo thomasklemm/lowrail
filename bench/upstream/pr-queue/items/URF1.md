@@ -16,8 +16,8 @@ alternative_of:
 impact: "An unused refinement of any included module (Kernel too) hides the methods after that module from send, public_send, respond_to?, method, method_defined?, alias_method, undef_method and every C call through rb_funcall; e.g. refining Kernel#== without using it makes `obj != 1` raise in the interpreter and YJIT on 3.4, 4.0 and master"
 rank: 1
 risky: true
-state: reviewed
-pr:
+state: ready
+pr: 20267
 note: "2026-11-27 (Thomas, via coordinator): open directly on ruby/ruby without a Redmine ticket, as an exception to the ruby/ruby pace cap; body carries the report's repro, actual/expected output, versions and why true is right. Draft, cause, evidence and the earlier report text: docs/upstream-drafts/ruby-bug-kernel-eq-refinement.md; data: bench/upstream/ruby-bugs-2026-11-27. thermos-sol found an active-undef regression on 4939c8c7f9, fixed in 07c745a4ab (151bebd34d is the same tree, commit message only). Tests on 07c745a4ab: test-all ruby 11763 interpreter and --zjit-call-threshold=1, only TestThread#test_handle_interrupt_masks_sigint (fails on unmodified master in the orb; 0 failures in both reviewers' orbs); YJIT targeted 754/0; btest 2148 with and without ZJIT; ruby/spec 3577/0, ZJIT repeat 7134/0. Found by the 2026-11-27 lead sweep (row 26, ZNE1 lead 2)."
 evidence:
   - bench/upstream/ruby-bugs-2026-11-27

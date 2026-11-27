@@ -16,8 +16,8 @@ alternative_of:
 impact: "With prism, every hash literal with a pair after `**` (or with more than 128 non-static pairs) in a constant under shareable_constant_value literal, experimental_everything or experimental_copy raises NoMethodError for an internal method, on 3.4.0 and later; two-line compiler fix, results then match parse.y"
 rank: 1
 risky: true
-state: reviewed
-pr:
+state: ready
+pr: 20266
 note: "2026-11-27 (Thomas, via coordinator): open directly on ruby/ruby without a Redmine ticket, as an exception to the ruby/ruby pace cap; body carries the report's repro, actual/expected output and versions. Draft, cause, evidence and the earlier report text: docs/upstream-drafts/ruby-bug-shareable-kwsplat.md; data: bench/upstream/ruby-bugs-2026-11-27. Tests on 9b8a037535 (same tree): parser tests 778/0, parse.y 190/0, btest 2148, test-all ruby 11761 with only TestThread#test_handle_interrupt_masks_sigint (fails on unmodified master in the orb; 0 failures in both reviewers' orbs). Found by the 2026-11-27 lead sweep (row 337)."
 evidence:
   - bench/upstream/ruby-bugs-2026-11-27
