@@ -710,6 +710,23 @@ runs. F1-a is unmeasured. Ownership checked 2026-11-04 against Shopify/ruby issu
 | F1-f a singleton class on every request's Rack env Hash keeps exiting the final version | `exit_patchpoint_no_singleton_class` on `PatchPoint(NoSingletonClass(Hash))` | `HttpAcceptLanguage::Middleware#call` (http_accept_language 2.1.1) runs `def env.http_accept_language` per request. Exits land in `AttributeSet#[]`, `IndexedRow::Mutable#fetch`, `LazyAttributeSet#fetch_value!`, `association_instance_get` (Mastodon), `NonConcurrentMapBackend#[]`, `_load_from_sql`, `HashLookupTypeMap#key?` (Loomio). Repro `data/frontier-census-f1/zjit-hash-singleton-repro.rb` (on the F1 branch): an ISEQ that spent its versions, then one Hash singleton class per request → 100,000 exits per 100 requests at `--zjit-max-versions=4`, 0 exits (fallbacks instead) at 5 | `f1u1` (exec 512 MiB, 0 out-of-memory), per op: Mastodon 13,915 (95% of its side exits), Mastodon-nops 16,105, Loomio 9,213; Discourse loads the gem but not the middleware. 9 apps, 0.0% drift between runs | taken: app side linyiru's iain/http_accept_language#80 (open, opt-out option); ZJIT side ruby/ruby#19617 (k0kubun, open) lets PatchPoints recompile a final version |
 | F1-e not-inlined cfuncs on the request path | `not_inlined_cfuncs_Hash#key?`, `not_inlined_cfuncs_ERB::Util.html_escape` (`String#match?` is bet Z7; `Hash#fetch` is Shopify/ruby#1086, assigned) | request path in all apps; also `Fiber.[]`/`Fiber.current` (18 apps) | `Hash#key?` 17 apps, median 408/op (Discourse 4,669); `html_escape` 15 apps, median 133 (Sure 3,571); `Fiber.[]`/`Fiber.current` medians 53/66 (Sure 3,069/2,220) | free |
 
+## New leads from hashie's Mash (2026-11-27)
+
+Found while measuring hashie candidates ([round 2](../../bench/upstream/hashie_perf/round2/README.md)), Ruby master
+`0d399335b7` `--zjit`, hashie master `9e313f3`; the workload builds a Mash from one GitHub repository payload. Ownership
+against Shopify/ruby issues and open ruby/ruby ZJIT PRs is **not checked**. Nothing posted.
+
+| lead | fallback / exit | repro or site | counts | status |
+|---|---|---|---|---|
+| H1 a splat of a frozen constant Array into a C method | `send_fallback_one_or_more_complex_arg_pass`, with one `rb_vm_splat_array` call each | `name.end_with?(*ALLOWED_SUFFIXES)` in `Hashie::Mash#_method_suffix` (`ALLOWED_SUFFIXES = %w[? ! = _].freeze`), once per key written | 112 fallbacks per `Mash.new` of the fixture; 13.5M `rb_vm_splat_array` calls in the 36,000-call stats run (`out/zjit-stats-master-quiet_body-*.txt`); with the four suffixes written out the helper alone takes 61 ns instead of 113 ns under YJIT (`out/suffix-micro.txt`) | part of lead 14 (splat arguments to C methods); the constant, frozen Array is the narrower case |
+| H2 a class-method call on `self.class` seen with a class and its subclass | `send_fallback_send_polymorphic_fallback`, although both receivers resolve to the same method | `self.class.disable_warnings?(key)` in `Hashie::Mash#_log_collision?`, after a subclass ran the same method first (`probes/zjit_mixed.rb`) | fallbacks per plain `Mash.new` 20 → 114 once the call runs for every key (`out/zjit-mixed-order.txt`); plain `Mash.new` +9.1% [+7.4, +9.8] in such a process against +2.5% alone (`wall/HM4-10a9303-master-zjit`, 8-CPU orb) | same family as lead 3 (`_reflections`): a singleton-class receiver that varies while the method doesn't |
+
+A YJIT observation from the same work, cause not found: when a Mash subclass with its own `_log_collision?` (hashie's
+`PermissiveRespondTo` ships one) builds a Mash before the first plain Mash is built, plain `Mash.new` is 19% slower
+under YJIT 4.0.10 and about as much on master; not under ZJIT or the interpreter, and not when plain Mash is
+compiled first (`probes/yjit_first.rb`, `out/yjit-first.txt`, screening without A/A; one A/A cohort in
+`body/HM4-module-f41c3b2`).
+
 ## Lead 10: the receiver class
 
 The fallback is the `UNSET.equal?(value)` send. The lobsters HIR dump shows
