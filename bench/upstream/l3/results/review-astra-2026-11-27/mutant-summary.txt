@@ -1,0 +1,1 @@
+57 of 165 adversary cases differ after removing snapshot

@@ -1,0 +1,15 @@
+source "https://rubygems.org"
+%w[activesupport activemodel activerecord].each do |component|
+  gem component, path: File.join(ENV.fetch("RAILS"), component)
+end
+gem "sqlite3", "2.10.2"
+gem "msgpack"
+gem "benchmark-ips"
+gem "minitest"
+gem "minitest-mock"
+gem "minitest-reporters"
+gem "minitest-retry"
+gem "rake"
+gem "bcrypt"
+gem "connection_pool", "< 3"
+gem "pg"

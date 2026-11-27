@@ -1,0 +1,27 @@
+/home/user/workspace/repo/bench/upstream/l3/results/review-astra-2026-11-27/mutant.rb:8: warning: method redefined; discarding old values_for_database
+/home/user/workspace/repo/.amp/in/orb-backup/l3-astra/head/activemodel/lib/active_model/attribute_set.rb:389: warning: previous definition of values_for_database was here
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: --name=test_attributes_for_database_serializes_the_attributes_the_record_had_when_it_was_called --seed 32819
+
+# Running:
+
+F
+
+Failure:
+AttributeMethodsTest#test_attributes_for_database_serializes_the_attributes_the_record_had_when_it_was_called [test/cases/attribute_methods_test.rb:397]:
+Expected: "David"
+  Actual: "Mary"
+
+bin/rails test test/cases/attribute_methods_test.rb:391
+
+
+
+Finished in 0.023077s, 43.3327 runs/s, 43.3327 assertions/s.
+1 runs, 1 assertions, 1 failures, 0 errors, 0 skips
+rake aborted!
+Command failed with status (1)
+/home/user/workspace/repo/.lowrail/gate-gems/4.0.7-x86_64-linux-229531a6cfbf07e3caef30dbac24a2a3f3fed482/gems/rake-13.4.2/exe/rake:27:in '<top (required)>'
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/bundle:33:in '<main>'
+Tasks: TOP => test:sqlite3
+(See full trace by running task with --trace)
