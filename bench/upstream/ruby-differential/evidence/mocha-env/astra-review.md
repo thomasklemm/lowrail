@@ -71,3 +71,15 @@ Verdict: **changes**, solely for the remaining release names in the body link la
 * Fetched both new raw URLs again with `curl -fsSL`, selecting Capistrano lines 275–276 and Sure lines 359–360 with `sed -n`. Both contain the cited `ENV.stubs(:[])` calls. Their SHAs are the latest-release commits verified in the first pass, and Capistrano now appears first.
 * The universal-equivalence sentence is absent and `risky` is true.
 * **Remaining:** public body labels are still `[Capistrano]` and `[Sure]`. Change them to `[Capistrano 3.20.1]` and `[Sure v0.7.6-hotfix.2]`, leaving the verified URLs unchanged. DECISIONS explicitly requires the version in the link text; recording versions only in the internal note does not satisfy that part of the prior finding. This is body-only and does not require another code head or suite run.
+
+## Code-shape confirmation of a3134958dc, 2026-11-27
+
+Verdict: **approve**, no open must-fixes. The preceding citation-label finding was closed by the approval pass on `2db1c86782`; those corrected labels and the entire body remain unchanged.
+
+Applied the regenerated patch for `a3134958dc38c52d9c498a09d9bcd269184ee1dd` on `99da677165` in `mocha-shape`. Compared it to `mocha-confirm`, the previously verified patch application for `2db1c86782`. The complete tree diff contains only the explicit shareable create/read branches and replacement of two rationale lines with the single class/module explanation. New tree: `2f051289ea90da14cc4cb7dab06aea82f8dc3230`. Patch applications have local committer timestamps; the candidate SHA is the supplied patch's head, not the locally generated commit ID.
+
+The create branch returns the mock from `||=` rather than reading it again. Read-only and ordinary-object paths now evaluate the existing private predicate twice; its built-in shareability/module checks do not change state. The excluded private-helper overrides remain outside the supported-contract equivalence claim. The one retained comment explains the module exclusion. Message comparison ignoring trailing whitespace is identical, with no trailers.
+
+Executed `mise exec ruby -- ruby .amp/in/orb-backup/mo1/confirm-shape.rb`: all **37 scenarios per pin** produce identical full output and exit status between old and new trees on Ruby 4.0.9 and master `f3e180b5eb`. No normalization was needed. Also ran `ruby -Ilib -Itest test/unit/object_methods_test.rb` and `ruby -Ilib -Itest test/acceptance/stub_env_test.rb` on the new tree under both Rubies: respectively 9 runs / 11 assertions and 3 runs / 1 assertion, all with zero failures and errors. All child processes used the credential-free environment from the earlier review.
+
+Raw logs, comparison summary, reviewed diff, metadata checks and executable probe sources are retained in `astra-shape-confirm.tar.gz`. This was the requested limited confirmation, not another full-suite, integration, lint or JIT run; the coordinator's new full-suite results were not independently rerun here. No performance claim.
