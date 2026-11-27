@@ -149,3 +149,9 @@ Ruby 3.0.7 `rake spec` 1,072/0 (bundler 2.5.23, own lockfile).
 Thermos-sol delta (T-01a21cc1) asked for text-only corrections (R1 commit message and the `.duel.rb` CPU comment, R2
 this section), applied as `be311bb`: the same tree as `a00b9ab` except that one comment line. Allocation plant attempt
 2 (run 45987737817): 13 regressed, 0 errors, job 606 s, Duel 592 s, plus a confirmed across-the-board CPU regression.
+
+On the PR branch (2026-11-27): `be311bb` pushed to `thomasklemm/duel` after thermos-sol's confirm; all 14 upstream
+checks passed without approval. Perf run 45993406528: 27 benchmarks in 110 s, 0 regressed, 1 unsettled (Dash
+read/write 1.058 [1.042, 1.077], the scenario with the thinnest A/A margin), across-the-board CPU 1.004
+[1.001, 1.008] same (limit 1.0125), job 126 s. Duel's header still prints its default 1.02; the per-metric results
+use 1.05.
