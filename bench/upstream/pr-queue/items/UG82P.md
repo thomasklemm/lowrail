@@ -14,7 +14,7 @@ alternative_of:
 impact: "parallel test workers loading fixtures on PostgreSQL 18.4+ can fail with out of shared memory; the guide doesn't say so or how to size max_locks_per_transaction"
 rank: 6
 risky: false
-state: ready
+state: merged
 pr: 59735
 note: "2026-11-14 (claude-code full review): the guide's list of locked objects missed triggers, the largest group; amended 3036f925aa -> 7ddc0d8abb (force-with-lease, same base 224f5b1563, still a draft), body unchanged; Sol approved 7ddc0d8abb the same day; marked ready by script/pr-queue ready UG82P, no comment. 2026-11-10 (Sol): precision fix plus the optional sentence applied, amended 9128031161 -> 3036f925aa (force-with-lease), mdl clean, no trailers. split out of UG82 (#59675) 2026-11-10 at Thomas's request; cherry-picked from cbcac181b3 unchanged (patch-id equal). Planned to open as a draft first, with UG82H, after a Claude Code pass."
 passes:
