@@ -81,6 +81,36 @@ passes:
       bench/upstream/gem-differential/evidence/separator-pat/astra-confirm-0a0321e20a.txt
       and the retained astra-2026-11-27.tar.gz in that directory. No upstream post.
     must_fix: []
+  - reviewer: thermos-sol
+    orb: T-01a21d5a-243c-7558-b622-6f5801179598
+    head: "0a0321e20aa64355a236e68331f8b89306a5c565"
+    date: 2026-11-27
+    verdict: approve
+    must_fix: []
+    open: >-
+      Both Thermos rubrics self-performed, no subagents or other threads.
+      Detailed code/test/repro/text review through a3256a73c6, with an executed
+      confirm of the sole changed paragraph on this exact Redmine-text head.
+      Own builds of base a1a9f45587, the unchanged transported patch, and newer
+      master 09cfdea5da; exact quoted repro fails on both unpatched masters,
+      passes on 4.0.10 and patched master. Patched pathname suite: 298 tests,
+      1226 assertions, zero failures/errors/skips; new test without restore
+      gives exactly one NameError. Constant value, /o interpolation, warning
+      on/off, frozen/Ractor shareability, private_constant, conversions and
+      load order match 4.0.10; Windows source/model checked, not native Windows.
+      Found and verified empty-files PATH/GIT and non-contiguous version
+      boundaries; final subject, example and caller permalink are exact.
+      Final fresh tip controls: system-version install exits 0 with lock
+      unchanged; explicit 4.1.1 update and next install exit 0 in normal mode;
+      frozen/deployment updates exit 16 with lock unchanged. Rubygems-only
+      sources do not read the constant. No report must-fix. Approval covers
+      the Redmine text and offered code, not the obsolete PR body or the
+      transported patch's old all-2.x and /o commit-message claims; narrow
+      that message before any future patch-file/PR publication. Full audit:
+      bench/upstream/gem-differential/evidence/separator-pat/thermos-sol-2026-11-27.md;
+      raw commands, sources and logs: thermos-sol-2026-11-27.tar.gz beside it.
+      No upstream action taken; item state left unchanged for the
+      coordinator's publication decision.
 ---
 
 # Keep Pathname::SEPARATOR_PAT as a deprecated constant
