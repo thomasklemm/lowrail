@@ -1,0 +1,27 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 639b35c341..777e7d576a 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -485,7 +485,7 @@ def map(&block)
+     def forgetting_assignments
+       row_keys.each do |name|
+         index = index_for_name(name)
+-        attribute_at(name, index) unless untouched?(index)
++        default_attribute(name, index) unless lookup(index) || untouched?(index)
+       end
+       dup.transform_attributes!(&:forgetting_assignment)
+     end
+@@ -589,10 +589,11 @@ def attribute_at(name, index)
+         lookup(index) || default_attribute(name, index)
+       end
+ 
+-      # Not built and not cast, so it still holds the value it was loaded with.
++      # Whether the attribute at +index+, which isn't built, hasn't been cast
++      # either, so it still holds the value it was loaded with.
+       #: (Integer) -> bool
+       def untouched?(index)
+-        !lookup(index) && IndexedRow.key_at?(@row, index) && UNCAST.equal?(@casted_values[index])
++        IndexedRow.key_at?(@row, index) && UNCAST.equal?(@casted_values[index])
+       end
+ 
+       # Stores the block's result for the attribute +name+. Unknown names

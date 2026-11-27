@@ -117,3 +117,20 @@ PostgreSQL 11,391 runs; 0 failures (`tests-fix2.log`). Differential probe (`scri
 must attack: in-place mutation of a value read through a path that neither builds nor casts (none found: every
 reader casts into `@casted_values`), `ReindexedAttributeSet` (becomes), Marshal/YAML of a set saved with unbuilt
 attributes, and subclasses overriding `forget_attribute_assignments`.
+
+## Reach check (later, 2026-11-27): DT1 held
+
+Callgrind per request, interpreter, Ruby 4.0.10, 4 rounds of fresh processes (`reach/`, `cg-reach.md`), main also
+loaded by path (`mainp`) as a control for the candidate's path gem:
+
+| workload | main Ir | DT1 4e635c7ca5 | DT1 variant ed506112d9 | A/A |
+|---|---:|---:|---:|---:|
+| Hackatime PATCH display name | 16.77M | −0.67% | **−1.26%** | ≤0.01% |
+| Hackatime POST heartbeat | 23.23M | −0.06% | 0.00% | 0.04% |
+| CASA PATCH casa case (redirect) | 27.38M | **+0.38%** | **+0.11%** | 0.01% |
+| CASA PATCH casa case.json | 25.92M | **+0.31%** | **+0.23%** | 0.07% |
+
+CASA's saved records have every attribute built already (TracePoint: touched_keys returns all keys), so DT1 skips
+nothing there and its extra walk in `forgetting_assignments` costs instructions (`cg-casa-fndiff.txt`,
+`casa_calls.rb`). SQL identical on both trees. Verdict: one request gains about 1%, another loses about 0.2%; DT1 is
+held as a parked idea, no reviews started.
