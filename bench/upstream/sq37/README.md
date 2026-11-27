@@ -70,8 +70,7 @@ for a distribution's system library; no distribution image was used.
 
 ## Choice of fix
 
-Raising the floor, as #58284 did for `RETURNING`: the versions it refuses cannot run a migration or create or find a record today (raw SQL and `create_table` still work, and are
-now refused at connect too). A `sqlite_master` fallback in `data_source_sql` for 3.35/3.36 would need a version branch, and `sqlite_master`
+Raising the floor, as #58284 did for `RETURNING`: migration and uncached model-schema discovery fail on the versions it refuses. Raw SQL, direct table creation, and model CRUD with a preloaded schema cache and cache-version checking disabled can still work; the new floor refuses those connections too (Astra and thermos-sol, 2026-11-27). A `sqlite_master` fallback in `data_source_sql` for 3.35/3.36 would need a version branch, and `sqlite_master`
 cannot tell virtual and shadow tables apart, which is why #52354 moved to `pragma_table_list`. #58284 changed only
 `check_version`, the `supports_*` predicates and the CHANGELOG, with no test; no guide names the SQLite floor. The
 fix adds a test of the message and the 3.37.0 boundary next to `test_connect`.
@@ -105,3 +104,13 @@ No merged PR covers it: none of the 2026-11-25..27 merges touch `check_version` 
 * Full Active Record suites on head, Ruby 4.0.9: SQLite (sqlite3 gem 2.5.0 from Rails' Gemfile.lock, SQLite 3.47.2) 10,460
   runs, 37,402 assertions, 0 failures, 0 errors, 52 skips; PostgreSQL 17 11,391 runs, 41,340 assertions, 0
   failures, 0 errors, 31 skips (the change is SQLite-only; PostgreSQL is the control).
+
+## Disclosure fix (2026-11-27)
+
+Astra and thermos-sol on `3e348f32bd` both showed that on main, with a schema cache built on a newer SQLite,
+`schema_cache_path` set and `check_schema_cache_dump_version = false`, `bin/rails runner` create/find/update/destroy
+pass on SQLite 3.35.5 and 3.36.0, and that the head refuses those connections
+([review-astra-2026-11-27](review-astra-2026-11-27/README.md), [review-thermos-sol-2026-11-27](review-thermos-sol-2026-11-27/README.md)).
+The `Model.create!` / `find` row above is the uncached case. `e7a17ff01b` keeps the code and test and rewords the commit
+message and CHANGELOG to say uncached schema discovery fails and that these working paths are refused too; the body is
+thermos-sol's two-paragraph version, which also names #58284 as unreleased.
