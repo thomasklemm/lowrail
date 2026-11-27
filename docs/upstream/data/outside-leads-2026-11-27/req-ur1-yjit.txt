@@ -21,3 +21,8 @@ codetriage GET repo yjit none.rb Ir/op 8618117 objs/op 3179.2 jit 5/0 settle 1
 codetriage GET repo yjit ur1_copy.rb Ir/op 8623093 objs/op 3175.0 jit 5/0 settle 1
 codetriage GET repo yjit ur1_cgi.rb Ir/op 8585842 objs/op 3130.5 jit 5/0 settle 1
 codetriage GET repo yjit none.rb Ir/op 8622930 objs/op 3178.6 jit 5/0 settle 1
+blog GET articles.json yjit none.rb Ir/op 2181555 objs/op 1134.6 jit 0/0 settle 1
+blog GET articles.json yjit ur1_copy.rb Ir/op 2184865 objs/op 1134.6 jit 0/0 settle 1
+blog GET articles.json yjit ur1_cgi.rb Ir/op 2184388 objs/op 1134.6 jit 0/0 settle 1
+blog GET articles.json yjit none.rb Ir/op 2186254 objs/op 1134.6 jit 0/0 settle 1
+DONE

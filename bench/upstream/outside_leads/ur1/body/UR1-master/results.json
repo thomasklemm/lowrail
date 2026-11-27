@@ -1,0 +1,710 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/outside_leads/ur1/ur1_body.rb",
+  "at": "2026-11-27T20:09:48Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.rubies/master-zjit/bin/ruby",
+      "tree": "/home/user/w/uri-base",
+      "description": "ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "48cda77031e343d35213c36fe164b2a46ffbefa7",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.rubies/master-zjit/bin/ruby",
+      "tree": "/home/user/w/uri",
+      "description": "ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "a3b201f05b2efd737af193bc45ebd0534b3b6a5c",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp hello": {
+      "base": 3.999,
+      "base1": 3.999,
+      "base2": 3.999,
+      "candidate": 1.999,
+      "change": -0.5001250312578145,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp form key": {
+      "base": 7.0,
+      "base1": 7.0,
+      "base2": 7.0,
+      "candidate": 1.0,
+      "change": -0.8571428571428572,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp form value": {
+      "base": 8.0,
+      "base1": 8.0,
+      "base2": 8.0,
+      "candidate": 1.0,
+      "change": -0.875,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp cookie": {
+      "base": 7.0,
+      "base1": 7.0,
+      "base2": 7.0,
+      "candidate": 1.0,
+      "change": -0.8571428571428572,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit hello": {
+      "base": 3.999,
+      "base1": 3.999,
+      "base2": 3.999,
+      "candidate": 1.999,
+      "change": -0.5001250312578145,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit form key": {
+      "base": 7.0,
+      "base1": 7.0,
+      "base2": 7.0,
+      "candidate": 1.0,
+      "change": -0.8571428571428572,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit form value": {
+      "base": 8.0,
+      "base1": 8.0,
+      "base2": 8.0,
+      "candidate": 1.0,
+      "change": -0.875,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit cookie": {
+      "base": 7.0,
+      "base1": 7.0,
+      "base2": 7.0,
+      "candidate": 1.0,
+      "change": -0.8571428571428572,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp hello": {
+      "base": 4365.139,
+      "base1": 4365.139,
+      "base2": 4365.139,
+      "candidate": 4053.2355,
+      "change": -0.0714532801819141,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp form key": {
+      "base": 12754.5235,
+      "base1": 12741.0235,
+      "base2": 12768.0235,
+      "candidate": 5729.282,
+      "change": -0.5508039167437341,
+      "aa": 0.0021168960173227956,
+      "claim": true
+    },
+    "interp form value": {
+      "base": 14779.094,
+      "base1": 14776.094,
+      "base2": 14782.094,
+      "candidate": 5281.197,
+      "change": -0.6426575945724413,
+      "aa": 0.0004059788780015879,
+      "claim": true
+    },
+    "interp cookie": {
+      "base": 18935.88,
+      "base1": 18935.88,
+      "base2": 18935.88,
+      "candidate": 10407.5545,
+      "change": -0.4503791479455933,
+      "aa": 0.0,
+      "claim": true
+    },
+    "zjit hello": {
+      "base": 3335.9385,
+      "base1": 3335.9385,
+      "base2": 3335.9385,
+      "candidate": 2835.2585,
+      "change": -0.15008669973981847,
+      "aa": 0.0,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                15833713,
+                15833713
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16142083,
+                16142083
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1753,
+                1753
+              ],
+              "invalidation_time_ns": [
+                15613189,
+                15613189
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1753,
+                1753
+              ],
+              "invalidation_time_ns": [
+                15284123,
+                15284123
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                15711254,
+                15711254
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16687444,
+                16687444
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit form key": {
+      "base": 11901.612,
+      "base1": 11901.612,
+      "base2": 11901.612,
+      "candidate": 4620.185,
+      "change": -0.6118017458475372,
+      "aa": 0.0,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16930232,
+                16930232
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16826086,
+                16826086
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1753,
+                1753
+              ],
+              "invalidation_time_ns": [
+                17634531,
+                17634531
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1753,
+                1753
+              ],
+              "invalidation_time_ns": [
+                16679995,
+                16679995
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16705158,
+                16705158
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16650448,
+                16650448
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit form value": {
+      "base": 13955.3165,
+      "base1": 13958.3165,
+      "base2": 13952.3165,
+      "candidate": 4172.14,
+      "change": -0.7010358023768217,
+      "aa": 0.0004299436705717136,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16344767,
+                16344767
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                18236737,
+                18236737
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1753,
+                1753
+              ],
+              "invalidation_time_ns": [
+                16148370,
+                16148370
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1753,
+                1753
+              ],
+              "invalidation_time_ns": [
+                16330419,
+                16330419
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16361643,
+                16361643
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16592386,
+                16592386
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit cookie": {
+      "base": 18021.5815,
+      "base1": 18021.564,
+      "base2": 18021.599,
+      "candidate": 9298.4475,
+      "change": -0.4840382071906397,
+      "aa": 0.0000019421159014182233,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16724464,
+                16724464
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                15764533,
+                15764533
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1753,
+                1753
+              ],
+              "invalidation_time_ns": [
+                18859130,
+                18859130
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1753,
+                1753
+              ],
+              "invalidation_time_ns": [
+                15335669,
+                15335669
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                16944663,
+                16944663
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                105,
+                105
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                1747,
+                1747
+              ],
+              "invalidation_time_ns": [
+                17019319,
+                17019319
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

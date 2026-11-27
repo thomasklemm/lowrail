@@ -525,10 +525,10 @@ Per call, built branch against ruby/uri master (`script/upstream-bench`,
 | `Hello+world+from+Rack` | 15,322 → 5,265 (−65.6%) | 14,518 → 3,921 (−73.0%) | 8 → 1 |
 | 248-byte cookie value | 18,056 → 10,154 (−43.8%) | 17,272 → 8,810 (−49.0%) | 7 → 1 |
 
-Master and ZJIT per call (`ir.sh`, [`ur1-micro*.txt`](data/outside-leads-2026-11-27/)): the cgi decoder is 2,793 /
-4,636 / 4,183 / 9,309 Ir under ZJIT for the four inputs. ZJIT cells through `upstream-bench` are in
-`body/UR1-master` (the first run, `UR1-master-aborted`, stopped when one ZJIT process wrote an empty log; the cause
-was not established, four Valgrind batches ran beside it).
+On master `0d399335b7` ([`body/UR1-master`](../../bench/upstream/outside_leads/ur1/body/UR1-master/table.md), A/A ≤
+0.21%, ZJIT JIT-flat), interpreter −7.1% / −55.1% / −64.3% / −45.0%, **ZJIT 3,336 → 2,835 (−15.0%), 11,902 → 4,620
+(−61.2%), 13,958 → 4,172 (−70.1%), 18,022 → 9,298 (−48.4%)**. The first master run (`UR1-master-aborted`) stopped when
+one ZJIT process wrote an empty log; the cause was not established, and four Valgrind batches ran beside it.
 
 Per request, cgi variant as a method overlay:
 
@@ -539,7 +539,7 @@ Per request, cgi variant as a method overlay:
 | pingcrm PUT contact | −0.78% (0.30%) | **−1.82%** (0.47%) | — |
 | blog GET article | −0.35% (0.04%) | −0.95% (0.34%) | −0.64% (0.38%) |
 | codetriage GET repo | −0.34% (0.02%) | not JIT-flat | — |
-| blog GET articles.json (control) | +0.33% (0.19%), objects equal | — | +0.10% (0.11%) |
+| blog GET articles.json (control) | +0.33% (0.19%), objects equal | +0.02% (0.22%) | +0.10% (0.11%) |
 
 The interpreter JSON control sits just outside its A/A with identical objects. This is the same bimodal allocator
 noise RK3 met (`malloc_consolidate`), and it was not rerun with `mxfast=0`. These overlays include Rack's calls
@@ -547,7 +547,7 @@ through URI as well as Rails'. Once rack#2557 merges, the Rails part remains: ev
 every query parameter.
 
 **Built.** Queue item [UR1](../../bench/upstream/pr-queue/items/UR1.md). Fork branch
-`thomasklemm/decode-www-form-component-cgi`, commit `a3b201f05b` on ruby/uri master `48cda77031`, no PR. The
+`thomasklemm/decode-www-form-component-cgi`, commit `33c17e6` (measured as `a3b201f05b`, which differs only in the RDoc) on ruby/uri master `48cda77031`, no PR. The
 differential ([`ur1/diff.rb`](../../bench/upstream/outside_leads/ur1/diff.rb)) ran 300,000 random + 142 fixed cases
 on 4.0.10 and master: the only difference is a `BasicObject` with `to_str`, which raises `NoMethodError` either way
 with another method name. A singleton `#b` on the input is no longer called. Two test assertions are added, each

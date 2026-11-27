@@ -1,0 +1,70 @@
+==147319== Callgrind, a call-graph generating cache profiler
+==147319== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==147319== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==147319== Command: /home/user/.rubies/master-zjit/bin/ruby --zjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/outside_leads/ur1/ur1_body.rb hello 2000
+==147319== Parent PID: 144569
+==147319== 
+--147319-- 
+--147319-- Valgrind options:
+--147319--    --verbose
+--147319--    --tool=callgrind
+--147319--    --collect-atstart=no
+--147319--    --toggle-collect=rb_ary_cycle
+--147319--    --smc-check=all
+--147319--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/outside_leads/ur1/body/UR1-master/raw/ir-zjit-1-hello-base-n2000.callgrind
+--147319--    --log-file=/home/user/workspace/repo/bench/upstream/outside_leads/ur1/body/UR1-master/raw/ir-zjit-1-hello-base-n2000.valgrind.log
+--147319-- Contents of /proc/version:
+--147319--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--147319-- 
+--147319-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--147319-- Page sizes: currently 4096, max supported 4096
+--147319-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==147319== For interactive control, run 'callgrind_control -h'.
+--147319-- Reading syms from /home/user/.rubies/master-zjit/bin/ruby
+--147319-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--147319--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--147319--   .. build-id is valid
+--147319-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--147319--    object doesn't have a dynamic symbol table
+--147319-- Scheduler: using generic scheduler lock implementation.
+==147319== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-147319-by-user-on-???
+==147319== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-147319-by-user-on-???
+==147319== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-147319-by-user-on-???
+==147319== 
+==147319== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==147319== don't want to do, unless you know exactly what you're doing,
+==147319== or are doing some strange experiment):
+==147319==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=147319 ...command...
+==147319== 
+==147319== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==147319==   /path/to/gdb /home/user/.rubies/master-zjit/bin/ruby
+==147319== and then give GDB the following command
+==147319==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=147319
+==147319== --pid is optional if only one valgrind process is running
+==147319== 
+--147319-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--147319-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--147319--    object doesn't have a symbol table
+--147319-- Reading syms from /usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0
+--147319--    object doesn't have a symbol table
+--147319-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
+--147319--    object doesn't have a symbol table
+--147319-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--147319--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--147319--   .. build-id is valid
+--147319-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--147319--    object doesn't have a symbol table
+--147319-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--147319--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--147319--   .. build-id is valid
+--147319-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--147319-- Reading syms from /home/user/.rubies/master-zjit/lib/ruby/4.1.0+7/x86_64-linux/enc/encdb.so
+--147319-- Reading syms from /home/user/.rubies/master-zjit/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/transdb.so
+==147319== 
+--147319-- Start dumping at BB 172591937 (Prg.Term.)...
+--147319-- Dump to /home/user/workspace/repo/bench/upstream/outside_leads/ur1/body/UR1-master/raw/ir-zjit-1-hello-base-n2000.callgrind
+--147319-- Dumping done.
+==147319== Events    : Ir
+==147319== Collected : 6671932
+==147319== 
+==147319== I   refs:      6,671,932

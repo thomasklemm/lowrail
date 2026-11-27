@@ -6,7 +6,7 @@ kind: perf
 area: URI.decode_www_form_component
 reviewer: hsbt
 branch: thomasklemm/decode-www-form-component-cgi
-head: "a3b201f05b2efd737af193bc45ebd0534b3b6a5c"
+head: "33c17e67fdbd274a255dcf61f5fb1d65a0b57634"
 base: master
 built_on: "48cda77031"
 depends_on: []
@@ -53,7 +53,12 @@ note: >-
   the same input methods; guarding against hooked `encoding` or `instance_of?` would take more calls on the
   input, not fewer. Not named in the body, since users can't hit them through any caller. Body: Rack before Rails by
   reach (1.40B vs 823M downloads), with Rack::QueryParser's own call (query_parser.rb:268) linked. Astra confirm
-  requested on the decision and body; code head unchanged. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  requested on the decision and body; code head unchanged.
+  2026-11-27 (Astra confirm: changes, text only): the RDoc of decode_www_form_component no longer says the string
+  is converted with String#b ("The bytes of the given string are decoded (as below), and the result is
+  force-encoded to the given encoding +enc+."); commit amended to 33c17e6 (same message, code identical), fork
+  branch moved with a lease from a3b201f05b. Suite 94 tests green on 4.0.10. Body: one sentence that singleton
+  methods on a plain string, such as its own `b`, are no longer called. Measurements on a3b201f05b apply (comment-only change). ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes:
   - reviewer: astra
@@ -105,7 +110,7 @@ passes:
 
 `URI.decode_www_form_component` copies the string with `b` and then runs `gsub` with a hash table, so every `+` and `%XX` builds a MatchData and looks up the hash. Rack decodes query strings and cookies with it ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes every query string and form body key and value with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
 
-This uses `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C, for plain ASCII-compatible strings. The check for an invalid `%` still runs first, and the result is still forced to the requested encoding, also when its bytes are invalid there. String subclasses and other objects keep the current path.
+This uses `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C, for plain ASCII-compatible strings. The check for an invalid `%` still runs first, and the result is still forced to the requested encoding, also when its bytes are invalid there. String subclasses and other objects keep the current path; singleton methods on a plain string, such as its own `b`, are no longer called.
 
 | Objects and instructions per call, Ruby 4.0.10 | Before | After |
 | --- | ---: | ---: |
