@@ -454,6 +454,13 @@ rules in [DECISIONS](../DECISIONS.md#submission-queue-2026-11-03)). `script/pr-q
 state and rank; `script/pr-queue next` the next one to open. The table that stood here until 2026-11-05 is in git
 history (d25db64).
 
+- **Rails 8 default stack census (2026-11-27, [record](solid-stack-census.md)):** SCB1 (solid_cable, the listener polls
+  without the query cache; idle poll −14.5% / −23% instructions interp / YJIT) built and queued. Held: SSQ1 (Solid
+  Queue enqueue without `create_or_find_by!`'s savepoint, −62 objects and −6.3% instructions per enqueue; shared,
+  deliberately idempotent `ready` path and open solid_queue#833 next to it), SSQ2 (worker re-reads pauses and
+  prefix queues every poll; that is how pauses take effect, not exact). Dropped as native or covered: Solid Cache
+  inflate/Marshal and SHA-256 keys, cable writer hashes, `escape!`, `URI::GID.build`.
+
 ### Erklärung für Thomas: K1 (2026-11-14, Census 9; gebaut, nicht geöffnet)
 
 Nicht zu verwechseln mit dem Rack-K1 vom 2026-11-04 weiter unten. Belege, Messungen und Überschneidungen:

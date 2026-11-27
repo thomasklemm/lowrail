@@ -1,0 +1,2 @@
+ENV["STACK"] = "cand"
+eval_gemfile File.join(__dir__, "Gemfile")

@@ -1,0 +1,7 @@
+source "https://rubygems.org"
+gem "solid_cable", path: "/home/user/w/main/solid_cable"
+gem "railties"
+gem "activerecord"
+gem "actioncable"
+gem "sqlite3"
+gem "benchmark-ips"

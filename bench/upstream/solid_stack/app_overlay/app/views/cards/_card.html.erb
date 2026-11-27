@@ -1,0 +1,11 @@
+<article id="<%= dom_id(card) %>" class="card card--preview" data-controller="card" data-card-id-value="<%= card.id %>">
+  <header class="card__header">
+    <a href="/cards/<%= card.id %>" class="card__title"><%= card.title %></a>
+    <span class="card__number">#<%= card.id %></span>
+  </header>
+  <div class="card__body"><%= card.description %></div>
+  <footer class="card__footer">
+    <span class="card__author"><%= card.user.name %></span>
+    <time datetime="<%= card.updated_at.iso8601 %>"><%= card.updated_at.strftime("%b %-d") %></time>
+  </footer>
+</article>

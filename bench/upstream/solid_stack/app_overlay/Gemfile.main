@@ -1,0 +1,2 @@
+ENV["STACK"] = "main"
+eval_gemfile File.join(__dir__, "Gemfile")
