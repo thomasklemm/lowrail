@@ -374,7 +374,8 @@ otherwise"; `script/pr-queue` still implements it), and the compatibility-PR fre
 
 ### DECISIONS.md as of 2026-11-27, before the condensation
 
-Verbatim from `docs/DECISIONS.md` at 16b5349195 (only the leading "> " is added). Its #self-links point into the old
+Verbatim from `docs/DECISIONS.md` at 16b5349195 (only the leading "> " is added). The rule "Cite only relevant, current projects,
+most important first" (Thomas, 2026-11-27), added on main in c7795974 after this copy, is in DECISIONS word for word. Its #self-links point into the old
 file and may not resolve.
 
 > # Decision register

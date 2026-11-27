@@ -406,6 +406,9 @@ enter the queue at `built`; an item is `reviewed` only when the floor below appr
   typecasting, caching or memoization, thread or fiber state, VM/JIT code. Items are marked `risky` for correctness
   changes on hot paths, Ractor/thread or frozen-object semantics, anything a maintainer pushed back on before, and
   critical changes; how Astra is briefed on other risky items is the coordinator's choice.
+  Every Astra brief includes the relevance and currency check of every project the body, issue or comment cites
+  ([Pull requests](#pull-requests), "Cite only relevant, current projects"): stars, downloads, last push or release,
+  and the order by reach.
 
 Beyond the floor:
 
