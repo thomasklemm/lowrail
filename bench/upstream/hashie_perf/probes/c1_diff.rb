@@ -30,7 +30,10 @@ klasses = {
   'UnderscoreKeys' => Class.new(Hashie::Mash) { include Hashie::Extensions::Mash::UnderscoreKeys },
   'MethodAccessWithOverride' => Class.new(Hashie::Mash) { include Hashie::Extensions::MethodAccessWithOverride },
   'Subclass mm override' => Class.new(Hashie::Mash) { def method_missing(name, *args, &blk) = name.to_s.end_with?('!') ? [:own, super] : super },
-  'Singleton' => :singleton
+  'Singleton' => :singleton,
+  'Mash+dp' => Hashie::Mash,
+  'DefineAccessors+dp' => Class.new(Hashie::Mash) { include Hashie::Extensions::Mash::DefineAccessors },
+  'StrictKeyAccess+dp' => Class.new(Hashie::Mash) { include Hashie::Extensions::Mash::StrictKeyAccess }
 }
 names = %i[name name? name! name_ name= new_key new_key? new_key! new_key_ new_key= zip zip= key key= Ünïcode? 名前= a?= ?! = _ a__ size= private? owner! homepage_ Name=]
 names += names.map(&:to_s)
@@ -48,6 +51,7 @@ klasses.each do |label, klass|
           puts [label, si, frozen, name.inspect, "new raised #{e.message}"].join(' | ')
           next
         end
+        mash.default_proc = proc { |h, key| key.is_a?(String) && !key.frozen? ? (h[key.upcase!] = key.frozen?) : [:dp, key, key.frozen?] } if label.end_with?('+dp')
         mash.freeze if frozen
         args = name.to_s.end_with?('=') ? ['v'] : []
         result = begin

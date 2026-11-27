@@ -46,6 +46,17 @@ message, DefineAccessors' closures through `convert_key`); stored key frozenness
 iteration; (7) frozen mashes give identical FrozenErrors; (8) no load-order effect. Suite: Ruby 4.0.9 `rake spec`
 1,076/0, rubocop 124 + 156 files clean.
 
+### Head eae505a after Astra's must-fix
+
+Astra found that `d1f403e` returned Symbol#name's frozen String for a name without a suffix. DefineAccessors then hands that
+String to a public default proc, so `m.default_proc = proc { |h, key| h[key.upcase!] = 7 }; m.missing` raised
+FrozenError where master returned 7 (reproduced, `probes/astra_repro.rb`). `eae505a` finds the suffix in
+`Symbol#name` and returns `method_name.to_s` for an unsuffixed name, as master did. `c1_diff.rb` now also sets
+mutating default procs on Mash, DefineAccessors and StrictKeyAccess. Its 10,400 rows are identical to master on 4.0.9
+and master+ZJIT, and the same probe finds 16 differing rows on `d1f403e` (`c1/differential-eae505a.tar.gz`). The
+benchmarked paths are all suffixed, so their allocations are unchanged (13, 5, 5). The body's Callgrind and YJIT wall
+runs were repeated on `eae505a` (`body/HM2-eae505a`, `c1/wall-4.0.10-yjit-eae505a`).
+
 ## 2. `deep_merge` copies the whole tree: a real win, not exact, not opened
 
 Confirmed: `dup` is `self.class.new(self, ...)`, so every key goes through `custom_writer` again, including the
