@@ -1,0 +1,4 @@
+["/opt/hostedtoolcache/Ruby/3.4.6/x64/lib/ruby/3.4.0/cgi/util.rb", 27]
+["/opt/hostedtoolcache/Ruby/3.4.6/x64/lib/ruby/3.4.0/cgi/util.rb", 14]
+{"error_highlight" => "0.7.0", "did_you_mean" => "2.0.0", "syntax_suggest" => "2.0.2", "cgi" => "0.4.2", "uri" => "1.0.3", "fileutils" => "1.7.3", "set" => "1.1.1", "tempfile" => "0.3.1", "delegate" => "0.4.0", "tmpdir" => "0.3.1", "etc" => "1.4.6", "date" => "3.4.1", "time" => "0.4.1", "erb" => "6.0.7", "strscan" => "3.1.2"}
+["/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/cgi/escape.rb", 41]

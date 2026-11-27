@@ -1,0 +1,14 @@
+2.7.3 clean: 204073 records; only 2 Object-address differences vs 0046982320
+2.7.3 util: 204073 records; only 2 Object-address differences vs 0046982320
+3.0.7 clean: 204073 records; only 2 Object-address differences vs 0046982320
+3.0.7 util: 204073 records; only 2 Object-address differences vs 0046982320
+3.1.7 clean: 204073 records; only 2 Object-address differences vs 0046982320
+3.1.7 util: 204073 records; only 2 Object-address differences vs 0046982320
+3.2.9 clean: 204073 records; only 2 Object-address differences vs 0046982320
+3.2.9 util: 204073 records; only 2 Object-address differences vs 0046982320
+3.3.9 clean: 204073 records; only 2 Object-address differences vs 0046982320
+3.3.9 util: 204073 records; only 2 Object-address differences vs 0046982320
+3.4.6 clean: 204073 records; only 2 Object-address differences vs 0046982320
+3.4.6 util: 204073 records; only 2 Object-address differences vs 0046982320
+4.0.9 clean: 204073 records; only 2 Object-address differences vs 0046982320
+4.0.9 util: 204073 records; only 2 Object-address differences vs 0046982320
