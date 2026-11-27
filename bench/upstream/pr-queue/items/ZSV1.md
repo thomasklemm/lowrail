@@ -109,6 +109,19 @@ passes:
       Cold deep-extension cost and controls are recorded, with seven replayable probes.
       Record: bench/upstream/zsv1/thermos-review.md, Astra full review of revision 3.
       No Ruby push, PR opening or upstream post.
+  - reviewer: astra
+    orb: "T-01a21d4e-deb9-7380-98f8-9a1f549b64ae"
+    head: "d0f0dc2da57a4b2d070d279fa4e5b67078d14a34"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None. Exact-head dev build and adversarial interpreter/ZJIT comparisons found no
+      semantic differences. zjit-test 2048 passed/15 skipped; btest thresholds 1/2
+      each 2148 passed. Frozen/object_id, re-embedding, shared layouts, inlined blocks,
+      compaction, version limits, threads and Ractors checked. Body and commit message
+      accepted; stats-4 Lobsters diff replays exactly; citations relevant and current
+      (ruby/ruby, Shopify/ruby, lobsters, ruby-bench lobsters headline). No upstream action.
+      Receipts: zsv1/astra-probes/zsv1-astra4-evidence.tar.gz
 ---
 
 # ZJIT: Profile the real class for setinstancevariable
