@@ -1,0 +1,33 @@
+2026-11-27T15:50:56Z
+652f5a402c216ee6a1772b0e5a5ccae4d3922c0f
+dbbfb84cec40d64ef7cf8fdc21e89b98dbdd1a46	refs/heads/main
+41af869c787a33db4cb46149746cf3cabeb896f7	refs/heads/thomasklemm/attrs-for-database-row-2
+commit 41af869c787a33db4cb46149746cf3cabeb896f7
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Fri Nov 27 10:58:42 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Fri Nov 27 12:53:19 2026 +0000
+
+    Build attribute Hashes without copying the lazy row
+    
+    LazyIndexedAttributeSet#attributes copies the set's attributes into a new
+    IndexedRow::Mutable on every call. AttributeSet#values_for_database and
+    #values_before_type_cast, which back attributes_for_database (used by
+    Marshal and the MessagePack coder) and attributes_before_type_cast, only
+    turn that row into a Hash.
+    
+    The two methods now materialize the attributes, then read them by name in
+    the order of the set's indexes, as IndexedRow#transform_values does. They
+    build the same attributes and call the same method on each, so the
+    Hashes and the record's state afterwards are unchanged. Both still read
+    from a copy of the set's Array, as they read the row before: serializing
+    a value or evaluating a callable default can run application code that
+    assigns another attribute, and the Hash keeps the attributes the record
+    had when it was called.
+    
+    Reading values from the row instead, as #to_hash does, would also skip
+    materialize, but wouldn't be the same: Attribute#value_for_database keeps
+    the value it returns, so an encrypted attribute dumps the same ciphertext
+    each time, and accessed_fields would leave out attributes read as nil.
+
+6f81bf3f080da8a8893eafaa0e6216b2776ebf46 Merge pull request #59800 from thomasklemm/thomasklemm/lazy-indexed-keys

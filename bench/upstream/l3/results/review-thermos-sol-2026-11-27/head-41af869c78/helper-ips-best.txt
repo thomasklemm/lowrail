@@ -1,0 +1,10 @@
+Marshal.dump: main 34843.0 (+0.00%) r2; head 39564.0 (+13.55%) r3; helper 39178.0 (+12.44%) r1; main2 33828.0 (-2.91%) r1
+  main: Marshal.dump     34.843k (± 9.8%) i/s   (28.70 μs/i) -     55.020k in   1.579097s
+  head: Marshal.dump     39.564k (±10.6%) i/s   (25.28 μs/i) -     61.665k in   1.558629s
+  helper: Marshal.dump     39.178k (±13.3%) i/s   (25.52 μs/i) -     64.080k in   1.635626s
+  main2: Marshal.dump     33.828k (±12.9%) i/s   (29.56 μs/i) -     51.498k in   1.522352s
+attributes_for_database: main 91129.0 (+0.00%) r2; head 144700.0 (+58.79%) r2; helper 139901.0 (+53.52%) r1; main2 90035.0 (-1.20%) r1
+  main: attributes_for_database     91.129k (± 2.7%) i/s   (10.97 μs/i) -    142.095k in   1.559276s
+  head: attributes_for_database    144.700k (±10.4%) i/s    (6.91 μs/i) -    223.455k in   1.544262s
+  helper: attributes_for_database    139.901k (±10.7%) i/s    (7.15 μs/i) -    217.840k in   1.557102s
+  main2: attributes_for_database     90.035k (± 4.8%) i/s   (11.11 μs/i) -    142.095k in   1.578224s

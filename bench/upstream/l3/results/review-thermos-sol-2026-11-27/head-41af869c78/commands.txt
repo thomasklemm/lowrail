@@ -1,0 +1,74 @@
+Working root: /home/user/workspace/repo
+WORK=$ROOT/.amp/in/orb-backup/l3-review-41af
+OUT=$ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-27/head-41af869c78
+Ruby for all new validation and timing: 4.0.10 a704b7cd95
+export PATH=$HOME/.local/share/mise/installs/ruby/4.0.10/bin:$PATH
+export BUNDLE_PATH=$WORK/gems TMPDIR=$WORK/tmp
+
+Environment:
+  mise install ruby@4.0.10
+  git -C .corpus/rails fetch --quiet --unshallow origin main
+  git -C .corpus/rails fetch --quiet origin main:refs/remotes/l3-review/main
+  git -C .corpus/rails fetch --quiet https://github.com/thomasklemm/rails.git thomasklemm/attrs-for-database-row-2
+  git -C .corpus/rails fetch --quiet https://github.com/thomasklemm/rails.git f70d3e091759d3f7acf5f5b46ba40537c7b6c6f5 768ad013702517396f96f9f69ff9b9d2791c85eb
+  git worktree add --detach for main, head, old-db and old-btc at the pins in README.md.
+  Gemfile is copied from the previous review; RAILS selects each tree.
+  RAILS=$WORK/head BUNDLE_GEMFILE=$WORK/bundle/Gemfile bundle install
+  Per tree, copy Gemfile and lock to b-TREE and run bundle lock --local.
+  sudo -n pg_ctlcluster 17 main start
+  sudo -n -u postgres createuser -s user
+  sudo -n -u postgres createdb -O user l3_probe
+
+Retained drivers, invoked from repository root:
+  taskset -c 2-7 bash $WORK/run-probes.sh
+  taskset -c 2-7 bash $WORK/run-tests.sh
+  bash $WORK/run-benchmarks.sh
+  python3 $WORK/audit_body.py
+
+Negative controls, each old tree's RAILS and BUNDLE_GEMFILE:
+  ARCONN=sqlite3 RAILS_MINITEST_PLUGIN=true ruby -rbundler/setup -I$WORK/head/activerecord/test $WORK/head/activerecord/test/cases/attribute_methods_test.rb -n '/attributes_(for_database_serializes|before_type_cast_returns)_the_attributes_the_record_had/'
+
+Validation-only helper, RAILS=head, head bundle:
+  ruby -r$WORK/shared_transform.rb bench/upstream/l3/results/review-thermos-sol-2026-11-25/exactness_extension.rb
+  Repeat with ADAPTER=postgresql and compare to corresponding main output.
+  ruby -r$WORK/shared_transform.rb bench/upstream/l3/results/review-thermos-sol-2026-11-27/callable_default_repro.rb
+  Same regression-test command, with -r$WORK/shared_transform.rb instead of -rbundler/setup.
+  ruby -r$WORK/shared_transform.rb bench/upstream/l3/results/review-thermos-sol-2026-11-25/body_claims.rb
+  For rounds 1,2,3, interleave main/head/helper/main2:
+    taskset -c 1 ruby --yjit -rbundler/setup [-r$WORK/shared_transform.rb for helper only] $WORK/helper_bench.rb
+    Same fixed heap as run-benchmarks.sh. main2 uses main source and bundle; helper uses head.
+  ruby bench/upstream/l3/results/review-thermos-sol-2026-11-25/summarize_ips.rb $OUT/helper-ips.log $OUT/helper-ips.json
+
+Each main/head tree, its RAILS and bundle:
+  ruby bench/upstream/l3/concurrency_probe.rb
+  ruby -rbundler/setup -ractive_model/attribute_set -e 'puts ActiveModel::LazyIndexedAttributeSet.name'
+  bundle exec rubocop --config $OUT/metrics.yml --format json $RAILS/activemodel/lib/active_model/attribute_set.rb
+  bundle exec flog -a $RAILS/activemodel/lib/active_model/attribute_set.rb
+Head project lint:
+  bundle exec rubocop --config $RAILS/.rubocop.yml $RAILS/activemodel/lib/active_model/attribute_set.rb $RAILS/activerecord/test/cases/attribute_methods_test.rb
+Body claims A/A, main/head/main2:
+  ruby -rbundler/setup bench/upstream/l3/results/review-thermos-sol-2026-11-25/body_claims.rb
+Row-reading control, head:
+  ruby -r$ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-25/row_read_variant.rb bench/upstream/l3/results/review-thermos-sol-2026-11-25/body_claims.rb
+
+Source claims inspected:
+  activemodel/lib/active_model/attribute_set.rb (base, head, introducing merge and current main)
+  activemodel/lib/active_model/indexed_row.rb
+  activemodel/lib/active_model/attribute.rb
+  activemodel/lib/active_model/attribute/user_provided_default.rb
+  activerecord/lib/active_record/attribute_methods/before_type_cast.rb
+  activerecord/lib/active_record/marshalling.rb:21-24
+  activerecord/lib/active_record/message_pack.rb:86-91
+  activerecord/lib/active_record/model_schema.rb:648-695
+
+Live read-only API queries (each response retained):
+  gh api -X GET search/issues -f q='repo:rails/rails is:pr is:merged merged:>=2026-11-25' -f per_page=100
+  gh api -X GET search/issues -f q='repo:rails/rails is:pr is:merged base:main merged:>=2026-11-25' -f per_page=100
+  gh api -X GET search/issues -f q='repo:rails/rails is:pr (values_for_database OR values_before_type_cast OR attributes_for_database OR attributes_before_type_cast)' -f per_page=100
+  gh api repos/rails/rails/pulls/59141
+  gh api repos/{rails/rails,msgpack/msgpack-ruby,evanphx/benchmark-ips,sparklemotion/sqlite3-ruby,ruby/ruby}
+  curl -fsSL https://rubygems.org/api/v1/gems/{rails,activerecord,msgpack,sqlite3,benchmark-ips}.json
+
+Git history, pin and overlap commands are reflected in pins-and-history.txt and the retained diffs.
+Input probes and pre-existing measurement files are pinned by input-sha256.txt.
+Review evidence is checksummed in SHA256SUMS.

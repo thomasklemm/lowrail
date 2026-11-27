@@ -1,0 +1,4 @@
+serialize 128MiB every call: main 6.09 (+0.00%) r3; head 5.92 (-2.76%) r2; main2 5.62 (-7.66%) r2
+  main: serialize 128MiB every call      6.087 (± 0.0%) i/s  (164.28 ms/i) -     10.000 in   1.642816s
+  head: serialize 128MiB every call      5.919 (± 0.0%) i/s  (168.94 ms/i) -      9.000 in   1.520462s
+  main2: serialize 128MiB every call      5.621 (± 0.0%) i/s  (177.89 ms/i) -      9.000 in   1.601025s

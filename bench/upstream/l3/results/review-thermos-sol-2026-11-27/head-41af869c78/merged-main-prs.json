@@ -1,0 +1,438 @@
+{
+  "total_count": 72,
+  "incomplete_results": false,
+  "items": [
+    {
+      "number": 60013,
+      "title": "Let the Action Mailer test helper load without Active Job",
+      "closed_at": "2026-11-27T15:26:56Z",
+      "html_url": "https://github.com/rails/rails/pull/60013"
+    },
+    {
+      "number": 60008,
+      "title": "Bump the minimum supported SQLite version to 3.37.0",
+      "closed_at": "2026-11-27T15:07:14Z",
+      "html_url": "https://github.com/rails/rails/pull/60008"
+    },
+    {
+      "number": 60007,
+      "title": "Note in the upgrade guide that default_url_options is frozen by default",
+      "closed_at": "2026-11-27T15:34:13Z",
+      "html_url": "https://github.com/rails/rails/pull/60007"
+    },
+    {
+      "number": 59999,
+      "title": "Fix the `attribute_method_affix` example in Active Model docs [ci skip]",
+      "closed_at": "2026-11-27T09:05:03Z",
+      "html_url": "https://github.com/rails/rails/pull/59999"
+    },
+    {
+      "number": 59997,
+      "title": "Add missing Active Support core extension requires",
+      "closed_at": "2026-11-27T15:34:45Z",
+      "html_url": "https://github.com/rails/rails/pull/59997"
+    },
+    {
+      "number": 59995,
+      "title": "Keep navigation helpers available through UrlHelper",
+      "closed_at": "2026-11-26T22:29:49Z",
+      "html_url": "https://github.com/rails/rails/pull/59995"
+    },
+    {
+      "number": 59992,
+      "title": "Honor DATE_FORMATS overrides of built-in formats",
+      "closed_at": "2026-11-26T17:24:09Z",
+      "html_url": "https://github.com/rails/rails/pull/59992"
+    },
+    {
+      "number": 59991,
+      "title": "Don't run a query when checking `or` compatibility",
+      "closed_at": "2026-11-26T15:40:01Z",
+      "html_url": "https://github.com/rails/rails/pull/59991"
+    },
+    {
+      "number": 59990,
+      "title": "Fix the `:content_type` description in `register_encoder` docs [ci skip]",
+      "closed_at": "2026-11-26T14:34:35Z",
+      "html_url": "https://github.com/rails/rails/pull/59990"
+    },
+    {
+      "number": 59989,
+      "title": "Don't share the query cache state with the ActionController::Live thread",
+      "closed_at": "2026-11-26T20:28:54Z",
+      "html_url": "https://github.com/rails/rails/pull/59989"
+    },
+    {
+      "number": 59988,
+      "title": "Add `change_check_constraint` for PostgreSQL 19+",
+      "closed_at": "2026-11-26T15:43:02Z",
+      "html_url": "https://github.com/rails/rails/pull/59988"
+    },
+    {
+      "number": 59987,
+      "title": "Stop setting the Action Mailer delivery job in `load_defaults`",
+      "closed_at": "2026-11-26T22:28:18Z",
+      "html_url": "https://github.com/rails/rails/pull/59987"
+    },
+    {
+      "number": 59986,
+      "title": "Note in the upgrade guide that Action Mailer no longer loads Active Job",
+      "closed_at": "2026-11-26T22:38:11Z",
+      "html_url": "https://github.com/rails/rails/pull/59986"
+    },
+    {
+      "number": 59985,
+      "title": "Note in the upgrade guide that Rack::Sendfile is omitted when x_sendfile_header is unset",
+      "closed_at": "2026-11-26T22:07:12Z",
+      "html_url": "https://github.com/rails/rails/pull/59985"
+    },
+    {
+      "number": 59984,
+      "title": "Note in the upgrade guide that Sidekiq 8.0.3 or later is required",
+      "closed_at": "2026-11-26T22:06:25Z",
+      "html_url": "https://github.com/rails/rails/pull/59984"
+    },
+    {
+      "number": 59983,
+      "title": "Look up an existing connection lease without the registry mutex",
+      "closed_at": "2026-11-26T16:02:21Z",
+      "html_url": "https://github.com/rails/rails/pull/59983"
+    },
+    {
+      "number": 59982,
+      "title": "Apply the rest of the scope of a `disable_joins` association",
+      "closed_at": "2026-11-25T20:39:17Z",
+      "html_url": "https://github.com/rails/rails/pull/59982"
+    },
+    {
+      "number": 59980,
+      "title": "Bound quoted-name cache entries by byte size",
+      "closed_at": "2026-11-26T15:44:50Z",
+      "html_url": "https://github.com/rails/rails/pull/59980"
+    },
+    {
+      "number": 59977,
+      "title": "Document redirect settings for metal controllers",
+      "closed_at": "2026-11-25T15:31:43Z",
+      "html_url": "https://github.com/rails/rails/pull/59977"
+    },
+    {
+      "number": 59976,
+      "title": "Keep adapter-specific index readers on every `IndexDefinition`",
+      "closed_at": "2026-11-26T22:50:35Z",
+      "html_url": "https://github.com/rails/rails/pull/59976"
+    },
+    {
+      "number": 59975,
+      "title": "Hide generator-only flags from `rails new --help`",
+      "closed_at": "2026-11-26T15:58:05Z",
+      "html_url": "https://github.com/rails/rails/pull/59975"
+    },
+    {
+      "number": 59972,
+      "title": "Don't share nested values of a column default between records",
+      "closed_at": "2026-11-26T16:03:58Z",
+      "html_url": "https://github.com/rails/rails/pull/59972"
+    },
+    {
+      "number": 59971,
+      "title": "Speed up numbering of Action Text plain-text list items",
+      "closed_at": "2026-11-25T16:07:46Z",
+      "html_url": "https://github.com/rails/rails/pull/59971"
+    },
+    {
+      "number": 59965,
+      "title": "Rescue all Redis errors in RedisCacheStore failsafe",
+      "closed_at": "2026-11-25T16:38:35Z",
+      "html_url": "https://github.com/rails/rails/pull/59965"
+    },
+    {
+      "number": 59964,
+      "title": "Compare scalar ids without arrays in nested attributes",
+      "closed_at": "2026-11-26T15:58:44Z",
+      "html_url": "https://github.com/rails/rails/pull/59964"
+    },
+    {
+      "number": 59962,
+      "title": "Don't build log subscriber events whose logging is turned off",
+      "closed_at": "2026-11-26T15:41:05Z",
+      "html_url": "https://github.com/rails/rails/pull/59962"
+    },
+    {
+      "number": 59961,
+      "title": "Locate an Array of records passed to a job with one query per model",
+      "closed_at": "2026-11-25T18:33:08Z",
+      "html_url": "https://github.com/rails/rails/pull/59961"
+    },
+    {
+      "number": 59960,
+      "title": "Fix the hour and zone in `ActiveModel::Type::DateTime` docs [ci skip]",
+      "closed_at": "2026-11-25T16:27:08Z",
+      "html_url": "https://github.com/rails/rails/pull/59960"
+    },
+    {
+      "number": 59959,
+      "title": "Document the 8.2 default of `s3_public_uploads_via_acl` [ci skip]",
+      "closed_at": "2026-11-26T21:36:44Z",
+      "html_url": "https://github.com/rails/rails/pull/59959"
+    },
+    {
+      "number": 59958,
+      "title": "Reset the dirty tracker before dup copies the record",
+      "closed_at": "2026-11-26T16:04:59Z",
+      "html_url": "https://github.com/rails/rails/pull/59958"
+    },
+    {
+      "number": 59957,
+      "title": "Give Live actions the event reporter context and tags of their request",
+      "closed_at": "2026-11-26T16:33:48Z",
+      "html_url": "https://github.com/rails/rails/pull/59957"
+    },
+    {
+      "number": 59956,
+      "title": "Keep the unaliased table name for left_joins when eager loading",
+      "closed_at": "2026-11-25T16:51:03Z",
+      "html_url": "https://github.com/rails/rails/pull/59956"
+    },
+    {
+      "number": 59955,
+      "title": "Limit the size of the quoted name caches",
+      "closed_at": "2026-11-25T16:11:24Z",
+      "html_url": "https://github.com/rails/rails/pull/59955"
+    },
+    {
+      "number": 59954,
+      "title": "Check the encrypted file key length when decrypting",
+      "closed_at": "2026-11-25T17:33:01Z",
+      "html_url": "https://github.com/rails/rails/pull/59954"
+    },
+    {
+      "number": 59952,
+      "title": "Don't run Action Mailer deliver callbacks when no email was built",
+      "closed_at": "2026-11-26T16:45:02Z",
+      "html_url": "https://github.com/rails/rails/pull/59952"
+    },
+    {
+      "number": 59950,
+      "title": "Only draw Action Mailbox conductor routes in local environments",
+      "closed_at": "2026-11-26T15:57:14Z",
+      "html_url": "https://github.com/rails/rails/pull/59950"
+    },
+    {
+      "number": 59936,
+      "title": "Fix the in-place modification example in `ActiveModel::Dirty` docs [ci skip]",
+      "closed_at": "2026-11-26T15:59:58Z",
+      "html_url": "https://github.com/rails/rails/pull/59936"
+    },
+    {
+      "number": 59931,
+      "title": "Handle escaped quotes in Accept header parameters",
+      "closed_at": "2026-11-26T20:48:49Z",
+      "html_url": "https://github.com/rails/rails/pull/59931"
+    },
+    {
+      "number": 59925,
+      "title": "Fix parallel CI groups raising when steps share a title",
+      "closed_at": "2026-11-25T16:17:56Z",
+      "html_url": "https://github.com/rails/rails/pull/59925"
+    },
+    {
+      "number": 59919,
+      "title": "Fix unused block warnings for strict locals with ampersands",
+      "closed_at": "2026-11-26T16:34:56Z",
+      "html_url": "https://github.com/rails/rails/pull/59919"
+    },
+    {
+      "number": 59915,
+      "title": "Return a plain String when truncate_bytes cuts an html_safe string",
+      "closed_at": "2026-11-26T16:45:15Z",
+      "html_url": "https://github.com/rails/rails/pull/59915"
+    },
+    {
+      "number": 59913,
+      "title": "Fix the nested attributes `expect` example in Strong Parameters docs",
+      "closed_at": "2026-11-26T16:47:03Z",
+      "html_url": "https://github.com/rails/rails/pull/59913"
+    },
+    {
+      "number": 59911,
+      "title": "Treat a missing namespaced class as a MessagePack cache miss too",
+      "closed_at": "2026-11-26T17:25:54Z",
+      "html_url": "https://github.com/rails/rails/pull/59911"
+    },
+    {
+      "number": 59908,
+      "title": "Fix `Response` raising when the Content-Type header is not a String",
+      "closed_at": "2026-11-26T17:59:05Z",
+      "html_url": "https://github.com/rails/rails/pull/59908"
+    },
+    {
+      "number": 59907,
+      "title": "Fix preloading ordered `has_many :through` scoped on its through table",
+      "closed_at": "2026-11-25T18:36:05Z",
+      "html_url": "https://github.com/rails/rails/pull/59907"
+    },
+    {
+      "number": 59906,
+      "title": "Fix `order(Arel.sql(...).desc)` making `includes` load with a join",
+      "closed_at": "2026-11-25T17:35:41Z",
+      "html_url": "https://github.com/rails/rails/pull/59906"
+    },
+    {
+      "number": 59903,
+      "title": "Fix `ConnectionPoolFiberTest` leaking a connection from pool maintenance",
+      "closed_at": "2026-11-26T19:53:04Z",
+      "html_url": "https://github.com/rails/rails/pull/59903"
+    },
+    {
+      "number": 59902,
+      "title": "[ci skip][docs] Revert link facebook/jemalloc to jemalloc/jemalloc",
+      "closed_at": "2026-11-26T19:53:39Z",
+      "html_url": "https://github.com/rails/rails/pull/59902"
+    },
+    {
+      "number": 59900,
+      "title": "[memory ⬇️] CodeGenerate class_attribute methods",
+      "closed_at": "2026-11-26T19:56:27Z",
+      "html_url": "https://github.com/rails/rails/pull/59900"
+    },
+    {
+      "number": 59884,
+      "title": "Don't drop the STI type condition when joining",
+      "closed_at": "2026-11-27T07:01:31Z",
+      "html_url": "https://github.com/rails/rails/pull/59884"
+    },
+    {
+      "number": 59851,
+      "title": "Don't compare owner conditions when joining an association without a scope",
+      "closed_at": "2026-11-26T22:59:44Z",
+      "html_url": "https://github.com/rails/rails/pull/59851"
+    },
+    {
+      "number": 59832,
+      "title": "Return no messages for an attribute when a model has no errors",
+      "closed_at": "2026-11-26T22:40:22Z",
+      "html_url": "https://github.com/rails/rails/pull/59832"
+    },
+    {
+      "number": 59826,
+      "title": "Keep readonly when preloading a filtered through",
+      "closed_at": "2026-11-25T19:13:23Z",
+      "html_url": "https://github.com/rails/rails/pull/59826"
+    },
+    {
+      "number": 59824,
+      "title": "Skip copying form field names that need no changes",
+      "closed_at": "2026-11-26T22:33:54Z",
+      "html_url": "https://github.com/rails/rails/pull/59824"
+    },
+    {
+      "number": 59817,
+      "title": "Unpin the main pool the Ractor proxy pinned",
+      "closed_at": "2026-11-26T22:12:24Z",
+      "html_url": "https://github.com/rails/rails/pull/59817"
+    },
+    {
+      "number": 59812,
+      "title": "Compare Server-Timing durations with the events they come from",
+      "closed_at": "2026-11-26T22:09:33Z",
+      "html_url": "https://github.com/rails/rails/pull/59812"
+    },
+    {
+      "number": 59810,
+      "title": "Skip merging a blank relation into a relation without conditions",
+      "closed_at": "2026-11-26T23:02:44Z",
+      "html_url": "https://github.com/rails/rails/pull/59810"
+    },
+    {
+      "number": 59804,
+      "title": "Allocate less per field in `text_field_tag` and `tag`",
+      "closed_at": "2026-11-26T22:16:50Z",
+      "html_url": "https://github.com/rails/rails/pull/59804"
+    },
+    {
+      "number": 59800,
+      "title": "Avoid rebuilding attribute names in `LazyIndexedAttributeSet#keys`",
+      "closed_at": "2026-11-26T21:53:09Z",
+      "html_url": "https://github.com/rails/rails/pull/59800"
+    },
+    {
+      "number": 59796,
+      "title": "Add enforced option to add_check_constraint on PostgreSQL 18+",
+      "closed_at": "2026-11-26T00:41:45Z",
+      "html_url": "https://github.com/rails/rails/pull/59796"
+    },
+    {
+      "number": 59735,
+      "title": "Note in the upgrade guide that PostgreSQL 18.4+ fixture loading acquires more locks",
+      "closed_at": "2026-11-26T21:51:01Z",
+      "html_url": "https://github.com/rails/rails/pull/59735"
+    },
+    {
+      "number": 59668,
+      "title": "Let a temporary SQLite table or view hide a permanent one in the schema readers",
+      "closed_at": "2026-11-26T23:10:26Z",
+      "html_url": "https://github.com/rails/rails/pull/59668"
+    },
+    {
+      "number": 59662,
+      "title": "Don't freeze serialized column defaults",
+      "closed_at": "2026-11-27T15:27:50Z",
+      "html_url": "https://github.com/rails/rails/pull/59662"
+    },
+    {
+      "number": 59661,
+      "title": "Allow registering parameter parsers in place during boot",
+      "closed_at": "2026-11-26T22:32:17Z",
+      "html_url": "https://github.com/rails/rails/pull/59661"
+    },
+    {
+      "number": 59627,
+      "title": "Restore ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED",
+      "closed_at": "2026-11-26T21:49:48Z",
+      "html_url": "https://github.com/rails/rails/pull/59627"
+    },
+    {
+      "number": 59617,
+      "title": "Keep the UTC offset in Time#change for times with a zone object",
+      "closed_at": "2026-11-26T23:15:39Z",
+      "html_url": "https://github.com/rails/rails/pull/59617"
+    },
+    {
+      "number": 59611,
+      "title": "Declare Prism dependencies in Action View and Railties",
+      "closed_at": "2026-11-26T21:50:52Z",
+      "html_url": "https://github.com/rails/rails/pull/59611"
+    },
+    {
+      "number": 59574,
+      "title": "Deprecate a positional table name in Arel::Table.new",
+      "closed_at": "2026-11-25T16:22:55Z",
+      "html_url": "https://github.com/rails/rails/pull/59574"
+    },
+    {
+      "number": 59569,
+      "title": "Build the association alias tracker only for through chains",
+      "closed_at": "2026-11-26T22:31:00Z",
+      "html_url": "https://github.com/rails/rails/pull/59569"
+    },
+    {
+      "number": 58842,
+      "title": "Inline connection_pool dependency",
+      "closed_at": "2026-11-26T20:39:56Z",
+      "html_url": "https://github.com/rails/rails/pull/58842"
+    },
+    {
+      "number": 58677,
+      "title": "Match Rack::BadRequest errors in ActionDispatch::ParamError",
+      "closed_at": "2026-11-25T15:47:22Z",
+      "html_url": "https://github.com/rails/rails/pull/58677"
+    },
+    {
+      "number": 58173,
+      "title": "Locate Action Text attachables in bulk",
+      "closed_at": "2026-11-25T12:45:14Z",
+      "html_url": "https://github.com/rails/rails/pull/58173"
+    }
+  ]
+}

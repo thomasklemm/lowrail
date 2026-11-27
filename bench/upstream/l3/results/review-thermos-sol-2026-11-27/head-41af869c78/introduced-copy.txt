@@ -1,0 +1,33 @@
+
+    def cast_types
+      attributes.transform_values(&:type)
+    end
+
+    def values_before_type_cast
+      attributes.transform_values(&:value_before_type_cast)
+    end
+
+    def values_for_database
+      attributes.transform_values(&:value_for_database)
+    end
+
+    def to_hash
+      keys.index_with { |name| self[name].value }
+    end
+    alias :to_h :to_hash
+      dup.transform_attributes!(&block)
+    end
+
+    protected
+      # An IndexedRow of every attribute, for the methods that work on all
+      # of them. Built on each call, so writes must go through #store.
+      #: () -> ActiveModel::IndexedRow::Mutable
+      def attributes
+        materialize
+
+        row = IndexedRow.unset_row(indexes.size)
+        @attributes&.each_with_index { |attr, i| row[i] = attr if attr }
+        IndexedRow::Mutable.new(indexes, row)
+      end
+
+      # Replaces each cached attribute with the block's result. Only for

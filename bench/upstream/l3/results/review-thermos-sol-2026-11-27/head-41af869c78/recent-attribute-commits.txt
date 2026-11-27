@@ -1,0 +1,4 @@
+15a91fed06c4b7b02d07e2416c9faf2790fc8f98 Merge pull request #59662 from thomasklemm/thomasklemm/frozen-default-attribute-unread
+424441d98683697154e5a3b85de8fc86fefec508 Don't freeze serialized column defaults
+3604f94b4a6c2afabd613dca44e64a0489b896cc Fix the `attribute_method_affix` example in Active Model docs [ci skip]
+6f81bf3f080da8a8893eafaa0e6216b2776ebf46 Merge pull request #59800 from thomasklemm/thomasklemm/lazy-indexed-keys

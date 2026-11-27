@@ -1,0 +1,222 @@
+{
+  "best": {
+    "Marshal.dump": {
+      "main": {
+        "tree": "main",
+        "round": 2,
+        "ips": 34843.0,
+        "output": "Marshal.dump     34.843k (± 9.8%) i/s   (28.70 μs/i) -     55.020k in   1.579097s"
+      },
+      "head": {
+        "tree": "head",
+        "round": 3,
+        "ips": 39564.0,
+        "output": "Marshal.dump     39.564k (±10.6%) i/s   (25.28 μs/i) -     61.665k in   1.558629s"
+      },
+      "helper": {
+        "tree": "helper",
+        "round": 1,
+        "ips": 39178.0,
+        "output": "Marshal.dump     39.178k (±13.3%) i/s   (25.52 μs/i) -     64.080k in   1.635626s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 1,
+        "ips": 33828.0,
+        "output": "Marshal.dump     33.828k (±12.9%) i/s   (29.56 μs/i) -     51.498k in   1.522352s"
+      }
+    },
+    "attributes_for_database": {
+      "main": {
+        "tree": "main",
+        "round": 2,
+        "ips": 91129.0,
+        "output": "attributes_for_database     91.129k (± 2.7%) i/s   (10.97 μs/i) -    142.095k in   1.559276s"
+      },
+      "head": {
+        "tree": "head",
+        "round": 2,
+        "ips": 144700.0,
+        "output": "attributes_for_database    144.700k (±10.4%) i/s    (6.91 μs/i) -    223.455k in   1.544262s"
+      },
+      "helper": {
+        "tree": "helper",
+        "round": 1,
+        "ips": 139901.0,
+        "output": "attributes_for_database    139.901k (±10.7%) i/s    (7.15 μs/i) -    217.840k in   1.557102s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 1,
+        "ips": 90035.0,
+        "output": "attributes_for_database     90.035k (± 4.8%) i/s   (11.11 μs/i) -    142.095k in   1.578224s"
+      }
+    }
+  },
+  "samples": {
+    "Marshal.dump": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 30615.0,
+          "output": "Marshal.dump     30.615k (±15.9%) i/s   (32.66 μs/i) -     48.825k in   1.594830s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 34843.0,
+          "output": "Marshal.dump     34.843k (± 9.8%) i/s   (28.70 μs/i) -     55.020k in   1.579097s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 33572.0,
+          "output": "Marshal.dump     33.572k (±11.1%) i/s   (29.79 μs/i) -     53.790k in   1.602219s"
+        }
+      ],
+      "head": [
+        {
+          "tree": "head",
+          "round": 1,
+          "ips": 39303.0,
+          "output": "Marshal.dump     39.303k (±12.5%) i/s   (25.44 μs/i) -     60.928k in   1.550197s"
+        },
+        {
+          "tree": "head",
+          "round": 2,
+          "ips": 38646.0,
+          "output": "Marshal.dump     38.646k (±12.0%) i/s   (25.88 μs/i) -     60.774k in   1.572587s"
+        },
+        {
+          "tree": "head",
+          "round": 3,
+          "ips": 39564.0,
+          "output": "Marshal.dump     39.564k (±10.6%) i/s   (25.28 μs/i) -     61.665k in   1.558629s"
+        }
+      ],
+      "helper": [
+        {
+          "tree": "helper",
+          "round": 1,
+          "ips": 39178.0,
+          "output": "Marshal.dump     39.178k (±13.3%) i/s   (25.52 μs/i) -     64.080k in   1.635626s"
+        },
+        {
+          "tree": "helper",
+          "round": 2,
+          "ips": 35761.0,
+          "output": "Marshal.dump     35.761k (±14.1%) i/s   (27.96 μs/i) -     54.717k in   1.530072s"
+        },
+        {
+          "tree": "helper",
+          "round": 3,
+          "ips": 36979.0,
+          "output": "Marshal.dump     36.979k (±15.0%) i/s   (27.04 μs/i) -     56.121k in   1.517626s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 33828.0,
+          "output": "Marshal.dump     33.828k (±12.9%) i/s   (29.56 μs/i) -     51.498k in   1.522352s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 32788.0,
+          "output": "Marshal.dump     32.788k (±15.3%) i/s   (30.50 μs/i) -     49.602k in   1.512816s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 33061.0,
+          "output": "Marshal.dump     33.061k (±11.6%) i/s   (30.25 μs/i) -     51.319k in   1.552237s"
+        }
+      ]
+    },
+    "attributes_for_database": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 89603.0,
+          "output": "attributes_for_database     89.603k (± 8.0%) i/s   (11.16 μs/i) -    135.744k in   1.514942s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 91129.0,
+          "output": "attributes_for_database     91.129k (± 2.7%) i/s   (10.97 μs/i) -    142.095k in   1.559276s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 90385.0,
+          "output": "attributes_for_database     90.385k (± 3.6%) i/s   (11.06 μs/i) -    136.108k in   1.505872s"
+        }
+      ],
+      "head": [
+        {
+          "tree": "head",
+          "round": 1,
+          "ips": 141943.0,
+          "output": "attributes_for_database    141.943k (±10.9%) i/s    (7.05 μs/i) -    215.865k in   1.520784s"
+        },
+        {
+          "tree": "head",
+          "round": 2,
+          "ips": 144700.0,
+          "output": "attributes_for_database    144.700k (±10.4%) i/s    (6.91 μs/i) -    223.455k in   1.544262s"
+        },
+        {
+          "tree": "head",
+          "round": 3,
+          "ips": 142341.0,
+          "output": "attributes_for_database    142.341k (±10.4%) i/s    (7.03 μs/i) -    226.448k in   1.590879s"
+        }
+      ],
+      "helper": [
+        {
+          "tree": "helper",
+          "round": 1,
+          "ips": 139901.0,
+          "output": "attributes_for_database    139.901k (±10.7%) i/s    (7.15 μs/i) -    217.840k in   1.557102s"
+        },
+        {
+          "tree": "helper",
+          "round": 2,
+          "ips": 129770.99999999999,
+          "output": "attributes_for_database    129.771k (±11.0%) i/s    (7.71 μs/i) -    194.908k in   1.501940s"
+        },
+        {
+          "tree": "helper",
+          "round": 3,
+          "ips": 135870.0,
+          "output": "attributes_for_database    135.870k (±12.9%) i/s    (7.36 μs/i) -    217.665k in   1.602004s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 90035.0,
+          "output": "attributes_for_database     90.035k (± 4.8%) i/s   (11.11 μs/i) -    142.095k in   1.578224s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 87619.0,
+          "output": "attributes_for_database     87.619k (± 3.1%) i/s   (11.41 μs/i) -    134.775k in   1.538188s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 86435.0,
+          "output": "attributes_for_database     86.435k (± 7.9%) i/s   (11.57 μs/i) -    129.864k in   1.502447s"
+        }
+      ]
+    }
+  }
+}

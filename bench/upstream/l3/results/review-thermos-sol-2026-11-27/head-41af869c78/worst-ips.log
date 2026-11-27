@@ -1,0 +1,54 @@
+=== main round 1 ===
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+serialize 128MiB every call     1.000 i/100ms
+Calculating -------------------------------------
+serialize 128MiB every call      5.844 (±17.1%) i/s  (171.10 ms/i) -      9.000 in   1.539921s
+=== head round 1 ===
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+serialize 128MiB every call     1.000 i/100ms
+Calculating -------------------------------------
+serialize 128MiB every call      5.711 (± 0.0%) i/s  (175.11 ms/i) -      9.000 in   1.575954s
+=== main2 round 1 ===
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+serialize 128MiB every call     1.000 i/100ms
+Calculating -------------------------------------
+serialize 128MiB every call      5.526 (± 0.0%) i/s  (180.96 ms/i) -      9.000 in   1.628628s
+=== main round 2 ===
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+serialize 128MiB every call     1.000 i/100ms
+Calculating -------------------------------------
+serialize 128MiB every call      5.584 (±17.9%) i/s  (179.07 ms/i) -      9.000 in   1.611644s
+=== head round 2 ===
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+serialize 128MiB every call     1.000 i/100ms
+Calculating -------------------------------------
+serialize 128MiB every call      5.919 (± 0.0%) i/s  (168.94 ms/i) -      9.000 in   1.520462s
+=== main2 round 2 ===
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+serialize 128MiB every call     1.000 i/100ms
+Calculating -------------------------------------
+serialize 128MiB every call      5.621 (± 0.0%) i/s  (177.89 ms/i) -      9.000 in   1.601025s
+=== main round 3 ===
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+serialize 128MiB every call     1.000 i/100ms
+Calculating -------------------------------------
+serialize 128MiB every call      6.087 (± 0.0%) i/s  (164.28 ms/i) -     10.000 in   1.642816s
+=== head round 3 ===
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+serialize 128MiB every call     1.000 i/100ms
+Calculating -------------------------------------
+serialize 128MiB every call      5.405 (±18.5%) i/s  (185.01 ms/i) -      9.000 in   1.665114s
+=== main2 round 3 ===
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+serialize 128MiB every call     1.000 i/100ms
+Calculating -------------------------------------
+serialize 128MiB every call      5.237 (± 0.0%) i/s  (190.95 ms/i) -      8.000 in   1.527609s

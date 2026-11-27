@@ -1,0 +1,10 @@
+columns=30
+for_database_owner=ActiveModel::AttributeSet
+attributes_for_database allocated_per_call=4.0 all=[4.032, 4.0, 4.0, 4.0, 4.0]
+attributes_before_type_cast allocated_per_call=4.0 all=[4.0, 4.0, 4.0, 4.0, 4.0]
+attributes_for_database cold_allocated_per_call=47 all=[48, 47, 47, 47, 47]
+attributes_before_type_cast cold_allocated_per_call=36 all=[36, 36, 36, 36, 36]
+ciphertext_stable=true
+Marshal_stable=true
+same_ciphertext_object=true
+accessed_after_attributes=["id", "secret", "nil_column"]

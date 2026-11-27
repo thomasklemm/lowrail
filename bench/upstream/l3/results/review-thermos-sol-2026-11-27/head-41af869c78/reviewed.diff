@@ -1,0 +1,69 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 441e74635a..69b7716d13 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -373,6 +373,32 @@ def to_hash
+     end
+     alias :to_h :to_hash
+ 
++    #: () -> Hash[String, untyped]
++    def values_before_type_cast
++      materialize
++      attrs = @attributes&.dup
++      hash = {}
++      indexes.each_key do |name|
++        if attribute = attrs&.[](index_for_name(name))
++          hash[name] = attribute.value_before_type_cast
++        end
++      end
++      hash
++    end
++
++    #: () -> Hash[String, untyped]
++    def values_for_database
++      materialize
++      attrs = @attributes&.dup
++      hash = {}
++      indexes.each_key do |name|
++        if attribute = attrs&.[](index_for_name(name))
++          hash[name] = attribute.value_for_database
++        end
++      end
++      hash
++    end
++
+     #: (String) ?{ (String) -> untyped } -> untyped
+     def fetch_value(name, &block)
+       index = index_for_name(name)
+diff --git a/activerecord/test/cases/attribute_methods_test.rb b/activerecord/test/cases/attribute_methods_test.rb
+index 17f9de83d3..5bb9ce2669 100644
+--- a/activerecord/test/cases/attribute_methods_test.rb
++++ b/activerecord/test/cases/attribute_methods_test.rb
+@@ -388,6 +388,27 @@ def setup
+     assert_equal Topic.column_names, Topic.instantiate(topic.attributes_for_database).attributes.keys
+   end
+ 
++  test "attributes_for_database serializes the attributes the record had when it was called" do
++    topic = Topic.new(title: "title", author_name: "David")
++    title = Object.new
++    title.define_singleton_method(:to_s) { topic.author_name = "Mary"; "title" }
++    topic.title = title
++
++    assert_equal "David", topic.attributes_for_database["author_name"]
++    assert_equal "Mary", topic.author_name
++  end
++
++  test "attributes_before_type_cast returns the attributes the record had when it was called" do
++    topic = nil
++    klass = Class.new(Topic) do
++      attribute :title, default: -> { topic.author_name = "Mary"; "title" }
++    end
++    topic = klass.new(author_name: "David")
++
++    assert_equal "David", topic.attributes_before_type_cast["author_name"]
++    assert_equal "Mary", topic.author_name
++  end
++
+   test "read attributes after type cast on a date" do
+     tz = "Pacific Time (US & Canada)"
+ 

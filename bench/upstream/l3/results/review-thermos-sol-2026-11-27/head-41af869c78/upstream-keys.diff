@@ -1,0 +1,22 @@
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 1298344dc9..441e74635a 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -345,8 +345,7 @@ def key?(name)
+ 
+     #: () -> Array[String]
+     def keys
+-      keys = row_keys | @ctx.type_keys
+-      keys.keep_if do |name|
++      row_keys.keep_if do |name|
+         index = index_for_name(name)
+         if attribute = lookup(index)
+           attribute.initialized?
+@@ -488,7 +487,6 @@ def transform_attributes!
+       def materialize
+         unless @materialized
+           row_keys.each { |key| self[key] }
+-          @ctx.type_keys.each { |key| self[key] }
+           @materialized = true
+         end
+       end

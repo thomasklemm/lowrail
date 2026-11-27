@@ -1,0 +1,44 @@
+w6 Marshal.dump: main 107297.0 (+0.00%) r3; head 115509.0 (+7.65%) r3; main2 103590.0 (-3.45%) r1
+  main: w6 Marshal.dump    107.297k (± 6.9%) i/s    (9.32 μs/i) -    170.768k in   1.591551s
+  head: w6 Marshal.dump    115.509k (±12.4%) i/s    (8.66 μs/i) -    173.460k in   1.501695s
+  main2: w6 Marshal.dump    103.590k (± 8.4%) i/s    (9.65 μs/i) -    155.985k in   1.505785s
+w6 for_database: main 430826.0 (+0.00%) r1; head 847501.0 (+96.72%) r2; main2 424144.0 (-1.55%) r2
+  main: w6 for_database    430.826k (± 4.7%) i/s    (2.32 μs/i) -    667.515k in   1.549384s
+  head: w6 for_database    847.501k (± 9.7%) i/s    (1.18 μs/i) -      1.309M in   1.544841s
+  main2: w6 for_database    424.144k (± 6.5%) i/s    (2.36 μs/i) -    663.930k in   1.565342s
+w100 Marshal.dump: main 13247.0 (+0.00%) r1; head 16789.0 (+26.74%) r1; main2 13350.0 (+0.78%) r1
+  main: w100 Marshal.dump     13.247k (± 2.9%) i/s   (75.49 μs/i) -     20.688k in   1.561687s
+  head: w100 Marshal.dump     16.789k (± 3.5%) i/s   (59.56 μs/i) -     26.416k in   1.573424s
+  main2: w100 Marshal.dump     13.350k (± 3.1%) i/s   (74.91 μs/i) -     20.800k in   1.558103s
+w100 for_database: main 30243.0 (+0.00%) r1; head 54319.0 (+79.61%) r3; main2 30124.0 (-0.39%) r1
+  main: w100 for_database     30.243k (± 5.8%) i/s   (33.07 μs/i) -     47.277k in   1.563246s
+  head: w100 for_database     54.319k (±12.7%) i/s   (18.41 μs/i) -     82.134k in   1.512060s
+  main2: w100 for_database     30.124k (± 5.6%) i/s   (33.20 μs/i) -     47.760k in   1.585471s
+w300 Marshal.dump: main 4908.0 (+0.00%) r2; head 5658.0 (+15.28%) r2; main2 4568.0 (-6.93%) r2
+  main: w300 Marshal.dump      4.908k (± 2.0%) i/s  (203.75 μs/i) -      7.530k in   1.534253s
+  head: w300 Marshal.dump      5.658k (±10.4%) i/s  (176.75 μs/i) -      8.489k in   1.500393s
+  main2: w300 Marshal.dump      4.568k (± 8.8%) i/s  (218.93 μs/i) -      7.259k in   1.589181s
+w300 for_database: main 10800.0 (+0.00%) r2; head 19601.0 (+81.49%) r3; main2 10022.0 (-7.20%) r3
+  main: w300 for_database     10.800k (± 5.0%) i/s   (92.59 μs/i) -     16.635k in   1.540267s
+  head: w300 for_database     19.601k (± 6.2%) i/s   (51.02 μs/i) -     31.125k in   1.587897s
+  main2: w300 for_database     10.022k (± 6.0%) i/s   (99.78 μs/i) -     15.570k in   1.553511s
+w1500 Marshal.dump: main 1016.0 (+0.00%) r1; head 1260.0 (+24.02%) r3; main2 955.78 (-5.93%) r1
+  main: w1500 Marshal.dump      1.016k (± 1.8%) i/s  (984.62 μs/i) -      1.600k in   1.575384s
+  head: w1500 Marshal.dump      1.260k (± 2.5%) i/s  (793.60 μs/i) -      1.980k in   1.571330s
+  main2: w1500 Marshal.dump    955.777 (± 6.0%) i/s    (1.05 ms/i) -      1.442k in   1.508720s
+w1500 for_database: main 2222.0 (+0.00%) r2; head 3865.0 (+73.94%) r1; main2 2159.0 (-2.84%) r1
+  main: w1500 for_database      2.222k (± 2.4%) i/s  (450.06 μs/i) -      3.360k in   1.512207s
+  head: w1500 for_database      3.865k (± 4.9%) i/s  (258.74 μs/i) -      6.154k in   1.592263s
+  main2: w1500 for_database      2.159k (± 4.7%) i/s  (463.19 μs/i) -      3.366k in   1.559103s
+w6 Marshal 1MiB string: main 3155.0 (+0.00%) r1; head 3292.0 (+4.34%) r2; main2 3312.0 (+4.98%) r1
+  main: w6 Marshal 1MiB string      3.155k (± 8.8%) i/s  (316.96 μs/i) -      4.740k in   1.502371s
+  head: w6 Marshal 1MiB string      3.292k (±16.9%) i/s  (303.80 μs/i) -      5.022k in   1.525659s
+  main2: w6 Marshal 1MiB string      3.312k (± 9.1%) i/s  (301.90 μs/i) -      5.002k in   1.510100s
+w6 serialize 1MiB every call: main 1103.0 (+0.00%) r1; head 1122.0 (+1.72%) r2; main2 1134.0 (+2.81%) r2
+  main: w6 serialize 1MiB every call      1.103k (± 4.7%) i/s  (907.00 μs/i) -      1.672k in   1.516507s
+  head: w6 serialize 1MiB every call      1.122k (± 5.6%) i/s  (891.54 μs/i) -      1.770k in   1.578025s
+  main2: w6 serialize 1MiB every call      1.134k (± 7.8%) i/s  (882.04 μs/i) -      1.701k in   1.500356s
+w1500 cold for_database: main 794.9 (+0.00%) r1; head 967.51 (+21.72%) r2; main2 777.43 (-2.20%) r3
+  main: w1500 cold for_database    794.898 (± 5.3%) i/s    (1.26 ms/i) -      1.224k in   1.539819s
+  head: w1500 cold for_database    967.513 (±11.8%) i/s    (1.03 ms/i) -      1.488k in   1.537964s
+  main2: w1500 cold for_database    777.429 (±11.1%) i/s    (1.29 ms/i) -      1.170k in   1.504961s
