@@ -149,6 +149,12 @@ Orbs bill per running minute by size; a paused orb costs nothing.
   superseded.
 * **Collaborative, not credit-seeking** (2026-11-03): don't point out overlap, ask who lands what, or offer to close
   ours for theirs. If someone else's PR covers ours, close ours with one neutral line.
+* **Combined PRs only for one concern** (Thomas, 2026-11-27): build on someone else's open PR, keeping their
+  commits and authorship and putting ours on top, when it makes the maintainers' merge simpler: the changes depend on
+  each other or conflict, they serve the same concern, and the other PR has stalled (no author activity for weeks) or
+  its author agreed. The body names their PR and what ours adds, in one sentence. Never fold separate concerns
+  (a feature and a performance change) into one PR, and never take over an active author's PR; then our change waits
+  for or rebases onto theirs.
 * **Well-reviewed PRs over issue discussions** (2026-11-03): no issues or issue discussions on things Thomas doesn't
   understand well or where we have little to add; an issue needs a verified bug or a question we can answer. Past
   mistakes stay as they are.
