@@ -64,6 +64,23 @@ passes:
         Bundler" with "Outside frozen or deployment mode, `bundle _4.1.1_ update
         --bundler` updates the lockfile. With Bundler 4.1, `BUNDLE_VERSION=system
         bundle install` avoids the version switch."
+  - reviewer: astra
+    orb: T-01a21d5c-3bca-76ba-9b8d-c6960f5eabf9
+    head: "0a0321e20aa64355a236e68331f8b89306a5c565"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      Short text-only confirm. Read the complete revised report and verified
+      byte-for-byte that its only changes from a3256a73c6 are the exact requested
+      wording replacements: the rubygems-only lookup scope, default version
+      switching, and the explicit-update/frozen-mode qualification with the
+      system-version bypass. Both must-fix findings are resolved. Repro script,
+      patch, caller permalink and linked PR are unchanged; the prior executed
+      matrix, exact repro, patch tests and link checks remain applicable. No
+      rebuild or matrix rerun needed for these prose-only changes. Evidence:
+      bench/upstream/gem-differential/evidence/separator-pat/astra-confirm-0a0321e20a.txt
+      and the retained astra-2026-11-27.tar.gz in that directory. No upstream post.
+    must_fix: []
 ---
 
 # Keep Pathname::SEPARATOR_PAT as a deprecated constant

@@ -1,0 +1,6 @@
+Reviewed head: 0a0321e20aa64355a236e68331f8b89306a5c565
+PASS: redmine.md differs from the prior reviewed head only by the exact requested wording replacements.
+PASS: unchanged bytes: redmine-repro.sh
+PASS: unchanged bytes: 0001-Keep-Pathname-SEPARATOR_PAT-as-a-deprecated-constant.patch
+Prior executed evidence remains applicable: astra-2026-11-27.tar.gz, logs/validation.log and logs/latest-head-validation.log.
+No Ruby builds or matrix reruns in this text-only confirm. Verdict: approve. No must-fix findings remain.
