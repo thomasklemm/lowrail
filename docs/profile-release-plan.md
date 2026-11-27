@@ -326,9 +326,12 @@ publishing is done by an agent and recorded here; publishing and tagging need Th
   parallel warning; compare of the two exits 0; compare with the base as its own A/A report exits 2.
 - [x] CI green on `95faabeb`: run 46042156810, all 13 jobs (Ruby 3.3/3.4/4.0 × Rails 7.2/8.0/8.1, macOS 3.3 and
   4.0, Ruby head, the `test` job). The release commit changes only Markdown after it, which CI does not run on.
-- [ ] Thomas: build from the release commit (`cd gem && gem build lowrail-profile.gemspec`), check the SHA-256 above,
-  `gem push lowrail-profile-0.1.2.gem` from an account with MFA, tag the release commit `lowrail-profile-v0.1.2` and
-  push the tag.
+- [ ] Publishing runs in GitHub Actions through RubyGems trusted publishing (`.github/workflows/release-profile.yml`,
+  environment `release`, which admits only `lowrail-profile-v*` tags): no API key is stored anywhere. Once, Thomas
+  adds a pending trusted publisher on rubygems.org (gem `lowrail-profile`, repository `thomasklemm/lowrail`, workflow
+  `release-profile.yml`, environment `release`). Then, with his OK, the tag `lowrail-profile-v0.1.2` on the release
+  commit is pushed; the workflow builds with Ruby 4.0.7 and RubyGems 4.0.20, checks the tag against the version,
+  prints the SHA-256 (must be the one above) and pushes the gem.
 - [ ] After publishing: `gem install lowrail-profile -v 0.1.2` from rubygems.org in a new app, and the README's
   "Until 0.1.2 is on rubygems.org" paragraph removed.
 

@@ -1,0 +1,33 @@
+name: Release lowrail-profile
+
+on:
+  push:
+    tags: ["lowrail-profile-v*"]
+
+jobs:
+  push:
+    runs-on: ubuntu-latest
+    environment: release
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "4.0.7"
+          rubygems: "4.0.20"
+      - name: Build
+        working-directory: gem
+        run: |
+          gem build lowrail-profile.gemspec
+          version=$(ruby -e 'print File.read("lib/lowrail/profile_version.rb")[/VERSION = "([^"]+)"/, 1]')
+          test "lowrail-profile-v$version" = "$GITHUB_REF_NAME" || { echo "tag $GITHUB_REF_NAME does not match version $version"; exit 1; }
+          sha256sum "lowrail-profile-$version.gem"
+          echo "GEM=lowrail-profile-$version.gem" >> "$GITHUB_ENV"
+      - uses: rubygems/configure-rubygems-credentials@v2.2.0
+      - name: Push
+        working-directory: gem
+        run: gem push "$GEM"
