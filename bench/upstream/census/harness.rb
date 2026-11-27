@@ -364,14 +364,18 @@ module RailsCensus
     # cycles. CENSUS_WALL_WARM warm windows, then CENSUS_WALL_WINDOWS timed ones,
     # through one loop, GC on. The JIT counters are read after every window; the
     # gate passes when none moved over the last six warm windows and the timed ones.
-    # CENSUS_WALL_SKIP drops workloads by name (those that grow the database every cycle).
+    # CENSUS_WALL_SKIP drops workloads by name (those that grow the database every cycle);
+    # CENSUS_ONLY (run --only) keeps only the named ones.
     def wall(name, output)
       raise "fresh output required" if File.exist?(output)
       ops = workloads(name)
       skip = ENV["CENSUS_WALL_SKIP"]&.split(",")
       ops = ops.reject { skip.include?(_1.name) } if skip
+      only = ENV["CENSUS_ONLY"]&.split(",")
+      ops = ops.select { only.include?(_1.name) } if only
+      raise "no workloads selected" if ops.empty?
       counters = lambda do
-        if RubyVM::ZJIT.enabled?
+        if mode == "zjit" # RubyVM::ZJIT is undefined on a Ruby built without it
           RubyVM::ZJIT.stats.slice(:compiled_iseq_count, :compiled_side_exit_count, :invalidation_time_ns)
         elsif RubyVM::YJIT.enabled?
           RubyVM::YJIT.runtime_stats.slice(:compiled_iseq_count, :compiled_block_count, :invalidation_count)
