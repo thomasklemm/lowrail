@@ -1,5 +1,8 @@
 # Where ZJIT spends more instructions than YJIT on Rails
 
+> **Round 3 (bet Z, 2026-11-27):** wall time on Rails main and a residue/ownership map on master `0d399335b7` and
+> headline6 are in [zjit-gap-census-3.md](zjit-gap-census-3.md).
+>
 > **Bet Z13, 2026-11-15:** remeasured on Ruby master `3be2b028a7` with the JIT-flat gate and a fixed heap in every
 > window, sorted into the Z13 classes and checked against the open leads. That measurement is the first part of this
 > page ([Result](#result)). The 2026-11-03 measurement and its lead sections follow from

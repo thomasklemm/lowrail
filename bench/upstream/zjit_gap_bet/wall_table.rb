@@ -49,7 +49,7 @@ Dir.children(out).sort.each do |target|
   end
   next if rows.empty?
   procs = rows.flat_map { |r| r[:p].map { |name, v| [name, v] } }
-  count = ->(mode) { sel = procs.select { _1.start_with?(mode) }.map(&:last); [sel.count { _1[:gate] == "pass" }, sel.size, sel.sum { _1[:rejected] }, sel.sum { _1[:timed] }] }
+  count = ->(mode) { sel = procs.select { _1[0].start_with?(mode) }.map(&:last); [sel.count { _1[:gate] == "pass" }, sel.size, sel.sum { _1[:rejected] }, sel.sum { _1[:timed] }] }
   result[target] = { rounds: rows.size, yjit_ms: geomean(rows.map { _1[:y] }), zjit_ms: geomean(rows.map { _1[:z] }),
     ratio: interval(rows.map { _1[:ratio] }), ratio_all: interval(rows.map { _1[:ratio_all] }),
     aa_yjit: interval(rows.map { _1[:aa_y] }), aa_zjit: interval(rows.map { _1[:aa_z] }),
