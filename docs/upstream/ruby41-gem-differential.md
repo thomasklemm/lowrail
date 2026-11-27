@@ -70,7 +70,8 @@ BUNDLED WITH 2.4.2, 2.6.9, 4.0.7, 4.0.11 and 4.0.12 on 4.0.10, master and master
   switches to `BUNDLED WITH` (4.0.11, 2.6.9 and 4.0.12 all switch;
   [`autoswitch-80343e1cf5.txt`](../../bench/upstream/gem-differential/evidence/separator-pat/autoswitch-80343e1cf5.txt)),
   and no ruby/rubygems PR, issue or CHANGELOG entry (4.1.0, 4.1.1) turns it off; `settings.rb` has the same default at
-  rubygems v4.1.0.beta3, v4.1.1 and master. Draft reply answering eregon's question, not posted:
+  rubygems v4.1.0.beta3, v4.1.1 and master. The only plan found is ruby/rubygems#9236, the open RubyGems/Bundler
+  merge proposal, where hsbt leaves redefining the autoswitch to later phases without a 4.1 date. Draft reply answering eregon's question, not posted:
   [`reply-16909.md`](../../bench/upstream/gem-differential/evidence/separator-pat/reply-16909.md).
 * Reach: in this differential every committed lock with Bundler < 4.0.12 and a PATH section fails, and no other lock
   does. Apps with git gems have the same shape, e.g. forem's main lock (BUNDLED WITH 2.4.17, two GIT/PATH sections).
