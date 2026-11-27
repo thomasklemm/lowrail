@@ -380,7 +380,8 @@ which refuses unless the gates pass on the current head. A candidate made moot u
   per call. A GC figure (Δobjects × a named heap's average GC time per object) is illustrative and stays in the
   record, never time in a body. Wall time with GC is claimed only from a GC-on cohort whose A/A passes and whose
   interval excludes 0 (on E2's micro such a cohort resolved about 3–4%). Timed windows read no files and create no
-  finalizable objects: GC-time finalization makes JIT code exit, and YJIT then compiles in the window.
+  finalizable objects: GC-time finalization can make JIT code exit and lead to YJIT
+  interpreter-entry compilation once the entry threshold is reached.
 
 ### Benchmark tables in the project's own format (Thomas, 2026-11-14)
 

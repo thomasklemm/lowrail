@@ -79,8 +79,7 @@ measured.
 Other candidates, checked: GC-triggered invalidation (no invalidation counter moved in any window, shapes and
 constant caches included); code GC or exec memory pressure (YJIT 4.0 has no code GC without `--yjit-code-gc`;
 `code_gc_count` and `freed_page_count` stayed 0; ZJIT `compile_error_out_of_memory` 0); finalizer code itself being
-compiled (the compiled ISEQs are Rails methods, not the finalizer procs); lazy paths that run only after a GC (none:
-every compiled block is an entry of an already hot method).
+compiled (the compiled ISEQs are Rails methods, not the finalizer procs).
 
 ## 2. Production: no GC-driven recompiles found under ZJIT, a warm-up cost under YJIT
 
