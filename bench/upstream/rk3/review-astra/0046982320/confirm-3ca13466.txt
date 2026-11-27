@@ -1,0 +1,14 @@
+yard: 966 -> 967 records; changed keys: ['Rack::QueryParser#unescape', 'Rack::QueryParser::Unescape', 'Rack::QueryParser::Unescape#unescape']
+  Rack::QueryParser#unescape: {'kind': 'method', 'doc': '', 'parameters': [['string', None], ['encoding', 'Encoding::UTF_8']], 'visibility': 'private'} -> None
+  Rack::QueryParser::Unescape: None -> {'kind': 'module', 'doc': ':nodoc:', 'visibility': 'public'}
+  Rack::QueryParser::Unescape#unescape: None -> {'kind': 'method', 'doc': '', 'parameters': [['s', None], ['encoding', 'Encoding::UTF_8']], 'visibility': 'private'}
+  API assertions passed; RDoc 7 whitespace/call-seq representation recorded above
+rdoc-7.0.4: 535 -> 535 records; changed keys: ['Rack::Utils#unescape']
+  Rack::Utils#unescape: {'kind': 'method', 'doc': 'Unescapes a URI escaped string with +encoding+. +encoding+ will be the\ntarget encoding of the string returned, and it defaults to UTF-8', 'parameters': '(s, encoding = Encoding::UTF_8)', 'call_seq': None, 'visibility': 'public', 'document_self': True} -> {'kind': 'method', 'doc': '\nUnescapes a URI escaped string with +encoding+. +encoding+ will be the\ntarget encoding of the string returned, and it defaults to UTF-8', 'parameters': '', 'call_seq': 'unescape(s, encoding = Encoding::UTF_8)\n', 'visibility': 'public', 'document_self': True}
+  API assertions passed; RDoc 7 whitespace/call-seq representation recorded above
+rdoc-7.2.0: 535 -> 535 records; changed keys: ['Rack::Utils#unescape']
+  Rack::Utils#unescape: {'kind': 'method', 'doc': 'Unescapes a URI escaped string with +encoding+. +encoding+ will be the\ntarget encoding of the string returned, and it defaults to UTF-8', 'parameters': '(s, encoding = Encoding::UTF_8)', 'call_seq': None, 'visibility': 'public', 'document_self': True} -> {'kind': 'method', 'doc': '\nUnescapes a URI escaped string with +encoding+. +encoding+ will be the\ntarget encoding of the string returned, and it defaults to UTF-8', 'parameters': '', 'call_seq': 'unescape(s, encoding = Encoding::UTF_8)\n', 'visibility': 'public', 'document_self': True}
+  API assertions passed; RDoc 7 whitespace/call-seq representation recorded above
+rdoc-8.1.0: 535 -> 535 records; changed keys: ['Rack::Utils#unescape']
+  Rack::Utils#unescape: {'kind': 'method', 'doc': 'Unescapes a URI escaped string with +encoding+. +encoding+ will be the\ntarget encoding of the string returned, and it defaults to UTF-8', 'parameters': '(s, encoding = Encoding::UTF_8)', 'call_seq': None, 'visibility': 'public', 'document_self': True} -> {'kind': 'method', 'doc': 'Unescapes a URI escaped string with +encoding+. +encoding+ will be the\ntarget encoding of the string returned, and it defaults to UTF-8', 'parameters': '()', 'call_seq': 'unescape(s, encoding = Encoding::UTF_8)', 'visibility': 'public', 'document_self': True}
+  API assertions passed; RDoc 7 whitespace/call-seq representation recorded above

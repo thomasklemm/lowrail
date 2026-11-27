@@ -1,15 +1,44 @@
-# RK3 adversarial Astra review: 0046982320 and fc894812
+# RK3 adversarial Astra review and confirmations
 
-**Current verdict: changes on `fc894812dd7269da65685b4aea5b5d6cae3fbbeb`, for missing YARD API documentation.**
-The redundant comment is fixed and RDoc 8.1.0 documentation is restored. YARD still produces an undocumented,
-parameterless stub for `Rack::Utils.unescape`. No demonstrated ordinary runtime/security failure.
+**Current verdict: approve `3ca13466d56965731d4419cd465ad6e33dce9ace`.** The remaining YARD documentation finding
+is fixed. No new must-fix or nit, and no additional runtime compatibility change. The original demonstrated
+method-lookup/reflection differences remain recorded below and do not require another fix.
+
+**Earlier verdict on fc894812: changes, for missing YARD API documentation.** The redundant comment was fixed and
+RDoc 8.1.0 documentation was restored, but YARD still produced an undocumented, parameterless stub.
 
 **Original verdict on 0046982320: changes, for public documentation and one unnecessary comment.** The additional
 method-table differences below are recorded explicitly; none establishes a normal request/security failure.
 
-Reviewed head: `0046982320094e11d80d2ec19bf0ab69f05ba41b`, whose sole parent is
+Original reviewed head: `0046982320094e11d80d2ec19bf0ab69f05ba41b`, whose sole parent is
 `e26338b40a0c5bc83cb4eba645e5954fc264b699`. This pass covers only that third commit, not a new performance review of
 the earlier CGI changes. Self-performed in thread `T-01a21cee-55cd-73c2-8f95-9e7cd65e2243`; no delegation.
+
+## Short confirmation on 3ca13466
+
+Fetched `unescape-cgi-7` and confirmed exact head `3ca13466d56965731d4419cd465ad6e33dce9ace`, with the single parent
+`e26338b40a0c5bc83cb4eba645e5954fc264b699`. Its only source change against fc894812 is the five tested documentation
+lines in Utils. Both changed files have equal executable token streams against fc894812.
+
+The complete-library YARD 0.9.46 registry dump now gives **both** `Rack::Utils.unescape` and `Rack::Utils#unescape`
+exactly the base's parameters, description and visibility. Its only changed records concern the moved private
+QueryParser method and new `:nodoc:` mixin/method. Complete-library RDoc dumps on 7.0.4 and 8.1.0 (Ruby 4.0.9), and
+7.2.0 (Ruby 2.7.3), all contain the original public prose and `unescape(s, encoding = Encoding::UTF_8)` call sequence.
+Their only changed record is Utils' unescape entry using call-seq instead of parsed parameters; the RDoc 7 raw
+comment/call-seq strings also gain leading/trailing newlines. No unrelated public documentation changed.
+
+Fresh independent adversarial probes on 2.7.3 and 4.0.9 are byte-identical to fc894812, including the 4.0.9 Ractor
+probe. A fresh full `CI=spec bundle exec rake` on **3ca13466**, Ruby 4.0.9 clean, passes: 1,317 runs, 6,421 assertions,
+zero failures/errors, two skips, and every separate test file passes. This short confirmation does not rerun the
+entire version/preload matrix or the broad random replay; those results below belong to their explicitly named heads.
+
+The updated commit message's RDoc/YARD claim is now supported. The supplied reply draft with `(3ca1346)` is accurate
+and appropriately toned; no edit is requested. The documentation directives are functional API documentation,
+including the tested separator, not a new unnecessary explanatory comment. The name and placement remain acceptable.
+
+Raw whole-library dumps, the dump script, the fresh suite/probe outputs and the comparisons are retained in
+`confirm-3ca13466.tar.xz`; `confirm-3ca13466.txt` lists every documentation difference. No Rack source change or
+public posting was made by this confirmation.
 
 ## Follow-up on fc894812
 
