@@ -28,4 +28,4 @@ built-ruby: ruby 4.1.0dev (2026-11-27T17:45:37Z HEAD 5fc1871eec) +PRISM [x86_64-
 |                   |           -|     1.20x|
 ```
 
-Across 10 runs this change measured 1.18x–1.23x, while base against itself measured 1.00x–1.06x. Ruby 4.0.9 runs this benchmark at about the same speed as this change.
+Across 10 runs this change measured 1.18x–1.23x, while base against itself measured 1.00x–1.06x. Ruby 4.0.9 runs this benchmark at about the same speed as this change. With `--zjit` or `--yjit`, `caller`, `Exception#backtrace` and `Location#to_s` 50 frames deep take about 18–19% less time than on master.
