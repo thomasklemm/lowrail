@@ -260,3 +260,9 @@ it). Gone on this head: the frozen-view error and both custom elements.
 Body findings, for a later attempt: say "time per call" (the cohort measures thread CPU time with GC off), the
 article page is 1,941 to 1,920, and "returns a new String as before" also has to allow for nil. All ten timing
 percentages and the page objects recompute from the raw data. thermos-sol was stopped before its verdict.
+
+thermos-sol (thread T-01a21f5c-9997-76de-883c-4b88b10c89e2), stopped after Astra's finding, with verdict "not exact,
+hold" on Astra's repro (not rerun independently). Its own checks: its 2,836-case probe and `to1_probe.rb` identical to
+main; 752 tag, form and asset tests green on both trees; frozen view and custom elements as on main; every wall and
+page number recomputed exactly; L1, no code-shape blocker. Body: the same article-page and nil-return fixes, and a
+before/after in a benchmark tool's own format instead of a table of percentages only.
