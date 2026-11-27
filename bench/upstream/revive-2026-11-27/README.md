@@ -9,7 +9,7 @@ wins (FH2, LBL1), and because the four upgrade-guide PRs had no decision yet (SP
 | --- | --- | --- | --- |
 | TO1 | `thomasklemm/tag-attributes-own-string` | `7f1f0dce45` | held: ZJIT `f.text_field` +0.64% unexplained, and no form-level effect |
 | FH2 | `thomasklemm/form-builder-tag-copies` | `7401f9dac7` | parked: Astra broke V and TR; the exact remainder (PH + SV) is within noise |
-| LBL1 | `thomasklemm/label-translation-key-once` | `4c64fb7898` | unchanged code and message; sent to review |
+| LBL1 | `thomasklemm/label-translation-key-once` | `4c64fb7898` | held for Thomas: Astra found Chain, Proc and Cache rendering boundaries |
 | SP1 | `thomasklemm/upgrade-guide-frozen-default-url-options` | `d41b93d147` | the 2026-11-17 claude-code must-fixes applied; approved |
 
 ## Ownership and drift
@@ -104,3 +104,15 @@ caller's unfrozen object name instead of a copy. Both hunks have to go. What is 
 `f.radio_button` −0.31%, `f.label` −0.14%, 5-field `form_with` −0.09% / −0.16%, with main/main2 A/A ≤ 0.07%. Objects:
 text_field 17 → 16, text_area 18 → 17, radio_button 21 → 19, label 90 → 88. That is within cross-tree noise at the form
 level and below the bar, so FH2 is parked and not opened.
+
+## LBL1 after Astra (2026-11-27)
+
+Astra's pass on `4c64fb7898` (archives and `adversarial.rb` in `astra-lbl1/`; reproduced here, `adversarial_diff.txt`)
+found differences beyond the disclosed ones:
+
+* a Hash translation in an earlier `Chain` backend: main renders the Hash, the head renders "Title";
+* a translation Proc that reads `default:` renders other text, and under `Cache` two builders' entries coincide;
+* a BasicObject `i18n_key` duck raises `NoMethodError` (`Symbol === key` fixes this one).
+
+Astra's fresh Callgrind run (i18n 1.15.2) confirms the effect: `f.label` −16.9% in the interpreter and with YJIT, and a
+five-label form −9.3% / −9.6%. LBL1 is held until Thomas decides whether these boundaries are acceptable.

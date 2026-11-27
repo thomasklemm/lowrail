@@ -1,0 +1,38 @@
+1,10c1,10
+< simple default-aware label: "<label for=\"post_title\">[:&quot;post.title&quot;, &quot;&quot;]</label>"
+< simple default-aware placeholder: "<input placeholder=\"[:&quot;post.title&quot;, &quot;&quot;]\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+< fallbacks default-aware label: "<label for=\"post_title\">[:&quot;post.title&quot;]</label>"
+< fallbacks default-aware placeholder: "<input placeholder=\"[:&quot;post.title&quot;]\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+< chain default-aware label: "<label for=\"post_title\">[:&quot;post.title&quot;, &quot;&quot;]</label>"
+< chain default-aware placeholder: "<input placeholder=\"[:&quot;post.title&quot;, &quot;&quot;]\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+< memoize default-aware label: "<label for=\"post_title\">[:&quot;post.title&quot;, &quot;&quot;]</label>"
+< memoize default-aware placeholder: "<input placeholder=\"[:&quot;post.title&quot;, &quot;&quot;]\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+< cache default-aware label: "<label for=\"post_title\">[:&quot;post.title&quot;, &quot;&quot;]</label>"
+< cache default-aware placeholder: "<input placeholder=\"[:&quot;post.title&quot;, &quot;&quot;]\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+---
+> simple default-aware label: "<label for=\"post_title\">&quot;&quot;</label>"
+> simple default-aware placeholder: "<input placeholder=\"&quot;&quot;\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+> fallbacks default-aware label: "<label for=\"post_title\">[]</label>"
+> fallbacks default-aware placeholder: "<input placeholder=\"[]\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+> chain default-aware label: "<label for=\"post_title\">&quot;&quot;</label>"
+> chain default-aware placeholder: "<input placeholder=\"&quot;&quot;\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+> memoize default-aware label: "<label for=\"post_title\">&quot;&quot;</label>"
+> memoize default-aware placeholder: "<input placeholder=\"&quot;&quot;\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+> cache default-aware label: "<label for=\"post_title\">&quot;&quot;</label>"
+> cache default-aware placeholder: "<input placeholder=\"&quot;&quot;\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+12,13c12,13
+< cache model label: "<label for=\"post_title\">Label 2</label>"
+< chain first-backend hash label: "<label for=\"post_title\">{short: &quot;Short&quot;, long: &quot;Long&quot;}</label>"
+---
+> cache model label: "<label for=\"post_title\">Label 1</label>"
+> chain first-backend hash label: "<label for=\"post_title\">Title</label>"
+15c15
+< chain first-backend hash placeholder: "<input placeholder-short=\"Short\" placeholder-long=\"Long\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+---
+> chain first-backend hash placeholder: "<input placeholder=\"Title\" type=\"text\" value=\"Hello\" name=\"post[title]\" id=\"post_title\" />"
+19,20c19,20
+< BasicObject key label: "<label for=\"post_title\">Label</label>"
+< BasicObject key placeholder: "<input placeholder=\"Placeholder\" type=\"text\" name=\"post[title]\" id=\"post_title\" />"
+---
+> BasicObject key label: NoMethodError: undefined method 'is_a?' for an instance of BareKey
+> BasicObject key placeholder: NoMethodError: undefined method 'is_a?' for an instance of BareKey
