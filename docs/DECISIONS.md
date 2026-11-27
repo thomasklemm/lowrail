@@ -334,8 +334,9 @@ which refuses unless the gates pass on the current head. A candidate made moot u
 
 ## Evidence and measurement
 
-* **Ruby pin 4.0.9** (2026-11-03) for census and Rails PR evidence. Never compare across pins; every A/A and
-  main-versus-branch pair runs on one pin. Open bodies with 4.0.7 numbers stay; they name their Ruby.
+* **Ruby pin 4.0.10** (Thomas, 2026-11-27; 4.0.9 from 2026-11-03) for census and Rails PR evidence. New
+  measurements start on 4.0.10 with their own A/A; comparisons already running finish on 4.0.9. Never compare
+  across pins; every A/A and main-versus-branch pair runs on one pin. Open bodies with 4.0.7 numbers stay; they name their Ruby.
 * **4.1 is measured on pinned Ruby master, SHA recorded**, not previews: boot, interpreter, YJIT and ZJIT allocations
   with A/A on the ZJIT pass's build; the routine cell moves to 4.1 when 4.1.0 ships
   ([measurement-matrix](upstream/measurement-matrix.md)).
