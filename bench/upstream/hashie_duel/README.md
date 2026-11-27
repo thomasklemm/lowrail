@@ -114,7 +114,7 @@ Symbol reads `[0.933, 1.031]`, KeepOriginalKeys String reads `[0.986, 1.026]`, P
 benchmarks. Duel judges over the 12 workers' medians (Mann-Whitney interval, at most 120 pairs), so the interval is
 as wide as the spread between processes; more iterations per sample don't narrow it (Duel sizes samples to 1 ms).
 
-Round 7 (`calibration-7`, `-7p12`) tested the obvious fix and found the real problem:
+Round 7 (`calibration-7`, `-7p12`) tested more workers and still produced false regression classifications:
 
 | Head | Settings | A/A | Unsettled |
 |---|---|---|---|
@@ -123,30 +123,29 @@ Round 7 (`calibration-7`, `-7p12`) tested the obvious fix and found the real pro
 
 Every failure held in four fresh-process measurements: `Mash: read keys given as Symbols as methods`
 at 1.027–1.041, `Mash: read keys as methods` at 1.037–1.046, KeepOriginalKeys Symbol reads at 1.030–1.052, on trees
-that differ by one comment. `Mash#to_hash` came out 0.96 (settled faster) in all five A/A runs and in the #656 run,
-which doesn't touch it; earlier rounds put the same `to_hash` between 0.946 and 1.027. So identical code shifts by
-3–7% for a whole run, in fresh processes too, which more samples cannot average away; more workers only make
-Duel surer of the shift. Code layout is the likely cause (a comment moves what follows it), but that is a hypothesis.
-The 0/35 at 1.02 of rounds 5–6 held for that set of benchmarks; adding six changed which ones the shifts hit.
+that differ by one comment. In round 7's five A/A runs, `Mash#to_hash` medians were 0.962–0.984, classified faster in two runs and same in three, not 0.96 and settled faster in all five. Some comment-only comparisons show method-call medians 3–7% apart, and several differences survived four fresh-process measurements. Code layout is one hypothesis, not a demonstrated cause. These cohorts do not isolate the effect of adding scenarios or show that more sampling cannot reduce the differences. Rounds 5–6 remain a separate 0/35-failure cohort.
 
-Across all 2,111 A/A and #656 measurements of rounds 1–7, an interval's lower bound passed 1.05 once (1.051).
-Round 8 therefore sets `c.measure('cpu', limit: 1.05)` and `c.processes = 24`; allocations still fail on any
-increase (`calibration-8`, `python3 -I tally.py calibration-8`):
+Across 2,436 per-scenario CPU timing records (initial measurements and confirmations) in the full A/A and #656 logs for rounds 1–7 and 7p12, an interval's lower bound exceeded 1.05 once (1.051).
+Round 8 therefore sets `c.measure('cpu', limit: 1.05)` and `c.processes = 24`; the allocation guard is
+unchanged (`calibration-8`, `python3 -I tally.py calibration-8`):
 
 * **A/A: 0 of 20 runs failed, none measured again, 6 of 540 verdicts unsettled**, job 124–137 s (median 130 s),
   Duel 109–118 s; the highest lower bound was 1.048. The six: KeepOriginalKeys Symbol reads three times (medians 1.030–1.036, upper bounds
   1.051–1.057), Dash read/write twice (1.063 and 1.068, intervals `[1.043, 1.083]` and `[1.048, 1.085]`),
   `Mash: read keys as methods` once (1.041 `[1.026, 1.054]`). Each is a shift of the kind above whose interval
-  straddles 1.05; unsettled doesn't fail. Dash read/write at 1.068 is the closest to a false alarm: the margin there is
-  thin, and `limit: 1.1` is the fallback if one shows up.
+  straddles 1.05; unsettled doesn't fail. Dash read/write at 1.068 [1.048, 1.085] is unsettled, not equal; its lower bound is only 0.002 below 1.05. No higher limit has been calibrated.
 * **#656 candidate** (fork PR #9: `duel-calibration-pre656` = the candidate with `lib/` of `812c48c^`, head adds
   `lib/` back): 0 of 3 slower, 0 unsettled, faster on 5–6 (deep_merge 0.82, Mash.new 0.82, respond_to? 0.77,
   overwrite 0.85, flat Mash.new 0.92), allocations down as before. #8 could not be reopened (branch recreated).
 * **CPU plant:** 4 regressed in both runs (method reads, plain and KeepOriginalKeys, Symbol and String), job
   222–238 s. **Allocation plant:** 13 regressed on allocations, job 432 s: its CPU timings sat at 1.049–1.054,
-  so Duel measured them again up to seven times. Only a run that fails pays that.
+  so Duel measured them again up to seven times.
 * Opening #9 with "hashie/hashie#656" in its body put a cross-reference event on upstream #656's timeline (as #8
   did on 2026-11-26); the body was edited within a minute. It is not a comment, but it is visible upstream.
 
 Local: Ruby 4.0.9 `rake` 1,076 examples 0 failures, RuboCop 155 files clean (`cpu` added to `.spellcheck.txt`);
 Ruby 3.0.7 `rake spec` 1,072/0 (bundler 2.5.23, own lockfile).
+
+Thermos-sol delta (T-01a21cc1) asked for text-only corrections (R1 commit message and the `.duel.rb` CPU comment, R2
+this section), applied as `be311bb`: the same tree as `a00b9ab` except that one comment line. Allocation plant attempt
+2 (run 45987737817): 13 regressed, 0 errors, job 606 s, Duel 592 s, plus a confirmed across-the-board CPU regression.
