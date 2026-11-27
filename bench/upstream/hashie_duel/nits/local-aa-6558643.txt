@@ -1,0 +1,31 @@
+Comparing 27 benchmarks, 1 at a time: baseline /home/user/workspace/repos/.df445 against candidate /home/user/workspace/repos/hashie (slower: a 99.0% interval above 1.02, over 24 worker processes of each version)
+  Dash.new: required properties and defaults         4.3s n=565    cpu 0.993 [0.990, 0.997] same  allocations 3
+  Dash: read and write properties                    4.4s n=2193   cpu 0.987 [0.970, 1.000] same  allocations 0
+  Trash.new: renamed and transformed properties      4.3s n=481    cpu 1.003 [0.995, 1.011] same  allocations 4
+  Dash.new: coerced properties                       4.3s n=360    cpu 1.005 [0.993, 1.017] same  allocations 7
+  Dash.new: String keys with IndifferentAccess       4.4s n=184    cpu 1.008 [0.996, 1.018] same  allocations 32
+  Dash.new: coerced nested Dashes                    4.4s n=151    cpu 1.010 [0.999, 1.021] same  allocations 16
+  Mash: read keys given as Symbols as methods        4.4s n=1096   cpu 0.999 [0.988, 1.009] same  allocations 5
+  KeepOriginalKeys: read Symbol keys as methods      4.1s n=1069   cpu 1.001 [0.984, 1.009] same  allocations 5
+  KeepOriginalKeys: read String keys as methods      4.3s n=756    cpu 1.002 [0.979, 1.025] same  allocations 5
+  PermissiveRespondTo: include in a Mash subclass    4.2s n=68     cpu 1.000 [0.988, 1.011] same  allocations 15
+  Mash.new: a flat Hash                              4.1s n=1219   cpu 0.997 [0.990, 1.004] same  allocations 3
+  PermissiveRespondTo: Mash.new                      4.3s n=832    cpu 0.993 [0.983, 0.997] same  allocations 3
+  PermissiveRespondTo: write a new key as a method   4.3s n=625    cpu 1.003 [0.990, 1.013] same  allocations 5
+  PermissiveRespondTo: overwrite a key as a method   4.5s n=641    cpu 0.999 [0.984, 1.012] same  allocations 5
+  IndifferentAccess: new from a nested JSON response   5.1s n=24     cpu 1.002 [0.989, 1.013] same  allocations 252
+  IndifferentAccess: read String and Symbol keys     4.4s n=1016   cpu 1.010 [0.968, 1.050] same  allocations 1
+  IndifferentAccess: write String and Symbol keys    4.3s n=1277   cpu 1.002 [0.902, 1.025] same  allocations 0
+  DeepFind and DeepFetch: nested keys                4.4s n=75     cpu 1.006 [0.994, 1.019] same  allocations 105
+  Mash.new: a nested JSON response                   4.8s n=52     cpu 0.987 [0.967, 1.013] same  allocations 25.35
+  Mash: read keys as methods                         4.1s n=921    cpu 0.995 [0.987, 1.002] same  allocations 5
+  Mash: read keys with suffixes                      4.1s n=403    cpu 1.003 [0.987, 1.019] same  allocations 16
+  Mash: read keys with [] and dig                    4.2s n=2011   cpu 1.008 [0.999, 1.016] same  allocations 4
+  Mash: write new keys as methods                    4.7s n=949    cpu 1.000 [0.973, 1.026] same  allocations 5
+  Mash: overwrite a key as a method                  4.2s n=744    cpu 0.997 [0.985, 1.012] same  allocations 6
+  Mash: respond_to? a key, a suffix and a missing name   5.6s n=2150   cpu 1.007 [0.967, 1.053] unsettled  allocations 1
+  Mash#deep_merge: a nested update                   4.6s n=48     cpu 0.999 [0.988, 1.009] same  allocations 31.5
+  Mash#to_hash: a nested Mash                        4.4s n=140    cpu 1.004 [0.991, 1.017] same  allocations 10
+
+across the board: cpu 1.000 [0.997, 1.003] same (limit 1.0125, 27 benchmarks)
+27 benchmarks in 127s: 0 regressed, 0 errors, 1 with a timing too close to the limit to settle
