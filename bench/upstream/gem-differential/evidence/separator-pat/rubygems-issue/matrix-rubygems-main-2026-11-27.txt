@@ -1,0 +1,20 @@
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=2.4.2 variant=plain exit=1 switch='Installing Bundler 2.4.2' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.4.2
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=4.0.11 variant=plain exit=1 switch='Installing Bundler 4.0.11' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=4.0.11
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=4.0.7 variant=plain exit=1 switch='Installing Bundler 4.0.7' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=4.0.7
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=2.7.2 variant=plain exit=1 switch='Installing Bundler 2.7.2' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.7.2
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=2.6.9 variant=plain exit=1 switch='Installing Bundler 2.6.9' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.6.9
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=4.0.12 variant=plain exit=0 switch='Installing Bundler 4.0.12' result='Bundle complete!' lock_after=4.0.12
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=2.4.22 variant=plain exit=1 switch='Installing Bundler 2.4.22' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.4.22
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=2.5.23 variant=plain exit=1 switch='Installing Bundler 2.5.23' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.5.23
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=2.6.9 variant=env-system exit=0 switch='' result='Bundle complete!' lock_after=4.2.0.dev
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=2.4.2 variant=plain exit=1 switch='Installing Bundler 2.4.2' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.4.2
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=2.7.2 variant=plain exit=1 switch='Installing Bundler 2.7.2' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.7.2
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=2.4.22 variant=plain exit=1 switch='Installing Bundler 2.4.22' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.4.22
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=4.0.11 variant=plain exit=1 switch='Installing Bundler 4.0.11' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=4.0.11
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=4.0.7 variant=plain exit=1 switch='Installing Bundler 4.0.7' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=4.0.7
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=2.5.23 variant=plain exit=1 switch='Installing Bundler 2.5.23' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.5.23
+ruby=0d399335b7 bundler=4.2.0.dev kind=gemspec bundled_with=2.6.9 variant=update-explicit update_exit=0 exit=0 switch='' result='Bundle complete!' lock_after=4.2.0.dev
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=2.6.9 variant=env-system exit=0 switch='' result='Bundle complete!' lock_after=4.2.0.dev
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=2.6.9 variant=plain exit=1 switch='Installing Bundler 2.6.9' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT' lock_after=2.6.9
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=4.0.12 variant=plain exit=0 switch='Installing Bundler 4.0.12' result='Bundle complete!' lock_after=4.0.12
+ruby=0d399335b7 bundler=4.2.0.dev kind=git bundled_with=2.6.9 variant=update-explicit update_exit=0 exit=0 switch='' result='Bundle complete!' lock_after=4.2.0.dev
