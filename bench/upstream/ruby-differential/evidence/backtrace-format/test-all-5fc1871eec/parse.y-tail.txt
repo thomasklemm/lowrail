@@ -1,0 +1,40 @@
+[801/805] 654752=prism/heredoc_recovery_test
+[802/805] 654753=net/http/test_httpresponse
+[803/805] 654752=rubygems/test_gem_remote_fetcher_s3
+[804/805] 654753=openssl/test_ssl_server
+[805/805] 654752=prism/escaped_crlf_test
+
+Failed tests:
+TestIO#test_copy_stream_no_busy_wait: Test::Unit::PendedError: multiple threads already active
+TestIO#test_seek: Test::Unit::ProxyError: No such file or directory @ rb_io_seek - /tmp/rubytest.o13cet/test_io20261127-654752-be60mj
+TestIO#test_seek_symwhence: Test::Unit::ProxyError: No such file or directory @ rb_io_seek - /tmp/rubytest.o13cet/test_io20261127-654752-cmu030
+TestIO#test_puts_parallel: Test::Unit::PendedError: not portable
+
+Retrying...
+
+  1) Error:
+TestIO#test_seek:
+Errno::ENOENT: No such file or directory @ rb_io_seek - /tmp/rubytest.o13cet/test_io20261127-654749-97vsgt
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2623:in 'IO#seek'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2623:in 'block (2 levels) in TestIO#test_seek'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2619:in 'Kernel#open'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2619:in 'block in TestIO#test_seek'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2187:in 'TestIO#make_tempfile'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2590:in 'TestIO#test_seek'
+
+  2) Error:
+TestIO#test_seek_symwhence:
+Errno::ENOENT: No such file or directory @ rb_io_seek - /tmp/rubytest.o13cet/test_io20261127-654749-f0snt4
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2671:in 'IO#seek'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2671:in 'block (2 levels) in TestIO#test_seek_symwhence'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2667:in 'Kernel#open'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2667:in 'block in TestIO#test_seek_symwhence'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2187:in 'TestIO#make_tempfile'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2643:in 'TestIO#test_seek_symwhence'
+
+Finished tests in 289.751967s, 146.2458 tests/s, 29532.4001 assertions/s.
+42375 tests, 8557071 assertions, 0 failures, 2 errors, 298 skips
+
+ruby -v: ruby 4.1.0dev (2026-11-27T17:45:37Z thomasklemm/backtrace-format-length 5fc1871eec) [x86_64-linux]
+make: *** [uncommon.mk:958: yes-test-all] Error 2
+RC=2

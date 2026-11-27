@@ -1,0 +1,40 @@
+[801/805] 304008=optparse/test_did_you_mean
+[802/805] 304008=test_open3
+[803/805] 304008=psych/test_psych
+[804/805] 304008=ruby/test_time_tz
+[805/805] 304008=ruby/test_io_timeout
+
+Failed tests:
+TestIO#test_seek_symwhence: Test::Unit::ProxyError: No such file or directory @ rb_io_seek - /tmp/rubytest.5pbz4d/test_io20261127-304009-y7z4tv
+TestIO#test_puts_parallel: Test::Unit::PendedError: not portable
+TestIO#test_copy_stream_no_busy_wait: Test::Unit::PendedError: multiple threads already active
+TestIO#test_seek: Test::Unit::ProxyError: No such file or directory @ rb_io_seek - /tmp/rubytest.5pbz4d/test_io20261127-304009-cydwdx
+
+Retrying...
+
+  1) Error:
+TestIO#test_seek_symwhence:
+Errno::ENOENT: No such file or directory @ rb_io_seek - /tmp/rubytest.5pbz4d/test_io20261127-304005-v7cfmu
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2671:in 'IO#seek'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2671:in 'block (2 levels) in TestIO#test_seek_symwhence'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2667:in 'Kernel#open'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2667:in 'block in TestIO#test_seek_symwhence'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2187:in 'TestIO#make_tempfile'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2643:in 'TestIO#test_seek_symwhence'
+
+  2) Error:
+TestIO#test_seek:
+Errno::ENOENT: No such file or directory @ rb_io_seek - /tmp/rubytest.5pbz4d/test_io20261127-304005-60tchh
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2623:in 'IO#seek'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2623:in 'block (2 levels) in TestIO#test_seek'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2619:in 'Kernel#open'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2619:in 'block in TestIO#test_seek'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2187:in 'TestIO#make_tempfile'
+    /home/user/rdiff/src/bt-fix/test/ruby/test_io.rb:2590:in 'TestIO#test_seek'
+
+Finished tests in 247.688803s, 167.0039 tests/s, 34443.1879 assertions/s.
+41365 tests, 8531192 assertions, 0 failures, 2 errors, 330 skips
+
+ruby -v: ruby 4.1.0dev (2026-11-27T17:45:37Z thomasklemm/backtrace-format-length 5fc1871eec) +PRISM [x86_64-linux]
+make: *** [uncommon.mk:958: yes-test-all] Error 2
+RC=2
