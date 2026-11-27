@@ -16,3 +16,5 @@ https://github.com/hashie/hashie/pull/660
 https://github.com/hashie/hashie/pull/661
 https://github.com/ruby/uri/pull/276
 https://github.com/rails/rails/pull/60024
+https://github.com/ruby/ruby/pull/20266
+https://github.com/ruby/ruby/pull/20267

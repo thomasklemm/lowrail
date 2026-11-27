@@ -96,7 +96,8 @@ Known reds that are not ours (don't report):
 Ours, open (watch CI, comments, state):
 - rails/rails: #60024 (ASC1, head ed1b28c5b9, opened ready 2026-11-27 21:38 UTC), #59565. (#60020 merged 2026-11-27, removed.)
 - ruby/uri#276 (UR1, head c43954f, opened ready 2026-11-27 20:56 UTC).
-- ruby/ruby: #20261 (BT1, e75b1f0109), #20208 (TN1, 2e061793aa; khasinski's commit is intended), #20169 (ZSV1,
+- ruby/ruby: #20266 (SHK1, head 2bda3f18fa, prism) and #20267 (URF1, head 151bebd34d, VM), both opened ready
+  2026-11-27, no Redmine ticket by Thomas's choice; #20261 (BT1, e75b1f0109), #20208 (TN1, 2e061793aa; khasinski's commit is intended), #20169 (ZSV1,
   d0f0dc2da5), #19912 (ZS1; Rafael França's ported commit is intended).
 - rack/rack#2557 (e3d53cfdb2; our reply to jeremyevans posted), hashie/hashie#659 (the hashie thread
   T-01a2179d-be22-73a3-8fe1-b196f9746e8c applies dblock's nits and replies; its head change is expected),
