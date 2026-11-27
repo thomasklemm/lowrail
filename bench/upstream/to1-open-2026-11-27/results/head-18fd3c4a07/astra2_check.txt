@@ -1,0 +1,6 @@
+== rails-main
+["UTF-8", true, "transcodes"]
+["UTF-8", true, "transcodes"]
+== rails
+["US-ASCII", false, "Encoding::InvalidByteSequenceError"]
+["US-ASCII", false, "Encoding::InvalidByteSequenceError"]

@@ -242,3 +242,21 @@ sweep's function diff, `lead-sweep-2026-11-27/results/to1_zjit_fn_diff.txt`, put
 case seen is the body's +640 instructions (about 0.1 µs); the wall cohorts on the same input are −0.2% [−1.0, +0.7]
 under YJIT and +0.4% [−0.4, +0.9] under ZJIT, so no time loss is claimed in either mode. Not a regression on the
 form builder path. The body leaves `f.text_field` out.
+
+## Astra on 18fd3c4a07: a new difference, stopped (2026-11-27)
+
+Astra (thread T-01a21f5c-aafb-73e1-9bee-b1c0c78193f7; evidence `astra/review-evidence-18fd3c4a07.tar.gz`): not exact.
+One new difference without any override, reproduced here (`astra2_check.rb`, `results/head-18fd3c4a07/astra2_check.txt`):
+an attribute value that is invalid US-ASCII (`"é".dup.force_encoding("US-ASCII")`) gives `tag(:input, id: value)` and
+`tag.input(id: value)` a valid UTF-8 result on main and an invalid US-ASCII result on the head, which raises
+`Encoding::InvalidByteSequenceError` when transcoded. The bytes are the same. Main interpolates into a UTF-8 literal;
+the head appends to `"<input"`, which is 7-bit, so the String takes the appended value's encoding. This is neither of
+Thomas's two accepted cases, and the coordinator's brief says to stop on any other difference.
+
+Also from that pass (`:nodoc:` override boundaries): a `tag_options` prepend whose return value replaces the
+attributes, or one that freezes it, no longer works for `tag()` and void elements (the head discards or appends to
+it). Gone on this head: the frozen-view error and both custom elements.
+
+Body findings, for a later attempt: say "time per call" (the cohort measures thread CPU time with GC off), the
+article page is 1,941 to 1,920, and "returns a new String as before" also has to allow for nil. All ten timing
+percentages and the page objects recompute from the raw data. thermos-sol was stopped before its verdict.
