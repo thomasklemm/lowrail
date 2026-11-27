@@ -802,6 +802,19 @@ class is known.
 * Breadth by ISEQ: the 10 apps have 5,026 distinct (fallback/exit counter, ISEQ) pairs. 169 of them appear in all
   10 apps and 1,042 in at least 5. A global counter can't show that.
 
+## Memory leads from the retained-memory census (2026-11-27)
+
+ZJIT's memory on six census apps after 1,000 requests, Rails main, default options (`--zjit-mem-size=128`, no
+`compile_error_out_of_memory`), master `0d399335b7` against 4.0.10; record and raw data in
+[memory_main](../../bench/upstream/memory_main/README.md). Memory only; ruby-bench and Ir unmeasured. Nothing posted.
+
+| lead | numbers | status |
+|---|---|---|
+| M1 metadata (`zjit_alloc_bytes`) | master 11.2–36.4 MB, 36–66% below 4.0.10 (23.8–108.1 MB); 4.0.10 already holds 13–108 MB at boot, master 4–22 MB | Taken: k0kubun's memdiet patches on Shopify/ruby#1039 (rows 66–81: breakdown by subsystem, exact profile sizes, profiles freed with the ISEQ, no over-reserved vectors) |
+| M2 code region | master 8.0–31.3 MB, 43–83% above 4.0.10; side exits are 31–35% of it (3.6 MB blog, 9.6 MB Sure) | Free as an app data point; the side-exit share is the one the ZJIT team already reports for lobsters. No issue or PR on side-exit size found |
+| M3 JIT frame region | master 3.7–13.3 MB (Sure 13.3; blog: 150k JITFrames, 32 bytes each), new since 4.0.10 | Known by design (the allocator's comment budgets lobsters at 4 MiB); recorded for scale only |
+| M4 RssAnon over the interpreter exceeds ZJIT's counters | blog +35.9 MB RssAnon against 30.0 MB `total_mem_bytes`, Sure +62.4 MB against 81.0 MB (inside its 22 MB A/A); the GC heap is +0.8–1.0 MB and the rest is malloc arenas left larger by compilation | Free; unmeasured beyond these totals |
+
 ## Cost
 
 `--zjit-stats-iseq` against `--zjit-stats-quiet` on the same build, railsbench, 10 warmup + 10 measured iterations,
