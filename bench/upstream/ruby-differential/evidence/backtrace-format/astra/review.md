@@ -166,3 +166,21 @@ increase and the intended NUL difference instead. Also, `git show 61879acc -- BT
 path) shows that the original Astra pass's `head` was rewritten from `afb18cccd9` to `e75b1f0109`; restore
 that historical attribution and keep this confirm as a separate new-head pass. The confirm appends its
 findings without overwriting the coordinator's edits.
+
+## Final body approval on e75b1f0109, 2026-11-27
+
+Verdict: **approve**, no open findings. Read the exact body and metadata at Lowrail `8d9d6857` and
+confirmed the fork branch still points to `e75b1f0109959b3df53738e68c273f812b8283d1`.
+All remaining requested changes are present: the body omits the benchmark table and closing speed
+sentence, the evidence file remains, `impact` describes instructions rather than elapsed time and the
+deliberate NUL output difference, and the first pass again names its actual reviewed head `afb18cccd9`.
+
+The supplied body hash is confirmed as
+`0043078758ad9a6b3833a484273efa9c4c321634de3a2b7b21a6bab4f4feb601`, for the body without its title
+and with two trailing newlines. `PrQueue.parse(...).body`, the text the opening command actually sends,
+has one trailing newline and SHA-256 `db9a3ad32c3c4e6006bc6d2b3afbb9117a6e3be00d99df75b8b8cd64d8d2286a`.
+This approval binds that exact text and head; it does not authorize bypassing the other opening gates.
+
+No runtime code or example changed in this final revision. The previously verified identical Git tree,
+fresh-build suites, real-frame differential, GC.stress probe and corrected-example execution remain the
+supporting evidence. No rebuild, suite rerun, or new performance measurement was needed for this text-only pass.

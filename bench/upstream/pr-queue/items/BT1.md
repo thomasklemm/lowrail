@@ -58,6 +58,21 @@ passes:
       different from 4.0.9), and restore the preceding historical Astra pass to afb18cccd9: 61879acc rewrote
       its head to e75b1f0109, although that pass reviewed afb18cccd9. No source-code change or repeat build is
       requested. Details: bench/upstream/ruby-differential/evidence/backtrace-format/astra/review.md, confirm section.
+  - reviewer: astra
+    orb: T-01a21dcc-1fab-7104-9ca4-c62537a6cf82
+    head: "e75b1f0109959b3df53738e68c273f812b8283d1"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None. Final text-only confirm against Lowrail 8d9d6857. Verified supplied body SHA-256
+      0043078758ad9a6b3833a484273efa9c4c321634de3a2b7b21a6bab4f4feb601 (without title, two trailing newlines);
+      script/pr-queue's parsed body hashes to db9a3ad32c3c4e6006bc6d2b3afbb9117a6e3be00d99df75b8b8cd64d8d2286a
+      (one trailing newline). The table and closing speed sentence are removed; benchmark evidence is retained.
+      Impact now distinguishes instructions from time and full NUL paths from 4.0.9 truncation. Historical
+      pass attribution is restored. Remote head remains e75b1f0109; prior verified tree identity, fresh-build
+      suites, oracle, GC.stress and corrected-example evidence apply. No further code/text findings and no
+      rebuild or test rerun for this text-only confirm. Approval is for this exact head and body, not permission
+      to open upstream outside the queue's remaining gates.
 ---
 
 # Append backtrace location strings by length
