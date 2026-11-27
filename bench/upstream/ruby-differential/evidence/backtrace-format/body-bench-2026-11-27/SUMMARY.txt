@@ -1,0 +1,25 @@
+SUMMARY                 | 
+aa-base-1              |vm_backtrace_to_s | 47.065k| 47.057k| | | | 1.00x| -|
+aa-base-2              |vm_backtrace_to_s | 47.260k| 41.310k| | | | 1.14x| -|
+aa-base-3              |vm_backtrace_to_s | 47.102k| 47.173k| | | | -| 1.00x|
+aa-base-4              |vm_backtrace_to_s | 38.784k| 45.104k| | | | -| 1.16x|
+aa-base-5              |vm_backtrace_to_s | 40.557k| 45.718k| | | | -| 1.13x|
+aa-base-6              |vm_backtrace_to_s | 40.383k| 37.408k| | | | 1.08x| -|
+aa20-1                 |vm_backtrace_to_s | 46.807k| 46.695k| | | | 1.00x| -|
+aa20-2                 |vm_backtrace_to_s | 47.117k| 42.139k| | | | 1.12x| -|
+aa20-3                 |vm_backtrace_to_s | 46.835k| 46.724k| | | | 1.00x| -|
+aa20-4                 |vm_backtrace_to_s | 47.037k| 46.804k| | | | 1.00x| -|
+hb20-1                 |vm_backtrace_to_s | 39.458k| 55.891k| | | | -| 1.42x|
+hb20-2                 |vm_backtrace_to_s | 47.061k| 49.185k| | | | -| 1.05x|
+hb20-3                 |vm_backtrace_to_s | 47.363k| 57.230k| | | | -| 1.21x|
+hb20-4                 |vm_backtrace_to_s | 47.014k| 56.233k| | | | -| 1.20x|
+head-vs-base-1         |vm_backtrace_to_s | 46.210k| 54.767k| | | | -| 1.19x|
+head-vs-base-2         |vm_backtrace_to_s | 47.132k| 57.069k| | | | -| 1.21x|
+head-vs-base-3         |vm_backtrace_to_s | 47.303k| 56.993k| | | | -| 1.20x|
+v409-vs-head-1         |vm_backtrace_to_s | 51.305k| 56.908k| | | | -| 1.11x|
+v409-vs-head-2         |vm_backtrace_to_s | 51.497k| 56.846k| | | | -| 1.10x|
+make benchmark ITEM=vm_backtrace_to_s, taskset -c 1, orb (2 vCPU, E2B), other services idle, perf matrix stopped.
+base = 274cfe719a installed (compare-ruby); head = e75b1f0109 build tree (built-ruby). aa-* = base build tree vs base installed.
+A/A within 0.5% in 5 of 10 runs; the others show one column 10-16% slow (whichever ran during a host-slow period).
+Head vs base: 1.19x-1.21x in 5 of 7 runs (outliers 1.05x, 1.42x). 4.0.9 vs head: 1.10x, 1.11x (head faster than 4.0.9).
+Not good enough for a body table under Thomas's rule (A/A within a few percent): no table drafted.
