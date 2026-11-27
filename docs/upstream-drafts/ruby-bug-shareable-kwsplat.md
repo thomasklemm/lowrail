@@ -110,7 +110,6 @@ returns a shareable `{b: 2, a: 1}` for `{ **H, a: 1 }` where parse.y raises Isol
 
 **Tests on the head** (build with `--enable-yjit --enable-zjit`; run on `9b8a037535`, which differs from the head only
 in the commit message):
-message):
 
 * New assertion fails without the fix (`NoMethodError: undefined method 'core#hash_merge_bang_ptr'`), passes with it.
 * `test/ruby/test_parse.rb test_iseq.rb test_compile_prism.rb test_syntax.rb test_keyword.rb test_ractor.rb`: 778

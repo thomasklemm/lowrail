@@ -1,0 +1,4 @@
+# Ruby builds for these runs
+3.4.13: mise prebuilt (ZJIT_SUPPORT no; --zjit is not an option).
+4.0.10: built from source a704b7cd95 at ~/rubies/4.0.10 with --enable-yjit --enable-zjit; yes; ruby --zjit -e "p RubyVM::ZJIT.enabled?" -> true
+master: built from source 0d399335b7 at ~/rubies/master with --enable-yjit --enable-zjit; yes; ZJIT enabled -> true

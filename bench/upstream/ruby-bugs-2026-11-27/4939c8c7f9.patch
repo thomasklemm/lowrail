@@ -1,4 +1,4 @@
-From 333ec5b1877a20ed187db753aedff666e2fa690f Mon Sep 17 00:00:00 2001
+From 4939c8c7f9b37938dbc81c45a10c68bd6c5f4337 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Fri, 27 Nov 2026 20:40:40 +0000
 Subject: [PATCH] Skip an unused module refinement from the include's
@@ -9,9 +9,10 @@ M itself does not define has to continue the search after M in the
 receiver's ancestors. resolve_refined_method continued from
 RCLASS_SUPER(me->owner), the superclass of the module M itself, which is
 usually empty, instead of from the iclass that includes M. Lookups that
-resolve refinements this way (send, public_send, Method objects,
-respond_to? and calls from C via rb_funcall) then raised NoMethodError,
-while a direct call found the method.
+resolve refinements this way did not find the method, while a direct
+call did: send, public_send and calls from C via rb_funcall raised
+NoMethodError, Kernel#method raised NameError and respond_to? returned
+false.
 
 For example, an unused refinement of Kernel#== made `obj != 1` raise,
 because BasicObject#!= calls #== with rb_funcall.

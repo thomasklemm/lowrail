@@ -4,7 +4,7 @@ Status, 2026-11-27: **draft, nothing posted.** Thomas posts the report (or appro
 PR. The PR cites the Redmine ticket, so the ticket goes first; replace `NNNNN` with its number in the PR body and add
 `[Bug #NNNNN]` to the commit subject before opening.
 
-Fix head: [`333ec5b187`](https://github.com/thomasklemm/ruby/commit/333ec5b187) on
+Fix head: [`4939c8c7f9`](https://github.com/thomasklemm/ruby/commit/4939c8c7f9) on
 `thomasklemm/ruby:fix-unused-module-refinement-funcall`, one commit on ruby/ruby master `0d399335b7`. Raw data, repros
 and probes: [bench/upstream/ruby-bugs-2026-11-27](../../bench/upstream/ruby-bugs-2026-11-27/).
 
@@ -40,7 +40,8 @@ Expected:
 :C
 ```
 
-`public_send`, `respond_to?`, `method` and calls from C with `rb_funcall` fail the same way. Since `Kernel` is a
+`public_send` and calls from C with `rb_funcall` raise the same way, `method` raises NameError and `respond_to?`
+returns false. Since `Kernel` is a
 module, an unused refinement of `Kernel#==` breaks `!=`, which calls `==` from C:
 
 ```ruby
@@ -69,7 +70,8 @@ When the refined entry has no original method, `resolve_refined_method` in vm_me
 
 When a module has an unused refinement for a method it does not define itself, `send`, `respond_to?`, `method` and
 calls from C must find the method further up the receiver's ancestors. `resolve_refined_method` continued from the
-superclass of the module itself, so these lookups raised NoMethodError while a direct call worked. For example, an
+superclass of the module itself, so these lookups did not find the method while a direct call did: `send` and C
+calls raised NoMethodError, `method` raised NameError and `respond_to?` returned false. For example, an
 unused refinement of `Kernel#==` made `Object.new != 1` raise, since `BasicObject#!=` calls `==` from C.
 
 This continues from the superclass of the class where the refined entry was found, as `search_refined_method` already
@@ -86,9 +88,10 @@ M itself does not define has to continue the search after M in the
 receiver's ancestors. resolve_refined_method continued from
 RCLASS_SUPER(me->owner), the superclass of the module M itself, which is
 usually empty, instead of from the iclass that includes M. Lookups that
-resolve refinements this way (send, public_send, Method objects,
-respond_to? and calls from C via rb_funcall) then raised NoMethodError,
-while a direct call found the method.
+resolve refinements this way did not find the method, while a direct
+call did: send, public_send and calls from C via rb_funcall raised
+NoMethodError, Kernel#method raised NameError and respond_to? returned
+false.
 
 For example, an unused refinement of Kernel#== made `obj != 1` raise,
 because BasicObject#!= calls #== with rb_funcall.
@@ -100,7 +103,7 @@ direct calls.
 
 **Diff:** `vm_method.c` (+2/-1: remember the class the entry was found in, use it instead of `me->owner` when it is
 known) and `test_unused_refinement_for_module_method_in_superclass` in `test/ruby/test_refinement.rb`
-([patch](../../bench/upstream/ruby-bugs-2026-11-27/333ec5b187.patch)).
+([patch](../../bench/upstream/ruby-bugs-2026-11-27/4939c8c7f9.patch)).
 
 ## Evidence
 
@@ -111,9 +114,12 @@ known) and `test_unused_refinement_for_module_method_in_superclass` in `test/rub
 | 3.4.13 | NoMethodError | NoMethodError | no ZJIT |
 | 4.0.10 | NoMethodError | NoMethodError | NoMethodError |
 | master `0d399335b7` | NoMethodError | NoMethodError | `true` |
-| head `333ec5b187` | `true` | `true` | `true` |
+| head `4939c8c7f9` | `true` | `true` | `true` |
 
-The `send(:foo)` repro raises NoMethodError on all of these except the head, including `--zjit` on master. With
+Ruby 3.4.13 is mise's build; 4.0.10 and master were built from source (`a704b7cd95` and `0d399335b7`) with
+`--enable-yjit --enable-zjit`. On both, `RbConfig::CONFIG["ZJIT_SUPPORT"]` is `"yes"` and
+`RubyVM::ZJIT.enabled?` is `true` under `--zjit` ([BUILDS.txt](../../bench/upstream/ruby-bugs-2026-11-27/BUILDS.txt)). 4.0.10 fails under ZJIT because `basic_object.rb` is not in 4.0.
+The head row is the same build of master plus the fix. The `send(:foo)` repro raises NoMethodError on all of these except the head, including `--zjit` on master. With
 error_highlight enabled (the default) the `!=` error prints only `NoMethodError` without a message; with
 `--disable-error_highlight` it prints the message above. The draft quotes the message.
 
@@ -142,7 +148,8 @@ unused-module-refinement rows that raised or returned false on base and now find
 refinements of classes are unchanged. `rb_resolve_refined_method` passes no class pointer, so `undef_method`,
 `alias_method` and `instance_methods` keep the old code path.
 
-**Tests on the head** (build with `--enable-yjit --enable-zjit`):
+**Tests on the head** (build with `--enable-yjit --enable-zjit`; run on `333ec5b187`, which differs from the head only
+in the commit message):
 
 * New test fails without the fix (`NoMethodError: undefined method 'foo' for an instance of D`), passes with it.
 * `make test-all TESTS=ruby -j8`: 11762 tests, 1 failure; with `RUN_OPTS=--zjit-call-threshold=1`: 11762 tests,
