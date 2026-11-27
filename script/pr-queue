@@ -116,27 +116,23 @@ module PrQueue
   end
 
   # Reviewers whose latest pass on the current head is missing or doesn't approve, unless waived on that head.
-  # Passes are listed oldest first. With guard_review, a thermos-opus or thermos-fable pass from an orb other than the
-  # detailed review's fills the Astra slot.
+  # Passes are listed oldest first. With guard_review, an approving thermos-opus or thermos-fable pass fills the Astra
+  # slot when another orb has an approving detailed pass, so two orbs approve.
   def missing(meta, lines)
     passes = Array(meta["passes"]).select { same_sha?(_1["head"], meta["head"]) }.reverse
     waived = Array(meta["waived"]).select { _1["reviewer"] == "thermos" && same_sha?(_1["head"], meta["head"]) && !_1["reason"].to_s.empty? }
     approves = ->(pass) { VERDICTS.first(2).include?(pass&.fetch("verdict", nil)) }
     latest_per_orb = passes.uniq { [_1["reviewer"], _1["orb"]] }
     guard = meta["guard_review"] ? GUARD_STAND_INS : []
-    reviews = passes.select { ACCEPTS["claude-code"].include?(_1["reviewer"]) }
-    claude_orb = (reviews.find { !guard.include?(_1["reviewer"]) } || reviews.first)&.[]("orb").to_s
-    used = ["", claude_orb]
+    detailed_orbs = latest_per_orb.select { ACCEPTS["claude-code"].include?(_1["reviewer"]) && approves.(_1) }
+                                  .map { _1["orb"].to_s }.reject(&:empty?)
     required(meta, lines).reject do |who|
       next true if waived.any? { _1["reviewer"] == who }
       next true if approves.(passes.find { ACCEPTS.fetch(who, [who]).include?(_1["reviewer"]) })
-      next false if claude_orb.empty?
-      stand_ins = who == "astra" ? guard : []
-      stand_in = latest_per_orb.find do
-        stand_ins.include?(_1["reviewer"]) && approves.(_1) && !used.include?(_1["orb"].to_s)
+      next false unless who == "astra" && approves.(passes.find { ACCEPTS["claude-code"].include?(_1["reviewer"]) })
+      latest_per_orb.any? do
+        guard.include?(_1["reviewer"]) && approves.(_1) && !_1["orb"].to_s.empty? && (detailed_orbs - [_1["orb"].to_s]).any?
       end
-      next false unless stand_in
-      used << stand_in["orb"].to_s
     end
   end
 

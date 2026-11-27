@@ -400,11 +400,12 @@ enter the queue at `built`; an item is `reviewed` only when the floor below appr
   thermos slot that diffs over 200 changed lines (or several files, or a new mechanism) need. `thermos-opus`,
   `thermos-fable` and recorded `claude-code` passes also count as the detailed pass.
 * **Astra on the exact head shortly before opening, for every item** (`openai/gpt-6-astra`; Thomas, 2026-11-27).
-  On `risky` items it runs adversarially after the detailed pass approves: try to break identical behaviour with
-  inputs, overrides, prepends, threads, reloading and error paths, run them, report only demonstrated differences.
-  Risky: correctness changes on hot paths, Ractor/thread or frozen-object semantics, anything a maintainer pushed back
-  on before, and **critical** changes: escaping or other security boundaries, connection or transaction handling,
-  record loading and typecasting, caching or memoization, thread or fiber state, VM/JIT code.
+  On a **critical** change it runs adversarially after the detailed pass approves: try to break identical behaviour
+  with inputs, overrides, prepends, threads, reloading and error paths, run them, report only demonstrated
+  differences. Critical: escaping or other security boundaries, connection or transaction handling, record loading and
+  typecasting, caching or memoization, thread or fiber state, VM/JIT code. Items are marked `risky` for correctness
+  changes on hot paths, Ractor/thread or frozen-object semantics, anything a maintainer pushed back on before, and
+  critical changes; how Astra is briefed on other risky items is the coordinator's choice.
 
 Beyond the floor:
 

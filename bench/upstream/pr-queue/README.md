@@ -107,7 +107,7 @@ alternative_of:               # ID this competes with; only one of them opens
 impact: one line, the effect a maintainer cares about
 evidence: [bench/upstream/form_helper_stack/body/fb1]  # repo paths with the raw data behind the body's numbers
 rank: 2                       # 1 opens first
-risky: false                  # true: Astra runs adversarially after the detailed pass (DECISIONS, Required passes)
+risky: false                  # true: hot path, concurrency, earlier pushback or critical; critical gets Astra's adversarial round (DECISIONS, Required passes)
 guard_review: true            # optional: reviews our own safety guards; thermos-opus/-fable from another orb fill the Astra slot
 state: draft
 pr: 59667
