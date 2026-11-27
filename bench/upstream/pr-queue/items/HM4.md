@@ -1,0 +1,41 @@
+---
+id: HM4
+repo: hashie/hashie
+fork: thomasklemm/hashie
+kind: perf
+area: Mash key conflict check (Mash#_log_collision?, KeyConflictWarning.disable_warnings?)
+reviewer: dblock
+branch: thomasklemm/skip-disabled-conflict-check
+head: "10a93033975136664d7b7231986663e9c7689d91"
+base: master
+built_on: "277e88e"
+tracker: []
+depends_on: []
+stacked_on:
+alternative_of:
+impact: "Mash subclasses that call disable_warnings without keys stop calling respond_to? for every key written (Mash.new, []=, merge, dup). On hashie 6 today that is the response object of omniauth (KeyStore and AuthHash, 235M downloads), elasticsearch-model (HashWrapper, 78M) and zendesk_api (SilentMash, 47M); restforce (60M) and chef-zero (23M) do the same, but their released versions require hashie < 6. Duel on Ruby 4.0.10, the exact head (run 46079366956): such a subclass built from the nested fixture, CPU 0.458 [0.456, 0.460] under YJIT and 0.655 [0.650, 0.662] under ZJIT, allocations unchanged; 28 benchmarks, 0 regressed. Cost: a Mash that disables nothing asks its class once per key written: Mash.new of the nested fixture 1.007 [1.003, 1.009] under YJIT and 1.006 [1.000, 1.012] under ZJIT, write new keys as methods 1.013 [1.010, 1.016] and 1.013 [1.009, 1.017], each 'same' for Duel."
+evidence: [bench/upstream/hashie_perf/round2, bench/upstream/hashie_perf/round2/duel, bench/upstream/hashie_perf/round2/wall, bench/upstream/hashie_perf/round2/body/HM4, bench/upstream/hashie_perf/round2/body/HM4-module-f41c3b2, bench/upstream/hashie_perf/round2/quiet]
+rank: 1
+risky: true
+state: built
+pr:
+note: "2026-11-27 rebuilt on master 277e88e as one commit 10a9303 (Thomas, no trailers, signed; forced over f41c3b2 and 0ded81e on the fork, no PR was open): _log_collision? asks self.class.disable_warnings? before respond_to?, and disable_warnings? returns false at once unless @disable_warnings or @disabled_warnings is set. Three earlier forms are refused with their numbers in the round2 README, HM4: the module form f41c3b2 (plain Mash.new +19.0% [+18.2, +19.6] under YJIT 4.0.10 once a quiet subclass was built first, body/HM4-module-f41c3b2), the reorder alone (plain Mash 3-5% slower in Duel, run 46077591328) and flag first 0ded81e (not exact for a class that fills disabled_warnings directly: 1,146 differential rows). Duel judged the exact head on fork PR #36 (run 46079366956): 0 regressed; under YJIT one benchmark is unsettled, KeepOriginalKeys: read Symbol keys as methods 1.038 [1.017, 1.055], which writes no key and was unsettled the same way in a run that only changed to_hash (46068675920). Local on 10a9303 (8-CPU orb, record only): quiet Mash.new, merge and []= -49 to -66% under ZJIT on master; plain Mash.new +3.1% instructions interpreted and +1.1% under YJIT 4.0.10 (Callgrind, body/HM4), +2.3% [+1.9, +4.3] YJIT wall after a quiet subclass ran; plain-only processes Mash.new +1.5% [+0.9, +1.8] under YJIT 4.0.10 and +2.5% [+0.2, +3.4] under ZJIT on master, overwriting a key -3.6% and -4.7%. Claimed local loss, stated in the body without a number: under ZJIT on master plain Mash.new is +9.1% [+7.4, +9.8] in a process where a quiet subclass ran the same methods first (wall/HM4-10a9303-master-zjit, 30 rounds); the class-method call then has two receiver classes and ZJIT sends dynamically (out/zjit-mixed-order.txt); ZJIT on 4.0.10 in the same process shows no loss (-2.6% [-3.7, +0.1], no claim). Ruby 4.0.10 rake spec 1,076/0, rubocop clean, docs:examples 359/0; 3.0.7 1,072/0; 3.4.7 1,076/0. Differential probes/quiet_diff.rb against 277e88e on 4.0.10, 4.0.10 YJIT and master ZJIT: 66,994 rows, 18 differ, all for the key 'respond_to?' on a quiet subclass with MethodAccessWithOverride, where master raises ArgumentError and the branch stores the key (not in the body). Accepted, record only: respond_to? and respond_to_missing? are no longer called for a key whose warning is disabled; a class that disabled nothing has disable_warnings? called once more per key; the query no longer assigns instance variables on a class that configured nothing, so a frozen class answers false instead of raising FrozenError. Metrics: _log_collision? ABC 14.46 -> 13.64, cyclomatic 8 -> 8; disable_warnings? ABC 5.1 -> 6.48, cyclomatic 4 -> 6. CHANGELOG line numbered #663 on the assumption that HM5 opens first as #662; recheck before opening."
+ownership: {date: 2026-11-27, checked: ["open PRs naming disable_warnings?, _log_collision? that change CHANGELOG.md, benchmarks/extensions_benchmark.rb, lib/hashie/extensions/key_conflict_warning.rb, lib/hashie/mash.rb"], hits: []}
+passes: []
+---
+
+# Skip the key conflict check in Mash subclasses that disable warnings
+
+Every `Mash` write asks `respond_to?` whether the key conflicts with a method, to warn about it. For a key that isn't set yet this runs `respond_to_missing?`, the most expensive step of building a Mash. A subclass that called `disable_warnings` does the same work and discards the answer, for example [OmniAuth's `KeyStore`](https://github.com/omniauth/omniauth/blob/2045f32693592360488c833b1505658dceddcd03/lib/omniauth/key_store.rb#L8) (omniauth 2.4.2), the parent of `AuthHash`, and [elasticsearch-model's `HashWrapper`](https://github.com/elastic/elasticsearch-rails/blob/41f4291407f4cd1b9f2c2b574e05853920086955/elasticsearch-model/lib/elasticsearch/model/hash_wrapper.rb#L29) (8.0.1).
+
+`_log_collision?` now asks the class before it calls `respond_to?`. So that asking for every key stays cheap, `disable_warnings?` answers false right away for a class that never disabled a warning. A new benchmark builds a subclass with warnings disabled from the nested fixture. Duel on Ruby 4.0, CPU time relative to master:
+
+| | YJIT | ZJIT |
+| --- | ---: | ---: |
+| `disable_warnings`: Mash.new from a nested JSON response | 0.46 | 0.66 |
+| Mash.new: a nested JSON response | 1.01 | 1.01 |
+| Mash: write new keys as methods | 1.01 | 1.01 |
+
+The last two rows are the cost: a Mash that disables nothing now asks its class once for every key written.
+
+On Ruby master, ZJIT slows a plain `Mash.new` further in a process that also builds a subclass with warnings disabled: the call to `disable_warnings?` then sees two classes. Ruby 4.0 doesn't show this.

@@ -73,7 +73,7 @@ built: it is a fix in another repository; lead for the coordinator.
 
 | # | Idea | Reach | Gain | State |
 |---|---|---|---|---|
-| 1 | HM4: skip the conflict check when a subclass disabled warnings | omniauth, elasticsearch-model, zendesk_api now; restforce and chef-zero once they allow hashie 6 | quiet `Mash.new` CPU 0.43 (YJIT) and 0.64 (ZJIT) in Duel; `[]=`, `dup`, `merge` alike | see [HM4](#hm4-skip-the-conflict-check-when-warnings-are-disabled) |
+| 1 | HM4: skip the conflict check when a subclass disabled warnings | omniauth, elasticsearch-model, zendesk_api now; restforce and chef-zero once they allow hashie 6 | quiet `Mash.new` CPU 0.46 (YJIT) and 0.66 (ZJIT) in Duel; `[]=`, `dup`, `merge` alike locally; plain Mash 1.01 | rebuilt as two lines in the shared check on `277e88e`, in review; see [HM4](#hm4-skip-the-conflict-check-when-warnings-are-disabled) |
 | 2 | HM3: `method_missing` without the arguments Array | every Mash, Ruby ≥ 4.0 | 1 object per method-style read; reads CPU 0.91–0.95 in Duel; setters 1.01–1.02 | **held after review**: a forwarded keyword Hash is stored with its keyword flag ([below](#hm3-method_missing-without-the-arguments-array)) |
 | 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.84 (YJIT) and 0.69 (ZJIT) in Duel | rebuilt on `277e88e`, in review |
 | 4 | `Hash#dup` before `self.class.new(val)` in `convert_value` | every nested hash in `Mash.new` | 101 of 774 objects; time not measured | held: a subclass `initialize` would receive the caller's Hash instead of a copy |
@@ -194,6 +194,114 @@ benchmarks, 0 regressed, 0 unsettled under both. Rerun on `6b6f67b`: 4.0.10 `rak
 and master with ZJIT has the same 2,340 identical rows and the same two expected differences
 (`to_hash/differential-6b6f67b.tar.gz`). The Callgrind and wall cells above are from `e10dce0` on `9e313f3`; the
 `to_hash` code is the same on both bases.
+
+## HM4: skip the conflict check when warnings are disabled
+
+Branch `thomasklemm/skip-disabled-conflict-check`, head `10a9303` on `277e88e`, two added lines and one removed:
+`Mash#_log_collision?` asks `self.class.disable_warnings?(method_key)` before `respond_to?` instead of after it, and
+`KeyConflictWarning#disable_warnings?` starts with `return false unless @disable_warnings || @disabled_warnings`, so
+that a class that configured nothing answers from two instance variable reads. The commit also adds the Duel
+benchmark "disable_warnings: Mash.new from a nested JSON response". This is the shared check, so `Mash.new`, `[]=`,
+`merge`, `dup`, `update` and `replace` gain alike, in every subclass that disabled warnings.
+
+| | interp 4.0.10 | YJIT 4.0.10 | ZJIT 4.0 (Duel) | ZJIT master |
+|---|---|---|---|---|
+| Duel CPU, `disable_warnings`: Mash.new nested | | 0.458 [0.456, 0.460] faster | 0.655 [0.650, 0.662] faster | |
+| Duel CPU, Mash.new: a nested JSON response | | 1.007 [1.003, 1.009] same | 1.006 [1.000, 1.012] same | |
+| Duel CPU, Mash.new: a flat Hash | | 1.008 [1.006, 1.011] same | 1.005 [0.998, 1.011] same | |
+| Duel CPU, Mash: write new keys as methods | | 1.013 [1.010, 1.016] same | 1.013 [1.009, 1.017] same | |
+| Duel CPU, Mash: overwrite a key as a method | | 0.981 [0.977, 0.984] same | 0.952 [0.949, 0.955] same | |
+| Duel CPU, Mash#deep_merge: a nested update | | 1.000 [0.997, 1.003] same | 0.998 [0.992, 1.003] same | |
+| Callgrind, quiet.new(repository) (`body/HM4`) | −32.6% (A/A 0.04%) | −48.1% (A/A 0.23%) | | |
+| Callgrind, quiet merge / quiet `[]=` | −32.3% / −42.7% | −47.8% / −53.3% | | |
+| Callgrind, plain Mash.new(repository), quiet subclass ran first | **+3.1%** (A/A 0.04%) | +1.1% (A/A 0.09%) | | |
+| Wall, quiet.new(repository) / auth hash | | −51.7% [−51.8, −50.6] / −47.0% [−47.6, −46.7] | | −55.6% [−55.8, −54.7] / −49.0% [−49.2, −48.6] |
+| Wall, quiet merge / quiet `[]=` | | −51.0% [−51.4, −50.4] / −66.2% [−66.3, −65.9] | | −54.5% [−55.2, −53.2] / −66.1% [−66.4, −65.9] |
+| Wall, plain Mash.new(repository), quiet subclass ran first | | +2.3% [+1.9, +4.3], A/A +0.4% [−0.1, +0.7] | | **+9.1% [+7.4, +9.8]**, A/A +0.2% [−1.2, +2.6] |
+| Wall, plain Mash.new(repository), plain only | | +1.5% [+0.9, +1.8], A/A −0.3% [−1.3, +0.4] | | +2.5% [+0.2, +3.4], A/A −0.1% [−1.1, +1.2] |
+| Wall, plain Mash#merge / `mash['description'] =`, plain only | | +1.0% [+0.2, +1.5] / −3.6% [−4.1, −2.7] | | −0.2% (no claim, A/A excludes 0) / −4.7% [−4.9, −4.3] |
+
+Duel (fork #36, run 46079366956, the exact head): 28 benchmarks, 0 regressed under both JITs. Under YJIT one
+benchmark is unsettled, "KeepOriginalKeys: read Symbol keys as methods" 1.038 [1.017, 1.055]; it writes no key, and
+it was unsettled the same way in a run that only changed `to_hash` (46068675920, 1.056 [1.039, 1.065]). Objects are
+unchanged (11 for the quiet subclass, 25 for plain Mash). Local wall cohorts are `wall/HM4-10a9303-*` and
+`body/HM4`.
+
+**Cost: a Mash that disables nothing asks its class once per key written.** On master it asked only for a key that
+conflicts with a method. Duel has plain `Mash.new` at 1.005–1.008 and new keys written as methods at 1.013, each
+"same". Locally, a process that builds only plain Mashes has `Mash.new(repository)` at +1.5% [+0.9, +1.8] under
+YJIT 4.0.10 and +2.5% [+0.2, +3.4] under ZJIT on master, `Mash#merge` at +1.0% under YJIT, and overwriting an existing
+key 3.6% and 4.7% faster (not traced; master's `disable_warnings?` read the list and assigned `@disable_warnings`
+on every call, which the early return skips). Interpreted, plain
+`Mash.new(repository)` runs 3.1% more instructions (Callgrind, A/A 0.04%): the extra class-method call per key.
+
+**Under ZJIT on master the cost is larger when one process builds both kinds of Mash.** `wall/HM4-10a9303-master-zjit` (30 rounds): plain `Mash.new(repository)` +9.1% [+7.4, +9.8] in a process where the
+quiet subclass ran the same methods first, against +2.5% alone. ZJIT on 4.0.10 in the same mixed process (`wall/HM4-10a9303-4.0.10-zjit`, 20 rounds): −2.6% [−3.7, +0.1],
+no claim (the interval includes 0, and 4.0.10's ZJIT has no side-exit counter for the JIT-flat gate); its quiet
+cases are −49 to −69%. So the mixed-process cost shows on master's ZJIT only.
+`probes/zjit_mixed.rb` (`out/zjit-mixed-order.txt`, measured on the module form and the flag-first form): after a
+quiet subclass ran first, `send_polymorphic_fallback` per plain `Mash.new` goes from 20 to 114. The call
+`self.class.disable_warnings?` in the shared method then has two receiver classes, `Hashie::Mash` and the subclass,
+and ZJIT sends dynamically although both resolve to the same method. Every form measured pays this (below); the
+body says so in one sentence without a number, because the number is local.
+
+### Three other forms, measured and refused
+
+| Form | Quiet `Mash.new` in Duel (YJIT / ZJIT) | Plain `Mash.new` nested in Duel | Plain, local | Why not |
+|---|---|---|---|---|
+| Module included by `disable_warnings` without keys, overriding `_log_collision?` (`f41c3b2`, `probes/held-conflict-check-module.patch`; run 46071221821) | 0.433 / 0.639 | 0.996 / 0.996 | YJIT 4.0.10, quiet subclass ran first: **+19.0% [+18.2, +19.6]** wall, +20.4% instructions (`body/HM4-module-f41c3b2`); plain only +0.1% (no claim); ZJIT master mixed +8.4% [+7.3, +9.2], plain first +5.8% [+4.6, +7.1] | plain Mash pays 19% under YJIT once a quiet subclass was built first, which Duel's one-benchmark processes don't show; and it is a one-caller fast path beside the shared check |
+| Reorder only: ask the class before `respond_to?`, `disable_warnings?` unchanged apart from `\|\|` (`probes/held-conflict-check-reorder.patch`; run 46077591328) | 0.417 / 0.645 | 1.027 [1.020, 1.033] / 1.046 [1.042, 1.051] unsettled; flat Hash 1.043 unsettled / 1.033; new keys 1.035 / 1.028 | YJIT mixed +4.8% [+4.2, +5.7]; ZJIT master mixed +11.1% [+10.1, +11.9], plain only +6.3% [+4.5, +7.6] | 3–5% on every plain Mash, 3 unsettled benchmarks in Duel |
+| Flag first: `return false unless @disable_warnings`, then the list, else `true` (`0ded81e`, `probes/alt-flag-first-reorder.patch`; run 46077594232) | 0.450 / 0.638 | 1.010 / 1.013 | YJIT mixed +1.4% [+1.1, +1.7], plain only +2.0% [+1.7, +2.3]; ZJIT master mixed +9.7% [+8.8, +10.2], plain only +3.5% without a claim (measured as a patch on `9e313f3`) | not exact: a class that fills the Array `disabled_warnings` returns without calling `disable_warnings` warned again (1,146 of 66,994 differential rows, `quiet/flag-first-0ded81e-diffs.tar.gz`) |
+
+The head keeps the flag-first cost and stays exact for that class: calling `disabled_warnings` sets
+`@disabled_warnings`, so such a class takes the old path.
+
+**YJIT lead, also on unmodified master.** `probes/yjit_first.rb` (`out/yjit-first.txt`, screening without A/A): when
+a Mash class with its own `_log_collision?` builds a Mash before the first plain Mash is built, plain `Mash.new`
+of the fixture takes 81 µs instead of 68 µs under YJIT 4.0.10, and 85–91 µs instead of 71 µs under YJIT on master.
+`PermissiveRespondTo`, which ships such an override, does it on master `9e313f3` and on the final head (85 µs
+against 69 µs). An override that only calls `super`, an overridden `custom_writer`, an empty subclass and a plain
+quiet subclass don't. It does not happen when plain Mash is compiled first, in the interpreter, or under ZJIT.
+In the slow process Callgrind has `respond_to?` reached from the interpreter loop (`vm_call_cfunc_with_frame_`,
+`vm_exec_core`) where the fast process stays in JIT code (`body/HM4-module-f41c3b2`, raw.tar.gz); the cause in YJIT
+is not found. Not ours to fix in hashie; lead for the coordinator.
+
+### Exactness
+
+`probes/quiet_diff.rb`: 31 classes (Mash, subclasses that disable all, some or no warnings, by Symbol and String,
+children that inherit or narrow, a class that disables twice in either order, a class with its own
+`disable_warnings?`, a class that fills `disabled_warnings` directly, a class disabled after instances exist, quiet
+classes with each Mash extension, with their own methods, and Restforce- and OmniAuth-like classes) × 3 seeds × 30
+keys (Strings, Symbols, suffixed names, numbers, nil, an Array, objects with `to_sym`, names of Mash's own private
+methods) × 12 operations (`[]=`, a setter, `update`, `merge` with and without a block, `dup`, `replace`,
+`assign_property`, `new`, `shallow_update`, `reverse_merge`, a bang reader) × frozen and unfrozen. Each row records
+the result and its class, the mash afterwards, and the warnings logged during construction and during the
+operation. **66,994 rows; 66,976 identical** against `277e88e` on 4.0.10, 4.0.10 with YJIT and master with ZJIT
+(`quiet/differential-10a9303.tar.gz`). The 18 that differ are one case: the key `"respond_to?"` on a quiet subclass
+with `MethodAccessWithOverride`. There the stored key shadows `respond_to?` with a reader that takes no argument;
+master then raises ArgumentError from the conflict check on the next write, and the branch, which no longer calls
+`respond_to?` for that class, stores the key. Not in the body: it is a failure that goes away for one key name.
+
+Accepted, printed by the probe as `accepted` lines: (1) for a key whose warning is disabled, `respond_to?` and with
+it `respond_to_missing?` are no longer called by a write (a subclass counting them sees fewer calls); (2) a class
+that disabled nothing has `disable_warnings?` called once more per key, 5 instead of 4 for three keys; (3) the query
+no longer assigns `@disable_warnings` or creates `@disabled_warnings` on a class that configured nothing, so
+`instance_variables` stays empty and a frozen class answers false where master raised FrozenError. Checklist: (1)
+overrides of `disable_warnings?`, `_log_collision?` (PermissiveRespondTo) and `respond_to_missing?` probed; (2)
+nothing is stored or returned differently; (3) no conversion added, `method_key` reaches the class as before; (4)
+the calls on user objects that go are (1) above, none is added; (5) nothing copied; (6) no iteration; (7) frozen
+mashes give identical errors; (8) a class disabled after its instances exist behaves as on master ("late").
+
+Suite on `10a9303`: 4.0.10 `rake spec` 1,076/0, rubocop 156 files clean, `docs:examples` 359/0; 3.0.7 1,072/0; 3.4.7
+1,076/0. No spec added: the existing ones cover every warning case, and the new benchmark guards the cost.
+
+Out loud: a key can only collide if it is a String or Symbol; if the class disabled its warning there is nothing to
+log; otherwise look for a method of that name as before. A class that never disabled anything says so at once.
+RuboCop metrics: `_log_collision?` ABC 14.46 → 13.64, cyclomatic 8 → 8, perceived 8 → 8; `disable_warnings?` ABC 5.1
+→ 6.48, cyclomatic 4 → 6, perceived 4 → 6. L0.
+
+Risky (`risky: true`): the conflict check runs on every Mash write, and the change touches what every plain Mash
+pays.
 
 ## Astra: changes on 282ebcbb8248ae3ef379bc7254ad69fd0422d7b4
 

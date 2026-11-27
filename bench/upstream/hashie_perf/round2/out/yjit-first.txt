@@ -1,0 +1,64 @@
+== ruby 4.0.10 --yjit, hashie base (9e313f3)
+A x1 68.3 us
+L x1 68.7 us
+B x1 69.3 us
+C x1 81.1 us
+E x1 69.1 us
+K x1 81.5 us
+G x1 80.9 us
+H x1 71.1 us
+== ruby 4.0.10 --yjit, hashie quiet (f41c3b2)
+A x1 68.2 us
+L x1 71.4 us
+B x1 81.7 us
+C x1 83.4 us
+E x1 70.8 us
+K x1 82.2 us
+G x1 81.8 us
+H x1 70.3 us
+== ruby master --yjit, hashie base (9e313f3)
+A x1 71.2 us
+L x1 74.0 us
+B x1 76.9 us
+C x1 85.6 us
+E x1 75.1 us
+K x1 84.8 us
+G x1 91.0 us
+H x1 75.1 us
+== ruby master --yjit, hashie quiet (f41c3b2)
+A x1 69.5 us
+L x1 76.3 us
+B x1 91.1 us
+C x1 85.0 us
+E x1 74.5 us
+K x1 86.6 us
+G x1 90.1 us
+H x1 71.5 us
+== ruby master --zjit, hashie base
+A x1 80.1 us
+B x1 83.4 us
+G x1 85.5 us
+K x1 86.7 us
+== ruby 4.0.10 interpreter, hashie base
+A x1 155.7 us
+G x1 154.9 us
+== ruby 4.0.10 --yjit, hashie base, plain Mash compiled before the subclass runs
+G x1 plain-first 67.2 us
+G x3000 plain-first 67.6 us
+K x1 plain-first 66.5 us
+K x3000 plain-first 66.4 us
+C x1 plain-first 67.0 us
+C x3000 plain-first 67.0 us
+== ruby 4.0.10 --yjit, HM4 head 0ded81e
+A x1 68.1 us
+B x1 73.6 us
+G x1 85.2 us
+== ruby 4.0.10 --yjit, five processes each: master 277e88e and HM4 head 0ded81e, alone (A) and after a quiet subclass (B)
+277e88e A: 68.7 67.0 69.9 69.3 69.6
+277e88e B: 69.5 69.1 71.1 68.4 70.5
+0ded81e A: 68.6 71.9 70.3 70.1 71.4
+0ded81e B: 70.0 73.3 71.2 72.7 71.2
+== ruby 4.0.10 --yjit, HM4 final head 10a9303, alone (A), after a quiet subclass (B), after PermissiveRespondTo (G): three processes each
+10a9303 A: 69.9 70.2 68.6 
+10a9303 B: 73.8 71.6 73.6 
+10a9303 G: 85.4 85.2 87.5 

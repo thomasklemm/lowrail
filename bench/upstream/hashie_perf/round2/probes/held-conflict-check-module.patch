@@ -1,0 +1,94 @@
+From f41c3b2b273b1e90a9f4040352289577617a2335 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Fri, 27 Nov 2026 21:03:10 +0000
+Subject: [PATCH] Skip the key conflict check in Mash subclasses that disable
+ warnings
+
+Every Mash write asks `respond_to?` whether the key conflicts with a
+method, and for a key that isn't set yet that runs
+`respond_to_missing?`. A subclass that called `disable_warnings` did
+the same work and then discarded the answer.
+
+Disabling all warnings now includes a module whose `_log_collision?`
+asks the class first and only looks for a conflict while the key's
+warning is enabled, as PermissiveRespondTo overrides the same method.
+Mash itself, and subclasses that disable no warning or only some keys',
+don't include it and are unchanged. A benchmark builds such a subclass
+from the nested fixture.
+---
+ CHANGELOG.md                                  |  1 +
+ benchmarks/extensions_benchmark.rb            |  9 +++++++++
+ lib/hashie/extensions/key_conflict_warning.rb | 13 +++++++++++++
+ 3 files changed, 23 insertions(+)
+
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index b0cb41a..590907a 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -18,6 +18,7 @@ Any violations of this scheme are considered to be bugs.
+ ### Changed
+ 
+ * [#656](https://github.com/hashie/hashie/pull/656): Write new Mash keys without allocating in respond_to_missing? - [@thomasklemm](https://github.com/thomasklemm).
++* [#663](https://github.com/hashie/hashie/pull/663): Skip the key conflict check in Mash subclasses that disable its warnings - [@thomasklemm](https://github.com/thomasklemm).
+ * Your contribution here.
+ 
+ ### Deprecated
+diff --git a/benchmarks/extensions_benchmark.rb b/benchmarks/extensions_benchmark.rb
+index e331408..bc9e141 100644
+--- a/benchmarks/extensions_benchmark.rb
++++ b/benchmarks/extensions_benchmark.rb
+@@ -10,6 +10,10 @@ class PermissiveMash < Hashie::Mash
+   include Hashie::Extensions::Mash::PermissiveRespondTo
+ end
+ 
++class QuietMash < Hashie::Mash
++  disable_warnings
++end
++
+ class IndifferentHash < Hash
+   include Hashie::Extensions::MergeInitializer
+   include Hashie::Extensions::IndifferentAccess
+@@ -73,6 +77,11 @@ duel 'PermissiveRespondTo: overwrite a key as a method' do
+   @mash.a = 1
+ end
+ 
++duel 'disable_warnings: Mash.new from a nested JSON response' do
++  once { @repository = repository }
++  QuietMash.new(@repository)
++end
++
+ duel 'IndifferentAccess: new from a nested JSON response' do |n|
+   attributes = untimed { Array.new(n) { repository } }
+   attributes.each { |hash| IndifferentHash.new(hash) }
+diff --git a/lib/hashie/extensions/key_conflict_warning.rb b/lib/hashie/extensions/key_conflict_warning.rb
+index 0f55fa0..d3ca507 100644
+--- a/lib/hashie/extensions/key_conflict_warning.rb
++++ b/lib/hashie/extensions/key_conflict_warning.rb
+@@ -40,11 +40,24 @@ module Hashie
+           disabled_warnings.concat(method_keys).tap(&:flatten!).uniq!
+         else
+           disabled_warnings.clear
++          include DisabledWarnings
+         end
+ 
+         @disable_warnings = true
+       end
+ 
++      # Skips the conflict check while the class disables the key's warning
++      #
++      # @api private
++      # @private
++      module DisabledWarnings
++        private
++
++        def _log_collision?(method_key)
++          !self.class.disable_warnings?(method_key) && super
++        end
++      end
++
+       # Checks whether this class disables warnings for conflicting keys/methods
+       #
+       # @api semipublic
+-- 
+2.55.0
+

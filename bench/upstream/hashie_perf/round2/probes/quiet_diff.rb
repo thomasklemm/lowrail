@@ -2,7 +2,8 @@
 
 # Differential probe for skipping the key conflict check when its warning is disabled:
 # ruby -I LIB quiet_diff.rb > out; diff two libs' outputs. Rows record results, stored state and the log.
-# Lines starting with "accepted" record the two expected differences (ancestors, hook call counts).
+# Lines starting with "accepted" record the expected differences: hook call counts, ancestors (the held module form
+# only), a class that fills disabled_warnings without calling disable_warnings, and what a query leaves on the class.
 require 'hashie'
 require 'logger'
 require 'stringio'
@@ -162,3 +163,28 @@ counts.clear
 counting.new('zip' => 1, 'name' => 2, 'size' => 3)
 puts "accepted hook calls for quiet.new of 3 keys | #{counts.sort.inspect}"
 puts "accepted ancestors | quiet adds #{quiet.ancestors.size - Hashie::Mash.ancestors.size - 1} module(s): #{(quiet.ancestors - Hashie::Mash.ancestors - [quiet]).inspect} | Mash #{Hashie::Mash.ancestors.size}"
+
+plain_counts = Hash.new(0)
+plain = sub do
+  define_method(:respond_to_missing?) { |name, priv = false| (plain_counts[:respond_to_missing?] += 1; super(name, priv)) }
+  define_singleton_method(:disable_warnings?) { |key = nil| (plain_counts[:disable_warnings?] += 1; super(key)) }
+end
+plain_counts.clear
+plain.new('zip' => 1, 'name' => 2, 'size' => 3)
+puts "accepted hook calls for a subclass that disabled nothing, new of 3 keys | #{plain_counts.sort.inspect}"
+
+filled = sub { disabled_warnings << :zip }
+LOG.truncate(0)
+LOG.rewind
+filled.new('zip' => 1)
+puts "accepted disabled_warnings filled without disable_warnings | disable_warnings? #{[nil, :zip, :size].map { |k| filled.disable_warnings?(k) }.inspect} | #{log}"
+
+asked = sub
+asked.disable_warnings?(:zip)
+frozen_class = sub.freeze
+frozen_query = begin
+  frozen_class.disable_warnings?
+rescue StandardError => e
+  e.class
+end
+puts "accepted after a query | ivars #{asked.instance_variables.sort.inspect} | frozen class query #{frozen_query.inspect}"

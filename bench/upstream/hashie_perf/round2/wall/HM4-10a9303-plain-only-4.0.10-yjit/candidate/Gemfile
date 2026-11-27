@@ -1,0 +1,2 @@
+source "https://rubygems.org"
+gem "hashie", path: "/home/user/w/hashie-h"
