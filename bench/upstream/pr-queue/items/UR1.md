@@ -12,7 +12,7 @@ built_on: "48cda77031"
 depends_on: []
 stacked_on:
 alternative_of:
-evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz]
+evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz]
 impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
@@ -208,6 +208,26 @@ passes:
       At Lowrail 72be858b, revised exact-tree body data had not arrived; old cecaed1 numbers are not approved
       for this head. Existing same-day citation audit remains applicable to the unchanged links/order.
       Repros, base/head output, suites and reviewed snapshot: bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz.
+  - reviewer: astra
+    head: "c43954fa4d2a7605e18ecc8968c1aa188eae549a"
+    orb: T-01a21e96-8207-76d7-8f64-404eb741d298
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None. Confirmed the remote head, matching tree b4d512787702911904b7ec8d51b0ec07744ec7c9 and parent for
+      c43954f, 7da6979 and tested/measured cecaed1. The added JRuby 9.4 exception in the body and qualified
+      commit message accurately disclose the accepted subclass identity boundary. No new guard requested.
+      Actual JRuby 9.4.16.0 probes on this tree give 24 differences in 40 synthetic subclass cases, all return
+      class only for unescaped subclasses; bytes, encoding and frozen status match. The removed to_s hook
+      no longer changes bytes or raises. Reran ActiveSupport 7.2.4 SafeBuffer cases on the restored tree:
+      empty/plain inputs return SafeBuffer; percent/plus inputs return String. The script-tag case still has
+      html_safe? nil and ERB escapes it. No XSS or request-bytes-only exploit demonstrated; this explicit
+      boundary decision is accepted, alongside the earlier CGI/private-URI boundary assessment.
+      Rechecked all four body rows and all 16 micro cells from retained raw data/A/A and the 48 JIT windows;
+      all match. Prior native/pure differential, suites, concurrency and unchanged caller citation audit
+      apply to this identical tree. This confirm adds no new performance, master/ZJIT or TruffleRuby run.
+      Outgoing body SHA256 27c9301a17648b0a7f954db85187d9a505e2c0b904a05e92bf8df07cee469566 at Lowrail 4f0a4011.
+      Sources, outputs, body and commit/tree receipts: bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz.
 ---
 
 # Decode www-form components with cgi/escape
