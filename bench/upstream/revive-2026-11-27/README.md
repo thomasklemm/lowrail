@@ -9,7 +9,7 @@ wins (FH2, LBL1), and because the four upgrade-guide PRs had no decision yet (SP
 | --- | --- | --- | --- |
 | TO1 | `thomasklemm/tag-attributes-own-string` | `7f1f0dce45` | held: ZJIT `f.text_field` +0.64% unexplained, and no form-level effect |
 | FH2 | `thomasklemm/form-builder-tag-copies` | `7401f9dac7` | parked: Astra broke V and TR; the exact remainder (PH + SV) is within noise |
-| LBL1 | `thomasklemm/label-translation-key-once` | `4c64fb7898` | held for Thomas: Astra found Chain, Proc and Cache rendering boundaries |
+| LBL1 | `thomasklemm/label-translation-key-once` | `4c64fb7898` | parked: boundaries rejected; the exact variant gains nothing under production Fallbacks |
 | SP1 | `thomasklemm/upgrade-guide-frozen-default-url-options` | `d41b93d147` | the 2026-11-17 claude-code must-fixes applied; approved |
 
 ## Ownership and drift
@@ -116,3 +116,23 @@ found differences beyond the disclosed ones:
 
 Astra's fresh Callgrind run (i18n 1.15.2) confirms the effect: `f.label` −16.9% in the interpreter and with YJIT, and a
 five-label form −9.3% / −9.6%. LBL1 is held until Thomas decides whether these boundaries are acceptable.
+
+## LBL1 exact attempt (2026-11-27)
+
+The coordinator rejected the boundaries and allowed one exact attempt. Main's default `[:"post.title", ""]` is visible
+through public I18n: Proc translations receive it, the Cache backend hashes it, and Fallbacks handles a Symbol default
+specially. So the only exact fast path skips `I18n.t` altogether, and only when the backend is a plain
+`I18n::Backend::Simple` (no included extensions, no singleton methods, locale available) and `I18n.exists?` is false.
+That prototype is `lbl1-exact/lbl1_exact.patch`. With it, Astra's `adversarial.rb` matches main
+(`lbl1-exact/adversarial_diff.txt` is empty).
+
+Objects per text-less `f.label` (`lbl1-exact/objects.txt`, Ruby 4.0.9):
+
+| Backend | main | head 4c64fb7898 | exact variant |
+| --- | ---: | ---: | ---: |
+| plain `Simple` | 90 | 75 | 71 |
+| `Simple` with `Fallbacks` (new apps' production default) | 116 | 100 | 118 |
+
+The exact variant gains only where no extension is loaded (development and test), and in production it costs 2 objects.
+Its guard inspects the backend's class and ancestors, which an Action View maintainer wouldn't write. Instructions
+weren't measured; the allocation result already decides it. LBL1 is parked.

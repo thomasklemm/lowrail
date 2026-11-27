@@ -1,0 +1,34 @@
+diff --git a/actionview/lib/action_view/helpers/tags/translator.rb b/actionview/lib/action_view/helpers/tags/translator.rb
+index e81ca3aef0..e5bb143891 100644
+--- a/actionview/lib/action_view/helpers/tags/translator.rb
++++ b/actionview/lib/action_view/helpers/tags/translator.rb
+@@ -12,7 +12,10 @@ def initialize(object, object_name, method_and_value, scope:)
+         end
+ 
+         def translate
+-          translated_attribute = I18n.t("#{object_name}.#{method_and_value}", default: i18n_default, scope: scope).presence
++          key = "#{object_name}.#{method_and_value}"
++          return human_attribute_name if repeated_default? && plain_simple_backend? && !I18n.exists?(key, scope: scope)
++
++          translated_attribute = I18n.t(key, default: i18n_default, scope: scope).presence
+           translated_attribute || human_attribute_name
+         end
+ 
+@@ -28,6 +31,17 @@ def i18n_default
+             end
+           end
+ 
++          def repeated_default?
++            model && Symbol === (key = model.model_name.i18n_key) && key.name == object_name
++          end
++
++          def plain_simple_backend?
++            backend = I18n.backend
++            backend.instance_of?(I18n::Backend::Simple) && backend.singleton_methods.empty? &&
++              I18n::Backend::Simple.ancestors[1] == I18n::Backend::Simple::Implementation &&
++              I18n.locale_available?(I18n.locale)
++          end
++
+           def human_attribute_name
+             if model && model.class.respond_to?(:human_attribute_name)
+               model.class.human_attribute_name(method_and_value)
