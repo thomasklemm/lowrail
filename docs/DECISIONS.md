@@ -48,7 +48,7 @@ block forwarding) over single-app hotspots. App numbers are breadth evidence, no
 * **Performance across the whole stack** (Ruby runtime and GC, C extensions and drivers, Rack and Puma, Rails, gems).
   YJIT is the production reference; interpreter numbers alone don't carry a claim.
 * **No new compatibility PRs for Rails main** (Rails or gems) until the Rails 8.2 beta, since the internal design can
-  still change; findings go into an inventory with callers and proposed fixes. Exception: WAL150 (Thomas, 2026-11-26).
+  still change; findings go into an inventory with callers and proposed fixes. Exceptions: WAL150 (Thomas, 2026-11-26), TSP1 (Thomas, 2026-11-27).
 * **Only PRs with large relevance open:** the effect reaches many apps or a widely used gem, or a whole request, test
   run or ruby-bench benchmark moves measurably. Small per-call wins in niche gems or rare paths, and fixes for niche gems, are
   recorded as `held` items ("parked idea") and not opened later as they are. Every item states its reach in `impact` before review.
