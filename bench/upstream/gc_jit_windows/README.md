@@ -8,8 +8,9 @@ in [bench.md](../../../docs/bench.md#gc-in-wall-windows-and-the-compiles-it-trig
 
 Rubies: current master `0d399335b7` (2026-11-27, ZJIT and YJIT), the wall_noise pin master `42a644f6e0` (ZJIT) and
 4.0.10 `a704b7cd95` (YJIT). Rails main `088fc0cf61`; ruby-bench `43d41e22d7` (railsbench and lobsters on their locked
-Rails 8.1.4.1). One a1.xxlarge orb (16 vCPUs). The counting runs (parts 1 and 2) ran up to seven processes at once,
-each pinned to its own core: compile and exit counts don't depend on timing. The timed cohorts (part 3) ran alone on
+Rails 8.1.4.1). One a1.xxlarge orb (16 vCPUs). The counting runs (parts 1 and 2) ran up to 12 processes at once,
+each pinned to its own core: compile and exit counts barely depend on timing, but the times and per-object GC costs
+from these runs come from contended processes, not isolated timing. The timed cohorts (part 3) ran alone on
 core 1 with its SMT sibling idle.
 
 `study-2026-11-27.tar.gz` (directory `gcjit/`) holds every script and every process record (JSONL): `attr.rb` (the
@@ -43,15 +44,17 @@ No window in any run moved an invalidation counter (YJIT `invalidation_count` an
 `RUBY_TYPED_FREE_IMMEDIATELY`, and on 4.0.10 every `File`) become zombies when GC sweeps them, and GC registers a
 postponed job that sets the interrupt flag. JIT code checks interrupts at sends, returns and backward branches and
 side-exits there, so the rest of that frame runs in the interpreter, and every method it calls is entered from the
-interpreter. Under YJIT that entry needs code of its own: an ISEQ entry plus a new version of block 0, compiled the
-first time each method is entered that way. With `--yjit-stats` the chain is in the counters:
+interpreter. Under YJIT that entry needs code of its own: an ISEQ entry, compiled once the method's interpreter-entry
+counter `jit_entry_calls` reaches the call threshold (30, or 120 with more than 40,000 ISEQs; `vm.c` `yjit_compile`),
+reusing an existing block 0 version where one fits. So an entry may compile some calls after the exit that started
+the count. With `--yjit-stats` the chain is in the counters:
 
 * 4.0.10, one `File.read` per window: 123 interrupt side exits (`leave_se_interrupt` 60, `guard_send_interrupted`
   50, `branchif_interrupted` 13), 93 of them in GC windows, and 23 `compiled_iseq_entry`; without the read, 0 and 0.
 * master, one finalizer per window: 99 interrupt exits, all in GC windows, and 12 `compiled_iseq_entry`.
-* The compiled blocks are `index: 0` of methods that were hot for thousands of calls (`table_structures`,
-  `table_info_pragma`, `block in build_foreign_keys`, `Instrumenter#start!`, `Fanout#start`, `quote`), never a new
-  ISEQ.
+* The compiled blocks belong to methods that were hot for thousands of calls (`table_structures`,
+  `table_info_pragma`, `block in build_foreign_keys`, `Instrumenter#start!`, `Fanout#start`, `quote`); 40 of 120
+  (master, finalizer) and 40 of 86 (4.0.10, `File`) are block 0, the rest later blocks of the same methods.
 
 Master doesn't reproduce with a `File.read`, because it frees an already closed IO immediately (ruby/ruby commit
 `9c2ca0e1b7`, "Free already closed IO immediately", 2026-05-28); 4.0.10 makes every swept `File` a zombie. The
@@ -60,14 +63,18 @@ wall_noise worker read `/proc/stat` and `/proc/self/status` in every window, and
 **Why GC and compile only loosely coincide.** Per-call sampling places each compile relative to the GC. With a
 finalizer on master, 15 of 31 compile events fall in the very call whose allocation started the GC and the other 16
 within the next 21 calls (presumably further methods entered from the frame that finishes in the interpreter).
-On 4.0.10, 23 of 33 (`File`) and 21 of 27 (finalizer) fall more than 50 calls after the GC or in a window with no GC before them, because lazy
-sweeping reaches the zombie later and the GC count already moved, sometimes in the previous window. That is why
+On 4.0.10, 24 of 33 (`File`) and 21 of 27 (finalizer) fall more than 50 calls after the GC or in a window with no
+GC before them. Two explanations fit and the sampling (GC count and compile count per call, no sweep, finalizer or
+interrupt timestamps) can't separate them: lazy sweeping reaches the zombie later, and the entry counter needs
+further interpreter entries before it hits the threshold. That is why
 wall_noise saw 79% of compiling windows overlap a GC against 61% of all windows, not 100%.
 
 **ZJIT.** ZJIT takes the same exit: with a finalizer per window, master logged 30 `exit_interrupt`, all in GC
-windows, and none without. It doesn't compile afterwards, because ZJIT compiles an ISEQ together with its
-interpreter entry points (`jit_entry_ptrs`). The one compile in 320 windows was `build_foreign_keys`' first: a
-method that had only run inlined reached the call threshold from the interpreter after such an exit.
+windows, and none without. An ISEQ ZJIT already compiled doesn't compile again afterwards, because its interpreter
+entry (`start_ptr` in `IseqCodePtrs`) exists from the first compile. The one compile in 320 windows was
+`build_foreign_keys`' first: a method that had only run inlined reached the call threshold from the interpreter
+after such an exit. What the exit itself costs (materializing frames, finishing the frame in the interpreter) was not
+measured.
 
 Other candidates, checked: GC-triggered invalidation (no invalidation counter moved in any window, shapes and
 constant caches included); code GC or exec memory pressure (YJIT 4.0 has no code GC without `--yjit-code-gc`;
@@ -75,7 +82,7 @@ constant caches included); code GC or exec memory pressure (YJIT 4.0 has no code
 compiled (the compiled ISEQs are Rails methods, not the finalizer procs); lazy paths that run only after a GC (none:
 every compiled block is an entry of an already hot method).
 
-## 2. Production: no steady-state cost for ZJIT, a bounded warm-up cost for YJIT
+## 2. Production: no GC-driven recompiles found under ZJIT, a warm-up cost under YJIT
 
 ruby-bench railsbench (2,000 requests per iteration) and lobsters (114 requests per iteration), 40 iterations, the
 first 15 not counted, 3 processes per configuration (A/A), `rb_harness.rb` counting per iteration and per request.
@@ -83,24 +90,25 @@ GC off means `GC.start`, then GC off for each iteration. Per 1,000 requests, one
 
 | app | config | GCs | compiles (GC on) | compiles (GC off) | invalidations | JIT-flat iterations (GC on) |
 | --- | --- | --- | --- | --- | --- | --- |
-| railsbench | ZJIT master | 5.2 / 4.9 | 0.02 / 0.02 | 0.02 / 0.02 | 0 | 24/25, 24/25 |
-| railsbench | ZJIT pin | 5.0 / 5.1 | 0.02 / 0.02 | – | 0 | 24/25, 24/25 |
-| railsbench | YJIT 4.0.10 | 4.9 / 4.9 | 1.00 / 0.98 | 0.98 / 0.98 | 0 | 23/25, 24/25 |
+| railsbench | ZJIT master | 5.2 / 4.9 / 5.1 | 0.02 × 3 | 0.02 × 3 | 0 | 24/25 × 3 |
+| railsbench | ZJIT pin | 5.0 / 5.1 / 5.0 | 0.02 × 3 | – | 0 | 24/25 × 3 |
+| railsbench | YJIT 4.0.10 | 4.9 × 3 | 1.00 / 0.98 / 0.98 | 0.98 × 3 | 0 | 23/25, 24/25, 24/25 |
 | lobsters | ZJIT master | 7.4 × 3 | 17.2 / 17.5 / 17.5 | 17.2 × 3 | 0 | 8/25, 8/25, 7/25 |
-| lobsters | ZJIT pin | 7.7 / 7.4 | 16.8 / 16.8 | – | 0 | 9/25, 9/25 |
+| lobsters | ZJIT pin | 7.7 / 7.4 / 7.4 | 16.8 × 3 | – | 0 | 9/25 × 3 |
 | lobsters | YJIT master | 7.7 × 3 | 1,425 / 1,463 / 1,482 | – | 0 | 2/25, 3/25, 2/25 |
-| lobsters | YJIT 4.0.10 | 8.1 × 2 | 1,440 / 1,491 | 1,417 × 3 | 0 | 5/25, 3/25 |
+| lobsters | YJIT 4.0.10 | 8.1 × 3 | 1,440 / 1,491 / 1,484 | 1,417 × 3 | 0 | 5/25, 3/25, 6/25 |
 
 Railsbench is steady: under ZJIT the two compiles left per process are driver code that runs once per iteration
 and reaches the call threshold late (the harness's `Time.now` in iteration 24, the benchmark's iteration block in
 29), and YJIT's one per 1,000 requests is the harness's own sampling block. No Rails or app ISEQ compiled.
-Lobsters is still warming up at 1,700–4,560 requests: ZJIT compiles fall from 3,192 in the first iteration to 0–1 per iteration after the 33rd,
-identically with GC on and off. Its repeats of the same ISEQ (templates such as `rss.erb` compiled in iterations
-15, 24 and 32) are `ccall_exit_recompile` (576 over 3,420 requests) and the final-version exits of lead 20
-(`exit_patchpoint_method_redefined`), with the same counts GC on and off, so not GC's. YJIT 4.0.10 with GC on adds
-23–74 blocks and 2.8–9.1 ISEQ entries per 1,000 requests over GC off (50.2): the entries of part 1. At 42–47 µs per
-block (`compile_time_ns`), that is 1–3.5 ms per 1,000 requests, about 0.02–0.05% of lobsters' time, and each such
-entry compiles once per ISEQ.
+Lobsters is still warming up at 1,700–4,560 requests: ZJIT compiles fall from 3,192 in the first iteration to 0–1
+per iteration after the 33rd, identically with GC on and off. Its repeated template ISEQs (`rss.erb` in iterations 15,
+24 and 32) are new template ISEQs with new names, and the `ccall_exit_recompile` (576 over 3,420 requests) and
+lead-20 exits (`exit_patchpoint_method_redefined`) have the same counts GC on and off, so they are not GC's. YJIT
+4.0.10 with GC on adds 23–74 blocks and 2.8–9.5 ISEQ entries per 1,000 requests over GC off (50.2): the entries of
+part 1. A rough price, mixing runs: the stats run's 42–47 µs per block gives 1–3.5 ms per 1,000 requests, about
+0.02–0.05% of lobsters' time; the counting run's own `compile_time_ns` is 88–91 µs per block with GC on, which
+doubles that. It is a heuristic, not a measurement.
 
 Interrupt exits with stats on (2 processes, GC on / off):
 
@@ -125,8 +133,10 @@ Because lobsters was still warming up, it ran again for 120 iterations (13,680 r
 | YJIT master | 7.6 / 7.8 | 25.9 / 28.2 blocks | – | 121 / 94 | 0 |
 | YJIT 4.0.10 | 8.2 / 7.9 | 29.2 / 26.8 blocks, 2.8 / 1.8 ISEQ entries | 13.2 / 13.2 blocks, 1.5 / 1.5 entries | 93 / 90 against 55 / 55 | 0 |
 
-ZJIT in steady state compiles 2–3 ISEQs per 6,840 requests with GC on and 1 with GC off: a `_recent.html.erb`
-template in iteration 65 in every process, GC on or off, and 1–2 more per GC-on process (`MessageEncryptor`,
+This is a late-run sample, not a proven steady state. ZJIT compiles 2–3 ISEQs per 6,840 requests with GC on and 1
+with GC off: a `_recent.html.erb` template in iteration 65 in every process, GC on or off (the template ISEQ is
+rebuilt every 17 iterations, at 14, 31, 48 and 65, in every process; that is lobsters' Action View, not GC), and 1–2
+more per GC-on process (`MessageEncryptor`,
 `Preloader`, psych `TreeBuilder`), each the first compile of a rarely called method: two of them 6 and 17 requests
 after a GC, one in an iteration without a GC. Nothing compiles in the last 10 iterations, nothing invalidates. The
 stats run gives the exit counts (two processes each, GC off then GC on):
@@ -142,22 +152,25 @@ stats run gives the exit counts (two processes each, GC off then GC on):
 +side_exit_count:    576,348 / 576,353
 ```
 
-So GC adds about 50 side exits to 576,000 and 1–2 first compiles per 6,840 requests: no steady-state recompile
-under ZJIT. YJIT is not steady at 13,680 requests either way (55 blocks per 1,000 requests in the last 10 iterations
-even with GC off); GC on roughly doubles that, with 0.3–1.3 extra ISEQ entries per 1,000 requests over GC off, a
-cost that shrinks as entries accumulate.
+So in this sample GC adds about 50 interrupt exits and 1–2 first compiles of rare methods per 6,840 requests, and no
+GC-dependent repeat compile or invalidation was found under ZJIT. The count doesn't price the exits: what each one
+costs (materializing frames, finishing in the interpreter) was not measured. YJIT is not steady at 13,680 requests
+either way (55 blocks per 1,000 requests in the last 10 iterations even with GC off), and part of the GC-on excess
+there is the harness's own blocks (60 in iteration 119 of each GC-on process, from `rb_harness.rb`'s sampling); GC
+on adds 0.3–1.3 ISEQ entries per 1,000 requests over GC off.
 
 A census app was not run: setting one up on Rails main for counting would cost more than the two ruby-bench apps
-already settle (no GC-driven compiles under ZJIT in either).
+already show (no GC-driven repeat compiles under ZJIT in either sample).
 
 ## 3. `--wall` and GC
 
 **What GC off leaves out.** GC work per allocated object, from `GC.stat[:time]` over `total_allocated_objects`
 in GC-on windows and iterations: E2's micro 32 ns on master (`z-base` of wall_noise's round 1; 82 ns on 4.0.10,
-`y-base`), railsbench 57–58 ns and lobsters 53 ns on master, 66–68 ns on 4.0.10 (part 2's uncontended processes).
+`y-base`), railsbench 57–58 ns and lobsters 53 ns on master, 66–68 ns on 4.0.10 (part 2's processes, run
+concurrently). These are total GC time over total allocations, averages, not the marginal saving of one object.
 GC is 0.9% of the micro's time under ZJIT and 5.5–6.8% of railsbench's. E2's 7 objects per call are therefore about
 0.2–0.5 µs of GC, 0.03–0.07% of its 0.69 ms call: GC off hides nothing a cohort could resolve there. It matters for
-short calls: at 60 ns per object, saving 2 objects is 6% of a 2 µs call.
+short calls: at 60 ns per object, saving 2 objects would be about 6% of a 2 µs call, if the average held at the margin.
 
 **A GC-on mode, tried and not kept.** [wall-gc.diff](wall-gc.diff) adds `--wall-gc` to `script/upstream-bench`:
 GC on in every window, no heap floors, and each process's mean window instead of its 10th-percentile one (a low
@@ -187,18 +200,28 @@ not the ~1% of a planted regression: the 75-string plant (about 0.5% of
 work plus 0.3–0.6% of GC) is missed. The 150-string plant shows the GC share exists (+3.9% against +1.5% GC off),
 but its interval can't price it: anything from about 5 to 280 ns per object fits. Only the ratios compare across
 modes: the base's time per call (729–758 µs GC on, 688 µs GC off) also differs by estimator, mean against 10th
-percentile. So `--wall-gc` failed the bar for a tool change and is not in the tool; the cohort directories were run with the diff applied, and their `commands.sh` need it.
+percentile. The estimator also has a blind spot: per-process means go into an outer median of round ratios, so a GC
+cost that lands in a minority of processes is dropped. With the tool's own `wall_cell`, 30 rounds of equal windows
+and one 7× window in 9 of the 30 candidate processes (+6% total cost) give 0% [0%, 0%]. So `--wall-gc` failed the
+bar for a tool change and is not in the tool; the cohort directories were run with the diff applied, and their
+`commands.sh` need it. Their `results.json` `heap` field still lists the heap floors, which the diff unset for the
+wall workers (it applies to the objects pass only).
+
+All of this is one workload, E2's `foreign_keys` micro: 3–4% is what a GC-on cohort resolved here, not a floor for
+every workload.
 
 **Proposals** (in bench.md, body-numbers.md and DECISIONS' Evidence bullets):
 
 1. `--wall` stays GC off. It measures the work a change does; it is the only mode that resolves ~1%.
 2. An allocation-reducing change claims its objects per call (the objects pass, exact, deterministic). The record
-   adds a GC estimate: Δobjects × about 60 ns (the app heaps above, this orb) as a share of the call. It is an
-   estimate, so it stays in the record. A body gives the objects, and the estimate only as "about N ns of GC work
-   per call" when a maintainer asks.
-3. Wall time with GC on is claimed only when the estimate is large (≥ 4% of the call) and then from a GC-on cohort
-   with its A/A, like the diff's; below that it can't be measured on an orb.
+   may add an illustrative GC figure, Δobjects × the average GC time per object of a named heap (about 50–70 ns on
+   railsbench and lobsters here), stating Ruby, JIT and heap; it is an average, not a measured saving, and never
+   time in a body.
+3. Wall time with GC on is claimed only from a GC-on cohort whose own A/A passes and whose change interval excludes
+   0, with the estimator's blind spot for sparse GC named; this record's 3–4% is one workload's resolution, not a
+   threshold.
 4. Timed windows never read files, open IO or create finalizable objects (part 1's trigger). `upstream-bench`'s
    worker doesn't; any hand-written harness checks this.
 5. The JIT-flat gate stays as it is. With GC off it hides GC-triggered interrupt exits and YJIT's entry compiles;
-   part 2 shows ZJIT's steady-state compiles don't depend on GC, and YJIT's are a bounded warm-up cost.
+   part 2 found no GC-dependent repeat compiles under ZJIT, but the exits' cost is unmeasured, so this is not a claim
+   that GC off hides nothing.

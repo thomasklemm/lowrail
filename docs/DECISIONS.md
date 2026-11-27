@@ -377,10 +377,10 @@ which refuses unless the gates pass on the current head. A candidate made moot u
   win of their own on the pin.
 * **`--wall` stays GC off; allocations are claimed as objects** (2026-11-27,
   [gc_jit_windows](../bench/upstream/gc_jit_windows/README.md)): an allocation-reducing change claims its objects
-  per call. Its GC share (Δobjects × about 60 ns) is an estimate in the record, never time in a body; GC-on wall
-  time resolves only about 3–4%, so it is claimed only where the estimate is that large, from a GC-on cohort with its
-  A/A. Timed windows read no files and create no finalizable objects: GC-time finalization makes JIT code exit,
-  and YJIT then compiles in the window.
+  per call. A GC figure (Δobjects × a named heap's average GC time per object) is illustrative and stays in the
+  record, never time in a body. Wall time with GC is claimed only from a GC-on cohort whose A/A passes and whose
+  interval excludes 0 (on E2's micro such a cohort resolved about 3–4%). Timed windows read no files and create no
+  finalizable objects: GC-time finalization makes JIT code exit, and YJIT then compiles in the window.
 
 ### Benchmark tables in the project's own format (Thomas, 2026-11-14)
 

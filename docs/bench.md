@@ -1989,30 +1989,33 @@ ZJIT, master and 4.0.10 for YJIT).
 * **Cause.** A GC that leaves deferred finalization (an `ObjectSpace` finalizer, a lazily freed `T_DATA`, and on
   4.0.x every swept `File`) sets the interrupt flag. JIT code side-exits at its next interrupt check and finishes
   that frame in the interpreter, so methods it calls are entered from the interpreter. YJIT compiles an
-  interpreter entry for each such method the first time (`compiled_iseq_entry`, block 0); ZJIT compiles none,
-  because its ISEQs carry their entries from the first compile. No invalidation is involved. The wall_noise
+  interpreter entry for such a method once its entry counter reaches the call threshold (`compiled_iseq_entry`);
+  ZJIT doesn't recompile an ISEQ it already compiled, because its interpreter entry exists from the first compile
+  (a method that had only run inlined may get its first compile). No invalidation is involved. The wall_noise
   worker's per-window `/proc` reads were the trigger; a worker that reads no files compiles in no warm window,
   GC on or off, on every Ruby measured.
-* **Production.** Railsbench and lobsters (ruby-bench) compile the same with GC on and off under ZJIT, invalidate
-  nothing, and take at most 7.8 interrupt exits per 1,000 requests (lobsters, against 84k other side exits;
-  railsbench 0); over 6,840 steady lobsters requests GC adds 1–2 first compiles of rare methods. YJIT 4.0.10 adds
-  2.8–9.1 interpreter-entry compiles per 1,000 lobsters requests with GC on early and 0.3–1.3 later, about
-  0.02–0.05% of its time, once per ISEQ. Recorded as lead GCI1, not worth a PR.
-* **What GC off leaves out.** Each allocated object costs GC work later: about 32 ns in E2's micro (small heap,
-  master), 53–58 ns on railsbench's and lobsters' heaps on master and 66–68 ns on 4.0.10 (`GC.stat[:time]` per
-  `total_allocated_objects`, steady state, this orb). `--wall` doesn't see that share, so an allocation-reducing
+* **Production.** In railsbench and lobsters (ruby-bench) no GC-dependent repeat compile or invalidation was
+  found under ZJIT; GC adds at most 7.8 interrupt exits per 1,000 requests (lobsters; railsbench 0) and, in a late
+  lobsters sample of 6,840 requests, 1–2 first compiles of rare methods. What those exits cost was not measured.
+  YJIT 4.0.10 adds 2.8–9.5 interpreter-entry compiles per 1,000 lobsters requests with GC on early and 0.3–1.3
+  later; a rough price mixing runs is 0.02–0.1% of its time. Recorded as lead GCI1, unpriced.
+* **What GC off leaves out.** Average GC time per allocated object: about 32 ns in E2's micro (small heap,
+  master), 53–58 ns on railsbench's and lobsters' heaps on master and 66–68 ns on 4.0.10 (`GC.stat[:time]` over
+  `total_allocated_objects`, later iterations, concurrent processes on this orb; an average, not a marginal cost). `--wall` doesn't see that share, so an allocation-reducing
   change's time there is its work only. E2's 7 objects per call are about 0.4 µs of GC, 0.06% of the 0.69 ms call:
-  far below what any cohort resolves. The same 60 ns is 6% of a 2 µs call that saves 2 objects.
-* **The JIT-flat gate with GC off** hides only GC-triggered interrupt exits and, under YJIT, the entry compiles
-  they cause. Under ZJIT neither moves steady-state compiles, so the gate hides nothing real there.
+  far below what any cohort resolves. At the average, 2 objects would be about 6% of a 2 µs call.
+* **The JIT-flat gate with GC off** hides GC-triggered interrupt exits and, under YJIT, the entry compiles they
+  cause. Under ZJIT no GC-dependent repeat compile was found; the exits' cost is unmeasured.
 * **A GC-on `--wall` resolves about 3–4%, not 1%.** A trial `--wall-gc` (GC on, no heap floors, the mean window
   per process; [wall-gc.diff](../bench/upstream/gc_jit_windows/wall-gc.diff)) passed its A/A and claimed the
   150-string plant at +3.9% [+1.6%, +7.2%] (GC off: +1.5% [+1.0%, +2.0%]) under ZJIT, but missed a plant of about
-  1% (75 strings), with intervals 4–7 points wide. It is not in the tool.
+  1% (75 strings), with intervals 3–9 points wide, on this one workload. Its outer median over per-process means
+  also drops GC cost that lands in a minority of processes (a +6% sparse example gives 0% [0%, 0%]). It is not in
+  the tool.
 * **Rules.** `--wall` stays GC off. Timed windows don't read files, open IO or create finalizable objects (the
-  trigger above). An allocation-reducing change claims its objects per call, which is exact; the record adds its
-  GC share as an estimate, Δobjects × about 60 ns as a share of the call, and doesn't call it time. Time with GC
-  is claimed only where that estimate reaches about 4% of the call, from a GC-on cohort with its A/A.
+  trigger above). An allocation-reducing change claims its objects per call, which is exact; the record may add an
+  illustrative GC figure (Δobjects × a named heap's average GC time per object) and doesn't call it time. Time with
+  GC is claimed only from a GC-on cohort whose A/A passes and whose interval excludes 0.
 
 ## GC and retained-memory diagnosis
 
