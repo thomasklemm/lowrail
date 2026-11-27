@@ -130,3 +130,84 @@ Thanks for digging these up. I measured each one on master with Duel (YJIT and Z
 3. `Mash.new` allocates about 25 objects for the fixture in Duel, not 56. The two licenses' `key` fields cause warning Strings to be built even though the benchmark logger discards the warnings.
 4. `dig` with `map!` saves two objects, but Duel found the `[]` and `dig` benchmark 12% slower under YJIT. I left `method_missing`'s `*args` too: the setter needs the argument, and a fixed arity would reject the extra arguments it accepts today.
 ```
+
+## Astra: changes on d1f403e; code and body approved on eae505a (2026-11-27)
+
+Reviewer: `astra`, thread `T-01a21ea6-c103-7055-b928-054d2f8d8df1`. Reviewed exact heads `d1f403e0774a7ad509ae06477407dbc2836491fd` and, after the coordinator's repair, `eae505a846f162e743b65261a7cda01d32e84f85`, each against `9e313f308f3270995c2c978e92f0f216b861861b`. No subagents, new threads, upstream posts or fork pushes. Evidence and runnable probes: [astra-eae505a.tar.gz](astra-eae505a.tar.gz). The archive includes both patches, the reviewed text, raw outputs, commands, tool manifest and the rejected system-Valgrind attempt.
+
+### Demonstrated regression and repair
+
+The original head changes public behavior, not just a private helper's return value:
+
+```ruby
+klass = Class.new(Hashie::Mash) { include Hashie::Extensions::Mash::DefineAccessors }
+mash = klass.new
+mash.default_proc = proc { |hash, key| hash[key.upcase!] = 7 }
+mash.missing
+```
+
+Master returns `7` and stores `{"MISSING" => 7}`; d1f403e raises `FrozenError: can't modify frozen String: "missing"`. The generated unsuffixed reader passes the helper's name to `custom_reader`, which passes it to the public default proc. The coordinator's eae505a returns `method_name.to_s` in the unsuffixed branch; the same repro again returns `7` with the same stored hash. The archive's `default-proc-*.txt` also records the second instance after the generated accessor already exists. Both revisions keep mutable slices for suffixed Symbol names.
+
+Own runs on Ruby 4.0.10 `a704b7cd95`: the extended `c1_diff.rb` has **10,400 identical lines** between master and eae505a. The original probe also matched d1f403e on 8,528 lines on Ruby 4.0.9, explaining why it missed this callback. Log timestamps/PIDs were normalized, not messages or values. A separate **4,480-case** probe covered all nine Mash extension modules, MethodAccessWithOverride, three DefineAccessors combinations, subclass and prepended `method_missing` forwarding, extra positional/keyword arguments and blocks, repeated generated accessors, frozen receivers and keys, String subclasses, frozen Strings, Symbols, nil, integers, a duck-typed name, empty names, NUL, binary bytes and Unicode. Ordinary outcomes match on eae505a. Targeted Mash/extension specs: master, d1f403e and eae505a each **301 examples, 0 failures** (`ruby -Ilib -S rspec spec/hashie/mash_spec.rb spec/hashie/extensions/mash spec/hashie/extensions/method_access_spec.rb --format progress`). This reviewer did not rerun the full suite or Ruby master; the retained earlier master+ZJIT differential files were also compared successfully.
+
+Two deliberately nonstandard direct-call differences remain, recorded rather than hidden:
+
+* A String with a singleton `is_a?` that raises, passed directly to KeepOriginalKeys' `method_missing`, returns `7` on master but raises on both candidate heads. Ordinary Ruby method dispatch supplies a Symbol, and no documented caller requiring this overridden introspection was found.
+* A String subclass whose `to_s` raises on its second call, sent directly to KeepOriginalKeys' `method_missing` without a suffix, returns nil on master and d1f403e but raises on eae505a. Its new unsuffixed branch calls `to_s` twice. Ordinary Strings remain identical. This is the explicitly acknowledged direct non-Symbol boundary, not a claim of equivalence for arbitrary conversion hooks. No new guard is requested without a documented caller, per DECISIONS' guard rule.
+
+Checklist: singleton/prepend/subclass and conversion boundaries tested; frozen receivers, keys, results and error classes/messages compared; name mutation tested through the public default proc; no changed iteration, configuration access, loading or shared mutable cache. The replacement String is not exposed for suffixes. No new code comments. Cold read: borrow the Symbol's frozen name to find and slice a suffix; otherwise return its mutable `to_s` as before. Flog for the touched method is 4.9 → 8.6; RuboCop Metrics ABC 4.58 → 7.68, cyclomatic 2 → 3, perceived 3 → 4, length 6 → 6. The rise is the Symbol branch and preserved unsuffixed conversion, not new layering; readability remains L0. Metrics were measured with zero thresholds to expose the scores, not claimed as lint failures.
+
+### Slowest measured input and allocation controls
+
+The adverse shape is an unsuffixed name: the new type check and name lookup cannot save the final mutable String. A direct String name is worse because it saves no conversion and now repeats `to_s`. Ran `script/upstream-bench` workers with pinned Valgrind 3.19.0/512-MiB brk, Ruby 4.0.10, fixed heap settings, interpreter, N=100 minus N=0, and master twice. No time was measured on this 8-CPU orb. The system-Valgrind attempt hit brk overflow and is rejected; its outputs remain in the archive.
+
+| Input to `method_missing` | Master instructions/call | eae505a | Change | A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `:"?"` | 8,999.48 | 9,037.96 | +0.43% | 0% |
+| `"?"` | 8,804.35 | 9,093.06 | +3.28% | 0% |
+| Unsuffixed 16-byte Symbol | 6,882.20 | 7,249.62 | +5.34% | 0% |
+| Unsuffixed 16-byte String | 7,460.93 | 7,947.48 | **+6.52%** | 0% |
+| 1-MiB ASCII Symbol, final `?` | 1,057,898.73 | 1,057,861.62 | −0.004% | 0% |
+| 1-MiB ASCII String, final `?` | 1,057,807.68 | 1,058,098.72 | +0.028% | −0.00074% |
+
+The Symbol unsuffixed row is also a normal missing-method call shape; the overhead is not confined to artificial String dispatch. These are interpreter instructions, **not demonstrated wall-time regressions**. This limited sweep is not a universal worst-case bound. Allocation workers also covered 1-, 16- and 1,048,576-byte names with no suffix, an early `?` that is not a suffix, and a final `?`, as both Symbols and Strings. Symbol suffix splits save one object; String inputs do not. Separate base/head/base controls show a stored exact suffixed key stays at about 1 object/call, an ordinary missing suffix falls 5 → 4, and StrictKeyAccess falls 10 → 8 because it splits twice. Thus the body's corrected "Splitting a suffixed name" is right; "every suffixed call saves one" is not.
+
+### Body and reply claims checked
+
+* Read the exact diff, gemspec (Ruby ≥3.0), all helper callers, the benchmark fixture and benchmark definitions, merged #656's body and metadata, and dblock's original comment through GitHub's API. `_method_suffix` already uses `Symbol#name`; the basic mechanism, examples and CHANGELOG placement are correct. Only #660 was open at the check; **#661 must still be verified when opening**.
+* Inspected the six raw Duel logs in `duel/logs.tar.gz`, not just summaries. Suffix allocation rows are 16 → 13, 5 → 4 and 6 → 5. All relevant CPU classifications are `same`; this is Duel's configured 1.05 threshold, not proof of equal time. Those Duel runs used the original suffix prototype, not eae505a. Own allocation probes confirm the same suffix savings; these are the same suffix-path operations in eae505a. The body table is acceptable with that provenance retained here.
+* The old local YJIT wall record really reports −4.0209% with A/A −0.3411% and an interval containing zero for A/A. It was run on an 8-CPU orb, contrary to the current a1.xxlarge timing rule, and on the earlier head. **Approve the corrected body without that timing sentence**, not its restoration based on these old runs. The title and the body's remaining sentences are approved on eae505a.
+* The dup prototype's Duel CPU ratios are 0.346 and 0.316 (YJIT), 0.359 (ZJIT), with about 31 → 13 objects. "About three times faster" accurately summarizes those tool reports. One YJIT run also has one unsettled unrelated row; "zero regressions" must not be expanded into "all rows settled". Applied the kept prototype patch to master and reproduced exactly the four MethodAccessWithOverride failures at 226, 283, 292 and 302; the targeted suite is 301 examples/4 failures. The same fixture logs two warnings when master duplicates it and zero with the prototype. The local dup timings in `candidate-2-dup.txt` match the record, but lack their own retained A/A and are not approved for a new independent timing claim. No kept variant-B timing output substantiates 28.0 versus 27.3 µs; neither that comparison nor one failed prototype proves that every exact implementation must retain all existing work.
+* Duel's `Mash.new` count is about 25, not 56. The allocation-site record's 20.19 interpreter objects are **objects attributed to Hashie's library**, not the total. Own base/head/base probe gives approximately 20.93 total/7.98 Strings in the interpreter and 24.93/11.98 under YJIT; the repeated base matches. Renaming the two `key` fields removes about ten interpreter objects, including eight Strings, and fourteen YJIT objects, including twelve Strings. Hence neither "eight of the 25" nor an unqualified total of "20" is approved. The logging mechanism is verified in `_log_built_in_message`, `Utils.method_information`, the fixture and the logger configuration.
+* Dig's raw YJIT reruns range from 1.113 to 1.126 and all report regression for **the combined bracket-read/dig benchmark**. ZJIT is 0.984, classified same. Allocation rows are 4 → 2. The standalone `dig_probe.rb` adds another wrapper `dig` using `super`, so its 8-object result is not merely the effect of a different fixture. The original claim that `...` rejects extra arguments is false: the kept `mm_probe.rb` variant C and my `Forwarder#method_missing(name, ...)` run both accept them. The revised explanation about the setter needing a named argument and fixed arity rejecting extras is accurate; it does not prove all other signatures impossible.
+
+### Project relevance and currency, checked 2026-11-27
+
+GitHub repository APIs and RubyGems APIs were fetched live and retained. `hashie/hashie`: 3,035 stars, not archived, last push 2026-11-27, current master still `9e313f3`; Hashie 6.0.0 released 2026-11-11, 507,033,809 total downloads and 222,845 downloads for 6.0.0. `sferik/duel-ruby`: 21 stars, not archived, last push 2026-11-25; gem `duel` 0.3.1 released 2026-11-22, 8,695 total downloads and 631 for 0.3.1. This is niche, but it is the actual benchmark tool adopted by the target project, not an ecosystem-reach example; its citation is necessary methodology. `ruby/ruby`: 23,868 stars, not archived, last push 2026-11-27; latest release v4.0.10 published 2026-11-18; RubyGems downloads are not applicable to the interpreter. YJIT and ZJIT are part of that project. No downstream app is cited. The prose leads with the target Hashie and mentions tools only for evidence, so there is no misleading downstream reach ordering or superseded dependency version.
+
+### Exact replacement reply approved by Astra
+
+At this review's initial snapshot the draft still overgeneralized the dup prototype and labeled library-attributed allocations as a total. The coordinator has since applied the two replacements below. **This exact text is approved.** Posting still needs thermos-sol's approval of the same words and the actual #661 number. Code/body approval does not waive that separate text gate.
+
+```text
+Thanks for digging these up. I measured each one on master with Duel (YJIT and ZJIT) and locally:
+
+1. #661 finds the suffix in `Symbol#name`, one String fewer per split: "read keys with suffixes" goes from 16 to 13 objects, CPU time the same.
+2. Copying already converted values in `dup` makes `deep_merge` about three times faster (31 to 13 objects), but it skips the subclass's `initialize`, which `MethodAccessWithOverride`'s `dup` specs need, and stops re-logging key conflict warnings. This prototype breaks existing behavior, so I left it.
+3. `Mash.new` allocates about 25 objects for the fixture in Duel, not 56. The two licenses' `key` fields cause warning Strings to be built even though the benchmark logger discards the warnings.
+4. `dig` with `map!` saves two objects, but Duel found the `[]` and `dig` benchmark 12% slower under YJIT. I left `method_missing`'s `*args` too: the setter needs the argument, and a fixed arity would reject the extra arguments it accepts today.
+```
+
+## Astra: approve 1af7ad9a203fef81be51abb46869eabf6db5d34e (2026-11-27)
+
+Final pass by `T-01a21ea6-c103-7055-b928-054d2f8d8df1`: **approve the code, title, current body and exact reply draft introduced by Lowrail b7ea02a8; no must-fix remains.** This supersedes the eae505a approval above, which was too permissive about the demonstrated extra `to_s` call. Thermos-sol's StrictKeyAccess example shows why preserving it matters: master raises `KeyError` naming `name2` after two conversions, eae505a names `name3` after three, and 1af7ad9 again names `name2` after two. My KeepOriginalKeys name that raises on its second conversion also matches master again, as does the mutating DefineAccessors default proc. The final branch converts a Symbol back to a mutable String when unsuffixed and reuses the already converted non-Symbol String. No new helper or shared state is involved; L0.
+
+Independently reran the 10,400-row differential on Ruby 4.0.10: byte-identical to master after the same Logger prefix normalization. The separate 4,480-case extension/subclass/frozen/name probe also matches, except for the already recorded direct String with an overridden `is_a?` that raises. That artificial introspection boundary remains accepted, not claimed identical. Targeted Mash and extension specs pass **301 examples, 0 failures**. Full `rake spec` could not load the missing `guard` dependency here; a direct full RSpec attempt likewise stopped before examples for missing `yard` and `ruby-gem-release`. These failed attempts are retained; this pass does not claim to have independently rerun the coordinator's 1,076-example full suite.
+
+Reran the six Callgrind cases on the exact final head with the same Ruby, pinned Valgrind, worker, fixed heap and retained two-master controls. Unsuffixed 16-byte Symbol is now the worst observed relative increase: **6,882.20 → 7,527.33 interpreter instructions/call (+9.37%, A/A 0%)**; the String case is **7,460.93 → 8,035.35 (+7.70%, A/A 0%)**. The four suffixed cases have exactly the eae505a counts tabulated above. The extra unsuffixed type check costs instructions even though it repairs conversion behavior; this is not a wall-time claim or a universal bound. The final allocation probe still gives stored suffix 0.999, ordinary missing suffix 4.0 and StrictKeyAccess missing suffix 8.0 objects/call. Final method metrics versus master: Flog 4.9 → 10.1, ABC 4.58 → 9, cyclomatic 2 → 4, perceived 3 → 5, length 6 → 6. The second short conditional preserves conversion count without adding layering; the higher scores are acknowledged, not treated as unchanged complexity.
+
+Read the completed Duel run **46063675164** for fork PR 26. It runs the benchmark wrapper head `0e7794cfd9a9be82f5f2ad3f3bd1ae13b04e6f6c`, not the literal reviewed commit; fetched `lib/hashie/mash.rb` and verified it byte-identical to 1af7ad9. Both YJIT and ZJIT finish with 27 benchmarks, **0 regressed, 0 errors, 0 unsettled**. Both confirm 16 → 13, 5 → 4 and 6 → 5 allocations; suffix-read CPU ratios are 1.006 (YJIT) and 0.979 (ZJIT), both `same`. The new nested-fixture counts are 25.35 and 25.64 respectively, consistent with the reply's approximate 25. The earlier dup/dig evidence and project currency checks above remain the basis for the other claims.
+
+**Exact text approval:** the four-point reply under “Reply draft to dblock” is identical to the approved block above and to b7ea02a8. SHA-256 of its contents, including the trailing newline: `42d0e6df51851d656b8691903b4440ed06d2e0a863207da61b26b29607c193c1`. Keep `#661` as requested; it must identify the actual opened HM2 PR before this reply is posted. No replacement wording is requested. Posting still requires thermos-sol's approval of these exact words. This review posted nothing upstream.
+
+Final-head raw evidence and probes: [astra-1af7ad9.tar.gz](astra-1af7ad9.tar.gz), supplementing [astra-eae505a.tar.gz](astra-eae505a.tar.gz). Includes final differential outputs, conversion repros, specs (successful targeted and blocked full attempts), instructions, allocation counts, metrics, reviewed patch and reply, and the complete final Duel log plus wrapper comparison.
