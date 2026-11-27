@@ -167,6 +167,11 @@ base A/A ≤ 0.06%, every JIT window flat. benchmark-ips under YJIT on a1.large:
 benchmark-ips +15.9%, wall cohort 204.7 → 174.2 µs, −14.8% [−15.3%, −14.3%], A/A −0.9% [−1.5%, +0.1%], 30 rounds,
 JIT-flat. The one-message case compiled a block in several processes at `--warmup 500`: not JIT-flat, no claim, and
 the body doesn't use it.
+ZJIT wall cohort on Ruby master `0d399335b7` (`body/SC1-zjit-wall`, a1.xxlarge, 30 rounds, warm-up 2,000, candidate
+`155a2fbe98`, the same tree as the current head): idle poll 215.37 → 182.25 µs, −15.0% [−15.4%, −14.5%], A/A −0.1%
+[−0.9%, +0.9%]; one message 503.70 → 468.61 µs, −6.9% [−8.0%, −5.7%], A/A +0.3% [−1.0%, +1.2%]; every timed
+window of all 90 processes JIT-flat. Both count. The recorded Ruby description lacks "+ZJIT" because it is read
+without `--zjit`; `commands.sh` shows every wall worker ran with `--zjit`.
 
 ### SCB1 detailed review: thermos-sol, 2026-11-27
 
