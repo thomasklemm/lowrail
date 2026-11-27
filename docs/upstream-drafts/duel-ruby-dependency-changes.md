@@ -59,3 +59,13 @@ Verdict: changes to Astra's replacement at `3c1a25e3`; title approved. Applied b
 * Rechecked every other sentence against source and archived runs. Reran both tally scripts; the retained table cells match, as do the 3–7% observations, counter failures, tighter Callgrind intervals, differing JIT modes and absence of small-slowdown plants. All 108 summaries in the six requested CPU cohorts match their archived raw final reports.
 * Both Duel pins reproduced the Gemfile-only skip at Hashie `be311bbf4b`; a live worker probe confirmed separate library trees with the inherited Gemfile, then per-version Gemfiles through preparation. Code/docs support the combined-example request, not an unsupported-feature claim.
 * Unauthenticated API reads verified all link targets: the exact `a09111ec` docs file contains `Prepare each version`; the Hashie tree pin exists; fork PRs contain the controls/plants; the Hashie PR adds Duel; the open read-fix PR is #9. Direct HTML requests timed out, but the public API content was accessible. No additional body changes were needed.
+
+## Confirmation — 2026-11-27
+
+Verdict: approve the exact title and body from `0e1d2b11`, unchanged. Reviewed directly, without delegates;
+Thomas still approves posting. Checked all 55 archived A/A logs behind the table: round 1's 25 runs explicitly
+say two benchmarks at a time and 12 workers per version; rounds 7/7p12/8 say one at a time and 24/12/24 workers.
+All report Ruby 4.0.10 with YJIT. GitHub API reads of `.duel.rb` at the four cohorts' recorded aa-1 heads confirm
+`c.warm = 2`, with CPU limit 1.05 in round 8. Reran the four cohort tallies; table totals agree. The four raw
+round-8 plant logs confirm two runs per plant: 13 allocation regressions in each allocation run and four CPU
+regressions in each CPU run, all with zero errors. Both clarifications are accurate; no replacement needed.
