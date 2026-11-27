@@ -1,0 +1,15 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+              find, miss     5.737k i/100ms
+               find, hit     8.022k i/100ms
+where with 3 binds, miss     3.455k i/100ms
+ where with 3 binds, hit     4.473k i/100ms
+Calculating -------------------------------------
+              find, miss     60.894k (± 5.4%) i/s   (16.42 μs/i) -    304.061k in   4.993309s
+jit find, miss	compiled_iseq_count=959>959 compiled_block_count=13759>13759 invalidation_count=296>296
+               find, hit     80.410k (± 8.0%) i/s   (12.44 μs/i) -    409.122k in   5.087955s
+jit find, hit	compiled_iseq_count=963>963 compiled_block_count=13784>13784 invalidation_count=296>296
+where with 3 binds, miss     32.012k (± 8.1%) i/s   (31.24 μs/i) -    162.385k in   5.072593s
+jit where with 3 binds, miss	compiled_iseq_count=963>963 compiled_block_count=13786>13821 invalidation_count=296>296
+ where with 3 binds, hit     43.001k (± 5.7%) i/s   (23.26 μs/i) -    214.704k in   4.993030s
+jit where with 3 binds, hit	compiled_iseq_count=963>963 compiled_block_count=13821>13821 invalidation_count=296>296

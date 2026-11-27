@@ -1,0 +1,4 @@
+calibrate find, miss	1.5802260000000068e-05
+calibrate find, hit	1.2600941333333301e-05
+calibrate where with 3 binds, miss	3.0341982333333444e-05
+calibrate where with 3 binds, hit	2.0669032999999893e-05

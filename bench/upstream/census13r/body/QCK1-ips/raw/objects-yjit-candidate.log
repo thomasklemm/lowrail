@@ -1,0 +1,4 @@
+objects find, miss	51.999
+objects find, hit	38.0
+objects where with 3 binds, miss	93.0
+objects where with 3 binds, hit	79.0
