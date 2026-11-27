@@ -12,7 +12,7 @@ built_on: "48cda77031"
 depends_on: []
 stacked_on:
 alternative_of:
-evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz]
+evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-timing-body-2026-11-27.tar.gz]
 impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
@@ -234,6 +234,24 @@ passes:
       apply to this identical tree. This confirm adds no new performance, master/ZJIT or TruffleRuby run.
       Outgoing body SHA256 27c9301a17648b0a7f954db85187d9a505e2c0b904a05e92bf8df07cee469566 at Lowrail 4f0a4011.
       Sources, outputs, body and commit/tree receipts: bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz.
+  - reviewer: astra
+    head: "c43954fa4d2a7605e18ecc8968c1aa188eae549a"
+    orb: T-01a21e96-8207-76d7-8f64-404eb741d298
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None. Body-only confirm of 5bfaa607, unchanged at Lowrail 25ef284a; remote head remains c43954f.
+      Outgoing body SHA256 ee24e4611e2772bb5aa0eb84e1ca3036f47ba38279226270851a5f72e30be738.
+      All eight benchmark-ips cells match raw best-of-three logs in UR1-cecaed1-4010-time, averaging the two
+      base maxima; A/A is 0.15%-3.09%, below each claimed gain. Recomputed the eight YJIT/ZJIT 30-round point
+      estimates from raw samples in UR1-cecaed1-{4010,master}-time; reductions span 25.045%-80.388%, correctly
+      rounded to 25%-80%. Raw samples match stored rounds, all stored A/A intervals include zero and change
+      intervals exclude zero; all 720 case/process JIT counter reports are flat. These cohorts use thread CPU
+      time with GC off, as the tool documents; the body says time per call, not request latency or GC-on time.
+      Raw object logs confirm 4/7/8/7 to 3/2/2/2 for the four inputs. Each comparison uses one Ruby pin and
+      measured cecaed1's tree is identical to the approved head. Code, exception sentence, caller links and
+      order are unchanged; no new runtime tests or measurements were run. Checker, output and exact body:
+      bench/upstream/outside_leads/ur1/astra-timing-body-2026-11-27.tar.gz.
 ---
 
 # Decode www-form components with cgi/escape
