@@ -1,0 +1,31 @@
+L6-2026-11-27
+  interp update! of one column: verified [1456028.4, 1395418.325, 1456243.765]; delta=-4.1698%; A/A=0.0148%; claim=true; JIT-flat=nil
+  interp find, then changed?: verified [711899.93, 681893.445, 712176.74]; delta=-4.2336%; A/A=0.0389%; claim=true; JIT-flat=nil
+  interp serializable_hash: verified [191496.055, 178770.565, 191304.055]; delta=-6.5985%; A/A=0.1003%; claim=true; JIT-flat=nil
+  yjit update! of one column: verified [686369.38, 670800.675, 684922.435]; delta=-2.1651%; A/A=0.211%; claim=true; JIT-flat=true
+  yjit find, then changed?: verified [360074.47, 351096.305, 359534.715]; delta=-2.4203%; A/A=0.15%; claim=true; JIT-flat=true
+  yjit serializable_hash: verified [196390.67, 191767.99, 193990.855]; delta=-1.7536%; A/A=1.2295%; claim=true; JIT-flat=true
+  objects interp update! of one column: [207.987, 207.987, 207.999]
+  objects interp find, then changed?: [90.0, 90.0, 90.0]
+  objects interp serializable_hash: [32.0, 32.0, 32.0]
+  objects yjit update! of one column: [209.963, 209.999, 209.999]
+  objects yjit find, then changed?: [90.0, 90.0, 90.0]
+  objects yjit serializable_hash: [32.0, 32.0, 32.0]
+L6-w102-2026-11-27
+  interp update! of one column: verified [2460519.08, 2269275.57, 2460159.33]; delta=-7.7657%; A/A=0.0146%; claim=true; JIT-flat=nil
+  interp find, then changed?: verified [1832221.32, 1731696.84, 1832822.67]; delta=-5.502%; A/A=0.0328%; claim=true; JIT-flat=nil
+  interp serializable_hash: verified [642848.81, 601182.6, 643025.72]; delta=-6.4944%; A/A=0.0275%; claim=true; JIT-flat=nil
+  objects interp update! of one column: [279.987, 279.975, 279.975]
+  objects interp find, then changed?: [186.0, 186.0, 186.0]
+  objects interp serializable_hash: [104.0, 104.0, 104.0]
+L6-master-zjit-2026-11-27
+  zjit update! of one column: verified [665124.105, 652541.99, 664982.36]; delta=-1.8812%; A/A=0.0213%; claim=false; JIT-flat=false
+  zjit find, then changed?: verified [281738.88, 277680.755, 281082.185]; delta=-1.3254%; A/A=0.2334%; claim=false; JIT-flat=false
+  zjit serializable_hash: verified [124742.595, 126140.68, 123937.32]; delta=1.4482%; A/A=0.6476%; claim=false; JIT-flat=false
+  objects zjit update! of one column: [209.975, 209.987, 210.011]
+  objects zjit find, then changed?: [88.0, 88.0, 88.0]
+  objects zjit serializable_hash: [32.0, 32.0, 32.0]
+L6-master-zjit-serializable-hash-2026-11-27
+  zjit serializable_hash: verified [125194.052, 123884.114, 125111.31]; delta=-1.0136%; A/A=0.0661%; claim=false; JIT-flat=false
+  objects zjit serializable_hash: [31.999, 31.999, 31.999]
+ALL_ARCHIVED_TOTALS_MATCH
