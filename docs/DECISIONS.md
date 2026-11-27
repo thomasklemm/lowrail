@@ -210,6 +210,14 @@ column, row, link and sentence: would the reader miss it? If not, drop it. Bodie
   the most used first, and name a few strong ones rather than a long list.
 * **Maintainers can edit our branches** (2026-11-06): "Allow edits by maintainers" on (`script/pr-queue open` sets
   it); our forks hold no Actions secrets.
+* **A clear PR before a ticket** (Thomas, 2026-11-27): a fix PR whose body carries the repro, actual and expected
+  output and the versions tested replaces a separate issue or Redmine ticket, which only adds mail. Prefer it when the
+  expected behaviour is settled by docs, tests or an earlier ticket, and the fix is small, one concern and verified.
+  Draft a ticket (for Thomas) instead when the right behaviour is a question for the maintainers, the change is a
+  language or API behaviour change (ruby/ruby wants those discussed on Redmine), the fix is large or reaches into the
+  design, or there is no fix yet. A crash goes either way by the same test; anything that could be a security issue
+  follows the project's security policy, never a public PR or ticket. No fixed size limit: record which path each
+  item took and how maintainers answered in the item, and adjust this rule from that.
 * **Fix the shared helper, write code like a person would** (Thomas, 2026-11-27, after ruby/uri#276): when the
   avoidable work sits in a helper that several callers share, improve the helper so every caller gains, instead of
   special-casing one public method or copying the helper's checks into it. The result should read like code the
