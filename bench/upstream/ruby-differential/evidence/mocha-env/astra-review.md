@@ -61,3 +61,13 @@ Added comment lines were checked: the frozen-string directive and `@private` tag
 Exactness checklist: singleton/private/prepended behavior, subclasses/conversions, added dispatch, frozen objects, standalone API loading and lifecycle ordering were exercised. No caller-produced collection is adopted or iterated by the change; those copying/live-iteration checks are inapplicable. Fiber suspension and resumed lookup were checked. The only new user-dispatch difference found is the excluded helper override. No existing public contract was relaxed to obtain passing results.
 
 No Sure or Capistrano full application suite, older Ruby release, stress/concurrency-safety proof, or performance benchmark was run in this review. The claims above are limited to the exact two Ruby pins and scenarios retained here.
+
+## Limited confirmation of 2db1c86782, 2026-11-27
+
+Verdict: **changes**, solely for the remaining release names in the body link labels. Inspected Lowrail main `0db89ae4` and its regenerated patch for `2db1c867821c6ea4af94348c772afacd62c6e519`; no broader review or suite rerun was requested or performed.
+
+* Applied the new patch with `/usr/bin/git am` in a new worktree on base `99da677165`. `git diff --exit-code 3d3f63b4c136e807c6f532f97fc90794080ba364 HEAD` exited 0, and `git log -1 --format=%T` returned the previously tested tree `b415c4733d630d458bf9be4ccfe889851ff63ac1`. The applied commit has a local committer timestamp, not the signed upstream candidate's hash; code confirmation is by the supplied patch and matching tree.
+* Compared messages with `git show -s --format=%B`: identical after removing the old Amp trailer and trailing blank lines. `git show -s --format='%(trailers:only)'` is empty. The regenerated patch differs only in its head header and removal of that trailer.
+* Fetched both new raw URLs again with `curl -fsSL`, selecting Capistrano lines 275–276 and Sure lines 359–360 with `sed -n`. Both contain the cited `ENV.stubs(:[])` calls. Their SHAs are the latest-release commits verified in the first pass, and Capistrano now appears first.
+* The universal-equivalence sentence is absent and `risky` is true.
+* **Remaining:** public body labels are still `[Capistrano]` and `[Sure]`. Change them to `[Capistrano 3.20.1]` and `[Sure v0.7.6-hotfix.2]`, leaving the verified URLs unchanged. DECISIONS explicitly requires the version in the link text; recording versions only in the internal note does not satisfy that part of the prior finding. This is body-only and does not require another code head or suite run.
