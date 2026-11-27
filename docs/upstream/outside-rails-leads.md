@@ -617,3 +617,10 @@ guard. The RDoc is unchanged from base, and a test checks that a GB18030 string 
   −5.58% (0.51%), GET article −0.95% (0.05%). ZJIT on master: blog PATCH −4.46% (0.92%), GET article −0.95% (0.09%),
   JSON control −0.01% (0.03%). In the ZJIT runs no window compiled an ISEQ or a side exit; master has no
   `invalidation_count`. The earlier request table above prices the guarded `a3b201f05b` and is historical.
+
+**Final UR1 head `c43954f` (2026-11-27).** It has the same tree as `cecaed1`. thermos-sol and Astra both approve it,
+with the timing-led body. On a1.xxlarge (`body/UR1-cecaed1-*-time`): interpreter benchmark-ips +40% to +321%, YJIT
+wall −35% to −80%, ZJIT master wall −25% to −79%. Every A/A interval contains 0, and every window is JIT-flat. One
+difference is accepted and disclosed: on JRuby 9.4, whose `String#b` keeps a String subclass, a subclass input with
+nothing to decode returns that subclass. `.to_s` was tried (`545506a`) and dropped, because it doesn't help
+SafeBuffer and calls an overridable `to_s`. Waiting for Thomas: ruby/uri is a ruby-org repository and parked.

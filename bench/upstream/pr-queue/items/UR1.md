@@ -16,7 +16,7 @@ evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/up
 impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
-state: built
+state: reviewed
 pr:
 ownership: {date: 2026-11-27, checked: ["open ruby/uri PRs touching lib/uri/common.rb decode/encode (none change the method; #253 and #264 only change MailTo callers of it, #269 is URI.for/parse, #274 a WHATWG parser)", "ruby/uri commits on common.rb since 2025 (none on _decode_uri_component)", "rack/rack#2557 (ours) moves Rack off this method; Rails' QueryParser still calls it"], hits: []}
 note: >-
@@ -104,7 +104,13 @@ note: >-
   master wall -25.0% / -69.6% / -78.7% / -54.1%. Every A/A interval contains 0, and the runs
   are JIT-flat in 90 processes per cell. On a3b201f05b, YJIT cookie failed its A/A (no claim, recorded). Body now
   leads with the ips table; the JIT sentence covers the 25-80% range of both wall cohorts; the instruction table
-  stays in the record. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  stays in the record.
+  2026-11-27 final: thermos-sol and Astra both approve c43954f with the timing-led body (5bfaa607), no open
+  findings. Accepted boundaries: JRuby 9.4 subclass class (disclosed in body and commit; the subclass assertion fails
+  there, and ruby/uri's CI runs JRuby 10), prepends on CGI.unescape or the private URI._decode_uri_component, a
+  frozen singleton CGI result, and cgi/escape loading when uri loads (CGI defined earlier). Worst size-sweep row: 8 MiB
+  unescaped, -13.6% instructions. Fork CI green on the exact head. Not opened: ruby/uri is a ruby-org repository
+  and parked (DECISIONS, Bets); Thomas decides whether to open it. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes:
   - reviewer: astra
