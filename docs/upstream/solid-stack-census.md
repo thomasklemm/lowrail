@@ -144,6 +144,17 @@ connection.\"
 * solid_cable's suite: 47 runs, 0 failures on the branch with SQLite, PostgreSQL, Rails 7.2 and Rails main (and
   on main with SQLite and PostgreSQL).
 
+**Shared-helper check** (DECISIONS 2026-11-27, "Fix the shared helper"). The query-cache work comes from Active
+Record's executor hook, which turns the cache on for every pool in every executor run; that is right for requests,
+so the fix belongs with the poll loop that can never hit it, not in Rails. In solid_cable, `listen` is the only
+poll loop and `broadcast_messages` has no other caller, so SCB1 is in the one shared place; it copies no helper
+logic and adds no one-caller fast path. The other poll loops in the stack, Solid Queue's `Poller` (shared by the
+worker and dispatcher), gain nothing from the same change: their claim and dispatch queries lock (`FOR UPDATE`),
+which already skips the cache, and the `Pause` pluck has no binds. Measured on Rails main with the same harness,
+polls wrapped in `SolidQueue::Record.uncached`, two runs per side: worker `*` 580,017 / 580,724 → 588,959 / 589,918
+Ir (+1.5%), seven queues 2,579,393 / 2,580,535 → 2,569,004 / 2,572,378 (−0.4%), dispatcher 639,907 / 699,940 →
+722,267 / 648,882 (inside its spread). Not built.
+
 **Body numbers:** `bench/upstream/solid_stack/body/SC1` (Ruby 4.0.10, released Rails 8.1.4.1, interpreter, YJIT,
 benchmark-ips) and `body/SC1-zjit` (Ruby master `0d399335b7`, ZJIT). Idle poll with 20 streams: −14.5% instructions
 without a JIT, −23.2% YJIT, −23.7% ZJIT on master, 3 fewer objects; one new message −8.9% / −13.8% / −13.9%. Every
