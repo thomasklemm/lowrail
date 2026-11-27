@@ -1,0 +1,4 @@
+Comparing 1 benchmark, 1 at a time: baseline /home/user/workspace/repos/.df445 against candidate /home/user/workspace/repos/hashie (slower: a 99.0% interval above 1.02, over 24 worker processes of each version)
+  Mash.new: a flat Hash                              5.5s n=2180   cpu 0.988 [0.975, 0.995] same  allocations 3
+
+1 benchmark in 13s: 0 regressed, 0 errors, 0 with a timing too close to the limit to settle
