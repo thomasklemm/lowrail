@@ -1,0 +1,21 @@
+PATH
+  remote: /home/user/w/uri-cecaed1
+  specs:
+    uri (1.1.2)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  uri!
+
+CHECKSUMS
+  uri (1.1.2)
+
+BUNDLED WITH
+  4.1.1

@@ -1,0 +1,11 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               hello   333.519k i/100ms
+            form key   232.602k i/100ms
+          form value   255.149k i/100ms
+              cookie   103.243k i/100ms
+Calculating -------------------------------------
+               hello      3.353M (± 7.7%) i/s  (298.25 ns/i) -     17.009M in   5.073073s
+            form key      2.472M (± 4.6%) i/s  (404.48 ns/i) -     12.561M in   5.080419s
+          form value      2.698M (± 6.7%) i/s  (370.62 ns/i) -     13.523M in   5.011837s
+              cookie      1.084M (± 4.8%) i/s  (922.09 ns/i) -      5.472M in   5.045548s
