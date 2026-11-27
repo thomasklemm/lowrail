@@ -31,6 +31,7 @@ passes:
   - {reviewer: astra, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: changes, open: "R1 replace the proposed PR body with the approved 121-word text in the Astra ready review; no code must-fixes"}
   - {reviewer: astra, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21d2c-7be4-7084-a4e4-04d198283cc7, verdict: approve, open: none}
   - {reviewer: thermos-sol, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: approve, open: "none; exact posted 121-word body approved, identified in Thermos-sol body confirm below"}
+  - {reviewer: thermos-sol, head: "be311bbf4b0571d71481579f5c4e7aa27e704a01", date: 2026-11-27, orb: T-01a21cc1-195d-7700-b396-5e0bce5aa401, verdict: approve, open: "none; Astra's exact two-sentence ready-comment replacement and pre-merge audit approved below; no further Hashie commit needed"}
 ---
 
 # Add Duel performance regression guards
@@ -470,3 +471,24 @@ It's ready for review now. The code is unchanged since your comment; I've only s
 Fresh `gh pr view` confirms ready state, the unchanged `be311bbf4b0571d71481579f5c4e7aa27e704a01` head, exactly `bcf21e7` plus `be311bb`, and sixteen successful check runs. Read dblock's comment `7219255600` at 13:15:38 UTC and our preceding 11:55:48 comment naming this head and its settings; the head's checks began at 11:48, before both. The timeline records ready-for-review at 13:36. Thus the reply correctly distinguishes the description edit from code already present when dblock commented; it contains no thanks, ping, new performance claim or internal process detail.
 
 Rechecked the pre-merge note against the exact sources: numbered CHANGELOG entry under Added preserves the placeholder and matches the release script's categories; CONTRIBUTING provides the separate-bundle install/run commands on Ruby >=3.4; Perf uses `pull_request`, contents/PR read, no passed/inherited user secrets, and a separate fixed reporting workflow that executes no PR code. This means no user-provisioned secret is needed, not that the job has no built-in GitHub token or that repository fork-approval policies cannot apply. Duel's pinned reusable measurement job defaults `timeout-minutes` to 60 and Hashie does not override it; the recorded 606-second regression job is about ten minutes, not a universal upper bound. RubyGems still reports 0.3.1 as Duel's current release. Prior code/body approvals and execution evidence stand; no new test or timing run is warranted. Only this note was added; no upstream post, edit or workflow rerun was made.
+
+### Thermos-sol ready-comment and pre-merge confirm — 2026-11-27 (be311bb)
+
+**Verdict: approve Astra's exact replacement; audit confirmed, no further Hashie commit needed.** No open must-fix or alternative text. The approved comment is:
+
+```text
+It's ready for review now. The code is unchanged since your comment; I've only shortened the description.
+```
+
+Checked personally under both rubrics. `gh pr view 659 -R hashie/hashie` confirms ready state and unchanged `be311bbf4b0571d71481579f5c4e7aa27e704a01`. Read comment `7219255600` directly: dblock wrote at 13:15:38 UTC, after our 11:55:48 comment and the successful exact-head Perf run that began at 11:48. GitHub GraphQL `lastEditedAt`/`userContentEdits(first:2)` shows the only later body revision at 13:31:11, shortening 208 words to the current 121; the timeline records ready at 13:36. Thus both sentences are supported. They answer the request without thanks, pings, redundant calibration or the unsupported necessity claim about 24 workers. The commit check-runs API returns sixteen successes; `gh pr checks` deduplicates these to fourteen current names, not sixteen independent gates.
+
+Rechecked all six audit points against the exact checkout, pinned Duel source and live APIs:
+
+* **CHANGELOG:** #659 is under Added, with the placeholder retained. Existing CI/tooling entries use Added; `script/release_preparation.rb` has six categories and no Miscellaneous. The CONTRIBUTING prose's Miscellaneous suggestion does not warrant changing this established arrangement.
+* **Local commands:** CONTRIBUTING's Benchmark section supplies the separate `BUNDLE_GEMFILE=gemfiles/duel.gemfile` install/run commands, Ruby >=3.4 requirement and supported base/filter/JSON options. Earlier executed local checks stand.
+* **Fork permissions/secrets:** Perf is `pull_request` with contents/PR read and no passed/inherited user secrets. Its completed upstream run identifies `thomasklemm/hashie` as the head repository. No user-provisioned secret is required; the built-in GitHub token and possible fork-approval policy still exist. Fixed reporting/label jobs execute no PR code.
+* **Timeout:** pinned `.github/workflows/duel.yml` defaults `timeout-minutes` to 60 and Hashie does not override it. Scanning all 164 archived Duel-job metadata records gives a 606-second maximum. This supports the approximately ten-minute observation, not a future runtime bound.
+* **Release:** a fresh RubyGems API read still gives Duel 0.3.1, matching the optional Gemfile and pinned reusable workflows.
+* **History:** live PR commits and `git rev-list --reverse 812c48ca7b..be311bb` agree: exactly `bcf21e7` then `be311bb`, with those exact parent links and no rebase needed at the checked base.
+
+This confirm preserves the ready state, live head, body and prior reports. No new suite/timing run, Hashie edit/push, upstream comment or workflow rerun was performed.
