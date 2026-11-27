@@ -1,6 +1,6 @@
 # ruby/rubygems issue: autoswitch to Bundler < 4.0.12 fails on Ruby 4.1 (SEP1)
 
-**Draft only. Nothing is posted until Thomas approves the exact text.** Issue only, no PR. Queue item
+**Parked, not posted (Thomas, 2026-11-27):** hsbt [asked to end the discussion](https://github.com/ruby/ruby/pull/16909#issuecomment-7228959325) and plans the autoswitch change for Bundler 4.2. Kept as our own record; the thermos-sol and Astra passes were stopped before a verdict, so this text is unapproved. Issue only, no PR. Queue item
 [SEP1](../../bench/upstream/pr-queue/items/SEP1.md); background in
 [ruby41-gem-differential.md, SEP1](../upstream/ruby41-gem-differential.md#sep1-pathnameseparator_pat). Evidence:
 [`evidence/separator-pat/rubygems-issue/`](../../bench/upstream/gem-differential/evidence/separator-pat/rubygems-issue).
@@ -44,19 +44,19 @@ Many repositories will hit this when they first try Ruby 4.1. The committed lock
 
 `BUNDLE_VERSION=system bundle install` (the `version` setting) avoids the switch, and `bundle _4.1.1_ update --bundler` updates the lockfile. Plain `bundle update --bundler` can fail too once the old Bundler is installed, since it restarts with that version.
 
-One way out would be not to switch to a Bundler that can't run on the current Ruby. For context, ruby/ruby#16909 keeps the constant removed, and the autoswitch change is planned for Bundler 4.2 there and in #9236.
+One way out would be not to switch to a Bundler that can't run on the current Ruby. In ruby/ruby#16909, hsbt says autoswitch changes are planned for Bundler 4.2; the constant will remain removed.
 
 ---
 
 ## Follow-up comment for ruby/ruby#16909
 
-Dropped (2026-11-27, after Astra's interim finding): hsbt replied at
+Not posted (2026-11-27, after Astra's interim finding; revisit with the item): hsbt replied at
 https://github.com/ruby/ruby/pull/16909#issuecomment-7228959325 (22:01 UTC) that the earlier comment was wrong, the
 autoswitch change is planned for Bundler 4.2, not 4.1, the usual path is updating `BUNDLED WITH` to a recent 4.0.x
 on Ruby 4.0 before moving to 4.1, the constant stays removed, and he'd like to end the discussion there. No further
 comment on #16909.
 
-**Recommendation: hold the issue.** The rubygems maintainer has now said in public that the autoswitch changes in
+**Parked (Thomas, 2026-11-27).** Revisit when Bundler 4.2 changes the autoswitch or when Ruby 4.1.0 ships, whichever comes first: then check whether hsbt's change (or Ruby 4.1.0 with its bundled Bundler) still fails on lockfiles from Bundler < 4.0.12 with PATH/GIT sections (repros/autoswitch_matrix.sh, the 11 gem repos and 3 apps in evidence/separator-pat/rubygems-issue). Why not now: The rubygems maintainer has now said in public that the autoswitch changes in
 4.2 and that projects should update `BUNDLED WITH` before moving to Ruby 4.1. A new issue would ask him the same
 question again right after he closed the discussion. If Thomas still wants it, the text above is the corrected
 draft; its remaining value is the evidence that Bundler 4.1 users on Ruby 4.1 get a crash with an error report
