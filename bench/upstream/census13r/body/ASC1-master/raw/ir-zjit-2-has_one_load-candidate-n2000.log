@@ -1,1 +1,0 @@
-jit has_one load	compiled_iseq_count=825>825 failed_iseq_count=0>0 compiled_side_exit_count=14505>14505 invalidation_time_ns=82183112>82183112

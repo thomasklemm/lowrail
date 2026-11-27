@@ -1,0 +1,1 @@
+jit where with 3 binds, miss	compiled_iseq_count=723>723 failed_iseq_count=0>0 compiled_side_exit_count=12801>12801 invalidation_time_ns=72668964>72668964
