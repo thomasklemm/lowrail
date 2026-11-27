@@ -1,0 +1,24 @@
+3.4.13 prism none: {b: 2, a: 1}
+3.4.13 prism literal: k.rb:3:in '<main>': undefined method 'core#hash_merge_ptr' for an instance of Hash (NoMethodError)
+3.4.13 prism experimental_everything: k.rb:3:in '<main>': undefined method 'core#hash_merge_ptr' for an instance of Hash (NoMethodError)
+3.4.13 prism experimental_copy: k.rb:3:in '<main>': undefined method 'core#hash_merge_ptr' for an instance of Hash (NoMethodError)
+3.4.13 parse.y none: {b: 2, a: 1}
+3.4.13 parse.y literal: k.rb:3:in 'ensure_shareable': cannot assign unshareable object to X (Ractor::IsolationError)
+3.4.13 parse.y experimental_everything: {b: 2, a: 1}
+3.4.13 parse.y experimental_copy: {b: 2, a: 1}
+4.0.10 prism none: {b: 2, a: 1}
+4.0.10 prism literal: k.rb:3:in '<main>': undefined method 'core#hash_merge_ptr' for an instance of Hash (NoMethodError)
+4.0.10 prism experimental_everything: k.rb:3:in '<main>': undefined method 'core#hash_merge_ptr' for an instance of Hash (NoMethodError)
+4.0.10 prism experimental_copy: k.rb:3:in '<main>': undefined method 'core#hash_merge_ptr' for an instance of Hash (NoMethodError)
+4.0.10 parse.y none: {b: 2, a: 1}
+4.0.10 parse.y literal: k.rb:3:in 'RubyVM::FrozenCore.ensure_shareable': cannot assign unshareable object to X (Ractor::IsolationError)
+4.0.10 parse.y experimental_everything: {b: 2, a: 1}
+4.0.10 parse.y experimental_copy: {b: 2, a: 1}
+4.1.0 prism none: {b: 2, a: 1}
+4.1.0 prism literal: k.rb:3:in '<main>': undefined method 'core#hash_merge_bang_ptr' for an instance of Hash (NoMethodError)
+4.1.0 prism experimental_everything: k.rb:3:in '<main>': undefined method 'core#hash_merge_bang_ptr' for an instance of Hash (NoMethodError)
+4.1.0 prism experimental_copy: k.rb:3:in '<main>': undefined method 'core#hash_merge_bang_ptr' for an instance of Hash (NoMethodError)
+4.1.0 parse.y none: {b: 2, a: 1}
+4.1.0 parse.y literal: k.rb:3:in 'RubyVM::FrozenCore.ensure_shareable': cannot assign unshareable object to X (Ractor::IsolationError)
+4.1.0 parse.y experimental_everything: {b: 2, a: 1}
+4.1.0 parse.y experimental_copy: {b: 2, a: 1}

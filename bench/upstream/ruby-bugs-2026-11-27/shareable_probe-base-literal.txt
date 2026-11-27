@@ -1,0 +1,15 @@
+literal pairs: Ractor::IsolationError: cannot assign unshareable object to X
+literal pair_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal splat_pair: Ractor::IsolationError: cannot assign unshareable object to X
+literal pair_splat_pair: Ractor::IsolationError: cannot assign unshareable object to X
+literal splat_splat_pair: Ractor::IsolationError: cannot assign unshareable object to X
+literal splat_pair_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal dup_key: Ractor::IsolationError: cannot assign unshareable object to X
+literal nil_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal empty_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal nested: Ractor::IsolationError: cannot assign unshareable object to X
+literal big: Ractor::IsolationError: cannot assign unshareable object to X
+literal big_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal literal_val: Ractor::IsolationError: cannot assign unshareable object to X
+literal const_splat: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+literal string_val: Ractor::IsolationError: cannot assign unshareable object to X

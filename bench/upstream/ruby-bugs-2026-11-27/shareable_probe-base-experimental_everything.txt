@@ -1,0 +1,15 @@
+experimental_everything pairs: [{a: "v1", b: "v2"}, [1, 2], true, true, nil]
+experimental_everything pair_splat: [{a: "v1", k2: 2}, [1, -2], true, true, nil]
+experimental_everything splat_pair: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything pair_splat_pair: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything splat_splat_pair: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything splat_pair_splat: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything dup_key: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything nil_splat: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything empty_splat: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything nested: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything big: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything big_splat: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything literal_val: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything const_splat: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash
+experimental_everything string_val: NoMethodError: undefined method 'core#hash_merge_bang_ptr' for an instance of Hash

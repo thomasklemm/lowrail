@@ -1,0 +1,8 @@
+
+# Running tests:
+
+Finished tests in 18.095137s, 40.5081 tests/s, 435.5866 assertions/s.
+733 tests, 7882 assertions, 0 failures, 0 errors, 1 skips
+
+ruby -v: ruby 4.1.0dev (2026-11-27T20:40:40Z fix-unused-module-refinement-funcall 333ec5b187) +YJIT +PRISM [x86_64-linux]
+rc=0

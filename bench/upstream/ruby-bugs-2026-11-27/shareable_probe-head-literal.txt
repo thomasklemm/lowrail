@@ -1,0 +1,15 @@
+literal pairs: Ractor::IsolationError: cannot assign unshareable object to X
+literal pair_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal splat_pair: Ractor::IsolationError: cannot assign unshareable object to X
+literal pair_splat_pair: Ractor::IsolationError: cannot assign unshareable object to X
+literal splat_splat_pair: Ractor::IsolationError: cannot assign unshareable object to X
+literal splat_pair_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal dup_key: Ractor::IsolationError: cannot assign unshareable object to X
+literal nil_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal empty_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal nested: Ractor::IsolationError: cannot assign unshareable object to X
+literal big: Ractor::IsolationError: cannot assign unshareable object to X
+literal big_splat: Ractor::IsolationError: cannot assign unshareable object to X
+literal literal_val: Ractor::IsolationError: cannot assign unshareable object to X
+literal const_splat: [{b: 2, a: 1}, [], true, true, nil]
+literal string_val: Ractor::IsolationError: cannot assign unshareable object to X

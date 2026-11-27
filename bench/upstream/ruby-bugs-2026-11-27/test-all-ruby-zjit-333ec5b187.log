@@ -1,0 +1,293 @@
+generating x86_64-linux-fake.rb
+x86_64-linux-fake.rb updated
+	BASERUBY = /home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby --disable=gems
+	CC = gcc
+	LD = ld
+	LDSHARED = gcc -shared
+	CFLAGS = -fstack-protector-strong -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2  -O3 -fno-fast-math -ggdb3 -Wall -Wextra -Wdeprecated-declarations -Wdiv-by-zero -Wduplicated-cond -Wimplicit-function-declaration -Wimplicit-int -Wpointer-arith -Wwrite-strings -Wold-style-definition -Wimplicit-fallthrough=0 -Wmissing-noreturn -Wno-cast-function-type -Wno-long-long -Wno-missing-field-initializers -Wno-overlength-strings -Wno-packed-bitfield-compat -Wno-tautological-compare -Wno-unused-parameter -Wno-unused-value -Wsuggest-attribute=format -Wsuggest-attribute=noreturn -Wunused-variable -Wmisleading-indentation -Wundef  
+	XCFLAGS = -fno-strict-overflow -fvisibility=hidden -fexcess-precision=standard -DRUBY_EXPORT -fPIE -DPRISM_XALLOCATOR -I. -I.ext/include/x86_64-linux -I.ext/include -I/home/user/src/ruby/include -I/home/user/src/ruby -I/home/user/src/ruby/prism -I/home/user/src/ruby/enc/unicode/17.0.0   -Dmodular_gc_dir=
+	CPPFLAGS =   
+	DLDFLAGS = -Wl,--compress-debug-sections=zlib -fstack-protector-strong -pie  
+	SOLIBS = -lz -lrt -lrt -lgmp -ldl -lcrypt -lm -lpthread 
+	LANG = C.UTF-8
+	LC_ALL = 
+	LC_CTYPE = 
+	MFLAGS = 
+	RUSTC = rustc
+	YJIT_RUSTC_ARGS = --crate-name=yjit --crate-type=rlib -g -C lto=thin -C opt-level=3 -C overflow-checks=on --edition=2021 '--out-dir=/home/user/build/master/target/release/' '/home/user/src/ruby/yjit/src/lib.rs'
+	ZJIT_RUSTC_ARGS = --crate-name=zjit --crate-type=rlib -g -C lto=thin -C opt-level=3 -C overflow-checks=on --edition=2024 '--out-dir=/home/user/build/master/target/release/' '/home/user/src/ruby/zjit/src/lib.rs'
+gcc (Debian 14.2.0-19) 14.2.0
+Copyright (C) 2024 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+generating enc.mk
+making enc
+make[1]: Entering directory '/home/user/build/master'
+make[1]: Nothing to be done for 'enc'.
+make[1]: Leaving directory '/home/user/build/master'
+making srcs under enc
+make[1]: Entering directory '/home/user/build/master'
+make[1]: Nothing to be done for 'srcs'.
+make[1]: Leaving directory '/home/user/build/master'
+generating transdb.h
+transdb.h unchanged
+making trans
+make[1]: Entering directory '/home/user/build/master'
+make[1]: Nothing to be done for 'trans'.
+make[1]: Leaving directory '/home/user/build/master'
+making encs
+make[1]: Entering directory '/home/user/build/master'
+make[1]: Nothing to be done for 'encs'.
+make[1]: Leaving directory '/home/user/build/master'
+rm -rf .bundle/gems/win32ole-1.9.3/
+Update debug to 6510cfbc7496c55ebbefa437a25c17ca58f7c5eb
+echo 6510cfbc7496c55ebbefa437a25c17ca58f7c5eb | /bin/sh /home/user/src/ruby/tool/ifchange /home/user/src/ruby/.bundle/.timestamp/debug.revision -
+/home/user/src/ruby/.bundle/.timestamp/debug.revision unchanged
+generating makefiles ext/configure-ext.mk
+ext/configure-ext.mk updated
+make[1]: Entering directory '/home/user/build/master'
+make[1]: Leaving directory '/home/user/build/master'
+generating makefile exts.mk
+exts.mk unchanged
+make[1]: Entering directory '/home/user/build/master'
+make[2]: Entering directory '/home/user/build/master/ext/coverage'
+make[2]: Leaving directory '/home/user/build/master/ext/coverage'
+make[2]: Entering directory '/home/user/build/master/ext/date'
+make[2]: Leaving directory '/home/user/build/master/ext/date'
+make[2]: Entering directory '/home/user/build/master/ext/digest'
+make[2]: Leaving directory '/home/user/build/master/ext/digest'
+make[2]: Entering directory '/home/user/build/master/ext/digest/sha2'
+make[2]: Leaving directory '/home/user/build/master/ext/digest/sha2'
+make[2]: Entering directory '/home/user/build/master/ext/io/console'
+make[2]: Leaving directory '/home/user/build/master/ext/io/console'
+make[2]: Entering directory '/home/user/build/master/ext/json'
+make[2]: Leaving directory '/home/user/build/master/ext/json'
+make[2]: Entering directory '/home/user/build/master/ext/objspace'
+make[2]: Leaving directory '/home/user/build/master/ext/objspace'
+make[2]: Entering directory '/home/user/build/master/ext/openssl'
+make[2]: Leaving directory '/home/user/build/master/ext/openssl'
+make[2]: Entering directory '/home/user/build/master/ext/psych'
+make[2]: Leaving directory '/home/user/build/master/ext/psych'
+make[2]: Entering directory '/home/user/build/master/ext/pty'
+make[2]: Leaving directory '/home/user/build/master/ext/pty'
+make[2]: Entering directory '/home/user/build/master/ext/ripper'
+make[2]: Leaving directory '/home/user/build/master/ext/ripper'
+make[2]: Entering directory '/home/user/build/master/ext/rubyvm'
+make[2]: Leaving directory '/home/user/build/master/ext/rubyvm'
+make[2]: Entering directory '/home/user/build/master/ext/socket'
+make[2]: Leaving directory '/home/user/build/master/ext/socket'
+make[2]: Entering directory '/home/user/build/master/ext/strscan'
+make[2]: Leaving directory '/home/user/build/master/ext/strscan'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/bigdecimal-4.1.3/ext/bigdecimal'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/bigdecimal-4.1.3/ext/bigdecimal'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/debug-1.11.1/ext/debug'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/debug-1.11.1/ext/debug'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/fiddle-1.1.8/ext/fiddle'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/fiddle-1.1.8/ext/fiddle'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/nkf-0.3.0/ext/nkf'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/nkf-0.3.0/ext/nkf'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/prism-2.1.0/ext/prism'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/prism-2.1.0/ext/prism'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/racc-1.8.1/ext/racc/cparse'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/racc-1.8.1/ext/racc/cparse'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/rbs-4.2.0/ext/rbs_extension'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/rbs-4.2.0/ext/rbs_extension'
+make[2]: Entering directory '/home/user/build/master/.bundle/gems/syslog-0.4.0/ext/syslog'
+make[2]: Leaving directory '/home/user/build/master/.bundle/gems/syslog-0.4.0/ext/syslog'
+make[2]: Entering directory '/home/user/build/master'
+make[2]: 'ruby' is up to date.
+make[2]: Leaving directory '/home/user/build/master'
+make[1]: Leaving directory '/home/user/build/master'
+make[1]: Entering directory '/home/user/build/master'
+make[1]: Nothing to be done for 'note'.
+make[1]: Leaving directory '/home/user/build/master'
+Run options: 
+  --seed=3681
+  "--ruby=./miniruby -I/home/user/src/ruby/lib -I. -I.ext/common  /home/user/src/ruby/tool/runruby.rb --extout=.ext  -- --zjit-call-threshold=1"
+  --excludes-dir=/home/user/src/ruby/test/.excludes
+  --name=!/memory_leak/
+  -j8
+
+# Running tests:
+
+[  1/165] 463704=ruby/test_primitive
+[  2/165] 463706=ruby/test_ractor
+[  3/165] 463702=ruby/test_fnmatch
+[  4/165] 463708=ruby/test_thread
+[  5/165] 463711=ruby/test_string_memory
+[  6/165] 463705=ruby/test_unicode_escape
+[  7/165] 463709=ruby/test_float
+[  8/165] 463703=ruby/test_thread_cv
+[  9/165] 463711=ruby/test_defined
+[ 10/165] 463704=ruby/test_optimization
+[ 11/165] 463702=ruby/test_array
+[ 12/165] 463705=ruby/test_basicinstructions
+[ 13/165] 463711=ruby/test_symbol
+[ 14/165] 463705=ruby/test_default_gems
+[ 15/165] 463705=ruby/test_numeric
+[ 16/165] 463705=ruby/test_bignum
+[ 17/165] 463705=ruby/enc/test_koi8
+[ 18/165] 463705=ruby/enc/test_euc_kr
+[ 19/165] 463705=ruby/test_metaclass
+[ 20/165] 463705=ruby/test_iseq
+[ 21/165] 463703=ruby/test_object
+[ 22/165] 463711=ruby/test_sprintf_comb
+[ 23/165] 463709=ruby/test_method_cache
+[ 24/165] 463709=ruby/test_process
+[ 25/165] 463703=ruby/test_settracefunc
+[ 26/165] 463711=ruby/test_key_error
+[ 27/165] 463711=ruby/test_rubyoptions
+[ 28/165] 463705=ruby/test_rational
+[ 29/165] 463705=ruby/enc/test_euc_tw
+[ 30/165] 463705=ruby/test_dir_m17n
+[ 31/165] 463703=ruby/enc/test_grapheme_breaks
+[ 32/165] 463703=ruby/test_set
+[ 33/165] 463703=ruby/test_iterator
+[ 34/165] 463703=ruby/test_comparable
+[ 35/165] 463703=ruby/test_fiber
+[ 36/165] 463702=ruby/test_lambda
+[ 37/165] 463702=ruby/test_io_timeout
+[ 38/165] 463705=ruby/test_regexp
+[ 39/165] 463702=ruby/test_variable
+[ 40/165] 463702=ruby/test_random_formatter
+[ 41/165] 463702=ruby/test_literal
+[ 42/165] 463702=ruby/test_path
+[ 43/165] 463702=ruby/test_rational2
+[ 44/165] 463702=ruby/test_threadgroup
+[ 45/165] 463704=ruby/enc/test_iso_8859
+[ 46/165] 463704=ruby/test_warning
+[ 47/165] 463704=ruby/enc/test_gbk
+[ 48/165] 463704=ruby/test_ast
+[ 49/165] 463702=ruby/test_flip
+[ 50/165] 463702=ruby/test_dup
+[ 51/165] 463702=ruby/test_frozen_error
+[ 52/165] 463702=ruby/test_range
+[ 53/165] 463702=ruby/enc/test_emoji_breaks
+[ 54/165] 463702=ruby/enc/test_shift_jis
+[ 55/165] 463702=ruby/test_stringchar
+[ 56/165] 463702=ruby/test_complex2
+[ 57/165] 463702=ruby/test_thread_queue
+[ 58/165] 463703=ruby/test_file
+[ 59/165] 463709=ruby/test_sleep
+[ 60/165] 463708=ruby/test_name_error
+[ 61/165] 463708=ruby/test_memory_view
+[ 62/165] 463708=ruby/test_enumerator
+[ 63/165] 463702=ruby/test_eval
+[ 64/165] 463702=ruby/test_not
+[ 65/165] 463702=ruby/test_complex
+[ 66/165] 463702=ruby/enc/test_case_mapping
+[ 67/165] 463702=ruby/test_dir
+[ 68/165] 463702=ruby/test_object_id
+[ 69/165] 463702=ruby/test_sprintf
+[ 70/165] 463702=ruby/test_weakmap
+[ 71/165] 463706=ruby/test_call
+[ 72/165] 463706=ruby/test_zjit_cli
+[ 73/165] 463708=ruby/test_module
+[ 74/165] 463703=ruby/test_trace
+[ 75/165] 463703=ruby/test_assignment
+[ 76/165] 463711=ruby/test_arity
+[ 77/165] 463711=ruby/test_transcode
+[ 78/165] 463705=ruby/test_rubyvm
+[ 79/165] 463705=ruby/enc/test_big5
+[ 80/165] 463705=ruby/test_gc_compact
+[ 81/165] 463711=ruby/test_enum
+[ 82/165] 463706=ruby/test_encoding
+[ 83/165] 463708=ruby/test_proc_syntax_tree
+[ 84/165] 463708=ruby/enc/test_windows_1252
+[ 85/165] 463706=ruby/test_alias
+[ 86/165] 463708=ruby/test_complexrational
+[ 87/165] 463708=ruby/test_struct
+[ 88/165] 463706=ruby/enc/test_regex_casefold
+[ 89/165] 463708=ruby/test_super
+[ 90/165] 463706=ruby/test_yjit_exit_locations
+[ 91/165] 463706=ruby/test_signal
+[ 92/165] 463708=ruby/test_fixnum
+[ 93/165] 463708=ruby/test_env
+[ 94/165] 463711=ruby/test_box
+[ 95/165] 463706=ruby/test_io_m17n
+[ 96/165] 463709=ruby/test_pack
+[ 97/165] 463709=ruby/test_data
+[ 98/165] 463709=ruby/test_shapes
+[ 99/165] 463709=ruby/test_gc
+[100/165] 463705=ruby/test_weakkeymap
+[101/165] 463705=ruby/test_mixed_unicode_escapes
+[102/165] 463705=ruby/test_rand
+[103/165] 463706=ruby/test_readpartial
+[104/165] 463703=ruby/test_ifunless
+[105/165] 463703=ruby/test_io_buffer
+[106/165] 463705=ruby/test_exception
+[107/165] 463708=ruby/test_method
+[108/165] 463706=ruby/test_proc
+[109/165] 463703=ruby/test_time
+[110/165] 463702=ruby/test_m17n_comb
+[111/165] 463703=ruby/test_pipe
+[112/165] 463703=ruby/test_inlinecache
+[113/165] 463703=ruby/test_require
+[114/165] 463711=ruby/test_system
+[115/165] 463711=ruby/test_m17n
+[116/165] 463705=ruby/test_yjit
+[117/165] 463711=ruby/test_pattern_matching
+[118/165] 463711=ruby/test_argf
+[119/165] 463702=ruby/enc/test_case_comprehensive
+[120/165] 463702=ruby/test_refinement
+[121/165] 463708=ruby/test_integer
+[122/165] 463703=ruby/test_clone
+[123/165] 463703=ruby/enc/test_utf32
+[124/165] 463703=ruby/test_yield
+[125/165] 463706=ruby/test_nomethod_error
+[126/165] 463706=ruby/test_string
+[127/165] 463708=ruby/enc/test_windows_1251
+[128/165] 463708=ruby/enc/test_cesu8
+[129/165] 463708=ruby/test_hash
+[130/165] 463711=ruby/test_marshal
+[131/165] 463711=ruby/test_allocation
+[132/165] 463708=ruby/test_insns_leaf
+[133/165] 463708=ruby/test_require_lib
+[134/165] 463702=ruby/test_case
+[135/165] 463702=ruby/test_time_tz
+[136/165] 463702=ruby/test_objectspace
+[137/165] 463709=ruby/test_math
+[138/165] 463708=ruby/test_whileuntil
+[139/165] 463708=ruby/test_frozen
+[140/165] 463709=ruby/test_undef
+[141/165] 463708=ruby/test_io
+[142/165] 463709=ruby/test_file_exhaustive
+[143/165] 463711=ruby/enc/test_euc_jp
+[144/165] 463711=ruby/test_keyword
+[145/165] 463711=ruby/test_stack
+[146/165] 463705=ruby/test_integer_comb
+[147/165] 463711=ruby/enc/test_gb18030
+[148/165] 463711=ruby/test_arithmetic_sequence
+[149/165] 463711=ruby/test_econv
+[150/165] 463702=ruby/test_lazy_enumerator
+[151/165] 463702=ruby/test_syntax
+[152/165] 463711=ruby/enc/test_utf16
+[153/165] 463711=ruby/test_parse
+[154/165] 463705=ruby/test_backtrace
+[155/165] 463711=ruby/test_const
+[156/165] 463711=ruby/test_class
+[157/165] 463703=ruby/test_beginendblock
+[158/165] 463705=ruby/test_continuation
+[159/165] 463705=ruby/test_vm_dump
+[160/165] 463705=ruby/enc/test_case_options
+[161/165] 463705=ruby/test_autoload
+[162/165] 463703=ruby/enc/test_emoji
+[163/165] 463703=ruby/enc/test_cp949
+[164/165] 463703=ruby/test_condition
+[165/165] 463703=ruby/test_compile_prism
+
+  1) Failure:
+TestThread#test_handle_interrupt_masks_sigint [/home/user/src/ruby/test/ruby/test_thread.rb:904]:
+pid 463992 exit 0.
+
+1. [1/2] Assertion for "stdout"
+   | <["outer", "false"]> expected but was
+   | <["false"]>.
+
+Finished tests in 47.853290s, 245.7929 tests/s, 117065.1802 assertions/s.
+11762 tests, 5601954 assertions, 1 failures, 0 errors, 74 skips
+
+ruby -v: ruby 4.1.0dev (2026-11-27T20:40:40Z fix-unused-module-refinement-funcall 333ec5b187) +ZJIT +PRISM [x86_64-linux]
+make: *** [uncommon.mk:958: yes-test-all] Error 1
+rc=2

@@ -1,0 +1,349 @@
+super_class/module/unused direct: :parent
+super_class/module/unused send: :parent
+super_class/module/unused public_send: :parent
+super_class/module/unused method: nil
+super_class/module/unused call_method: :parent
+super_class/module/unused respond_to: true
+super_class/module/unused instance_method_owner: nil
+super_class/module/unused method_defined: false
+super_class/module/unused sym_proc: :parent
+super_class/module/unused try_convert: true
+super_class/module/false != : true
+super_class/module/used in-scope: [:refined, :refined, :refined]
+super_class/module/used direct: :refined
+super_class/module/used send: :refined
+super_class/module/used public_send: :refined
+super_class/module/used method: "#<Module"
+super_class/module/used call_method: :refined
+super_class/module/used respond_to: true
+super_class/module/used instance_method_owner: "#<Module"
+super_class/module/used method_defined: false
+super_class/module/used sym_proc: :refined
+super_class/module/used try_convert: true
+super_class/module/true != : true
+super_class/class/unused direct: :parent
+super_class/class/unused send: :parent
+super_class/class/unused public_send: :parent
+super_class/class/unused method: nil
+super_class/class/unused call_method: :parent
+super_class/class/unused respond_to: true
+super_class/class/unused instance_method_owner: nil
+super_class/class/unused method_defined: true
+super_class/class/unused sym_proc: :parent
+super_class/class/unused try_convert: true
+super_class/class/false != : true
+super_class/class/used in-scope: [:refined, :refined, :refined]
+super_class/class/used direct: :refined
+super_class/class/used send: :refined
+super_class/class/used public_send: :refined
+super_class/class/used method: "#<Module"
+super_class/class/used call_method: :refined
+super_class/class/used respond_to: true
+super_class/class/used instance_method_owner: "#<Module"
+super_class/class/used method_defined: true
+super_class/class/used sym_proc: :refined
+super_class/class/used try_convert: true
+super_class/class/true != : true
+super_class/prepended_module/unused direct: :parent
+super_class/prepended_module/unused send: :parent
+super_class/prepended_module/unused public_send: :parent
+super_class/prepended_module/unused method: nil
+super_class/prepended_module/unused call_method: :parent
+super_class/prepended_module/unused respond_to: true
+super_class/prepended_module/unused instance_method_owner: nil
+super_class/prepended_module/unused method_defined: false
+super_class/prepended_module/unused sym_proc: :parent
+super_class/prepended_module/unused try_convert: true
+super_class/prepended_module/false != : true
+super_class/prepended_module/used in-scope: [:refined, :refined, :refined]
+super_class/prepended_module/used direct: :refined
+super_class/prepended_module/used send: :refined
+super_class/prepended_module/used public_send: :refined
+super_class/prepended_module/used method: "#<Module"
+super_class/prepended_module/used call_method: :refined
+super_class/prepended_module/used respond_to: true
+super_class/prepended_module/used instance_method_owner: "#<Module"
+super_class/prepended_module/used method_defined: false
+super_class/prepended_module/used sym_proc: :refined
+super_class/prepended_module/used try_convert: true
+super_class/prepended_module/true != : true
+later_module/module/unused direct: :later
+later_module/module/unused send: :later
+later_module/module/unused public_send: :later
+later_module/module/unused method: "#<Module"
+later_module/module/unused call_method: :later
+later_module/module/unused respond_to: true
+later_module/module/unused instance_method_owner: "#<Module"
+later_module/module/unused method_defined: false
+later_module/module/unused sym_proc: :later
+later_module/module/unused try_convert: true
+later_module/module/false != : true
+later_module/module/used in-scope: [:refined, :refined, :refined]
+later_module/module/used direct: :refined
+later_module/module/used send: :refined
+later_module/module/used public_send: :refined
+later_module/module/used method: "#<Module"
+later_module/module/used call_method: :refined
+later_module/module/used respond_to: true
+later_module/module/used instance_method_owner: "#<Module"
+later_module/module/used method_defined: false
+later_module/module/used sym_proc: :refined
+later_module/module/used try_convert: true
+later_module/module/true != : true
+later_module/class/unused direct: :later
+later_module/class/unused send: :later
+later_module/class/unused public_send: :later
+later_module/class/unused method: "#<Module"
+later_module/class/unused call_method: :later
+later_module/class/unused respond_to: true
+later_module/class/unused instance_method_owner: "#<Module"
+later_module/class/unused method_defined: true
+later_module/class/unused sym_proc: :later
+later_module/class/unused try_convert: true
+later_module/class/false != : true
+later_module/class/used in-scope: [:refined, :refined, :refined]
+later_module/class/used direct: :refined
+later_module/class/used send: :refined
+later_module/class/used public_send: :refined
+later_module/class/used method: "#<Module"
+later_module/class/used call_method: :refined
+later_module/class/used respond_to: true
+later_module/class/used instance_method_owner: "#<Module"
+later_module/class/used method_defined: true
+later_module/class/used sym_proc: :refined
+later_module/class/used try_convert: true
+later_module/class/true != : true
+later_module/prepended_module/unused direct: :later
+later_module/prepended_module/unused send: :later
+later_module/prepended_module/unused public_send: :later
+later_module/prepended_module/unused method: "#<Module"
+later_module/prepended_module/unused call_method: :later
+later_module/prepended_module/unused respond_to: true
+later_module/prepended_module/unused instance_method_owner: "#<Module"
+later_module/prepended_module/unused method_defined: false
+later_module/prepended_module/unused sym_proc: :later
+later_module/prepended_module/unused try_convert: true
+later_module/prepended_module/false != : true
+later_module/prepended_module/used in-scope: [:refined, :refined, :refined]
+later_module/prepended_module/used direct: :refined
+later_module/prepended_module/used send: :refined
+later_module/prepended_module/used public_send: :refined
+later_module/prepended_module/used method: "#<Module"
+later_module/prepended_module/used call_method: :refined
+later_module/prepended_module/used respond_to: true
+later_module/prepended_module/used instance_method_owner: "#<Module"
+later_module/prepended_module/used method_defined: false
+later_module/prepended_module/used sym_proc: :refined
+later_module/prepended_module/used try_convert: true
+later_module/prepended_module/true != : true
+class_itself/module/unused direct: :klass
+class_itself/module/unused send: :klass
+class_itself/module/unused public_send: :klass
+class_itself/module/unused method: nil
+class_itself/module/unused call_method: :klass
+class_itself/module/unused respond_to: true
+class_itself/module/unused instance_method_owner: nil
+class_itself/module/unused method_defined: true
+class_itself/module/unused sym_proc: :klass
+class_itself/module/unused try_convert: true
+class_itself/module/false != : true
+class_itself/module/used in-scope: [:klass, :klass, :klass]
+class_itself/module/used direct: :klass
+class_itself/module/used send: :klass
+class_itself/module/used public_send: :klass
+class_itself/module/used method: nil
+class_itself/module/used call_method: :klass
+class_itself/module/used respond_to: true
+class_itself/module/used instance_method_owner: nil
+class_itself/module/used method_defined: true
+class_itself/module/used sym_proc: :klass
+class_itself/module/used try_convert: true
+class_itself/module/true != : true
+class_itself/class/unused direct: :klass
+class_itself/class/unused send: :klass
+class_itself/class/unused public_send: :klass
+class_itself/class/unused method: nil
+class_itself/class/unused call_method: :klass
+class_itself/class/unused respond_to: true
+class_itself/class/unused instance_method_owner: nil
+class_itself/class/unused method_defined: true
+class_itself/class/unused sym_proc: :klass
+class_itself/class/unused try_convert: true
+class_itself/class/false != : true
+class_itself/class/used in-scope: [:refined, :refined, :refined]
+class_itself/class/used direct: :refined
+class_itself/class/used send: :refined
+class_itself/class/used public_send: :refined
+class_itself/class/used method: "#<Module"
+class_itself/class/used call_method: :refined
+class_itself/class/used respond_to: true
+class_itself/class/used instance_method_owner: "#<Module"
+class_itself/class/used method_defined: true
+class_itself/class/used sym_proc: :refined
+class_itself/class/used try_convert: true
+class_itself/class/true != : true
+class_itself/prepended_module/unused direct: :klass
+class_itself/prepended_module/unused send: :klass
+class_itself/prepended_module/unused public_send: :klass
+class_itself/prepended_module/unused method: nil
+class_itself/prepended_module/unused call_method: :klass
+class_itself/prepended_module/unused respond_to: true
+class_itself/prepended_module/unused instance_method_owner: nil
+class_itself/prepended_module/unused method_defined: false
+class_itself/prepended_module/unused sym_proc: :klass
+class_itself/prepended_module/unused try_convert: true
+class_itself/prepended_module/false != : true
+class_itself/prepended_module/used in-scope: [:refined, :refined, :refined]
+class_itself/prepended_module/used direct: :refined
+class_itself/prepended_module/used send: :refined
+class_itself/prepended_module/used public_send: :refined
+class_itself/prepended_module/used method: "#<Module"
+class_itself/prepended_module/used call_method: :refined
+class_itself/prepended_module/used respond_to: true
+class_itself/prepended_module/used instance_method_owner: "#<Module"
+class_itself/prepended_module/used method_defined: false
+class_itself/prepended_module/used sym_proc: :refined
+class_itself/prepended_module/used try_convert: true
+class_itself/prepended_module/true != : true
+prepend/module/unused direct: [:pre, :parent]
+prepend/module/unused send: [:pre, :parent]
+prepend/module/unused public_send: [:pre, :parent]
+prepend/module/unused method: "#<Module"
+prepend/module/unused call_method: [:pre, :parent]
+prepend/module/unused respond_to: true
+prepend/module/unused instance_method_owner: "#<Module"
+prepend/module/unused method_defined: true
+prepend/module/unused sym_proc: [:pre, :parent]
+prepend/module/unused try_convert: true
+prepend/module/false != : true
+prepend/module/used in-scope: [[:pre, :parent], [:pre, :parent], [:pre, :parent]]
+prepend/module/used direct: [:pre, :parent]
+prepend/module/used send: [:pre, :parent]
+prepend/module/used public_send: [:pre, :parent]
+prepend/module/used method: "#<Module"
+prepend/module/used call_method: [:pre, :parent]
+prepend/module/used respond_to: true
+prepend/module/used instance_method_owner: "#<Module"
+prepend/module/used method_defined: true
+prepend/module/used sym_proc: [:pre, :parent]
+prepend/module/used try_convert: true
+prepend/module/true != : true
+prepend/class/unused direct: [:pre, :parent]
+prepend/class/unused send: [:pre, :parent]
+prepend/class/unused public_send: [:pre, :parent]
+prepend/class/unused method: "#<Module"
+prepend/class/unused call_method: [:pre, :parent]
+prepend/class/unused respond_to: true
+prepend/class/unused instance_method_owner: "#<Module"
+prepend/class/unused method_defined: true
+prepend/class/unused sym_proc: [:pre, :parent]
+prepend/class/unused try_convert: true
+prepend/class/false != : true
+prepend/class/used in-scope: [:refined, :refined, :refined]
+prepend/class/used direct: :refined
+prepend/class/used send: :refined
+prepend/class/used public_send: :refined
+prepend/class/used method: "#<Module"
+prepend/class/used call_method: :refined
+prepend/class/used respond_to: true
+prepend/class/used instance_method_owner: "#<Module"
+prepend/class/used method_defined: true
+prepend/class/used sym_proc: :refined
+prepend/class/used try_convert: true
+prepend/class/true != : true
+prepend/prepended_module/unused direct: [:pre, :parent]
+prepend/prepended_module/unused send: [:pre, :parent]
+prepend/prepended_module/unused public_send: [:pre, :parent]
+prepend/prepended_module/unused method: "#<Module"
+prepend/prepended_module/unused call_method: [:pre, :parent]
+prepend/prepended_module/unused respond_to: true
+prepend/prepended_module/unused instance_method_owner: "#<Module"
+prepend/prepended_module/unused method_defined: true
+prepend/prepended_module/unused sym_proc: [:pre, :parent]
+prepend/prepended_module/unused try_convert: true
+prepend/prepended_module/false != : true
+prepend/prepended_module/used in-scope: [[:pre, :parent], [:pre, :parent], [:pre, :parent]]
+prepend/prepended_module/used direct: [:pre, :parent]
+prepend/prepended_module/used send: [:pre, :parent]
+prepend/prepended_module/used public_send: [:pre, :parent]
+prepend/prepended_module/used method: "#<Module"
+prepend/prepended_module/used call_method: [:pre, :parent]
+prepend/prepended_module/used respond_to: true
+prepend/prepended_module/used instance_method_owner: "#<Module"
+prepend/prepended_module/used method_defined: true
+prepend/prepended_module/used sym_proc: [:pre, :parent]
+prepend/prepended_module/used try_convert: true
+prepend/prepended_module/true != : true
+none/module/unused direct: NoMethodError
+none/module/unused send: NoMethodError
+none/module/unused public_send: NoMethodError
+none/module/unused method: NameError
+none/module/unused call_method: NameError
+none/module/unused respond_to: false
+none/module/unused instance_method_owner: NameError
+none/module/unused method_defined: false
+none/module/unused sym_proc: NoMethodError
+none/module/unused try_convert: false
+none/module/false != : true
+none/module/used in-scope: [:refined, :refined, :refined]
+none/module/used direct: :refined
+none/module/used send: :refined
+none/module/used public_send: :refined
+none/module/used method: "#<Module"
+none/module/used call_method: :refined
+none/module/used respond_to: true
+none/module/used instance_method_owner: "#<Module"
+none/module/used method_defined: false
+none/module/used sym_proc: :refined
+none/module/used try_convert: true
+none/module/true != : true
+none/class/unused direct: NoMethodError
+none/class/unused send: NoMethodError
+none/class/unused public_send: NoMethodError
+none/class/unused method: NameError
+none/class/unused call_method: NameError
+none/class/unused respond_to: false
+none/class/unused instance_method_owner: NameError
+none/class/unused method_defined: false
+none/class/unused sym_proc: NoMethodError
+none/class/unused try_convert: false
+none/class/false != : true
+none/class/used in-scope: [:refined, :refined, :refined]
+none/class/used direct: :refined
+none/class/used send: :refined
+none/class/used public_send: :refined
+none/class/used method: "#<Module"
+none/class/used call_method: :refined
+none/class/used respond_to: true
+none/class/used instance_method_owner: "#<Module"
+none/class/used method_defined: false
+none/class/used sym_proc: :refined
+none/class/used try_convert: true
+none/class/true != : true
+none/prepended_module/unused direct: NoMethodError
+none/prepended_module/unused send: NoMethodError
+none/prepended_module/unused public_send: NoMethodError
+none/prepended_module/unused method: NameError
+none/prepended_module/unused call_method: NameError
+none/prepended_module/unused respond_to: false
+none/prepended_module/unused instance_method_owner: NameError
+none/prepended_module/unused method_defined: false
+none/prepended_module/unused sym_proc: NoMethodError
+none/prepended_module/unused try_convert: false
+none/prepended_module/false != : true
+none/prepended_module/used in-scope: [:refined, :refined, :refined]
+none/prepended_module/used direct: :refined
+none/prepended_module/used send: :refined
+none/prepended_module/used public_send: :refined
+none/prepended_module/used method: "#<Module"
+none/prepended_module/used call_method: :refined
+none/prepended_module/used respond_to: true
+none/prepended_module/used instance_method_owner: "#<Module"
+none/prepended_module/used method_defined: false
+none/prepended_module/used sym_proc: :refined
+none/prepended_module/used try_convert: true
+none/prepended_module/true != : true
+kernel ==: [true, true, true, BasicObject]
+comparable frozen?: true true
+alias: NameError
+undef: NameError

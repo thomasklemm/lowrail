@@ -1,0 +1,8 @@
+test_yjit_30k_methods.rb   .
+test_yjit_rust_port.rb     ......................................
+
+Finished in 59.45 sec
+
+Fiber count: 10000 (skipping)
+PASS all 2148 tests
+rc=0

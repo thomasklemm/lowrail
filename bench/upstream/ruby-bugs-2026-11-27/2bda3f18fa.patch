@@ -1,0 +1,70 @@
+From 2bda3f18fa443e82d3172db13deeede7c567734a Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Fri, 27 Nov 2026 20:43:06 +0000
+Subject: [PATCH] Fix hash literals with pairs after a chunk under
+ shareable_constant_value
+
+pm_compile_hash_elements collects the key and value of each pair in
+`anchor` and inserts them when a chunk is flushed, after the receiver
+and the hash to merge into. For a shareable constant the pairs were
+compiled straight into `ret` instead, so they came before the receiver.
+The first chunk still worked, but any later one, such as the pairs after
+a double splat in `X = { **h, a: 1 }`, sent core#hash_merge_bang_ptr
+or core#hash_merge_ptr to the hash and raised NoMethodError. The same
+happened to hash literals with more than 128 pairs unless all of them
+were static literals.
+
+Compile the pairs into `anchor` as in the non-shareable case.
+---
+ prism_compile.c         | 4 ++--
+ test/ruby/test_parse.rb | 7 +++++--
+ 2 files changed, 7 insertions(+), 4 deletions(-)
+
+diff --git a/prism_compile.c b/prism_compile.c
+index 4c96d334a1..8ccadc3ec2 100644
+--- a/prism_compile.c
++++ b/prism_compile.c
+@@ -1603,8 +1603,8 @@ pm_compile_hash_elements(rb_iseq_t *iseq, const pm_node_t *node, const pm_node_l
+             }
+             else {
+                 const pm_assoc_node_t *assoc = (const pm_assoc_node_t *) element;
+-                pm_compile_shareable_constant_value(iseq, assoc->key, shareability, path, ret, scope_node, false);
+-                pm_compile_shareable_constant_value(iseq, assoc->value, shareability, path, ret, scope_node, false);
++                pm_compile_shareable_constant_value(iseq, assoc->key, shareability, path, anchor, scope_node, false);
++                pm_compile_shareable_constant_value(iseq, assoc->value, shareability, path, anchor, scope_node, false);
+             }
+ 
+             if ((stack_length += 2) >= max_stack_length) FLUSH_CHUNK;
+diff --git a/test/ruby/test_parse.rb b/test/ruby/test_parse.rb
+index 9cad2084c9..94d718ddf1 100644
+--- a/test/ruby/test_parse.rb
++++ b/test/ruby/test_parse.rb
+@@ -1702,7 +1702,7 @@ class X
+   end
+ 
+   def test_shareable_constant_value_hash_with_keyword_splat
+-    a, b = eval_separately("#{<<~"begin;"}\n#{<<~'end;'}")
++    a, b, c = eval_separately("#{<<~"begin;"}\n#{<<~'end;'}")
+     begin;
+       # shareable_constant_value: experimental_everything
+       # [Bug #20927]
+@@ -1710,12 +1710,15 @@ def test_shareable_constant_value_hash_with_keyword_splat
+       y = { y: {} }
+       A = { **x }
+       B = { x: {}, **y }
+-      [A, B]
++      C = { **y, x: {} }
++      [A, B, C]
+     end;
+     assert_ractor_shareable(a)
+     assert_ractor_shareable(b)
++    assert_ractor_shareable(c)
+     assert_equal({ x: {}}, a)
+     assert_equal({ x: {}, y: {}}, b)
++    assert_equal({ y: {}, x: {}}, c)
+   end
+ 
+   def test_shareable_constant_value_unshareable_literal
+-- 
+2.55.0
+

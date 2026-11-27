@@ -1,0 +1,8 @@
+
+# Running tests:
+
+Finished tests in 1.198029s, 158.5938 tests/s, 1677.7557 assertions/s.
+190 tests, 2010 assertions, 0 failures, 0 errors, 0 skips
+
+ruby -v: ruby 4.1.0dev (2026-11-27T20:43:06Z fix-prism-shareable-hash-merge 9b8a037535) [x86_64-linux]
+rc=0
