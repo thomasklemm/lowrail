@@ -1,0 +1,5 @@
+body-rerun: 12 dump hashes and 2 instruction cells verified; exact clean pins
+size-sweep: 60 dump hashes and 10 instruction cells verified; exact clean pins
+worst-rerun: 60 dump hashes and 10 instruction cells verified; exact clean pins
+DIFFERENTIAL_OUTPUT_IDENTICAL
+ALL_FRESH_ARCHIVES_AND_TOTALS_MATCH

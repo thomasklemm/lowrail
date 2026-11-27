@@ -1,0 +1,4 @@
+Search for the separately claimed ZJIT counter run in the listed L6 evidence paths.
+Lowrail input commit: 739fdca9d7b17301d1de5dd1fbb5a76984db9cc1
+rg -n "600,000|600000|zjit_insn_count|compile_error_out_of_memory" docs/upstream/data/rails-main-census-9/lead6 bench/upstream/lead6 --glob "!**/review-thermos-sol-2026-11-27/**"
+rg exit status: 1 (1 means no matches)

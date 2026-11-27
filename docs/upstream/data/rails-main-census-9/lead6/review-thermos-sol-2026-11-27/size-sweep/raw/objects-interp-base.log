@@ -1,0 +1,10 @@
+objects keys 0 full raw row	0.999
+objects keys 0 absent row	1.0
+objects keys 1 full raw row	1.0
+objects keys 1 absent row	1.0
+objects keys 30 full raw row	1.0
+objects keys 30 absent row	1.0
+objects keys 102 full raw row	1.0
+objects keys 102 absent row	1.0
+objects keys 32768 full raw row	1.0
+objects keys 32768 absent row	1.0

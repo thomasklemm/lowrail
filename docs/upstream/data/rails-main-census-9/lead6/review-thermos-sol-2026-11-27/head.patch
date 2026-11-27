@@ -1,0 +1,38 @@
+commit 8b1c6428ea056b3c5983372d85b85615ae3d3f45
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Fri Nov 27 10:59:01 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Fri Nov 27 10:59:01 2026 +0000
+
+    Look up indexes inline in LazyIndexedAttributeSet#[] and #keys
+    
+    Saving a record reads every attribute by name through #[] and #keys
+    several times, so the two method calls per attribute in index_for_name
+    and lookup grow with the width of the table.
+
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 441e74635a..bf4f9b5c7e 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -322,8 +322,8 @@ module ActiveModel
+ 
+     #: (String) -> ActiveModel::Attribute
+     def [](name)
+-      if index = index_for_name(name)
+-        attribute_at(name, index)
++      if index = @indexes[name]
++        @attributes&.[](index) || default_attribute(name, index)
+       else
+         Attribute.null(name)
+       end
+@@ -346,8 +346,8 @@ module ActiveModel
+     #: () -> Array[String]
+     def keys
+       row_keys.keep_if do |name|
+-        index = index_for_name(name)
+-        if attribute = lookup(index)
++        index = @indexes[name]
++        if attribute = @attributes&.[](index)
+           attribute.initialized?
+         else
+           IndexedRow.key_at?(@row, index) || attribute_at(name, index).initialized?

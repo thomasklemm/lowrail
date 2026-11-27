@@ -1,0 +1,128 @@
+
+    # +row+ is the raw data from the database, an Array laid out by
+    # +indexes+ (see IndexedRow), which also type any names the model
+    # doesn't have (like from `select count(*) as blah`). +ctx+ is a
+    # Builder::Context, for looking up the model's attributes by index.
+    #: (Array[untyped], Hash[String, Integer] | ActiveModel::IndexedRow::ExtendedIndexes, ActiveModel::AttributeSet::Builder::Context) -> void
+    def initialize(row, indexes, ctx)
+      # Attributes are only built when something needs one (a write, a
+      # default, or #materialize), so +@attributes+ starts out +nil+.
+      super(nil)
+      @row = row
+      @ctx = ctx
+      # Values cast from +row+, by the same index. Only values in the row
+      # are cast, so this is never longer than the row. Slots with a built
+      # attribute are UNCAST here, so reads check this first.
+      @casted_values = Array.new(row.size, UNCAST)
+      @materialized = false
+      @indexes = indexes
+    end
+
+    #: (ActiveModel::LazyIndexedAttributeSet) -> void
+    def initialize_copy(other)
+      super
+      @casted_values = @casted_values.dup
+    end
+
+    #: (String) -> ActiveModel::Attribute
+    def [](name)
+      if index = index_for_name(name)
+        attribute_at(name, index)
+      else
+        Attribute.null(name)
+      end
+    end
+
+    #: (String, ActiveModel::Attribute) -> ActiveModel::Attribute
+    def []=(name, attribute)
+      store(indexes.fetch(name), attribute)
+    end
+
+    #: (String) -> bool
+    def key?(name)
+      index = index_for_name(name)
+      return false unless index
+
+      IndexedRow.key_at?(@row, index) ||
+        ((@ctx.type_key_at?(index) || !lookup(index).nil?) && attribute_at(name, index).initialized?)
+    end
+
+    #: () -> Array[String]
+    def keys
+      keys = row_keys | @ctx.type_keys | cached_names
+      keys.keep_if do |name|
+        index = index_for_name(name)
+        if attribute = lookup(index)
+          attribute.initialized?
+        else
+          IndexedRow.key_at?(@row, index) || attribute_at(name, index).initialized?
+        end
+      end
+    end
+
+    # Same keys, in the same order, as #keys. Values the row has are read
+    # like the generated readers do, without building an Attribute for each.
+    #: () -> Hash[String, untyped]
+    def to_hash
+      hash = {}
+      indexes.each_key do |name|
+        index = index_for_name(name)
+        if !lookup(index) && IndexedRow.key_at?(@row, index)
+          hash[name] = value_at(index, name)
+        else
+          attribute = attribute_at(name, index)
+          hash[name] = attribute.value if attribute.initialized?
+        end
+      end
+      hash
+    end
+    alias :to_h :to_hash
+
+    #: (String) ?{ (String) -> untyped } -> untyped
+    def fetch_value(name, &block)
+      index = index_for_name(name)
+      return unless index
+
+      value_at(index, name, &block)
+    end
+
+    #: (String) -> untyped
+    def fetch_value!(name)
+      index = index_for_name(name)
+      return unless index
+
+      value_at!(index, name)
+    end
+
+    # Rows are laid out by slot, so the slots that generated reader
+    # methods pass are indexes into this set.
+    #: (Integer) ?{ (String) -> untyped } -> untyped
+    def fetch_value_at(index, &block)
+      # Same as #value_at, inlined since generated readers call this.
+      value = @casted_values.fetch(index, UNCAST)
+      return value unless UNCAST.equal?(value)
+
+      if (attrs = @attributes) && (attr = attrs[index])
+        attr.value(&block)
+      else
+        cast_value(@ctx.name_at(index), index) { |attribute| attribute.value(&block) }
+      end
+    end
+
+    #: (Integer) -> untyped
+    def fetch_value_at!(index)
+      value = @casted_values.fetch(index, UNCAST)
+      return value unless UNCAST.equal?(value)
+
+      if (attrs = @attributes) && (attr = attrs[index])
+        cache_value_at(index, attr.value!)
+      else
+        cast_value(@ctx.name_at(index), index, &:value!)
+      end
+    end
+
+    #: (String, untyped) -> ActiveModel::Attribute
+    def write_from_database(name, value)
+      write(name) { |attribute| attribute.with_value_from_database(value) }
+    end
+

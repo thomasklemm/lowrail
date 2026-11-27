@@ -1,0 +1,1 @@
+{"base":"main","files":4,"merged_at":"2026-11-24T21:44:25Z","number":59963,"state":"closed","title":"Build AttributeSet#to_hash and #keys in one pass"}

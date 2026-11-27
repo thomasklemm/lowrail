@@ -1,0 +1,10 @@
+commit 1f32b09101783c398c6276856b7471c14dc66555
+Merge: c48c154e3f a522dab756
+Author:     Aaron Patterson <aaron@rubyonrails.org>
+AuthorDate: Wed Nov 11 16:41:53 2026 -0500
+Commit:     GitHub <noreply@github.com>
+CommitDate: Wed Nov 11 16:41:53 2026 -0500
+
+    Merge pull request #59141 from tenderlove/index-reader
+    
+    Use an Array for storing Active Record attributes

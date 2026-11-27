@@ -1,0 +1,109 @@
+088fc0cf61e4ba0c7987decafacc69adb3e22eec 2026-11-27T11:05:01+02:00 Merge pull request #59999 from wintan1418/fix-attribute-method-affix-example
+9e82904f18daceb77761a5705dde0c529026cea2 2026-11-27T16:01:29+09:00 Merge pull request #59884 from smyk-git/fix-sti-type-condition-in-join-scope
+621ad9a25b0fc8db077a00b4ed265c4b1909eb09 2026-11-26T18:15:38-05:00 Merge pull request #59617 from thomasklemm/thomasklemm/time-change-zone-offset
+33efc59003b760147914945d1748245d28eab4f0 2026-11-26T18:10:24-05:00 Merge pull request #59668 from thomasklemm/thomasklemm/sqlite-schema-readers-temp-shadowing
+9ed75f692fa2b3832e45e46d4fbf2916e2a920ee 2026-11-26T18:02:42-05:00 Merge pull request #59810 from thomasklemm/thomasklemm/merge-blank-relation
+3604f94b4a6c2afabd613dca44e64a0489b896cc 2026-11-26T23:47:01+01:00 Fix the `attribute_method_affix` example in Active Model docs [ci skip]
+de4a71a2ca42d44d6f0195ae83ac7b290d947701 2026-11-26T17:59:42-05:00 Merge pull request #59851 from thomasklemm/thomasklemm/association-owner-conditions-unscoped
+850be11e99ceefcb879746af315b2a7ff2483b90 2026-11-04T14:28:38Z Keep the UTC offset in Time#change for times with a zone object
+e1e3937797810168217e0aa07f00cca2846b1c39 2026-11-26T17:50:34-05:00 Merge pull request #59976 from thomasklemm/thomasklemm/index-definition-adapter-readers-2
+90c9862850386b2ec2852577c30e4c8b0454f7be 2026-11-04T15:41:07Z Let a temporary SQLite table or view hide a permanent one in the schema readers
+53f224023d21d0a25a7e06279d2e43555bb1a440 2026-11-26T17:40:21-05:00 Merge pull request #59832 from thomasklemm/thomasklemm/errors-messages-for-no-errors
+8dc1ec6683434c9f84dd08a92afb1f38d5f7b911 2026-11-26T17:38:10-05:00 Merge pull request #59986 from thomasklemm/thomasklemm/upgrade-guide-mailer-active-job-railtie
+60147d2f28487ea77549aa7c6cb36fc25c1236c4 2026-11-15T00:44:30Z Skip merging a blank relation into a relation without conditions
+73f8c7bea288eed99a4160ed4e34e94659f95d5c 2026-11-18T02:57:50Z Don't compare owner conditions when joining an association without a scope
+0e531ca769c3990e9055dae9cea8f51a967cebf4 2026-11-26T17:33:52-05:00 Merge pull request #59824 from thomasklemm/thomasklemm/form-builder-field-names
+ab840dcb3baf75b806e946369e152a16ffa0fa82 2026-11-26T17:32:15-05:00 Merge pull request #59661 from thomasklemm/thomasklemm/parameter-parsers-register-in-place
+828f4bef469c4d687f0a43a074cd0a5a3e8406e9 2026-11-26T17:30:59-05:00 Merge pull request #59569 from thomasklemm/thomasklemm/association-scope-lazy-alias-tracker
+eac0a06a66df97b7c9a6c1e9c23e4fa2c112cc0e 2026-11-26T17:29:47-05:00 Merge pull request #59995 from rails/rafaelfranca/url-helper-navigation-compatibility
+28a86e1d2e21a1475f3c44ea7285f1c3dd1c136b 2026-11-26T17:28:16-05:00 Merge pull request #59987 from thomasklemm/thomasklemm/mailer-delivery-job-without-active-job
+4f3c6aa98a2d3dcdc5522bfa6ac3911facb20468 2026-11-25T12:53:06Z Note in the upgrade guide that Action Mailer no longer loads Active Job
+271b595e9e38f109e381b1623b945238f1d436eb 2026-11-26T17:16:49-05:00 Merge pull request #59804 from thomasklemm/thomasklemm/button-to-params-tag
+e5f75f089eaceeba5258059e15a1bfbe57735f31 2026-11-26T16:59:32-05:00 Keep navigation helpers available through UrlHelper
+99fa0fb6736fb640a804483f0870fd8a14ec38f7 2026-11-26T17:12:23-05:00 Merge pull request #59817 from thomasklemm/thomasklemm/fix-ractor-proxy-unpin
+31f27a6b37764a60ca7947a655d2b7bd35af1c16 2026-11-26T17:09:32-05:00 Merge pull request #59812 from thomasklemm/thomasklemm/fix-flaky-ci-tests
+58893983f37a7a223042c6d961bc25b6a9303f86 2026-11-26T17:07:10-05:00 Merge pull request #59985 from thomasklemm/thomasklemm/upgrade-guide-sendfile-unset
+a946944748005cfd69e818485cf4aae6dd2643cb 2026-11-26T17:06:24-05:00 Merge pull request #59984 from thomasklemm/thomasklemm/upgrade-guide-sidekiq-8-0-3
+6efbc06a5ec07084fd4c6577b89996a63ec29eb6 2026-11-16T22:36:10Z Allocate less per field in text_field_tag and tag
+6f81bf3f080da8a8893eafaa0e6216b2776ebf46 2026-11-26T16:53:07-05:00 Merge pull request #59800 from thomasklemm/thomasklemm/lazy-indexed-keys
+2c211fbf508b5764d3ddb043cd4552b918b58c2b 2026-11-26T16:50:59-05:00 Merge pull request #59735 from thomasklemm/thomasklemm/upgrade-guide-pg-fixture-locks
+4ab078fad6092f00ef2b1ad609a7cd3d78af116b 2026-11-26T16:50:51-05:00 Merge pull request #59611 from thomasklemm/thomasklemm/declare-prism-dependency
+86c23bed6ccdc91ca965e39066f7b0062b3ac860 2026-11-26T16:49:46-05:00 Merge pull request #59627 from thomasklemm/thomasklemm/restore-max-password-length
+d1bc6836bc4325b7f41ca9b8a194a4f85bb35029 2026-11-04T13:24:07Z Declare Prism dependencies in Action View and Railties
+621df461050f4a801ba7a9e34782f0503c5b13f3 2026-11-26T16:36:43-05:00 Merge pull request #59959 from wintan1418/document-s3-public-uploads-via-acl-default
+197418c0a96bc6d298aa72fc99b7bc0e0a5b11c9 2026-11-26T15:48:47-05:00 Merge pull request #59931 from ozamasa/issue-33980
+de40846d6aca4504b8e0f1f373cbc6d27fde1498 2026-11-26T15:39:55-05:00 Merge pull request #58842 from rails/rmf-connection_pool
+b1775d5da80365ead6f8ac40673d32ac5a15a4af 2026-11-23T09:50:50+09:00 Fix #33980: Parse escaped quotes in Accept headers
+716e52ac646126d5868ba087b3fe19c6c7e076e3 2026-11-26T15:28:53-05:00 Merge pull request #59989 from cestercian/fix/live-query-cache-59973
+28d0f085b2a503b61599c136208c9d8025508985 2026-11-26T07:07:38Z Don't share the query cache state with the ActionController::Live thread
+50bdd8d1dbbac70c050c340bb60b164501c26ae9 2026-11-26T14:56:26-05:00 Merge pull request #59900 from fuzzyrichie/class-attribute-code-generator
+982e37f6f645b7a0fc598930ac96d8fa433e4188 2026-11-26T14:53:38-05:00 Merge pull request #59902 from hachi8833/revert_link_to_jemalloc_performance_guide
+3ee209a295d469591522ca7728d239b0a592b6cd 2026-11-26T14:53:03-05:00 Merge pull request #59903 from yahonda/fix-connection-pool-fiber-test-isolation-level-race
+521bd1cf3f5876fb712fed14a259e914903c9d8a 2026-11-26T12:59:03-05:00 Merge pull request #59908 from 55728/fix-response-content-type-non-string-header
+f8ad7563c3ae6e3ee987a8a48464c153a044ae03 2026-11-26T12:25:53-05:00 Merge pull request #59911 from 55728/fix-message-pack-missing-namespaced-class
+21181247bc702ed2ddf74bb09a82d86811dde45f 2026-11-26T12:24:07-05:00 Merge pull request #59992 from adityawrk/date-formats-builtin-override
+fc288487cbf7ef8ed163d1e1fdeae1dff92daa6d 2026-11-26T22:10:07+05:30 Honor DATE_FORMATS overrides of built-in formats
+66da04ae65fdc26672597714dacf9c8295bc207b 2026-11-26T11:47:02-05:00 Merge pull request #59913 from 55728/fix-strong-parameters-nested-attributes-expect-doc
+2a0b79554a41af6edf53399f835b1d2ad98cf124 2026-11-26T11:45:14-05:00 Merge pull request #59915 from carlosdanielpohlod/truncate-bytes-safe-buffer
+952ece7031a8fef91dd1437168edba1341ef1503 2026-11-26T11:45:00-05:00 Merge pull request #59952 from bastin27/fix-mailer-deliver-callbacks-without-mail
+3c6cc3aea4c9fe73c2fb231413247110ae896730 2026-11-21T11:26:32-03:00 Return a plain String when truncate_bytes cuts an html_safe string
+8363391db99e58cdd996634688daf3532004befb 2026-11-26T11:34:54-05:00 Merge pull request #59919 from milkcocoa/fix-action-view-strict-locals-block
+1c0abcd1f3d724ed42d6a25e7b1f237ef360ba7b 2026-11-26T11:33:47-05:00 Merge pull request #59957 from bruno-costanzo/live-event-reporter-context
+486fc04d3711a92f63a6bd5d5724f450b4a2930c 2026-11-26T11:28:10-05:00 Move strict local parsing to StrictLocalsParser
+f36806f67882519281a65cd888f444dd7230ec75 2026-11-22T12:23:37+09:00 Fix unused block warnings for strict locals with ampersands
+3a5516294b38f3e6ed5c258daa6802d2e72f4480 2026-11-24T12:19:40+01:00 Give Live actions the event reporter context and tags of their request
+9e92c0bcddd215590cf4436113ff1144e2e7d70e 2026-11-26T11:04:58-05:00 Merge pull request #59958 from bruno-costanzo/dup-lock-version-dirty-tracker
+49c23ad9e70c69355e840431050902b8aa0afecd 2026-11-26T11:03:56-05:00 Merge pull request #59972 from bruno-costanzo/nested-default-deep-dup
+ecbd6042af70f32638d00951768980226aeb4769 2026-11-26T11:02:20-05:00 Merge pull request #59983 from thomasklemm/thomasklemm/lease-registry-lockless-hit
+c5602bac8a452274980199b735cc8dbec4cb8b7a 2026-11-26T10:59:57-05:00 Merge pull request #59936 from 55728/fix-dirty-in-place-modification-doc-example
+62de58a851cb289a668c77755102bd6e2ed7a2bd 2026-11-26T10:58:43-05:00 Merge pull request #59964 from bruno-costanzo/nested-attributes-scalar-id-lookup
+e7a69fcab3206c60facfdbe7778210b97ad85c4d 2026-11-26T10:58:03-05:00 Merge pull request #59975 from yatmsu/hide-generator-flags-from-rails-new-help
+fd626edc46d6d40ec8170abe0e0e81770a5e11da 2026-11-26T10:57:13-05:00 Merge pull request #59950 from mattyr/action-mailbox-conductor-routes-local-only
+a80f47f8bf66491ac42bb56f3b6b9cd5c1216c4b 2026-11-26T10:51:59-05:00 Move find_record_by_id to the key strategy class
+b2075077f7dbd1b1c38e6fe3ea75c08284866a04 2026-11-26T10:44:49-05:00 Merge pull request #59980 from imattas/codex/bound-quoted-name-cache-bytes
+2f573093f34147349fe8a1d0fa300ede77e8b7be 2026-11-26T10:43:01-05:00 Merge pull request #59988 from yahonda/change-check-constraint-enforced
+0a8529a0ef4f8176e493055f5dfd88eaed0b1f9d 2026-11-26T10:41:03-05:00 Merge pull request #59962 from bruno-costanzo/fragment-cache-skip-unused-events
+1652ece5758558e8f592f1990d7c5ab13254c123 2026-11-26T17:39:59+02:00 Merge pull request #59991 from abdulwd/fix-or-loading-association-relation-in-from
+47af9248797503fa96dbb8e1f9d60529e541e762 2026-11-25T13:27:02-05:00 Bound quoted name cache entries by byte size
+38fbf2117ab22b38a0c7cf529fe9a139330fff8f 2026-11-26T23:34:34+09:00 Merge pull request #59990 from 55728/fix-register-encoder-content-type-doc
+20f84a72aad3f261f310b79435590909b0f2c28f 2026-11-26T19:16:10+05:30 Don't run a query when checking `or` compatibility
+114503c01585a15a5b85d7a0afc512894bba803a 2026-11-26T21:41:45+09:00 Fix the `:content_type` description in `register_encoder` docs [ci skip]
+1862f0ba893f45791f034cb500f4ccab1f52765f 2026-11-25T23:53:22Z Stop setting the Action Mailer delivery job in load_defaults
+734ec7c98e5371cef6182f8dd44737dc64f15943 2026-11-23T13:40:46+09:00 Add `change_check_constraint` for PostgreSQL 19+
+5a161379f577ac92afe15306802734c3cc1868c9 2026-11-26T09:41:43+09:00 Merge pull request #59796 from JuanitoFatas/pg18-check-constraint-not-enforced
+ee75a7e77cfde0799e2c5aa0902244d3a3162934 2026-11-14T00:12:14+09:00 Add `enforced:` option to `add_check_constraint` on PostgreSQL 18+
+f785381cca8621772cba659ff93f825eb7f99942 2026-11-26T05:39:15+09:00 Merge pull request #59982 from kamipo/disable-joins-apply-rest-of-scope
+794c6b910160bbf9c84bb4920aab8ccbfe08dd6f 2026-11-26T04:19:03+09:00 Apply the rest of the scope of a `disable_joins` association
+7c0f820c1ac4ee65b885d91cbd7d7e5a81a4cca0 2026-11-26T04:13:22+09:00 Merge pull request #59826 from wtn/readonly
+f3b26d3722bdef0f9212657ade24f0ccd6784fba 2026-11-16T18:21:03-06:00 Keep readonly when preloading a filtered through
+97c3e850a55a14a47be94ba23d94375b74b160d2 2026-11-26T03:36:04+09:00 Merge pull request #59907 from 55728/fix-through-preload-source-table-reference
+688921123c6eb731ba9f6f55c0da4b906639fd3f 2026-11-25T13:33:06-05:00 Merge pull request #59961 from bruno-costanzo/active-job-locate-records-in-bulk
+1de6e936c5fe7972c8f923260fe8fbe23a079ac1 2026-11-21T17:56:43+09:00 Fix preloading ordered `has_many :through` scoped on its through table
+cd3b471e06cd05ce565eba8a916a25098f1434b2 2026-11-25T13:09:08-05:00 Make sure the locate many path raises RecordUnavailable on errors
+f9061311e872e2566ae4069c4e30848cec1fc521 2026-11-25T12:51:34-05:00 Avoid reparsing GlobalIDs
+0e06db414486f244111ad0ccb0bcb101def25e0a 2026-11-24T14:35:29+01:00 Locate an Array of records passed to a job with one query per model
+5f98db3562d5cb9f2d3363d0e08fae90ab58a9c6 2026-11-26T02:35:40+09:00 Merge pull request #59906 from 55728/fix-order-sql-literal-ordering-references
+2a510119193b3c8990cd8353a57cb0d6e0ff377c 2026-11-25T12:32:59-05:00 Merge pull request #59954 from dennispaagman/encryped_file_key_length
+47e939f0659072a9f91c80fcaa5fd92b02633244 2026-11-23T12:15:33+01:00 Check the encrypted file key length when decrypting
+7926a0c5fafb094a00cd3ee7d10b7acb41ce3ec6 2026-11-26T01:50:05+09:00 Don't extract a table name starting with a digit from an SQL literal
+1b1a809125aea2978776f7c14aeacfcd49112b14 2026-11-26T01:51:02+09:00 Merge pull request #59956 from bruno-costanzo/eager-load-outer-join-aliases
+59388990b10e9d0262b03663d911abf6e9b0ad89 2026-11-25T11:38:33-05:00 Merge pull request #59965 from bruno-costanzo/redis-cache-store-rescue-command-errors
+b5a1d7f4afb737de89fa21a830707f4773b0e952 2026-11-25T11:27:07-05:00 Merge pull request #59960 from wintan1418/fix-datetime-type-docs
+56582a21173096a7ee9c87e0d935cfe83e6642f0 2026-11-24T16:08:49+01:00 Rescue all Redis errors in RedisCacheStore failsafe
+4c3694f3a5a9b0c5bbbbc27b17c1049bd96557b7 2026-11-25T11:22:54-05:00 Merge pull request #59574 from thomasklemm/thomasklemm/arel-table-positional-name
+a7776a6bdb936c99a04b5d110fc25ca6b7b847b1 2026-11-25T11:17:54-05:00 Merge pull request #59925 from 55728/fix-ci-parallel-group-shared-step-title
+8aca40de20cf7bdea7ee66f506e8172df1e4253f 2026-11-25T11:11:20-05:00 Merge pull request #59955 from bruno-costanzo/bound-quoted-name-caches
+10805685530a98285bfa0bf1c1c3d54238510ae2 2026-11-25T11:07:44-05:00 Merge pull request #59971 from saddestmartian/action-text-ordered-list-linear-numbering
+bb431e4b149656100adb37e8820228b39de18ed6 2026-11-25T10:56:15-05:00 Number Action Text list items in linear time
+9e8dbdee15380cab11a11a3b71920f7dc8fa793d 2026-11-25T10:47:19-05:00 Merge pull request #58677 from navidemad/param-error-rack-bad-request
+d217b47493390ed17b8706d5519a33eb66bdd8ba 2026-11-24T19:52:08-08:00 Speed up numbering of Action Text plain-text list items
+fcf2f0bab037248405e614bb965dff6a31fdf727 2026-09-06T18:50:14+02:00 Match Rack::BadRequest errors in ActionDispatch::ParamError
+f59ea4a095b76606a1824d732c9cf8f2397cffe4 2026-11-25T10:31:41-05:00 Document redirect settings for metal controllers (#59977)
+7e342de11f12e6ee056e6c7ff5df713b2518e03c 2026-11-25T13:15:04Z Look up an existing connection lease without the registry mutex
+30368145ecb76500e10ae487c4ffff219b1403d7 2026-11-25T12:58:19Z Keep adapter-specific index readers on every IndexDefinition
+31c9f987db91f653fe0d4299e22dbd3da1cc4536 2026-11-25T21:52:15+09:00 Hide generator-only flags from `rails new --help`
+818edfd76a405b29f4695e051c07ea28a5476a4e 2026-11-25T07:45:12-05:00 Merge pull request #58173 from lylo/action-text-batch-attachable-resolution
+632d2f4100690a2c3b4df5c52a094c14b40730f4 2026-11-24T14:42:14+01:00 Don't build log subscriber events whose logging is turned off
+330bcf16ece305572183a8b94f18e85fec3ddb4b 2026-11-25T11:33:36+01:00 Limit the size of the quoted name caches
+62321f21d0bb8d369c9c2c1e45232e13f53b0c8a 2026-11-03T09:48:20Z Deprecate a positional table name in Arel::Table.new
+61d442a7aed5c3cf4198751725166c6a17dc2a92 2026-11-25T10:14:06+01:00 Don't share nested values of a column default between records

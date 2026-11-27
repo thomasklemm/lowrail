@@ -1,0 +1,69 @@
+commit 6f81bf3f080da8a8893eafaa0e6216b2776ebf46
+Merge: 2c211fbf50 af84ab1445
+Author:     Rafael Mendonça França <rafael@rubyonrails.org>
+AuthorDate: Thu Nov 26 16:53:07 2026 -0500
+Commit:     GitHub <noreply@github.com>
+CommitDate: Thu Nov 26 16:53:07 2026 -0500
+
+    Merge pull request #59800 from thomasklemm/thomasklemm/lazy-indexed-keys
+    
+    Avoid rebuilding attribute names in `LazyIndexedAttributeSet#keys`
+
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 1298344dc9..441e74635a 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -345,8 +345,7 @@ module ActiveModel
+ 
+     #: () -> Array[String]
+     def keys
+-      keys = row_keys | @ctx.type_keys
+-      keys.keep_if do |name|
++      row_keys.keep_if do |name|
+         index = index_for_name(name)
+         if attribute = lookup(index)
+           attribute.initialized?
+@@ -488,7 +487,6 @@ module ActiveModel
+       def materialize
+         unless @materialized
+           row_keys.each { |key| self[key] }
+-          @ctx.type_keys.each { |key| self[key] }
+           @materialized = true
+         end
+       end
+diff --git a/activemodel/lib/active_model/attribute_set/builder.rb b/activemodel/lib/active_model/attribute_set/builder.rb
+index 922d661924..d8a7c7b416 100644
+--- a/activemodel/lib/active_model/attribute_set/builder.rb
++++ b/activemodel/lib/active_model/attribute_set/builder.rb
+@@ -6,13 +6,12 @@ module ActiveModel
+   class AttributeSet # :nodoc:
+     class Builder # :nodoc:
+       class TypeTable # :nodoc:
+-        attr_reader :types, :type_keys_lut, :type_keys
++        attr_reader :types, :type_keys_lut
+ 
+         #: (Array[String], Hash[String, Type::Value]) -> void
+         def initialize(names, types)
+           @types = names.map { |name| types[name] }.freeze
+           @type_keys_lut = names.map { |name| types.key?(name) }.freeze
+-          @type_keys = types.keys.freeze
+           freeze
+         end
+       end
+@@ -20,8 +19,6 @@ module ActiveModel
+       # What a LazyIndexedAttributeSet looks up about the model's attributes, by
+       # their index in the builder's #indexes.
+       class Context # :nodoc:
+-        attr_reader :type_keys
+-
+         # +names+ are the attribute names by index, +type_table+ their
+         # TypeTable, and +defaults+ the default attributes by index that
+         # attributes a row doesn't have fall back to.
+@@ -30,7 +27,6 @@ module ActiveModel
+           @names = names
+           @types = type_table.types
+           @type_keys_lut = type_table.type_keys_lut
+-          @type_keys = type_table.type_keys
+           @defaults = defaults
+           freeze
+         end

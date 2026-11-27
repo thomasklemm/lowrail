@@ -1,0 +1,11 @@
+AllCops:
+  TargetRubyVersion: 4.0
+  NewCops: disable
+Metrics/AbcSize:
+  Max: 0
+Metrics/CyclomaticComplexity:
+  Max: 0
+Metrics/PerceivedComplexity:
+  Max: 0
+Metrics/MethodLength:
+  Max: 0

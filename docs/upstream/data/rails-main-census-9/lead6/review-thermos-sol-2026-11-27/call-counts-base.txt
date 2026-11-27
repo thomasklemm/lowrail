@@ -1,0 +1,6 @@
+38	[] <- ActiveModel::AttributeMutationTracker#attribute_changed? attribute_mutation_tracker.rb:79
+1	[] <- ActiveModel::AttributeMutationTracker#original_value attribute_mutation_tracker.rb:60
+2	[] <- block in ActiveRecord::AttributeMethods#attributes_with_values attribute_methods.rb:586
+3	keys <- ActiveModel::AttributeMutationTracker#attr_names attribute_mutation_tracker.rb:75
+default update keys=3
+partial_updates=false keys=1

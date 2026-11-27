@@ -1,0 +1,10 @@
+commit 6f81bf3f080da8a8893eafaa0e6216b2776ebf46
+Merge: 2c211fbf50 af84ab1445
+Author:     Rafael Mendonça França <rafael@rubyonrails.org>
+AuthorDate: Thu Nov 26 16:53:07 2026 -0500
+Commit:     GitHub <noreply@github.com>
+CommitDate: Thu Nov 26 16:53:07 2026 -0500
+
+    Merge pull request #59800 from thomasklemm/thomasklemm/lazy-indexed-keys
+    
+    Avoid rebuilding attribute names in `LazyIndexedAttributeSet#keys`
