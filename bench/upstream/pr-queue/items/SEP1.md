@@ -112,6 +112,41 @@ passes:
       raw commands, sources and logs: thermos-sol-2026-11-27.tar.gz beside it.
       No upstream action taken; item state left unchanged for the
       coordinator's publication decision.
+  - reviewer: astra
+    orb: T-01a21d5c-3bca-76ba-9b8d-c6960f5eabf9
+    head: "976c193a7624cc0b42e46171e0f4935beff0bc68"
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      Reviewed reply-16909.md personally, not the dropped restore/Redmine plans.
+      Independently built Ruby master 80343e1cf5; generated a real 4.0.11 lock
+      with 4.0.11 on the earlier own 4.0.10 build. Twenty isolated probes cover
+      bundle versus gem exec, old Bundler initially absent/installed,
+      normal/frozen mode and system-version controls. Fresh bundle install
+      reproduces both quoted lines, also frozen; installed 4.0.11 runs directly
+      and raises without an installation announcement. gem exec also attempts
+      switching; with the old version absent it installs it then fails with a
+      different gem-command error, not evidence that autoswitch is disabled.
+      BUNDLE_VERSION=system controls succeed. Fetched settings permalink
+      matches built source at line 91; RubyGems master and release branch 4.1
+      retain the lockfile default. Found the open merge proposal: hsbt's June
+      plan leaves cutoff phases open, discussing late-4.x warnings and a 5.x
+      cutoff/wrapper, not a 4.1 deadline. No default-disable entry found in the
+      inspected CHANGELOG/search; this does not prove no other plan exists.
+      Sentence, currency and live discussion audit in
+      bench/upstream/gem-differential/evidence/separator-pat/astra-reply-976c193a76.md;
+      raw logs, source/search snapshots and validation in
+      astra-reply-976c193a76.tar.gz beside it. One no-pings violation; otherwise
+      a factual reply, with no renewed restore request or internal material.
+      Item remains held. No upstream post or runtime-code change.
+    must_fix:
+      - >-
+        Replace "@nobu, is turning off the autoswitch still planned for 4.1?"
+        with "Is turning off the autoswitch still planned for Ruby 4.1?".
+        DECISIONS forbids pings on PRs/issues; naming Ruby also distinguishes
+        its forthcoming release from Bundler 4.1, which has already shipped.
+        Evidence: docs/DECISIONS.md, Upstream etiquette; the reviewed reply and
+        logs/bundler-release.json in astra-reply-976c193a76.tar.gz.
 ---
 
 # Keep Pathname::SEPARATOR_PAT as a deprecated constant
