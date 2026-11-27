@@ -1,12 +1,48 @@
 # SQ37 Thermos review, 2026-11-27
 
-**Verdict: changes, posted body only.** The exact adapter code, regression test, CHANGELOG and commit are acceptable. Name the earlier floor bump as unreleased in the posted body. No Rails changes or queue-item edits were made by this review.
+**Verdict: changes, compatibility disclosure and wording.** The exact adapter code and regression test are acceptable. Qualify the failure claims in the body, CHANGELOG, commit message and record: model operations with a preloaded schema cache can work on the older SQLite versions that the new floor refuses. Also identify the previous floor bump as unreleased. No Rails changes or queue-item edits were made by this review.
 
 Reviewed `3e348f32bdc2b5b405d31f226e6de04aa3278dc9`, exactly one commit on `088fc0cf61e4ba0c7987decafacc69adb3e22eec`, from `thomasklemm/rails` branch `thomasklemm/sqlite-floor-3-37`. The fork fetch resolved to that exact head. Lowrail started at `9cd83cdf23557a1cec88330792e7c5225ad143aa` on local `main`. Review thread: https://ampcode.com/threads/T-01a21cf5-7978-7316-a2c3-ae40718644b4.
 
 The `thermos` skill ran two independent, read-only Task reviewers in parallel in this thread. Correctness/security loaded `thermo-nuclear-review`; maintainability loaded `thermo-nuclear-code-quality-review`. No other threads or nested reviewers were created. The main reviewer independently inspected the diff and context, checked external claims and recent merges, ran the tests and probes below, and synthesized the findings. Reviewer IDs and returned findings are in [reviewers.md](reviewers.md).
 
-## One body clarification is required
+## Required: disclose working cached-model operations
+
+The required Lowrail sync brought in the separate Astra review and its cached-model counterexample after the first evidence commit. The main reviewer then inspected the harness and public configuration path and independently reproduced it using this review's own Ruby/SQLite builds and exact base/head trees. This section supersedes the initial body-only conclusion; the two Task reviewers did not discover this case.
+
+With a schema cache generated on SQLite 3.44.2, `schema_cache_path` and `config.active_record.check_schema_cache_dump_version = false`, model create/find/update/destroy work on base with actual SQLite 3.35.5 and 3.36.0. They fail at connect on head. Both sides work on 3.37.0. This uses the public Rails configuration and real `bin/rails runner`, not adapter overrides. With the default cache-version check, the old-library control fails during schema discovery. A preloaded `schema_cache.data_source_exists?` read itself returns true on both base and head without connecting; saying the schema cache simply fails is too broad.
+
+Commands and full outputs: [cached-crud-confirmation.txt](cached-crud-confirmation.txt), [schema-cache-api-confirmation.txt](schema-cache-api-confirmation.txt), [run-cached-crud.sh](run-cached-crud.sh), [run-cell.sh](run-cell.sh). The independently rerun source fixture is the committed `../review-astra-2026-11-27/cached_crud_probe.rb` and its minimal app. No source in that evidence directory was modified.
+
+This does not require a compatibility fallback or show that the adapter floor is wrong. It requires an honest description of the connections being withdrawn.
+
+**Exact replacement for the posted second sentence** (also resolves the unreleased qualifier below):
+
+> [`check_version`](https://github.com/rails/rails/blob/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb#L518-L522) accepts 3.35.0 on main after #58284 (unreleased), so on SQLite 3.35 and 3.36 uncached schema discovery raises `no such table: pragma_table_list`, breaking `bin/rails db:prepare` and model operations that need it.
+
+**Add to the body and commit message:**
+
+> Raw SQL and model operations using a preloaded schema cache can still work on those versions; this change refuses those connections too.
+
+**Replace the commit paragraph beginning “On SQLite 3.35.x”:**
+
+> On SQLite 3.35.x and 3.36.x, which `check_version` still accepts, uncached schema discovery fails with "no such table: pragma_table_list". This breaks `db:prepare` and model operations that need that information.
+
+**Replace the CHANGELOG's sentence beginning “On older versions”:**
+
+> On SQLite 3.35 and 3.36, table listing and uncached schema discovery fail with "no such table: pragma_table_list"; make the requirement explicit.
+
+**Replace the record's assertion that these versions cannot create/find a record, and the corresponding unqualified failure claim in “For Thomas”:**
+
+> Migration and uncached model-schema discovery fail on these versions. Raw SQL, direct table creation, and model CRUD with a preloaded schema cache and cache-version checking disabled can still work; the new floor refuses those connections too.
+
+The wording above is verified. Changing the commit message or CHANGELOG requires a new head and fresh exact-head passes; the builder owns those changes. To avoid bloating the body past the preferred length, this complete two-paragraph body is an acceptable shorter replacement incorporating both findings:
+
+> Since #52354 (Rails 8.0), [`data_source_sql`](https://github.com/rails/rails/blob/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb#L218-L227) reads `pragma_table_list`, added in SQLite 3.37.0. On main, [`check_version`](https://github.com/rails/rails/blob/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb#L518-L522) accepts 3.35.0 after #58284 (unreleased), so SQLite 3.35 and 3.36 fail during uncached schema discovery with `no such table: pragma_table_list`, breaking `bin/rails db:prepare` and model operations that need it.
+>
+> Raise the connection-time check to 3.37.0 to report the missing requirement clearly. Raw SQL and model operations using a preloaded schema cache can still work on these versions; this change refuses those connections too. Only apps building the `sqlite3` gem against an older system SQLite are affected; the gem bundles a current SQLite.
+
+## Required: identify the unreleased prior floor bump
 
 In SQ37.md's posted second sentence, retain the existing `check_version` link and replace:
 
@@ -20,10 +56,11 @@ DECISIONS permits citing unreleased upstream evidence when the text identifies i
 
 [release-status.txt](release-status.txt) records the latest release lookup (`v8.1.4.1`, 2026-11-04), its actual `check_version` floor of 3.23.0, and the negative ancestry check for the 3.35.0-floor merge. The body describes current main, whereas that earlier floor bump has not shipped in the latest release.
 
-## Optional points, not opening blockers
+## Optional test point, not an opening blocker
 
 * **Test the effect rather than the hook's incidental return.** In `activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb:181`, `assert_nil @conn.check_version` could be `assert_nothing_raised { @conn.check_version }`. Stronger, use `@conn.connect!` in both version-stub blocks, preserving the exact error assertion. The current test covers the right rejection and inclusive boundary and fails on base; it is not a blocker.
-* **Narrow the CHANGELOG's older-version wording.** At `activerecord/CHANGELOG.md:4`, replace `On older versions` with `On SQLite 3.35 and 3.36,`. Base already refuses versions below 3.35.0 at connect, so only the newly refused range reaches the metadata error on base. This is a non-blocking precision improvement.
+
+The reviewers' original optional CHANGELOG range clarification is folded into the required schema-discovery wording above after reproducing successful cached reads. Base already refuses versions below 3.35.0 at connect.
 
 The generator template still advertises SQLite 3.8.0. That wording is identical on base and is already documented as deliberately omitted in the queue item; it is not an introduced finding and this review does not ask to expand the change. The raw commit messages differ only by one extra trailing blank line on the rebuilt head. Their prose is identical; no head rewrite is warranted for that whitespace ([rebuild-message-comparison.txt](rebuild-message-comparison.txt)).
 
@@ -43,13 +80,13 @@ The title and body were read only through the boundary before `## For Thomas`. T
 
 * **Title, “Bump the minimum supported SQLite version to 3.37.0.”** The actual comparison and matching diagnostic change from 3.35.0 to 3.37.0: [source-review.txt](source-review.txt).
 * **Sentence 1, “Since #52354 (Rails 8.0), data_source_sql reads pragma_table_list, which SQLite added in 3.37.0.”** `gh api repos/rails/rails/pulls/52354/files` shows the replacement of `sqlite_master` by `pragma_table_list`; the merge is an ancestor of `v8.0.0`, whose source contains that query. `curl -fsSL https://www.sqlite.org/releaselog/3_37_0.html` names the new table-list pragma and dates the release 2021-11-27. The table-list documentation states its first appearance is 3.37.0. See [claim-sources.txt](claim-sources.txt).
-* **Sentence 2, the 3.35.0 floor and the failing operations.** The actual earlier floor-bump diff is captured by `gh api repos/rails/rails/pulls/58284/files`; it changes 3.23.0 to 3.35.0 for RETURNING. Both exact body permalink targets were retrieved at the pinned SHA with the GitHub contents API and numbered: `schema_statements.rb:218–227` is `data_source_sql`, and `sqlite3_adapter.rb:518–522` is the base `check_version` accepting 3.35.0 ([additional-source-checks.txt](additional-source-checks.txt)). Ordinary table lookup/listing, schema-cache lookup and migrations fail with the stated error on actual 3.35.5/3.36.0 in [min-versions.json](min-versions.json). `Model.create!`, `find` and primary-key loading were independently run in [probes.txt](probes.txt). Actual `ruby bin/rails db:prepare` fails with that error on base and 3.36.0 ([app-results.txt](app-results.txt)). The missing unreleased qualifier is the required fix above.
+* **Sentence 2, the 3.35.0 floor and the failing operations.** The actual earlier floor-bump diff is captured by `gh api repos/rails/rails/pulls/58284/files`; it changes 3.23.0 to 3.35.0 for RETURNING. Both exact body permalink targets were retrieved at the pinned SHA with the GitHub contents API and numbered: `schema_statements.rb:218–227` is `data_source_sql`, and `sqlite3_adapter.rb:518–522` is the base `check_version` accepting 3.35.0 ([additional-source-checks.txt](additional-source-checks.txt)). Table lookup/listing, uncached schema-cache lookup and migrations fail with the stated error on actual 3.35.5/3.36.0 in [min-versions.json](min-versions.json). Cold-cache `Model.create!`, `find` and primary-key loading were independently run in [probes.txt](probes.txt). Actual `ruby bin/rails db:prepare` fails with that error on base and 3.36.0 ([app-results.txt](app-results.txt)). The preloaded-cache counterexample above disproves an unqualified claim about model operations or cache reads. Both the missing qualification and unreleased label are required fixes.
 * **Sentence 3, rejection in check_version, the RETURNING precedent, and failure at connect.** The earlier floor-bump diff/CHANGELOG explicitly cite RETURNING. The exact-head diff and actual old-library runs show the new diagnostic; `connect!` probes verify exception class, exact message and disconnected state. `db:prepare` on head and 3.36.0 fails with that diagnostic, not the metadata error. See [claim-sources.txt](claim-sources.txt), [probes.txt](probes.txt) and [app-results.txt](app-results.txt).
 * **Sentence 4, system-library builds and the bundled current SQLite.** RubyGems currently lists sqlite3 2.10.2. Its installation instructions distinguish native/precompiled gems and the source gem's packaged SQLite from opt-in `--enable-system-libraries`; `dependencies.yml` packages SQLite 3.54.1. Main has the same packaging instructions and SQLite pin. The SQLite release history identifies 3.54.1 as its newest release. Main Rails' minimum sqlite3 gem version is 2.1, whose packaged SQLite is also above 3.37. See [claim-sources.txt](claim-sources.txt), [metrics-and-final-main.txt](metrics-and-final-main.txt) and [packaging-floor.txt](packaging-floor.txt). This statement explains the ordinary supported installation paths, not custom drivers or private-hook overrides.
 
 Both GitHub HTML permalinks were attempted directly. The schema-statements page returned 503 through the page reader twice; direct curl returned 503 for both pages. The adapter page reader succeeded. This did not prevent verification of either permalink's exact path, SHA or line fragment: both contents-API fetches succeeded and match `git show SHA:path`. The failed direct fetches remain in [permalink-fetches.txt](permalink-fetches.txt), rather than being presented as successful page reads.
 
-The CHANGELOG and commit message were also checked sentence by sentence against the same sources and executed operations. Their historical query introduction, affected APIs, migration table creation, db:prepare and model-primary-key failure claims are supported. No substantive replacement is required there; the optional CHANGELOG range narrowing is above.
+The CHANGELOG and commit message were also checked sentence by sentence against the same sources and executed operations. Their historical query introduction and cold-schema-discovery failures are supported. Their unqualified schema-cache/model failure claims require the replacements above; a fresh cold-cache probe alone was insufficient evidence for those categorical statements.
 
 ## Citations remain relevant and current
 
@@ -83,6 +120,8 @@ All runtime comparisons used Ruby 4.0.9, revision `3e93b23afc`, and sqlite3 gem 
 
 `script/min-versions` exits **2**, correctly recording the below-floor helper crashes. This is not an all-green matrix, and the three newly refused controls are not hidden as equivalent behavior.
 
+After syncing the independent Astra evidence, this reviewer also ran **all 15 SQLite-specific adapter test files** on both sides with the matching SQLite CLI on PATH. [full-sqlite-adapter-suites.txt](full-sqlite-adapter-suites.txt) records 235 runs on base versus 236 on head: 0 failures/errors in all four cells, one skip on 3.37.0 and no skips on 3.44.2. This is separate from the changed-file matrix above, not a claim that full Active Record was run.
+
 * [boundary-regression.txt](boundary-regression.txt) runs the new head test unchanged with base libraries: `RuntimeError expected but nothing was raised` (one failure). With head libraries: `1 runs, 3 assertions, 0 failures, 0 errors, 0 skips`.
 * [probes.txt](probes.txt) independently reruns the prior review's fresh-connection public-API probe on base/head and actual SQLite 3.35.5, 3.36.0 and 3.37.0. Raw SQL, column inspection and direct table creation work only on base below the new floor; metadata/model paths produce the reported errors. At 3.37.0 both produce the same useful results.
 * The additional [boundary_probe.rb](boundary_probe.rb) checks ten version values, including both sides of each boundary, 3.36.99, 3.100.0 and 4.0.0, using real Rails Version objects, frozen Version objects, a Version subclass and a duck comparator. Each side passes 40 cases through `connect!`, checking exact RuntimeError text and cleanup on rejection. The expected boundaries are supplied independently as numeric tuples. Subclasses and duck values are extra probes, not claimed public inputs to this `:nodoc:` hook.
@@ -98,4 +137,4 @@ The original source-check attempt stopped because the single-branch clone had no
 
 The kept shell runners and boundary probe retain their executed scratch paths under `.amp/in/orb-backup/sq37-review`. `run-probes.sh` reuses the 2026-11-25 public-API probe; app fixtures are copied unchanged from that review, whose git history was inspected. To replay in a fresh orb, populate that scratch directory and cache with the same files/`script/min-versions` invocation first. No database binaries, generated app databases, gem installations or build trees are added to Lowrail.
 
-Only this evidence directory is part of the review's Lowrail commit. SQ37.md, the Rails fork and upstream GitHub state are unchanged. The builder owns recording the pass and applying the body wording. This `changes` verdict does not authorize opening a PR or bypass the separate current-head Astra gate.
+Only this evidence directory is part of this review's Lowrail commits. The first was pushed before the required sync's new Astra counterexample was reproduced; the follow-up updates the verdict details and preserves the additional executed evidence. SQ37.md and the Rails fork were not changed by this review; the synced Astra pass in SQ37.md belongs to its author. The builder owns recording this pass and applying the text changes. This `changes` verdict does not authorize opening a PR or bypass the separate current-head Astra gate.

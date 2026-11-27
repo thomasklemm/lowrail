@@ -1,0 +1,50 @@
++ for side in base head
++ SQ37_DATABASE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/cached-crud.sqlite3
++ SQ37_SCHEMA_CACHE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/cached-schema.yml
++ bash .amp/in/orb-backup/sq37-review/run-cell.sh base 3.36.0 -C /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/app-cached bin/rails runner 'puts "cached data source exists: #{ActiveRecord::Base.connection_pool.schema_cache.data_source_exists?("widgets")}"'
+cached data source exists: true
++ echo 'CACHE_READ_EXIT=0 SIDE=base'
+CACHE_READ_EXIT=0 SIDE=base
++ for side in base head
++ SQ37_DATABASE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/cached-crud.sqlite3
++ SQ37_SCHEMA_CACHE=/home/user/workspace/repo/.amp/in/orb-backup/sq37-review/cached-schema.yml
++ bash .amp/in/orb-backup/sq37-review/run-cell.sh head 3.36.0 -C /home/user/workspace/repo/.amp/in/orb-backup/sq37-review/app-cached bin/rails runner 'puts "cached data source exists: #{ActiveRecord::Base.connection_pool.schema_cache.data_source_exists?("widgets")}"'
+cached data source exists: true
++ echo 'CACHE_READ_EXIT=0 SIDE=head'
+CACHE_READ_EXIT=0 SIDE=head
++ rg -n -C 2 check_schema_cache_dump_version .amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb .amp/in/orb-backup/sq37-review/rails/guides/source/configuring.md
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-30-
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-31-    config.active_record.use_schema_cache_dump = true
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb:32:    config.active_record.check_schema_cache_dump_version = true
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-33-    config.active_record.maintain_test_schema = true
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-34-    config.active_record.has_many_inversing = false
+--
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-153-
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-154-      ActiveRecord::ConnectionAdapters::SchemaReflection.use_schema_cache_dump = active_record_config.use_schema_cache_dump
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb:155:      ActiveRecord::ConnectionAdapters::SchemaReflection.check_schema_cache_dump_version = active_record_config.check_schema_cache_dump_version
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-156-    end
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-157-
+--
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-167-      # This is why this initializer tries hard not to query the database, and if it
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-168-      # does, it makes sure to rescue any possible database error.
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb:169:      check_schema_cache_dump_version = config.active_record.check_schema_cache_dump_version
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-170-      config.after_initialize do
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-171-        ActiveSupport.on_load(:active_record) do
+--
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-173-          # db:test:prepare will trigger later and might change the schema.
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-174-          #
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb:175:          # Additionally if `check_schema_cache_dump_version` is enabled (which is the default),
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-176-          # loading the schema cache dump trigger a database connection to compare the schema
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-177-          # versions.
+--
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-180-          # but we unfortunately have to arbitrate between resiliency and performance, and chose
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-181-          # resiliency.
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb:182:          if !check_schema_cache_dump_version && app.config.eager_load && !Rails.env.local?
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-183-            begin
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-184-              descendants.each do |model|
+--
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-249-          :query_log_tags_prepend_comment,
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-250-          :sqlite3_adapter_strict_strings_by_default,
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb:251:          :check_schema_cache_dump_version,
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-252-          :use_schema_cache_dump,
+.amp/in/orb-backup/sq37-review/rails/activerecord/lib/active_record/railtie.rb-253-          :postgresql_adapter_decode_dates,

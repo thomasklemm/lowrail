@@ -1,0 +1,62 @@
++ for side in base head
++ for sqlite in 3.37.0 3.44.2
++ bash .amp/in/orb-backup/sq37-review/run-cell.sh base 3.37.0 -e 'Dir.glob("test/cases/adapters/sqlite3/*_test.rb").sort.each { |f| require File.expand_path(f) }' -- --seed 41231
+Using sqlite3
+Run options: --seed 41231
+
+# Running:
+
+......................................................................................................................S....................................................................................................................
+
+Finished in 1.027227s, 228.7712 runs/s, 598.6990 assertions/s.
+
+235 runs, 615 assertions, 0 failures, 0 errors, 1 skips
+
+You have skipped tests. Run with --verbose for details.
++ echo 'SQLITE_SUITE_EXIT=0 SIDE=base SQLITE=3.37.0'
+SQLITE_SUITE_EXIT=0 SIDE=base SQLITE=3.37.0
++ for sqlite in 3.37.0 3.44.2
++ bash .amp/in/orb-backup/sq37-review/run-cell.sh base 3.44.2 -e 'Dir.glob("test/cases/adapters/sqlite3/*_test.rb").sort.each { |f| require File.expand_path(f) }' -- --seed 41231
+Using sqlite3
+Run options: --seed 41231
+
+# Running:
+
+...........................................................................................................................................................................................................................................
+
+Finished in 0.895570s, 262.4026 runs/s, 690.0629 assertions/s.
+
+235 runs, 618 assertions, 0 failures, 0 errors, 0 skips
++ echo 'SQLITE_SUITE_EXIT=0 SIDE=base SQLITE=3.44.2'
+SQLITE_SUITE_EXIT=0 SIDE=base SQLITE=3.44.2
++ for side in base head
++ for sqlite in 3.37.0 3.44.2
++ bash .amp/in/orb-backup/sq37-review/run-cell.sh head 3.37.0 -e 'Dir.glob("test/cases/adapters/sqlite3/*_test.rb").sort.each { |f| require File.expand_path(f) }' -- --seed 41231
+Using sqlite3
+Run options: --seed 41231
+
+# Running:
+
+.......................................................................................................................S....................................................................................................................
+
+Finished in 1.011220s, 233.3815 runs/s, 611.1430 assertions/s.
+
+236 runs, 618 assertions, 0 failures, 0 errors, 1 skips
+
+You have skipped tests. Run with --verbose for details.
++ echo 'SQLITE_SUITE_EXIT=0 SIDE=head SQLITE=3.37.0'
+SQLITE_SUITE_EXIT=0 SIDE=head SQLITE=3.37.0
++ for sqlite in 3.37.0 3.44.2
++ bash .amp/in/orb-backup/sq37-review/run-cell.sh head 3.44.2 -e 'Dir.glob("test/cases/adapters/sqlite3/*_test.rb").sort.each { |f| require File.expand_path(f) }' -- --seed 41231
+Using sqlite3
+Run options: --seed 41231
+
+# Running:
+
+............................................................................................................................................................................................................................................
+
+Finished in 0.950785s, 248.2159 runs/s, 653.1444 assertions/s.
+
+236 runs, 621 assertions, 0 failures, 0 errors, 0 skips
++ echo 'SQLITE_SUITE_EXIT=0 SIDE=head SQLITE=3.44.2'
+SQLITE_SUITE_EXIT=0 SIDE=head SQLITE=3.44.2
