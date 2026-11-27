@@ -1,0 +1,114 @@
+== plant-alloc-46053484797-a2 6fe3dfc92bf0426970daa69cc99cedd75f5ef282 failure job 2026-11-27T19:11:30Z -> 2026-11-27T19:20:43Z
+  Dash.new: String keys with IndifferentAccess       3.9s n=193    cpu 0.999 [0.990, 1.008] same  allocations 32
+  Dash.new: String keys with IndifferentAccess       4.0s n=193    cpu 1.004 [0.995, 1.012] same  allocations 32
+  Dash.new: coerced nested Dashes                    3.9s n=116    cpu 1.008 [1.002, 1.016] same  allocations 16
+  Dash.new: coerced nested Dashes                    4.0s n=112    cpu 1.004 [0.999, 1.010] same  allocations 16
+  Dash.new: coerced properties                       3.9s n=262    cpu 1.010 [1.004, 1.015] same  allocations 7
+  Dash.new: coerced properties                       3.9s n=263    cpu 1.003 [0.998, 1.009] same  allocations 7
+  Dash.new: required properties and defaults         3.8s n=390    cpu 1.004 [1.000, 1.010] same  allocations 3
+  Dash.new: required properties and defaults         3.9s n=390    cpu 1.006 [1.000, 1.012] same  allocations 3
+  Dash: read and write properties                    3.8s n=1330   cpu 0.999 [0.990, 1.008] same  allocations 0
+  Dash: read and write properties                    3.8s n=1353   cpu 0.993 [0.981, 1.003] same  allocations 0
+  DeepFind and DeepFetch: nested keys                4.3s n=70     cpu 0.997 [0.990, 1.004] same  allocations 105
+  DeepFind and DeepFetch: nested keys                4.5s n=78     cpu 0.999 [0.990, 1.010] same  allocations 105
+  IndifferentAccess: new from a nested JSON response   4.5s n=26     cpu 1.003 [1.000, 1.006] same  allocations 252
+  IndifferentAccess: new from a nested JSON response   5.1s n=34     cpu 1.000 [0.996, 1.004] same  allocations 252
+  IndifferentAccess: read String and Symbol keys     3.8s n=1177   cpu 1.015 [1.005, 1.024] same  allocations 0
+  IndifferentAccess: read String and Symbol keys     4.5s n=1766   cpu 1.014 [1.006, 1.022] same  allocations 0
+  IndifferentAccess: write String and Symbol keys    3.7s n=1553   cpu 0.984 [0.974, 0.994] same  allocations 0
+  IndifferentAccess: write String and Symbol keys    3.8s n=1609   cpu 0.983 [0.973, 0.994] same  allocations 0
+  KeepOriginalKeys: read String keys as methods      3.8s n=515    cpu 1.015 [1.001, 1.027] same  allocations 5
+  KeepOriginalKeys: read String keys as methods      3.8s n=528    cpu 1.013 [0.996, 1.030] same  allocations 5
+  KeepOriginalKeys: read Symbol keys as methods      3.8s n=831    cpu 1.004 [0.989, 1.022] same  allocations 5
+  KeepOriginalKeys: read Symbol keys as methods      3.9s n=835    cpu 1.008 [0.993, 1.025] same  allocations 5
+  Mash#to_hash: a nested Mash                        4.4s n=86     cpu 0.984 [0.978, 0.992] same  allocations 10
+  Mash#to_hash: a nested Mash                        4.5s n=84     cpu 0.987 [0.979, 0.997] same  allocations 10
+  PermissiveRespondTo: include in a Mash subclass    4.1s n=92     cpu 1.001 [0.999, 1.004] same  allocations 15
+  PermissiveRespondTo: include in a Mash subclass    4.2s n=96     cpu 1.001 [0.998, 1.004] same  allocations 15
+  Trash.new: renamed and transformed properties      3.9s n=331    cpu 1.005 [0.994, 1.018] same  allocations 4
+  Trash.new: renamed and transformed properties      3.9s n=340    cpu 1.004 [0.994, 1.013] same  allocations 4
+! Mash#deep_merge: a nested update                   4.1s n=22     cpu 1.036 [1.029, 1.042] same  allocations 32.09→73.09
+! Mash#deep_merge: a nested update                   4.1s n=22     cpu 1.036 [1.030, 1.043] same  allocations 32.09→73.09
+! Mash#deep_merge: a nested update                   4.1s n=22     cpu 1.039 [1.032, 1.046] same  allocations 32.09→73.09
+! Mash#deep_merge: a nested update                   4.4s n=34     cpu 1.033 [1.028, 1.038] same  allocations 31.71→72.71
+! Mash#deep_merge: a nested update                   4.4s n=34     cpu 1.036 [1.030, 1.042] same  allocations 31.71→72.71
+! Mash.new: a flat Hash                              3.8s n=758    cpu 1.096 [1.091, 1.104] slower  allocations 3→5
+! Mash.new: a flat Hash                              3.8s n=760    cpu 1.096 [1.090, 1.102] slower  allocations 3→5
+! Mash.new: a flat Hash                              3.8s n=766    cpu 1.094 [1.087, 1.100] slower  allocations 3→5
+! Mash.new: a flat Hash                              3.8s n=783    cpu 1.097 [1.090, 1.104] slower  allocations 3→5
+! Mash.new: a flat Hash                              3.8s n=786    cpu 1.096 [1.089, 1.103] slower  allocations 3→5
+! Mash.new: a nested JSON response                   4.4s n=40     cpu 1.032 [1.027, 1.038] same  allocations 25.45→63.45
+! Mash.new: a nested JSON response                   4.4s n=40     cpu 1.036 [1.030, 1.045] same  allocations 25.45→63.45
+! Mash.new: a nested JSON response                   4.5s n=32     cpu 1.034 [1.027, 1.040] same  allocations 25.75→63.75
+! Mash.new: a nested JSON response                   4.5s n=32     cpu 1.042 [1.035, 1.048] same  allocations 25.75→63.75
+! Mash.new: a nested JSON response                   4.5s n=32     cpu 1.043 [1.037, 1.049] same  allocations 25.75→63.75
+! Mash: overwrite a key as a method                  3.8s n=664    cpu 1.017 [1.014, 1.021] same  allocations 6→8
+! Mash: overwrite a key as a method                  3.8s n=667    cpu 1.016 [1.012, 1.021] same  allocations 6→8
+! Mash: overwrite a key as a method                  3.9s n=568    cpu 1.043 [1.038, 1.048] same  allocations 6→8
+! Mash: overwrite a key as a method                  3.9s n=579    cpu 1.043 [1.037, 1.049] same  allocations 6→8
+! Mash: overwrite a key as a method                  4.0s n=577    cpu 1.040 [1.035, 1.046] same  allocations 6→8
+! Mash: read keys as methods                         3.7s n=703    cpu 1.236 [1.229, 1.245] slower  allocations 5→15
+! Mash: read keys as methods                         3.8s n=716    cpu 1.236 [1.229, 1.243] slower  allocations 5→15
+! Mash: read keys as methods                         3.9s n=598    cpu 1.150 [1.136, 1.162] slower  allocations 5→15
+! Mash: read keys as methods                         3.9s n=606    cpu 1.149 [1.138, 1.162] slower  allocations 5→15
+! Mash: read keys as methods                         3.9s n=620    cpu 1.151 [1.140, 1.160] slower  allocations 5→15
+! Mash: read keys given as Symbols as methods        3.7s n=750    cpu 1.288 [1.276, 1.300] slower  allocations 5→15
+! Mash: read keys given as Symbols as methods        3.7s n=757    cpu 1.283 [1.277, 1.290] slower  allocations 5→15
+! Mash: read keys given as Symbols as methods        3.7s n=789    cpu 1.296 [1.287, 1.308] slower  allocations 5→15
+! Mash: read keys given as Symbols as methods        3.8s n=764    cpu 1.297 [1.288, 1.305] slower  allocations 5→15
+! Mash: read keys given as Symbols as methods        3.8s n=784    cpu 1.291 [1.282, 1.297] slower  allocations 5→15
+! Mash: read keys with [] and dig                    3.8s n=1033   cpu 1.072 [1.066, 1.077] slower  allocations 4→7
+! Mash: read keys with [] and dig                    3.8s n=1060   cpu 1.070 [1.060, 1.078] slower  allocations 4→7
+! Mash: read keys with [] and dig                    3.9s n=1005   cpu 1.079 [1.071, 1.085] slower  allocations 4→7
+! Mash: read keys with [] and dig                    3.9s n=989    cpu 1.086 [1.080, 1.092] slower  allocations 4→7
+! Mash: read keys with [] and dig                    3.9s n=994    cpu 1.091 [1.085, 1.095] slower  allocations 4→7
+! Mash: read keys with suffixes                      3.9s n=368    cpu 1.032 [1.028, 1.037] same  allocations 16→21
+! Mash: read keys with suffixes                      3.9s n=384    cpu 1.032 [1.027, 1.037] same  allocations 16→21
+! Mash: read keys with suffixes                      4.0s n=353    cpu 1.033 [1.029, 1.038] same  allocations 16→21
+! Mash: read keys with suffixes                      4.0s n=354    cpu 1.033 [1.029, 1.037] same  allocations 16→21
+! Mash: read keys with suffixes                      4.0s n=357    cpu 1.029 [1.024, 1.034] same  allocations 16→21
+! Mash: respond_to? a key, a suffix and a missing name   3.7s n=1180   cpu 1.104 [1.098, 1.111] slower  allocations 1→4
+! Mash: respond_to? a key, a suffix and a missing name   3.7s n=1224   cpu 1.101 [1.094, 1.108] slower  allocations 1→4
+! Mash: respond_to? a key, a suffix and a missing name   3.8s n=939    cpu 1.077 [1.069, 1.091] slower  allocations 1→4
+! Mash: respond_to? a key, a suffix and a missing name   3.8s n=953    cpu 1.081 [1.071, 1.091] slower  allocations 1→4
+! Mash: respond_to? a key, a suffix and a missing name   3.8s n=980    cpu 1.074 [1.066, 1.082] slower  allocations 1→4
+! Mash: write new keys as methods                    4.0s n=877    cpu 1.041 [1.037, 1.044] same  allocations 5→7
+! Mash: write new keys as methods                    4.0s n=904    cpu 1.040 [1.034, 1.043] same  allocations 5→7
+! Mash: write new keys as methods                    4.0s n=906    cpu 1.042 [1.036, 1.045] same  allocations 5→7
+! Mash: write new keys as methods                    4.4s n=864    cpu 1.048 [1.044, 1.054] unsettled  allocations 5→7
+! Mash: write new keys as methods                    4.5s n=875    cpu 1.047 [1.043, 1.053] unsettled  allocations 5→7
+! PermissiveRespondTo: Mash.new                      3.8s n=590    cpu 1.065 [1.054, 1.076] slower  allocations 3→4
+! PermissiveRespondTo: Mash.new                      3.8s n=592    cpu 1.067 [1.056, 1.077] slower  allocations 3→4
+! PermissiveRespondTo: Mash.new                      4.1s n=547    cpu 1.057 [1.047, 1.065] unsettled  allocations 3→4
+! PermissiveRespondTo: Mash.new                      4.1s n=598    cpu 1.060 [1.038, 1.067] unsettled  allocations 3→4
+! PermissiveRespondTo: Mash.new                      4.2s n=577    cpu 1.057 [1.048, 1.066] unsettled  allocations 3→4
+! PermissiveRespondTo: overwrite a key as a method   3.8s n=550    cpu 1.005 [0.996, 1.012] same  allocations 5→6
+! PermissiveRespondTo: overwrite a key as a method   3.8s n=560    cpu 1.008 [1.001, 1.016] same  allocations 5→6
+! PermissiveRespondTo: overwrite a key as a method   3.9s n=614    cpu 1.017 [1.009, 1.027] same  allocations 5→6
+! PermissiveRespondTo: overwrite a key as a method   3.9s n=622    cpu 1.018 [1.008, 1.028] same  allocations 5→6
+! PermissiveRespondTo: overwrite a key as a method   3.9s n=625    cpu 1.019 [1.012, 1.030] same  allocations 5→6
+! PermissiveRespondTo: write a new key as a method   3.9s n=594    cpu 1.006 [0.998, 1.015] same  allocations 5→6
+! PermissiveRespondTo: write a new key as a method   3.9s n=597    cpu 1.009 [1.003, 1.017] same  allocations 5→6
+! PermissiveRespondTo: write a new key as a method   4.0s n=658    cpu 1.005 [0.995, 1.012] same  allocations 5→6
+! PermissiveRespondTo: write a new key as a method   4.0s n=676    cpu 1.011 [0.997, 1.018] same  allocations 5→6
+! PermissiveRespondTo: write a new key as a method   4.0s n=678    cpu 1.010 [1.000, 1.013] same  allocations 5→6
+27 benchmarks in 539s: 13 regressed, 0 errors, 0 with a timing too close to the limit to settle
+Comparing 27 benchmarks, 1 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 24 worker processes of each version)
+Measuring 13 benchmarks that looked worse again, in fresh processes, up to 3 times each (4 if what's slower differs, and once more for each too close to call):
+Measuring every benchmark again, in fresh processes: slower across the board in cpu?
+REGRESSION Mash#deep_merge: a nested update: worse allocations in every measurement
+REGRESSION Mash.new: a flat Hash: worse cpu, allocations in every measurement
+REGRESSION Mash.new: a nested JSON response: worse allocations in every measurement
+REGRESSION Mash: overwrite a key as a method: worse allocations in every measurement
+REGRESSION Mash: read keys as methods: worse cpu, allocations in every measurement
+REGRESSION Mash: read keys given as Symbols as methods: worse cpu, allocations in every measurement
+REGRESSION Mash: read keys with [] and dig: worse cpu, allocations in every measurement
+REGRESSION Mash: read keys with suffixes: worse allocations in every measurement
+REGRESSION Mash: respond_to? a key, a suffix and a missing name: worse cpu, allocations in every measurement
+REGRESSION Mash: write new keys as methods: worse allocations in every measurement
+REGRESSION PermissiveRespondTo: Mash.new: worse allocations in every measurement
+REGRESSION PermissiveRespondTo: overwrite a key as a method: worse allocations in every measurement
+REGRESSION PermissiveRespondTo: write a new key as a method: worse allocations in every measurement
+REGRESSION across the board: cpu slower in both measurements
+across the board: cpu 1.018 [1.014, 1.021] slower (limit 1.0125, 27 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +ZJIT +PRISM [x86_64-linux]

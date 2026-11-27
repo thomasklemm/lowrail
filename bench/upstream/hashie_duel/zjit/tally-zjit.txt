@@ -1,0 +1,30 @@
+run                              job s duel s regressed unsettled faster  measured again
+aa-1-46053462771-a1                143    115         0         0      0  False
+aa-1-46053462771-a2                132    113         0         0      0  False
+aa-1-46053462771-a3                129    113         0         0      0  False
+aa-1-46053462771-a4                153    115         0         0      0  False
+aa-2-46053469392-a1                137    115         0         0      0  False
+aa-2-46053469392-a2                132    114         0         0      0  False
+aa-2-46053469392-a3                125    109         0         0      0  False
+aa-2-46053469392-a4                126    112         0         0      0  False
+aa-3-46053471526-a1                126    110         0         2      0  False
+aa-3-46053471526-a2                128    111         0         0      0  False
+aa-3-46053471526-a3                138    112         0         0      0  False
+aa-3-46053471526-a4                134    111         0         0      0  False
+aa-4-46053477027-a1                130    111         0         0      0  False
+aa-4-46053477027-a2                131    111         0         0      0  False
+aa-4-46053477027-a3                133    111         0         0      0  False
+aa-4-46053477027-a4                131    110         0         0      0  False
+aa-5-46053481830-a1                123    110         0         0      0  False
+aa-5-46053481830-a2                129    111         0         0      0  False
+aa-5-46053481830-a3                132    115         0         0      0  False
+aa-5-46053481830-a4                127    111         0         0      0  False
+hm1-46053498495-a1                 135    116         0         0      5  False
+hm1-46053498495-a2                 135    115         0         0      3  False
+hm1-46053498495-a3                 130    115         0         0      5  False
+plant-alloc-46053484797-a1         555    537        13         0      0  True
+plant-alloc-46053484797-a2         553    539        13         0      0  True
+plant-cpu-46053490588-a1           227    207         4         0      0  True
+plant-cpu-46053490588-a2           240    223         5         0      0  True
+
+A/A: 20 runs, 0 failed, 0 measured again, 2 of 540 verdicts unsettled, job 123-153 s (median 131 s)
