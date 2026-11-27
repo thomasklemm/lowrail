@@ -1,6 +1,9 @@
 # Draft: unused module refinement hides a superclass method from `send` and C calls
 
-Status, 2026-11-27: **draft, nothing posted.** Thomas posts the report (or approves posting) and approves opening the
+Status, 2026-11-27: **draft, nothing posted. Approved by thermos-sol and Astra** (report, PR text, commit message and
+head `151bebd34d`; Sol thread T-01a21eca-5c03-7779-b80e-e03aef7db05c, Astra T-01a21eca-63e1-76f7-b473-ee3433ea1051).
+Both Sol passes were one reviewer applying both rubrics, not two parallel reviewers.
+Thomas posts the report (or approves posting) and approves opening the
 PR. The PR cites the Redmine ticket, so the ticket goes first; replace `NNNNN` with its number in the PR body and add
 `[Bug #NNNNN]` to the commit subject before opening.
 
