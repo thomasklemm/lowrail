@@ -1,0 +1,3 @@
+category	reason	site	samples	apps	app_names
+side_exit	NoProfileSend	ActiveModel::LazyIndexedAttributeSet#fetch_value_at! (/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:422)	5	1	shipit
+side_exit	NoProfileSend	ActiveModel::LazyIndexedAttributeSet#fetch_value_at! (/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:423)	5	1	shipit

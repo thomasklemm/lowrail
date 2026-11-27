@@ -1,0 +1,1490 @@
+compiled_iseq_count	930
+jit_frame_stack_map_bytes	107421
+compile_time_ns	519442215
+profile_time_ns	6623711
+gc_time_ns	8181596
+invalidation_time_ns	4801380
+compiled_side_exit_count	16095
+side_exit_count	2880
+side_exit_size_bytes	1086609
+compile_side_exit_time_ns	33706377
+compile_hir_time_ns	168582394
+compile_hir_build_time_ns	47808842
+compile_hir_strength_reduce_time_ns	31663104
+compile_hir_inline_methods_time_ns	12893196
+compile_hir_remove_trivial_block_params_time_ns	6674700
+compile_hir_optimize_load_store_time_ns	8505846
+compile_hir_canonicalize_time_ns	24607160
+compile_hir_fold_constants_time_ns	7770196
+compile_hir_clean_cfg_time_ns	6724966
+compile_hir_remove_redundant_patch_points_time_ns	5250192
+compile_hir_remove_duplicate_check_interrupts_time_ns	3200164
+compile_hir_eliminate_empty_inline_frames_time_ns	1345350
+compile_hir_eliminate_dead_code_time_ns	8929269
+compile_lir_time_ns	323203935
+jit_frame_region_bytes	716800
+jit_frame_count	22717
+code_region_bytes	2789376
+zjit_alloc_bytes	2670602
+total_mem_bytes	6176778
+zjit_insn_count	327326581
+unspecialized_send_def_type_optimized_send	824
+unspecialized_send_def_type_optimized	13
+unspecialized_super_def_type_attrset	293
+complex_arg_pass_param_kwrest	479993
+complex_arg_pass_caller_kw_splat	120003
+caller_splat_profile_monomorphic	1
+caller_splat_optimized	1
+send_direct_fallback_context_send	479993
+vm_write_jit_frame_count	50503544
+vm_write_sp_count	50503544
+vm_write_stack_count	11494505
+vm_write_to_parent_iseq_local_count	121274
+throw_count	36
+guard_type_count	47045140
+guard_shape_count	25980667
+load_field_count	84777024
+store_field_count	17826323
+inline_method_count	622
+inline_block_count	21
+inline_reject_too_large	298
+inline_reject_complex_params	14
+inline_reject_ep_escapes	2
+inline_reject_budget_exceeded	932
+exit_function_stub_not_profiled	660
+exit_guard_type_failure	1527
+exit_guard_shape_failure	372
+exit_patchpoint_method_redefined	25
+exit_interrupt	8
+exit_invoke_block_handler_not_iseq	3
+exit_invoke_block_iseq_changed	17
+exit_no_profile_send	173
+exit_no_profile_getivar	80
+exit_no_profile_setivar	15
+send_fallback_send_not_optimized_method_type_optimized	824
+send_fallback_send_polymorphic_fallback	3688
+send_fallback_send_polymorphic	103
+send_fallback_send_megamorphic	338
+send_fallback_send_not_optimized_method_type	13
+send_fallback_send_not_optimized_need_permission	840594
+send_fallback_send_block_arg_not_nil	241072
+send_fallback_one_or_more_complex_arg_pass	961075
+send_fallback_singleton_class_seen	1692
+send_fallback_super_call_with_block	17
+send_fallback_super_from_block	17
+send_fallback_super_not_optimized_method_type	293
+send_fallback_super_polymorphic	515
+send_fallback_invokeblock_not_specialized	601172
+send_fallback_invokeblock_polymorphic_miss	129667
+send_fallback_sendforward_not_specialized	1679960
+send_fallback_invokesuperforward_not_specialized	119973
+dynamic_send_count	4581013
+iseq_optimized_send_count	19714032
+inline_cfunc_optimized_send_count	22201896
+inline_iseq_optimized_send_count	14071290
+non_variadic_cfunc_optimized_send_count	2078301
+variadic_cfunc_optimized_send_count	4591157
+block_iseq_direct_optimized_send_count	1332
+inline_block_optimized_send_count	909
+optimized_send_count	62658917
+send_count	67239930
+setivar_fallback_not_t_object	154
+setivar_fallback_shape_transition	270
+setivar_fallback_new_shape_needs_extension	214
+setivar_fallback_no_side_exits	27
+dynamic_setivar_count	665
+getivar_fallback_no_profile_missing_ic	1080923
+getivar_fallback_no_side_exits	221
+dynamic_getivar_count	1081144
+not_inlined_cfuncs_Enumerable#sort_by	88
+not_inlined_cfuncs_SQLite3::Statement#column_decltype_downcased	58
+not_inlined_cfuncs_String#downcase!	281
+not_inlined_cfuncs_String#-@	6496
+not_inlined_cfuncs_Integer#<=	4
+not_inlined_cfuncs_String#delete_prefix!	3064
+not_inlined_cfuncs_Array#include?	628
+not_inlined_cfuncs_Array#index	54
+not_inlined_cfuncs_Kernel#is_a?	122384
+not_inlined_cfuncs_SQLite3::Statement#step	56
+not_inlined_cfuncs_String#scan	230
+not_inlined_cfuncs_Enumerable#each_with_index	202
+not_inlined_cfuncs_Array#uniq	64
+not_inlined_cfuncs_String#match?	543
+not_inlined_cfuncs_Comparable#==	266
+not_inlined_cfuncs_Hash#fetch	3720343
+not_inlined_cfuncs_Array#compact	195
+not_inlined_cfuncs_Kernel#<=>	256
+not_inlined_cfuncs_String#%	2451
+not_inlined_cfuncs_Array#prepend	14
+not_inlined_cfuncs_Module#instance_method	299
+not_inlined_cfuncs_Thread::Backtrace::Location#path	112
+not_inlined_cfuncs_Module#<	28
+not_inlined_cfuncs_Hash#has_key?	36
+not_inlined_cfuncs_Array#hash	278
+not_inlined_cfuncs_Module#protected_method_defined?	1
+not_inlined_cfuncs_Hash#key?	260
+not_inlined_cfuncs_Hash.new	142
+not_inlined_cfuncs_Process.clock_gettime	193
+not_inlined_cfuncs_Hash#transform_keys	119972
+not_inlined_cfuncs_Integer#==	77
+not_inlined_cfuncs_Hash#values	240
+not_inlined_cfuncs_Kernel#eval	3
+not_inlined_cfuncs_File.join	474
+not_inlined_cfuncs_Thread#[]	8
+not_inlined_cfuncs_Array#freeze	264
+not_inlined_cfuncs_Array#-	599971
+not_inlined_cfuncs_Thread::Backtrace::Location#lineno	112
+not_inlined_cfuncs_String#index	27
+not_inlined_cfuncs_Array#shift	2671
+not_inlined_cfuncs_Array#reject!	41
+not_inlined_cfuncs_String#==	199
+not_inlined_cfuncs_File.directory?	2352
+not_inlined_cfuncs_String#to_i	648
+not_inlined_cfuncs_Module#singleton_class?	69
+not_inlined_cfuncs_String#hash	455
+not_inlined_cfuncs_String#sub!	18
+not_inlined_cfuncs_Array#any?	360459
+not_inlined_cfuncs_String#chomp!	457
+not_inlined_cfuncs_String#===	31
+not_inlined_cfuncs_Module#include	2
+not_inlined_cfuncs_Struct#[]=	252
+not_inlined_cfuncs_UnboundMethod#parameters	496
+not_inlined_cfuncs_String#downcase	2111
+not_inlined_cfuncs_Set#each	10
+not_inlined_cfuncs_String#strip	246
+not_inlined_cfuncs_Hash#clear	404
+not_inlined_cfuncs_Module#attr_reader	39
+not_inlined_cfuncs_Array#|	239971
+not_inlined_cfuncs_Enumerable#flat_map	119972
+not_inlined_cfuncs_Integer#chr	2270
+not_inlined_cfuncs_Module#const_get	10
+not_inlined_cfuncs_Numeric#nonzero?	1495
+not_inlined_cfuncs_Kernel#extend	16
+not_inlined_cfuncs_Enumerator#with_index	47
+not_inlined_cfuncs_String#+	377
+not_inlined_cfuncs_String#include?	121247
+not_inlined_cfuncs_String#sub	1540
+not_inlined_cfuncs_Module#initialize	7
+not_inlined_cfuncs_Kernel#respond_to?	238
+not_inlined_cfuncs_Set#include?	354
+not_inlined_cfuncs_String#freeze	31
+not_inlined_cfuncs_ObjectSpace::WeakKeyMap#[]	58
+not_inlined_cfuncs_Class#subclasses	7
+not_inlined_cfuncs_Kernel#catch	7
+not_inlined_cfuncs_Array.new	6
+not_inlined_cfuncs_Kernel#dup	350
+not_inlined_cfuncs_Module#define_method	2452
+not_inlined_cfuncs_String#rindex	273
+not_inlined_cfuncs_Kernel#method	119973
+not_inlined_cfuncs_SQLite3::Database#closed?	113
+not_inlined_cfuncs_Array#reverse	41
+not_inlined_cfuncs_File.expand_path	48
+not_inlined_cfuncs_Module#private_method_defined?	109
+not_inlined_cfuncs_Symbol#match?	509
+not_inlined_cfuncs_Enumerable#each_cons	119971
+not_inlined_cfuncs_Kernel#gem_original_require	22
+not_inlined_cfuncs_Hash#freeze	13
+not_inlined_cfuncs_Hash#each_value	137
+not_inlined_cfuncs_Regexp#===	225
+not_inlined_cfuncs_String#dup	162
+not_inlined_cfuncs_Kernel#format	31
+not_inlined_cfuncs_Integer#>	4
+not_inlined_cfuncs_Module#module_eval	2
+not_inlined_cfuncs_String#<=>	1632
+not_inlined_cfuncs_Time.utc	1
+not_inlined_cfuncs_Array#unshift	1
+not_inlined_cfuncs_Array#to_h	72
+not_inlined_cfuncs_File.file?	3
+not_inlined_cfuncs_Module#class_eval	30
+not_inlined_cfuncs_Hash#include?	317
+not_inlined_cfuncs_Kernel#instance_variable_defined?	595
+not_inlined_cfuncs_Module#const_defined?	4
+not_inlined_cfuncs_Float#round	18
+not_inlined_cfuncs_Enumerable#grep	14
+not_inlined_cfuncs_String#gsub	309
+not_inlined_cfuncs_Hash#keys	97
+not_inlined_cfuncs_Array#uniq!	415
+not_inlined_cfuncs_Enumerable#filter_map	110
+not_inlined_cfuncs_Module#undef_method	171
+not_inlined_cfuncs_Module#alias_method	13
+not_inlined_cfuncs_SQLite3::Statement#prepare	28
+not_inlined_cfuncs_Array#fetch	121268
+not_inlined_cfuncs_Kernel#instance_of?	102
+not_inlined_cfuncs_Method#call	112
+not_inlined_cfuncs_Symbol#inspect	97
+not_inlined_cfuncs_Array#delete	82
+not_inlined_cfuncs_Kernel#Array	198
+not_inlined_cfuncs_String#[]	382
+not_inlined_cfuncs_Kernel#object_id	7
+not_inlined_cfuncs_String#start_with?	1440
+not_inlined_cfuncs_RubyVM::FrozenCore.core#iseq_path	30
+not_inlined_cfuncs_SQLite3::Statement#column_count	13
+not_inlined_cfuncs_String.new	3
+not_inlined_cfuncs_File.path	1361
+not_inlined_cfuncs_Class#superclass	137
+not_inlined_cfuncs_SQLite3::Statement#bind_param	5
+not_inlined_cfuncs_Comparable#>=	64
+not_inlined_cfuncs_Module#method_defined?	369
+not_inlined_cfuncs_Array#zip	119971
+not_inlined_cfuncs_Module#public_instance_method	1
+not_inlined_cfuncs_Array#flatten	743
+not_inlined_cfuncs_SQLite3::Database#total_changes	40
+not_inlined_cfuncs_Array#==	181
+not_inlined_cfuncs_Array#join	767
+not_inlined_cfuncs_Class#new	220
+not_inlined_cfuncs_Kernel#instance_variable_get	316
+not_inlined_cfuncs_Kernel#instance_variable_set	198
+not_inlined_cfuncs_Hash#each	360515
+not_inlined_cfuncs_String#split	1752
+not_inlined_cfuncs_String#encoding	32
+not_inlined_cfuncs_Enumerable#find	11
+not_inlined_cfuncs_String#count	545
+not_inlined_cfuncs_Array#slice!	112
+not_inlined_cfuncs_Hash#any?	120013
+not_inlined_cfuncs_Array#concat	79
+not_inlined_cfuncs_Module#const_set	4
+not_inlined_cfuncs_Kernel#binding	3
+not_inlined_cfuncs_Regexp#=~	311
+not_inlined_cfuncs_Kernel#respond_to_missing?	120
+not_inlined_cfuncs_Array#reject	18
+not_inlined_cfuncs_Array#reverse_each	120053
+not_inlined_cfuncs_Array#all?	482
+not_inlined_cfuncs_Regexp#match?	4120
+not_inlined_cfuncs_Hash#each_key	8
+not_inlined_cfuncs_Set#add	2111
+not_inlined_cfuncs_Array#compact!	415
+not_inlined_cfuncs_Kernel#initialize_copy	89
+not_inlined_cfuncs_Struct#[]	252
+not_inlined_cfuncs_File.exist?	12
+not_inlined_cfuncs_Kernel#singleton_class	103
+not_inlined_cfuncs_String#gsub!	767
+not_inlined_cfuncs_String#=~	209
+not_inlined_cfuncs_Array#none?	513
+not_inlined_cfuncs_Integer#<=>	323
+not_inlined_cfuncs_Array#flatten!	8
+not_inlined_cfuncs_String#tr!	281
+not_inlined_cfuncs_SQLite3::Statement#column_name	58
+not_inlined_cfuncs_RubyVM::FrozenCore.core#hash_merge_bang_kwd	32
+not_inlined_cfuncs_Array#map!	556
+not_inlined_cfuncs_SQLite3::Statement#done?	43
+not_inlined_cfuncs_Method#owner	119973
+not_inlined_cfuncs_String#inspect	155
+not_inlined_cfuncs_Kernel#caller_locations	45
+not_inlined_cfuncs_Array#intersect?	14
+not_inlined_cfuncs_Kernel#public_send	1
+not_inlined_cfuncs_Symbol#start_with?	161
+not_annotated_cfuncs_Hash#key?	260
+not_annotated_cfuncs_File.join	474
+not_annotated_cfuncs_Array#reject	18
+not_annotated_cfuncs_Module#const_get	10
+not_annotated_cfuncs_Module#module_eval	372
+not_annotated_cfuncs_Array#intersect?	14
+not_annotated_cfuncs_Hash#each_value	137
+not_annotated_cfuncs_Kernel#eval	3
+not_annotated_cfuncs_Struct#[]=	252
+not_annotated_cfuncs_Hash.new	142
+not_annotated_cfuncs_String#to_i	648
+not_annotated_cfuncs_Array#all?	482
+not_annotated_cfuncs_Array#|	239971
+not_annotated_cfuncs_Enumerable#sort_by	88
+not_annotated_cfuncs_Hash#clear	404
+not_annotated_cfuncs_String#rindex	273
+not_annotated_cfuncs_Thread#[]	8
+not_annotated_cfuncs_Array#flatten!	8
+not_annotated_cfuncs_Kernel#caller_locations	45
+not_annotated_cfuncs_Array#shift	2671
+not_annotated_cfuncs_Integer#chr	2270
+not_annotated_cfuncs_Module#instance_method	809
+not_annotated_cfuncs_ObjectSpace::WeakKeyMap#[]	58
+not_annotated_cfuncs_Enumerable#find	11
+not_annotated_cfuncs_File.expand_path	48
+not_annotated_cfuncs_Array#unshift	1
+not_annotated_cfuncs_RubyVM::FrozenCore.core#hash_merge_bang_kwd	32
+not_annotated_cfuncs_String#start_with?	1440
+not_annotated_cfuncs_Array#none?	513
+not_annotated_cfuncs_Thread::Backtrace::Location#path	112
+not_annotated_cfuncs_Hash#keys	97
+not_annotated_cfuncs_Enumerator#with_index	47
+not_annotated_cfuncs_Array#reject!	41
+not_annotated_cfuncs_Comparable#>=	64
+not_annotated_cfuncs_Time.utc	1
+not_annotated_cfuncs_Enumerable#filter_map	110
+not_annotated_cfuncs_String#+	377
+not_annotated_cfuncs_Module#method_defined?	875
+not_annotated_cfuncs_Module#attr_reader	41
+not_annotated_cfuncs_String#strip	246
+not_annotated_cfuncs_String#hash	455
+not_annotated_cfuncs_Kernel#gem_original_require	22
+not_annotated_cfuncs_String#scan	230
+not_annotated_cfuncs_Array#slice!	112
+not_annotated_cfuncs_Array.new	6
+not_annotated_cfuncs_Array#zip	119971
+not_annotated_cfuncs_Symbol#match?	509
+not_annotated_cfuncs_Module#define_method	2452
+not_annotated_cfuncs_File.directory?	2352
+not_annotated_cfuncs_String#split	1752
+not_annotated_cfuncs_Numeric#nonzero?	1495
+not_annotated_cfuncs_Array#include?	628
+not_annotated_cfuncs_Array#delete	82
+not_annotated_cfuncs_Kernel#instance_variable_get	316
+not_annotated_cfuncs_Hash#has_key?	36
+not_annotated_cfuncs_SQLite3::Statement#column_name	58
+not_annotated_cfuncs_String#gsub	309
+not_annotated_cfuncs_Array#flatten	743
+not_annotated_cfuncs_Module#class_eval	30
+not_annotated_cfuncs_Hash#values	240
+not_annotated_cfuncs_Module#include	2
+not_annotated_cfuncs_Set#each	10
+not_annotated_cfuncs_Array#fetch	121268
+not_annotated_cfuncs_Module#const_defined?	4
+not_annotated_cfuncs_String#inspect	155
+not_annotated_cfuncs_String#[]	382
+not_annotated_cfuncs_Array#concat	79
+not_annotated_cfuncs_String#include?	121247
+not_annotated_cfuncs_String#chomp!	457
+not_annotated_cfuncs_Process.clock_gettime	193
+not_annotated_cfuncs_Module#const_set	4
+not_annotated_cfuncs_UnboundMethod#parameters	496
+not_annotated_cfuncs_Regexp#match?	4120
+not_annotated_cfuncs_Hash#include?	325
+not_annotated_cfuncs_Array#uniq	64
+not_annotated_cfuncs_Module#private_method_defined?	109
+not_annotated_cfuncs_Module#singleton_class?	69
+not_annotated_cfuncs_Class#subclasses	7
+not_annotated_cfuncs_Array#compact	195
+not_annotated_cfuncs_SQLite3::Statement#done?	43
+not_annotated_cfuncs_SQLite3::Statement#prepare	28
+not_annotated_cfuncs_Float#round	18
+not_annotated_cfuncs_Struct#[]	252
+not_annotated_cfuncs_Array#any?	360459
+not_annotated_cfuncs_Hash#fetch	3720343
+not_annotated_cfuncs_Array#uniq!	415
+not_annotated_cfuncs_Array#map!	556
+not_annotated_cfuncs_SQLite3::Database#closed?	113
+not_annotated_cfuncs_String#index	27
+not_annotated_cfuncs_Set#add	2111
+not_annotated_cfuncs_Kernel#instance_variable_defined?	595
+not_annotated_cfuncs_Hash#transform_keys	119972
+not_annotated_cfuncs_String#gsub!	767
+not_annotated_cfuncs_Kernel#singleton_class	103
+not_annotated_cfuncs_Hash#each_key	8
+not_annotated_cfuncs_String#encoding	32
+not_annotated_cfuncs_SQLite3::Database#total_changes	40
+not_annotated_cfuncs_String#downcase	2111
+not_annotated_cfuncs_File.path	1361
+not_annotated_cfuncs_Module#public_instance_method	6
+not_annotated_cfuncs_Kernel#public_send	1
+not_annotated_cfuncs_Enumerable#grep	14
+not_annotated_cfuncs_Array#compact!	415
+not_annotated_cfuncs_Kernel#respond_to_missing?	120
+not_annotated_cfuncs_Kernel#Array	198
+not_annotated_cfuncs_Kernel#extend	16
+not_annotated_cfuncs_Enumerable#each_with_index	202
+not_annotated_cfuncs_Integer#<=>	324
+not_annotated_cfuncs_File.exist?	12
+not_annotated_cfuncs_Module#alias_method	13
+not_annotated_cfuncs_Comparable#==	271
+not_annotated_cfuncs_Kernel#object_id	7
+not_annotated_cfuncs_Class#new	220
+not_annotated_cfuncs_Kernel#instance_of?	102
+not_annotated_cfuncs_Thread::Backtrace::Location#lineno	112
+not_annotated_cfuncs_Module#<	28
+not_annotated_cfuncs_Enumerable#flat_map	119972
+not_annotated_cfuncs_SQLite3::Statement#column_decltype_downcased	58
+not_annotated_cfuncs_Enumerable#each_cons	119971
+not_annotated_cfuncs_Kernel#binding	3
+not_annotated_cfuncs_String.new	3
+not_annotated_cfuncs_String#dup	162
+not_annotated_cfuncs_RubyVM::FrozenCore.core#iseq_path	30
+not_annotated_cfuncs_String#=~	209
+not_annotated_cfuncs_String#sub	1540
+not_annotated_cfuncs_Regexp#===	225
+not_annotated_cfuncs_Array#-	599971
+not_annotated_cfuncs_String#sub!	18
+not_annotated_cfuncs_Method#call	112
+not_annotated_cfuncs_Hash#any?	120013
+not_annotated_cfuncs_String#delete_prefix!	3064
+not_annotated_cfuncs_Array#reverse_each	120053
+not_annotated_cfuncs_String#<=>	1632
+not_annotated_cfuncs_Array#index	54
+not_annotated_cfuncs_Kernel#<=>	256
+not_annotated_cfuncs_String#tr!	281
+not_annotated_cfuncs_String#match?	543
+not_annotated_cfuncs_Array#to_h	72
+not_annotated_cfuncs_Module#initialize	7
+not_annotated_cfuncs_Kernel#catch	7
+not_annotated_cfuncs_Kernel#initialize_copy	89
+not_annotated_cfuncs_Method#owner	119973
+not_annotated_cfuncs_File.file?	3
+not_annotated_cfuncs_Module#undef_method	171
+not_annotated_cfuncs_String#downcase!	281
+not_annotated_cfuncs_Array#prepend	14
+not_annotated_cfuncs_SQLite3::Statement#step	56
+not_annotated_cfuncs_Symbol#inspect	97
+not_annotated_cfuncs_Regexp#=~	311
+not_annotated_cfuncs_Symbol#start_with?	161
+not_annotated_cfuncs_Kernel#format	31
+not_annotated_cfuncs_Module#protected_method_defined?	1
+not_annotated_cfuncs_Hash#each	360515
+not_annotated_cfuncs_SQLite3::Statement#column_count	13
+not_annotated_cfuncs_Array#hash	278
+not_annotated_cfuncs_SQLite3::Statement#bind_param	5
+not_annotated_cfuncs_Kernel#method	119973
+not_annotated_cfuncs_Kernel#instance_variable_set	198
+not_annotated_cfuncs_Set#include?	354
+not_annotated_cfuncs_String#count	545
+ccall_Enumerable#grep	14
+ccall_Kernel#instance_of?	102
+ccall_Class#new	220
+ccall_Array#uniq	64
+ccall_rb_vm_send	602131
+ccall_dir_s_glob	83
+ccall_rb_hash_bulk_insert	57
+ccall_Module#class_eval	30
+ccall_Kernel#caller_locations	45
+ccall_Array#reject!	41
+ccall_rb_vm_opt_newarray_include_p	59
+ccall_Hash#transform_keys	119972
+ccall_rb_vm_opt_getconstant_path	17
+ccall_rb_gvar_set	400
+ccall_Module#include	2
+ccall__bi290	1576
+ccall_Module#protected_method_defined?	1
+ccall_rb_hash_new_capa	32
+ccall_rb_vm_env_write	120620
+ccall_String#hash	455
+ccall_rb_fix_to_s	445
+ccall_rb_sym_to_proc	12
+ccall_Kernel#format	31
+ccall_Kernel#gem_original_require	22
+ccall_Array#zip	119971
+ccall_rb_ivar_set	2
+ccall_Hash#each_key	8
+ccall_String#encoding	32
+ccall_String#split	1752
+ccall_Kernel#<=>	256
+ccall_File.exist?	12
+ccall_Enumerable#find	11
+ccall_rb_vm_yield_with_cfunc	3778
+ccall_String#include?	121247
+ccall_String#downcase!	281
+ccall_String#freeze	31
+ccall_rb_hash_aref	3611338
+ccall_SQLite3::Statement#done?	43
+ccall_String#dup	162
+ccall_SQLite3::Statement#column_count	13
+ccall_String#inspect	155
+ccall_Array#fetch	121268
+ccall_rb_yarv_str_eql_internal	127808
+ccall_File.file?	3
+ccall_rb_ary_push	127746
+ccall_Hash#empty?	360064
+ccall_Enumerable#filter_map	110
+ccall_String#gsub	309
+ccall_String#length	927
+ccall_Array#reverse	41
+ccall_Hash#key?	260
+ccall_Symbol#match?	509
+ccall_rb_vm_defined	142
+ccall_Regexp#===	225
+ccall_rb_vm_sendforward	1679960
+ccall_SQLite3::Statement#prepare	28
+ccall_Array#reverse_each	120053
+ccall_File.directory?	2352
+ccall_Array#to_h	72
+ccall_Integer#chr	2270
+ccall_ractor_local_value_store_if_absent	9
+ccall_String#[]	382
+ccall_Module#module_eval	2
+ccall_String#chomp!	457
+ccall_Array#delete	82
+ccall_Hash#has_key?	36
+ccall_rb_obj_is_kind_of	1322391
+ccall_Kernel#respond_to?	238
+ccall_File.join	474
+ccall_Array#all?	482
+ccall_String#match?	543
+ccall__bi567	134
+ccall_String#sub!	18
+ccall_String.new	3
+ccall_Kernel#binding	3
+ccall_rb_vm_bh_to_procval	208
+ccall_rb_vm_get_ev_const	34
+ccall_Comparable#>=	64
+ccall_Array#-	599971
+ccall_Kernel#method	119973
+ccall_rb_jit_ruby2_keywords_splat_p	1
+ccall_Array#reject	18
+ccall_Module#attr_reader	39
+ccall_Array#any?	360459
+ccall_Kernel#instance_variable_set	198
+ccall_Set#include?	354
+ccall_exit_recompile	858
+ccall_Array#shift	2671
+ccall_Array#intersect?	14
+ccall_Kernel#extend	16
+ccall_SQLite3::Statement#column_name	58
+ccall_Float#round	18
+ccall_Array#==	181
+ccall_RubyVM::FrozenCore.core#iseq_path	30
+ccall_Array#slice!	112
+ccall_Method#call	112
+ccall_Array#flatten	743
+ccall_Kernel#instance_variable_defined?	595
+ccall_rb_range_new	67
+ccall_Integer#==	77
+ccall_Time.utc	1
+ccall_rb_ivar_get	1080923
+ccall_rb_obj_alloc	841
+ccall_Kernel#instance_variable_get	316
+ccall_Array#flatten!	8
+ccall_rb_ec_ary_new_from_values	8767
+ccall_Hash#include?	317
+ccall_rb_backref_get	1310
+ccall_Module#const_defined?	4
+ccall_rb_monitor_synchronize	79
+ccall_rb_reg_nth_match	1310
+ccall_Kernel#catch	7
+ccall_rb_vm_check_match	177
+ccall_Array#map!	556
+ccall_Array#index	54
+ccall_Hash#clear	404
+ccall_ObjectSpace::WeakKeyMap#[]	58
+ccall_gc_stat	84
+ccall_rb_optimized_call	240063
+ccall_Array#concat	79
+ccall_String#==	199
+ccall_Hash#each	360515
+ccall_Module#const_get	10
+ccall_Array#hash	278
+ccall_Symbol#inspect	97
+ccall_String#rindex	273
+ccall_Module#instance_method	299
+ccall_Array#|	239971
+ccall_String#tr!	281
+ccall_Module#const_set	4
+ccall_Comparable#==	266
+ccall__bi20	36
+ccall_Process.clock_gettime	193
+ccall_Module#public_instance_method	1
+ccall_Array#uniq!	415
+ccall_Method#owner	119973
+ccall_rb_gvar_get	1741
+ccall_rb_str_buf_append	261
+ccall_Module#<	28
+ccall_Kernel#singleton_class	103
+ccall_rb_vm_opt_send_without_block	1447268
+ccall_UnboundMethod#parameters	496
+ccall__bi503	34
+ccall_io_readline	1284
+ccall_rb_vm_invokesuper	842
+ccall_rb_zjit_defined_ivar	240103
+ccall_File.path	1361
+ccall_rb_float_minus	21
+ccall_rb_builtin_shareable_proc	88
+ccall_Integer#<=>	323
+ccall_Array#none?	513
+ccall_rb_gc_writebarrier	120347
+ccall_Class#subclasses	7
+ccall_rb_vm_setinstancevariable	665
+ccall_Integer#>	4
+ccall_Kernel#dup	350
+ccall_Enumerable#flat_map	119972
+ccall_Array#unshift	1
+ccall_SQLite3::Statement#step	56
+ccall_Enumerable#each_with_index	202
+ccall_Module#===	119973
+ccall_ActiveSupport::Callbacks::Filters::Environment::allocator	7
+ccall_rb_vm_getclassvariable	1026
+ccall_String#delete_prefix!	3064
+ccall_Numeric#nonzero?	1495
+ccall_Module#define_method	2452
+ccall_String#start_with?	1440
+ccall_String#%	2451
+ccall_Thread::Backtrace::Location#lineno	112
+ccall_Kernel#is_a?	122384
+ccall_SQLite3::Database#closed?	113
+ccall__bi701	83
+ccall_Integer#<=	4
+ccall_rb_ary_resurrect	4
+ccall_String#<=>	1632
+ccall_rb_str_concat_literals	9657
+ccall_SQLite3::Statement#column_decltype_downcased	58
+ccall_Array#join	767
+ccall_Hash#values	240
+ccall_rb_vm_splat_array	360214
+ccall_Class#superclass	137
+ccall_rb_str_init	14
+ccall_String#+	377
+ccall_Regexp#=~	311
+ccall_Array#freeze	264
+ccall_rb_vm_invokeblock	730839
+ccall_rb_ary_pop	87
+ccall_String#===	31
+ccall_Array#compact	195
+ccall_rb_jit_ary_push	3484
+ccall_SQLite3::Database#total_changes	40
+ccall_String#count	545
+ccall_Enumerable#sort_by	88
+ccall_Module#singleton_class?	69
+ccall_Struct::HTMLElementDescription::allocator	63
+ccall_Module#name	359986
+ccall_Module#alias_method	13
+ccall_String#=~	209
+ccall_Array#include?	628
+ccall_Kernel#public_send	1
+ccall_Hash#keys	97
+ccall_Module#initialize	7
+ccall__bi13	7060
+ccall_Kernel#eval	3
+ccall_Module#undef_method	171
+ccall_Thread#[]	8
+ccall_String#strip	246
+ccall_rb_class_allocate_instance	17335
+ccall_rb_mod_name	155
+ccall_Hash#blank?	119971
+ccall_Enumerator#with_index	47
+ccall_Hash#size	118
+ccall_rb_vm_getinstancevariable	221
+ccall_Regexp#match?	4120
+ccall_Hash#any?	120013
+ccall_Hash#freeze	13
+ccall_Struct#[]	252
+ccall_rb_vm_invokesuperforward	119973
+ccall_String#index	27
+ccall_Hash#fetch	3720343
+ccall_rb_vm_method_cfunc_is	811
+ccall_Arel::Attributes::Attribute::allocator	119980
+ccall_String#downcase	2111
+ccall_rb_str_intern	243042
+ccall_String#gsub!	767
+ccall_String#to_i	648
+ccall_Enumerable#each_cons	119971
+ccall_String#size	312
+ccall_rb_zjit_materialize_frames	2880
+ccall_Hash#each_value	137
+ccall_Kernel#object_id	7
+ccall_Kernel#respond_to_missing?	120
+ccall_Module#method_defined?	369
+ccall_Symbol#start_with?	161
+ccall_rb_hash_init	172
+ccall_Set#each	10
+ccall_String#sub	1540
+ccall_Kernel#initialize_copy	89
+ccall_Kernel#Array	198
+ccall_Struct#[]=	252
+ccall_Set#add	2111
+ccall_String#-@	6496
+ccall_File.expand_path	48
+ccall_rb_hash_aset	245742
+ccall_rb_zjit_throw	36
+ccall_ary_sized_alloc	121210
+ccall_Module#private_method_defined?	109
+ccall_rb_hash_new_with_bulk_insert	119971
+ccall_Thread::Backtrace::Location#path	112
+ccall_SQLite3::Statement#bind_param	5
+ccall_rb_mut_synchronize	248
+ccall_Hash.new	142
+ccall_Array#compact!	415
+ccall_Array#prepend	14
+ccall_String#scan	230
+ccall__bi59	48
+ccall_RubyVM::FrozenCore.core#hash_merge_bang_kwd	32
+ccall_rb_hash_new	10737
+ccall_Array.new	6
+iseq_calls_count_finder_needs_type_condition?@/home/user/w/rails-main/activerecord/lib/active_record/inheritance.rb:99	239985
+iseq_calls_count_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/materialization.rb:23	601
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:58	27
+iseq_calls_count_type_casted_binds@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/quoting.rb:237	1
+iseq_calls_count_canonical_segments@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:423	537
+iseq_calls_count_inflections@/home/user/w/rails-main/activesupport/lib/active_support/inflector/inflections.rb:341	338
+iseq_calls_count_summary=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:2372	14
+iseq_calls_count_ensure_result@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:301	27
+iseq_calls_count_arel_node?@/home/user/w/rails-main/activerecord/lib/arel.rb:76	5
+iseq_calls_count_empty?@/home/user/w/rails-main/activerecord/lib/active_record/relation/from_clause.rb:14	31
+iseq_calls_count_block in <module:URI>@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/uri-1.1.2/lib/uri/rfc2396_parser.rb:543	2
+iseq_calls_count_block in gemspec_stubs_in@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:808	353
+iseq_calls_count_local_search@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/index.rb:65	55
+iseq_calls_count_current_shard@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:200	29
+iseq_calls_count_klass@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:530	359922
+iseq_calls_count_block in initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lockfile_parser.rb:187	41
+iseq_calls_count_key_at?@/home/user/w/rails-main/activemodel/lib/active_model/indexed_row.rb:24	14
+iseq_calls_count_lookup@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:385	311
+iseq_calls_count_converted_value@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/settings.rb:746	146
+iseq_calls_count_index_for@/home/user/w/rails-main/activemodel/lib/active_model/indexed_row.rb:424	7
+iseq_calls_count_dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/materialization.rb:33	41
+iseq_calls_count_store_if_absent@/home/user/w/rails-main/activesupport/lib/active_support/ractors.rb:207	1
+iseq_calls_count_block in each@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:158	43
+iseq_calls_count_name@/home/user/w/rails-main/activerecord/lib/arel/table.rb:47	68
+iseq_calls_count_invoke_after@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:603	10
+iseq_calls_count_inject_join@/home/user/w/rails-main/activerecord/lib/arel/visitors/to_sql.rb:923	4
+iseq_calls_count_unscoped@/home/user/w/rails-main/activerecord/lib/active_record/scoping/default.rb:55	119971
+iseq_calls_count_block in <module:URI>@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/uri-1.1.2/lib/uri/common.rb:352	227
+iseq_calls_count_merge_preloads@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:120	119971
+iseq_calls_count_association_route@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:1633	119971
+iseq_calls_count_new@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:217	880
+iseq_calls_count_initialize_copy@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:295	89
+iseq_calls_count_build_default_scope@/home/user/w/rails-main/activerecord/lib/active_record/scoping/default.rb:167	119973
+iseq_calls_count_default_scoped@/home/user/w/rails-main/activerecord/lib/active_record/scoping/named.rb:58	119973
+iseq_calls_count_block in setup_manpath@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/runtime.rb:351	65
+iseq_calls_count_full_name@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:84	759
+iseq_calls_count_new@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:65	1033
+iseq_calls_count_files=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1899	14
+iseq_calls_count_block in _insert_record@/home/user/w/rails-main/activerecord/lib/active_record/persistence.rb:245	1
+iseq_calls_count_handler_for@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:251	119972
+iseq_calls_count_restorable?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:611	30
+iseq_calls_count_for_running_ruby@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/target_rbconfig.rb:26	16
+iseq_calls_count_!=@<internal:basic_object>:14	519
+iseq_calls_count_lookup@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:528	74
+iseq_calls_count_block in check_lockfile@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/definition.rb:1170	41
+iseq_calls_count_default@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:77	143
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:29	28
+iseq_calls_count_get_pool_manager@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/connection_handler.rb:254	63
+iseq_calls_count_block (2 levels) in define_attribute_method@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:344	152
+iseq_calls_count_quote_table_name@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/quoting.rb:155	1
+iseq_calls_count_==@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:271	44
+iseq_calls_count_local@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:14	198
+iseq_calls_count_[]=@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/non_concurrent_map_backend.rb:26	11
+iseq_calls_count_block in parse_checksum@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lockfile_parser.rb:321	27
+iseq_calls_count_block in <class:Requirement>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:18	53
+iseq_calls_count_block in initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lockfile_parser.rb:144	516
+iseq_calls_count__assign_attribute@/home/user/w/rails-main/activemodel/lib/active_model/attribute_assignment.rb:72	1
+iseq_calls_count_block (2 levels) in DelegateClass@/home/user/w/rails-main/activesupport/lib/active_support/delegation.rb:238	132
+iseq_calls_count_fetch_checksum@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:296	15
+iseq_calls_count_block in subscription_filter@/home/user/w/rails-main/activesupport/lib/active_support/event_reporter/log_subscriber.rb:55	16
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:47	239971
+iseq_calls_count_eql?@/home/user/w/rails-main/activerecord/lib/arel/table.rb:116	119972
+iseq_calls_count_block in <top (required)>@/home/user/workspace/repo/bench/upstream/rails-open/cpu_open.rb:76	99971
+iseq_calls_count_full_require_paths@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:94	27
+iseq_calls_count__where!@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:1334	119972
+iseq_calls_count_loaded_spec@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:254	4
+iseq_calls_count_base_class?@/home/user/w/rails-main/activerecord/lib/active_record/inheritance.rb:145	22
+iseq_calls_count_try_make_shareable@/home/user/w/rails-main/activesupport/lib/active_support/ractors.rb:78	42
+iseq_calls_count_block in deliver_result@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:250	22
+iseq_calls_count_block in last_chain_scope@/home/user/w/rails-main/activerecord/lib/active_record/associations/association_scope.rb:58	119971
+iseq_calls_count_initialize@/home/user/w/rails-main/activesupport/lib/active_support/notifications/instrumenter.rb:141	27
+iseq_calls_count_add_bind@/home/user/w/rails-main/activerecord/lib/arel/collectors/sql_string.rb:16	4
+iseq_calls_count_choose_compatible@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:279	41
+iseq_calls_count_merge_multi_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:181	119971
+iseq_calls_count_block in tsort_each_node@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:396	112
+iseq_calls_count_block in define_cached_method@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:20	507
+iseq_calls_count_build_retry_budget@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:1284	23
+iseq_calls_count_default_gem?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:82	10
+iseq_calls_count_polymorphic?@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:890	37
+iseq_calls_count_block (2 levels) in installed_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/source/rubygems.rb:396	250
+iseq_calls_count_call@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:178	16
+iseq_calls_count_matches_spec?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/dependency.rb:248	101
+iseq_calls_count_installable_on_platform?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/match_platform.rb:10	49
+iseq_calls_count_instrumenter@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:1409	27
+iseq_calls_count_skip_verification?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:1304	27
+iseq_calls_count_eql?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/source/rubygems.rb:84	2
+iseq_calls_count_register@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:230	41
+iseq_calls_count_call@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder/basic_object_handler.rb:11	119972
+iseq_calls_count_block in define_element@/home/user/w/rails-main/actionview/lib/action_view/helpers/tag_helper.rb:1347	75
+iseq_calls_count_full_name@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:150	2
+iseq_calls_count_block in add_default_gems_to@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_integration.rb:292	14
+iseq_calls_count_block in index_with@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/enumerable.rb:331	102
+iseq_calls_count_raw_require_paths@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:2661	21
+iseq_calls_count_materialize_for_installation@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:162	41
+iseq_calls_count_write_reference@/home/user/w/rails-main/activerecord/lib/active_record/association_route.rb:80	1
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:134	415
+iseq_calls_count_[]@/home/user/w/rails-main/activerecord/lib/arel/table.rb:102	119982
+iseq_calls_count_predicate_attribute@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:112	119973
+iseq_calls_count_block in replace_require@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundled_gems.rb:61	42
+iseq_calls_count_block in start@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:331	27
+iseq_calls_count_==@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/dependency.rb:169	60
+iseq_calls_count_block in <top (required)>@/home/user/workspace/repo/bench/upstream/rails-open/cpu_open.rb:67	19971
+iseq_calls_count_new_record?@/home/user/w/rails-main/activerecord/lib/active_record/persistence.rb:342	120010
+iseq_calls_count_schema_attributes@/home/user/w/rails-main/activerecord/lib/active_record/model_schema.rb:236	240012
+iseq_calls_count_select@<internal:array>:310	251
+iseq_calls_count_merge@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:60	239971
+iseq_calls_count_default_at@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set/builder.rb:63	13
+iseq_calls_count_block in DelegateClass@/home/user/w/rails-main/activesupport/lib/active_support/delegation.rb:210	509
+iseq_calls_count_block in <class:PostgreSQL>@/home/user/w/rails-main/activerecord/lib/arel/visitors/postgresql.rb:135	227
+iseq_calls_count_klass@/home/user/w/rails-main/activerecord/lib/active_record/associations/association.rb:171	360087
+iseq_calls_count_predicate_builder@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:445	359973
+iseq_calls_count_completely_missing_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/materialization.rb:43	41
+iseq_calls_count_extension_dir@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:115	8
+iseq_calls_count_valid?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:219	382
+iseq_calls_count_get_callbacks@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:1018	1
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:74	27
+iseq_calls_count_build_where_clause@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:2000	119972
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/association_relation.rb:6	119971
+iseq_calls_count_with_connection@/home/user/w/rails-main/activerecord/lib/active_record/connection_handling.rb:362	6
+iseq_calls_count_attribute_types@/home/user/w/rails-main/activerecord/lib/active_record/attributes.rb:283	15
+iseq_calls_count_block in attributes_with_values@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods.rb:586	1
+iseq_calls_count_match_platforms?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:23	297
+iseq_calls_count_table_name_qualified_unscope_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:1071	119981
+iseq_calls_count_block (2 levels) in <class:CurrentRuby>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/current_ruby.rb:78	2659
+iseq_calls_count_block in merge!@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/index.rb:126	250
+iseq_calls_count_satisfied_by?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:250	104
+iseq_calls_count_make_shareable@<internal:ractor>:498	34
+iseq_calls_count_notifier@/home/user/w/rails-main/activesupport/lib/active_support/notifications.rb:238	26
+iseq_calls_count_convert_dot_notation_to_hash@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:31	119972
+iseq_calls_count_block (2 levels) in DelegateClass@/home/user/w/rails-main/activesupport/lib/active_support/delegation.rb:218	116
+iseq_calls_count_name@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:173	3326
+iseq_calls_count_errors@/home/user/w/rails-main/activemodel/lib/active_model/validations.rb:373	10
+iseq_calls_count_loaded_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_integration.rb:38	2
+iseq_calls_count_dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1770	137
+iseq_calls_count_define_call@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:464	142
+iseq_calls_count_[]@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/settings.rb:123	77
+iseq_calls_count_ensure_state!@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:350	83
+iseq_calls_count_hash@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/sql_type_metadata.rb:31	18
+iseq_calls_count_notify@/home/user/w/rails-main/activesupport/lib/active_support/event_reporter.rb:443	16
+iseq_calls_count_search@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/index.rb:52	55
+iseq_calls_count_<=>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/remote_specification.rb:57	256
+iseq_calls_count_write_from_user@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:436	13
+iseq_calls_count_type_casted_binds@/home/user/w/rails-main/activerecord/lib/active_record/structured_event_subscriber.rb:53	5
+iseq_calls_count_parse_spec@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lockfile_parser.rb:356	168
+iseq_calls_count_correct?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:194	621
+iseq_calls_count_block in add_current_ruby_abi@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/definition.rb:984	41
+iseq_calls_count_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/source/rubygems.rb:150	36
+iseq_calls_count_block in add_default_gems_to@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_integration.rb:287	42
+iseq_calls_count_configs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/settings.rb:471	132
+iseq_calls_count_column_indexes@/home/user/w/rails-main/activerecord/lib/active_record/result.rb:200	8
+iseq_calls_count_store@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:534	55
+iseq_calls_count_runtime_dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:2305	1
+iseq_calls_count_records@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:244	19
+iseq_calls_count_fetch_value!@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:396	97
+iseq_calls_count_emit_debug_event@/home/user/w/rails-main/activesupport/lib/active_support/structured_event_subscriber.rb:91	16
+iseq_calls_count_<<@/home/user/w/rails-main/activerecord/lib/arel/collectors/bind.rb:13	14
+iseq_calls_count_incomplete_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/materialization.rb:53	41
+iseq_calls_count_value_for@/home/user/w/rails-main/activerecord/lib/active_record/scoping.rb:121	359986
+iseq_calls_count_other_contributes_nothing?@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:98	239971
+iseq_calls_count_expand_from_hash@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:144	119972
+iseq_calls_count_relation@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:482	120002
+iseq_calls_count_==@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:174	123
+iseq_calls_count_block in <class:MethodSet>@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:6	7
+iseq_calls_count_block in setup@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/runtime.rb:27	42
+iseq_calls_count_perform_sync_attempt@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:765	27
+iseq_calls_count_requirement@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/dependency.rb:117	390
+iseq_calls_count_block in make_lambda@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:399	13
+iseq_calls_count_singular@/home/user/w/rails-main/activesupport/lib/active_support/inflector/inflections.rb:219	10
+iseq_calls_count_reset_scope@/home/user/w/rails-main/activerecord/lib/active_record/associations/association.rb:125	17
+iseq_calls_count_block in finish@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:256	27
+iseq_calls_count_loaded_mapped_table@/home/user/w/rails-main/activerecord/lib/active_record/model_schema/schema_context.rb:120	2
+iseq_calls_count_block in configured_value@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/settings.rb:495	769
+iseq_calls_count_block in validate_required_attributes@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification_policy.rb:257	62
+iseq_calls_count_block in dangerous_attribute_methods@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods.rb:51	401
+iseq_calls_count_binary?@/home/user/w/rails-main/activemodel/lib/active_model/type/value.rb:79	2
+iseq_calls_count_add_constraints@/home/user/w/rails-main/activerecord/lib/active_record/associations/association_scope.rb:126	119971
+iseq_calls_count_reordering_value@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119971
+iseq_calls_count_now_cpu@/home/user/w/rails-main/activesupport/lib/active_support/notifications/instrumenter.rb:243	83
+iseq_calls_count_block in write_reference@/home/user/w/rails-main/activerecord/lib/active_record/association_route.rb:82	1
+iseq_calls_count_default_gem?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:99	585
+iseq_calls_count_hash@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:180	35
+iseq_calls_count_generic@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:301	33
+iseq_calls_count_plural@/home/user/w/rails-main/activesupport/lib/active_support/inflector/inflections.rb:209	4
+iseq_calls_count_respond_to_missing?@/home/user/w/rails-main/activerecord/lib/active_record/dynamic_matchers.rb:7	125
+iseq_calls_count_now@/home/user/w/rails-main/activesupport/lib/active_support/notifications/instrumenter.rb:236	83
+iseq_calls_count_block in _returning_columns_for_insert@/home/user/w/rails-main/activerecord/lib/active_record/model_schema/schema_context/mapped_table.rb:29	13
+iseq_calls_count_configured_value@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/settings.rb:491	131
+iseq_calls_count_logger@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:26	1
+iseq_calls_count_map_value@/home/user/w/rails-main/activerecord/lib/active_record/key.rb:193	1
+iseq_calls_count_find@<internal:array>:335	120
+iseq_calls_count_retryable=@/home/user/w/rails-main/activerecord/lib/arel/collectors/composite.rb:15	1
+iseq_calls_count_connected_to_stack@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:241	208
+iseq_calls_count_block in validate_nil_attributes@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification_policy.rb:237	75
+iseq_calls_count_block (2 levels) in <class:Delegator>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/delegate.rb:52	44
+iseq_calls_count_-@/home/user/w/rails-main/activerecord/lib/active_record/relation/where_clause.rb:22	599971
+iseq_calls_count_retrieve_connection_pool@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/connection_handler.rb:224	63
+iseq_calls_count_block in get_chain@/home/user/w/rails-main/activerecord/lib/active_record/associations/association_scope.rb:112	119971
+iseq_calls_count_key_for@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/settings.rb:444	131
+iseq_calls_count_from_stub@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:6	293
+iseq_calls_count_block in []=@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/mri_map_backend.rb:18	11
+iseq_calls_count_connection_descriptor@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:395	73
+iseq_calls_count_length@/home/user/w/rails-main/activerecord/lib/active_record/result.rb:74	24
+iseq_calls_count_is_array@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/settings.rb:540	146
+iseq_calls_count_prepare@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/database.rb:215	28
+iseq_calls_count_write@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:584	13
+iseq_calls_count_out_of_range?@/home/user/w/rails-main/activemodel/lib/active_model/type/integer.rb:118	5
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:80	382
+iseq_calls_count_abstract_class?@/home/user/w/rails-main/activerecord/lib/active_record/inheritance.rb:197	119994
+iseq_calls_count_block (2 levels) in tsort_each_child@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:407	234
+iseq_calls_count_block (2 levels) in groups_for@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:285	27
+iseq_calls_count_add_dependency@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:571	64
+iseq_calls_count_quote_column_name@/home/user/w/rails-main/activerecord/lib/arel/visitors/to_sql.rb:903	6
+iseq_calls_count_block in references@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:60	119972
+iseq_calls_count_block in <class:ElementDescription>@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/nokogiri-1.19.7/lib/nokogiri/html4/element_description_defaults.rb:2025	63
+iseq_calls_count_block in <class:TimeZone>@/home/user/w/rails-main/activesupport/lib/active_support/values/time_zone.rb:196	31
+iseq_calls_count_store_checksum@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:288	20
+iseq_calls_count_respond_to?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/remote_specification.rb:129	28
+iseq_calls_count_each_strongly_connected_component_from@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/tsort/lib/tsort.rb:411	112
+iseq_calls_count_current_schema_context@/home/user/w/rails-main/activerecord/lib/active_record/model_schema.rb:210	240036
+iseq_calls_count_lock_value@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119974
+iseq_calls_count_version@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:185	876
+iseq_calls_count_to_i@<internal:numeric>:273	29
+iseq_calls_count_extract_options!@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/array/extract_options.rb:29	26
+iseq_calls_count_block in lookup@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:388	83
+iseq_calls_count_key_to_s@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/settings.rb:899	473
+iseq_calls_count_consumes?@/home/user/w/rails-main/activesupport/lib/active_support/event_reporter/log_subscriber.rb:75	16
+iseq_calls_count_eq@/home/user/w/rails-main/activerecord/lib/arel/predications.rb:18	1
+iseq_calls_count_to_sym@<internal:symbol>:35	486
+iseq_calls_count_gem_build_complete_path@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:42	17
+iseq_calls_count_extending_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119971
+iseq_calls_count_build_handle@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:372	42
+iseq_calls_count_readline@<internal:io>:133	1284
+iseq_calls_count_underscore@/home/user/w/rails-main/activesupport/lib/active_support/inflector/methods.rb:113	281
+iseq_calls_count_block in <class:Requirement>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:14	11
+iseq_calls_count_reflect_on_aggregation@/home/user/w/rails-main/activerecord/lib/active_record/table_metadata.rb:51	119972
+iseq_calls_count_quote_column_name@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/quoting.rb:150	68
+iseq_calls_count_block in materialize@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:514	13
+iseq_calls_count_add_dependency_with_type@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1530	63
+iseq_calls_count_class@<internal:kernel>:20	36
+iseq_calls_count_sql@/home/user/w/rails-main/activerecord/lib/active_record/structured_event_subscriber.rb:22	27
+iseq_calls_count__sorted_requirements@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:287	186
+iseq_calls_count_redefine_method@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/module/redefine_method.rb:18	1
+iseq_calls_count_materialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:267	33
+iseq_calls_count_define_attribute_method_pattern@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:350	152
+iseq_calls_count_block in default_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_integration.rb:433	14
+iseq_calls_count_connection_specification_name@/home/user/w/rails-main/activerecord/lib/active_record/connection_handling.rb:369	98
+iseq_calls_count_block (2 levels) in DelegateClass@/home/user/w/rails-main/activesupport/lib/active_support/delegation.rb:215	279
+iseq_calls_count_reject!@/home/user/w/rails-main/activesupport/lib/active_support/descendants_tracker.rb:49	29
+iseq_calls_count_iterate_guarding_exceptions@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:22	139
+iseq_calls_count_materialized_spec@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/materialization.rb:39	181
+iseq_calls_count_build_mangled_name@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:454	146
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/retry_budget.rb:16	10
+iseq_calls_count_block in attributes_for_create@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods.rb:604	1
+iseq_calls_count_eligible?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/content_address.rb:87	407
+iseq_calls_count_build_quoted@/home/user/w/rails-main/activerecord/lib/arel/nodes/casted.rb:50	119973
+iseq_calls_count_block in _create_record@/home/user/w/rails-main/activerecord/lib/active_record/persistence.rb:1028	3
+iseq_calls_count_finish_log@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:359	5
+iseq_calls_count_block in validate_array_attributes@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification_policy.rb:319	127
+iseq_calls_count_block (3 levels) in class_attribute@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/class/attribute.rb:114	46
+iseq_calls_count_ensure_connection_ready@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:1294	28
+iseq_calls_count_build_handle@/home/user/w/rails-main/activesupport/lib/active_support/notifications/instrumenter.rb:109	42
+iseq_calls_count_instance@/home/user/w/rails-main/activerecord/lib/active_record/scoping.rb:85	359990
+iseq_calls_count_index_spec@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:438	112
+iseq_calls_count_licenses=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:386	14
+iseq_calls_count_context@/home/user/w/rails-main/activesupport/lib/active_support/isolated_execution_state.rb:55	3
+iseq_calls_count_replica?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:304	34
+iseq_calls_count_block in build_handle@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:379	27
+iseq_calls_count_description=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1806	13
+iseq_calls_count_type_cast@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/quoting.rb:120	6
+iseq_calls_count_apply_scope@/home/user/w/rails-main/activerecord/lib/active_record/associations/association_scope.rb:170	119971
+iseq_calls_count_all_errors@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/errors.rb:16	51
+iseq_calls_count_block in redefine@/home/user/w/rails-main/activesupport/lib/active_support/class_attribute.rb:12	120815
+iseq_calls_count_unresolved_deps@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1275	24
+iseq_calls_count_changed?@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:84	5
+iseq_calls_count_includes_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119974
+iseq_calls_count_rewrite_dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/override.rb:16	127
+iseq_calls_count_initialize@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:9	112
+iseq_calls_count_with_value_from_database@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:101	9
+iseq_calls_count_block in select_best_local_platform_match@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/match_platform.rb:51	41
+iseq_calls_count_warning?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundled_gems.rb:154	1279
+iseq_calls_count_register_handler@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:93	1
+iseq_calls_count_default_connection_handler@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:106	41
+iseq_calls_count_block in partition_segments@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:469	650
+iseq_calls_count_default_shard@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:110	11
+iseq_calls_count_to_s@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:135	3
+iseq_calls_count_hash@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1949	89
+iseq_calls_count_extensions@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:74	11
+iseq_calls_count_delete@/home/user/w/rails-main/activesupport/lib/active_support/inflector/inflections.rb:58	41
+iseq_calls_count_current_transaction@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:708	116
+iseq_calls_count_type_cast@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/sqlite3/quoting.rb:105	11
+iseq_calls_count_prepared_statements_disabled_cache@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:344	7
+iseq_calls_count_current_scope@/home/user/w/rails-main/activerecord/lib/active_record/scoping.rb:81	239986
+iseq_calls_count_content_addressed_full_names@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:68	48
+iseq_calls_count_insecurely_materialized?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:14	28
+iseq_calls_count_internal_init@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:2082	17
+iseq_calls_count_assert_valid_keys@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/hash/keys.rb:55	8
+iseq_calls_count_block in clear@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/mri_map_backend.rb:62	6
+iseq_calls_count_merge_select_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:108	119976
+iseq_calls_count_target_scope@/home/user/w/rails-main/activerecord/lib/active_record/associations/association.rb:320	119971
+iseq_calls_count_from_database@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:9	10
+iseq_calls_count_deserialize@/home/user/w/rails-main/activemodel/lib/active_model/type/integer.rb:70	13
+iseq_calls_count_block (2 levels) in default_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/source/rubygems.rb:406	14
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_attribute.rb:9	119973
+iseq_calls_count_where_clause@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	840053
+iseq_calls_count_compute_if_absent@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/mri_map_backend.rb:22	1
+iseq_calls_count_present?@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/object/blank.rb:32	6
+iseq_calls_count_connection_handler@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:146	19
+iseq_calls_count_subclasses@/home/user/w/rails-main/activesupport/lib/active_support/descendants_tracker.rb:19	2
+iseq_calls_count_instance_method_already_implemented?@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods/primary_key.rb:74	162
+iseq_calls_count_current_role@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:180	29
+iseq_calls_count_materialized?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:267	19
+iseq_calls_count_arel_table@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:441	480014
+iseq_calls_count_handle_warnings@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:902	27
+iseq_calls_count_block in specs_for_source_changed?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/definition.rb:1129	41
+iseq_calls_count_block (2 levels) in class_attribute@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/class/attribute.rb:113	59
+iseq_calls_count_set_nil_attributes_to_nil@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1961	17
+iseq_calls_count_[]@/home/user/w/rails-main/activesupport/lib/active_support/isolated_execution_state.rb:32	264
+iseq_calls_count_block in select_all_platform_match@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/match_platform.rb:58	54
+iseq_calls_count_block in execute_intent@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:747	38
+iseq_calls_count_block (2 levels) in table_structures@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:950	13
+iseq_calls_count__read_attribute!@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods/read.rb:64	29
+iseq_calls_count_finalized?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:21	5
+iseq_calls_count_compile_arel!@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:445	94
+iseq_calls_count_glob_files_in_dir@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/shared_helpers.rb:244	1
+iseq_calls_count_type_for_attribute@/home/user/w/rails-main/activemodel/lib/active_model/attribute_registration.rb:53	239986
+iseq_calls_count_full_name@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/name_tuple.rb:68	111
+iseq_calls_count_[]=@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/mri_map_backend.rb:18	11
+iseq_calls_count_block in each_strongly_connected_component_from@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/tsort/lib/tsort.rb:433	112
+iseq_calls_count_connection_pool@/home/user/w/rails-main/activerecord/lib/active_record/connection_handling.rb:397	33
+iseq_calls_count_attribute_at@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:577	24
+iseq_calls_count_block (2 levels) in clean_load_path@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/shared_helpers.rb:391	921
+iseq_calls_count_source@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_ext.rb:277	13
+iseq_calls_count_with_connection@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb:500	46
+iseq_calls_count_global_current_scope@/home/user/w/rails-main/activerecord/lib/active_record/scoping.rb:33	119971
+iseq_calls_count_serialize@/home/user/w/rails-main/activemodel/lib/active_model/type/serialize_cast_value.rb:32	16
+iseq_calls_count_collect_warnings@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:924	27
+iseq_calls_count_current_scope@/home/user/w/rails-main/activerecord/lib/active_record/scoping.rb:95	239986
+iseq_calls_count_status_code@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/errors.rb:6	11
+iseq_calls_count_context_for_validation@/home/user/w/rails-main/activemodel/lib/active_model/validations.rb:502	7
+iseq_calls_count_call_direct@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:738	7
+iseq_calls_count_run_callbacks@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:99	7
+iseq_calls_count__value_for_database@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:233	3
+iseq_calls_count_ignored?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:37	250
+iseq_calls_count_block in generate@/home/user/w/rails-main/activesupport/lib/active_support/delegation.rb:89	459
+iseq_calls_count_block in initialize@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:57	321
+iseq_calls_count_block in call_direct@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:740	4
+iseq_calls_count_merge_clauses@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:203	119971
+iseq_calls_count_expanded_original_path@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/source/path.rb:119	7
+iseq_calls_count_<=>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/dependency.rb:179	241
+iseq_calls_count_cast@/home/user/w/rails-main/activemodel/lib/active_model/type/value.rb:59	21
+iseq_calls_count_[]@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:96	119972
+iseq_calls_count_block in type_casted_binds@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/quoting.rb:240	16
+iseq_calls_count_block in add_downcased_set_members_to_all_set_constants@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/loofah-2.25.3/lib/loofah/metahelpers.rb:8	10
+iseq_calls_count_block (2 levels) in hash_rows@/home/user/w/rails-main/activerecord/lib/active_record/result.rb:331	163
+iseq_calls_count_to_s@<internal:pathname_builtin>:438	83
+iseq_calls_count_settings@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler.rb:355	78
+iseq_calls_count_value@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:53	58
+iseq_calls_count_cache_value_at@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:571	124
+iseq_calls_count_content_addresses=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:64	41
+iseq_calls_count_execute@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:70	137
+iseq_calls_count_select_best_local_platform_match@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/match_platform.rb:49	52
+iseq_calls_count_now_allocations@/home/user/w/rails-main/activesupport/lib/active_support/notifications/instrumenter.rb:263	83
+iseq_calls_count_block in build_indexes@/home/user/w/rails-main/activemodel/lib/active_model/indexed_row.rb:37	27
+iseq_calls_count_value_for_database@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:73	39
+iseq_calls_count_stale_target?@/home/user/w/rails-main/activerecord/lib/active_record/associations/association.rb:103	1
+iseq_calls_count_loaded!@/home/user/w/rails-main/activerecord/lib/active_record/associations/association.rb:92	1
+iseq_calls_count_last_chain_scope@/home/user/w/rails-main/activerecord/lib/active_record/associations/association_scope.rb:48	119971
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:45	41
+iseq_calls_count_block in keys@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:349	13
+iseq_calls_count_association_instance_get@/home/user/w/rails-main/activerecord/lib/active_record/associations.rb:98	15
+iseq_calls_count_merge_joins@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:141	119971
+iseq_calls_count_batch@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:42	152
+iseq_calls_count_merge@/home/user/w/rails-main/activerecord/lib/active_record/relation/where_clause.rb:30	239971
+iseq_calls_count_extensions@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:620	17
+iseq_calls_count_block (2 levels) in add_downcased_set_members_to_all_set_constants@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/loofah-2.25.3/lib/loofah/metahelpers.rb:12	2111
+iseq_calls_count_block in each@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/index.rb:82	240
+iseq_calls_count_merge_single_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:194	119971
+iseq_calls_count_block in define_call@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:465	80
+iseq_calls_count_association_scope@/home/user/w/rails-main/activerecord/lib/active_record/associations/association.rb:307	119971
+iseq_calls_count_find_full_gem_path@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:128	1
+iseq_calls_count_class_attribute@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/class/attribute.rb:101	49
+iseq_calls_count_block in <class:ToSql>@/home/user/w/rails-main/activerecord/lib/arel/visitors/to_sql.rb:768	5
+iseq_calls_count_block in make_synchronized_on_cruby@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/thread_safe/util/data_structures.rb:31	30
+iseq_calls_count_block in deprecate_methods@/home/user/w/rails-main/activesupport/lib/active_support/deprecation/method_wrappers.rb:44	1
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/dependency.rb:37	178
+iseq_calls_count_index_for_name@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:523	130
+iseq_calls_count_filter@/home/user/w/rails-main/activerecord/lib/active_record/structured_event_subscriber.rb:68	3
+iseq_calls_count_mapped_table@/home/user/w/rails-main/activerecord/lib/active_record/model_schema.rb:232	12
+iseq_calls_count_open_file@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems.rb:867	12
+iseq_calls_count_block in load@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1130	1
+iseq_calls_count_changed?@/home/user/w/rails-main/activemodel/lib/active_model/attribute_mutation_tracker.rb:44	13
+iseq_calls_count_activated=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:70	28
+iseq_calls_count_constraints@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:823	119971
+iseq_calls_count_prepared_statements?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:339	7
+iseq_calls_count_silence_redefinition_of_method@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/module/redefine_method.rb:8	256
+iseq_calls_count_parse_checksum@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lockfile_parser.rb:299	41
+iseq_calls_count_require@<internal:/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/core_ext/kernel_require.rb>:37	23
+iseq_calls_count_block in sort_best_platform_match@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:344	41
+iseq_calls_count_tsort_each_child@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:400	83
+iseq_calls_count_block in perform_fetch@/home/user/w/rails-main/activerecord/lib/active_record/type/type_map.rb:45	47
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:227	205
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1976	17
+iseq_calls_count_define_cached_method@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:16	507
+iseq_calls_count_block (2 levels) in <class:CurrentRuby>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/current_ruby.rb:31	89
+iseq_calls_count_block in get_metadata@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:221	58
+iseq_calls_count_finish@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:336	27
+iseq_calls_count_attribute_changed?@/home/user/w/rails-main/activemodel/lib/active_model/attribute_mutation_tracker.rb:79	13
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/relation.rb:81	359973
+iseq_calls_count_order_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119975
+iseq_calls_count_replace_from_clause?@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:213	119971
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/materialization.rb:12	41
+iseq_calls_count_find_gem@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundled_gems.rb:126	1274
+iseq_calls_count_block in finish_with_values@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:344	27
+iseq_calls_count_initialize@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:34	120069
+iseq_calls_count_class_name@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:217	5
+iseq_calls_count_validate_array_attribute@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification_policy.rb:324	127
+iseq_calls_count_to_a@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:131	60
+iseq_calls_count_block in validate_deps@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:110	103
+iseq_calls_count_missing?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:72	292
+iseq_calls_count_block in initialize@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:529	141
+iseq_calls_count_get_pool_config@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/pool_manager.rb:45	64
+iseq_calls_count_resolve_attribute_name@/home/user/w/rails-main/activemodel/lib/active_model/attribute_registration.rb:126	239986
+iseq_calls_count_null_relation?@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:1619	119986
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/remote_specification.rb:18	288
+iseq_calls_count_[]@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:325	58
+iseq_calls_count_now_gc@/home/user/w/rails-main/activesupport/lib/active_support/notifications/instrumenter.rb:253	83
+iseq_calls_count_changed?@/home/user/w/rails-main/activemodel/lib/active_model/type/value.rb:86	2
+iseq_calls_count_default_ext_dir_for@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/defaults.rb:49	1
+iseq_calls_count_column_for_attribute@/home/user/w/rails-main/activerecord/lib/active_record/model_schema.rb:549	1
+iseq_calls_count_required_ruby_version=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:696	11
+iseq_calls_count_default_scopes@/home/user/w/rails-main/activerecord/lib/active_record/scoping/default.rb:20	119986
+iseq_calls_count_block in data@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:119	382
+iseq_calls_count_incomplete?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:76	19
+iseq_calls_count_mark_transaction_dirty@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:389	4
+iseq_calls_count_synchronize@<internal:thread_sync>:388	189
+iseq_calls_count_value!@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:60	125
+iseq_calls_count_block in bump@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:256	7
+iseq_calls_count_load@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1115	3
+iseq_calls_count_full_gem_path@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:139	7
+iseq_calls_count_rubygems@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_integration.rb:457	47
+iseq_calls_count_block in extract!@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/hash/slice.rb:31	36
+iseq_calls_count_type_casted_binds@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:210	48
+iseq_calls_count_type_cast@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:200	8
+iseq_calls_count_current_default_association_route?@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:960	119987
+iseq_calls_count_block in add_to_transaction@/home/user/w/rails-main/activerecord/lib/active_record/transactions.rb:592	3
+iseq_calls_count_internal_build_intent@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:936	6
+iseq_calls_count_primary_key@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods/primary_key.rb:85	172
+iseq_calls_count_hash@/home/user/w/rails-main/activerecord/lib/arel/table.rb:112	1
+iseq_calls_count_render_bind@/home/user/w/rails-main/activerecord/lib/active_record/structured_event_subscriber.rb:57	5
+iseq_calls_count_start_intent_log@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:830	27
+iseq_calls_count_where_clause=@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:197	120000
+iseq_calls_count_block in append_features@/home/user/w/rails-main/activesupport/lib/active_support/concern.rb:146	19
+iseq_calls_count_block in build_where_clause@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:2018	119972
+iseq_calls_count_zero?@<internal:numeric>:290	1563
+iseq_calls_count_create_with_value@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119971
+iseq_calls_count_data@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:114	6404
+iseq_calls_count_block in invoke_before@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:599	5
+iseq_calls_count_none?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:176	7
+iseq_calls_count_content_addressed?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/content_address.rb:116	83
+iseq_calls_count___callbacks@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:72	44
+iseq_calls_count_block in merge@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:67	1559942
+iseq_calls_count_add_bind@/home/user/w/rails-main/activerecord/lib/arel/collectors/bind.rb:17	4
+iseq_calls_count_execute_intent@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:737	27
+iseq_calls_count_class_eval@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:62	20
+iseq_calls_count_constraints@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:1615	119971
+iseq_calls_count_block in <class:DeprecatedConstantProxy>@/home/user/w/rails-main/activesupport/lib/active_support/deprecation/proxy_wrappers.rb:152	97
+iseq_calls_count_instance_method_already_implemented?@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:435	171
+iseq_calls_count_shareable_proc@<internal:ractor>:719	88
+iseq_calls_count_empty?@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:633	42
+iseq_calls_count_attribute_aliases@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:64	480026
+iseq_calls_count_cast_value@/home/user/w/rails-main/activemodel/lib/active_model/type/string.rb:39	3
+iseq_calls_count_associated_with@/home/user/w/rails-main/activerecord/lib/active_record/table_metadata.rb:23	119972
+iseq_calls_count_block in full_require_paths@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:188	33
+iseq_calls_count_block in _tilde_requirements@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:291	86
+iseq_calls_count_append_features@/home/user/w/rails-main/activesupport/lib/active_support/concern.rb:141	63
+iseq_calls_count_<<@/home/user/w/rails-main/activerecord/lib/arel/collectors/composite.rb:21	209
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/result.rb:57	22
+iseq_calls_count_columns_hash@/home/user/w/rails-main/activerecord/lib/active_record/model_schema.rb:518	12
+iseq_calls_count_hash@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:273	243
+iseq_calls_count_eql?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/source/path.rb:65	10
+iseq_calls_count_from_lock@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:38	27
+iseq_calls_count_block in dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/materialization.rb:35	103
+iseq_calls_count_full_name@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/remote_specification.rb:44	671
+iseq_calls_count_source=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:21	293
+iseq_calls_count_prefer_content_addressable@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/match_platform.rb:30	54
+iseq_calls_count_block in glob_files_in_dir@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/util.rb:90	382
+iseq_calls_count_block in prefer_content_addressable@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/match_platform.rb:30	54
+iseq_calls_count_set_not_nil_attributes_to_default_values@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1966	17
+iseq_calls_count_block in get_metadata@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:218	58
+iseq_calls_count_full_name@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:202	31
+iseq_calls_count_table_name@/home/user/w/rails-main/activerecord/lib/active_record/model_schema.rb:309	239989
+iseq_calls_count_block in keep_only_files_and_directories@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:2592	2352
+iseq_calls_count_current_transaction@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:552	75
+iseq_calls_count_block in default_stubs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:832	7
+iseq_calls_count_forgetting_assignment@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:92	13
+iseq_calls_count_init_checksum@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:292	21
+iseq_calls_count_block in validate_duplicate_dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification_policy.rb:177	60
+iseq_calls_count_block in transform_attributes!@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:487	13
+iseq_calls_count_block (2 levels) in visit_Arel_Nodes_ValuesList@/home/user/w/rails-main/activerecord/lib/arel/visitors/to_sql.rb:122	5
+iseq_calls_count_hash@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:112	453
+iseq_calls_count_bind_params@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:75	4
+iseq_calls_count_user_transaction@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:135	4
+iseq_calls_count_block in compute_sort_key@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:451	1136
+iseq_calls_count_each@<internal:array>:266	242648
+iseq_calls_count_search_by_spec@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/index.rb:191	49
+iseq_calls_count_inspect@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:281	155
+iseq_calls_count_platform_specificity_match@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:315	43
+iseq_calls_count_use_exact_resolved_specifications?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:206	41
+iseq_calls_count_parse_source@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lockfile_parser.rb:214	179
+iseq_calls_count_apply@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:29	398
+iseq_calls_count_stat@<internal:gc>:347	1
+iseq_calls_count_index_with@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/enumerable.rb:329	31
+iseq_calls_count_execute!@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:223	27
+iseq_calls_count_id@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods/primary_key.rb:20	6
+iseq_calls_count_full_require_paths@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:185	39
+iseq_calls_count_block (2 levels) in each_strongly_connected_component@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/tsort/lib/tsort.rb:353	112
+iseq_calls_count_perform_query@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb:113	27
+iseq_calls_count_block in commit_transaction@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:632	3
+iseq_calls_count_block in sql@/home/user/w/rails-main/activerecord/lib/active_record/structured_event_subscriber.rb:33	5
+iseq_calls_count_block in each_strongly_connected_component_from@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/tsort/lib/tsort.rb:419	234
+iseq_calls_count_inspection_filter@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:413	5
+iseq_calls_count_having_clause@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	239993
+iseq_calls_count_platform_eligible?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/content_address.rb:76	32
+iseq_calls_count_loop@<internal:kernel>:153	2
+iseq_calls_count_block in <module:URI>@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/uri-1.1.2/lib/uri/common.rb:345	227
+iseq_calls_count_assert_modifiable!@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:2095	119975
+iseq_calls_count_sanitize_for_mass_assignment@/home/user/w/rails-main/activemodel/lib/active_model/forbidden_attributes_protection.rb:27	119984
+iseq_calls_count_predicate_value@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:121	119972
+iseq_calls_count_get_chain@/home/user/w/rails-main/activerecord/lib/active_record/associations/association_scope.rb:108	119971
+iseq_calls_count_freeze@/home/user/w/rails-main/activerecord/lib/active_record/result.rb:193	3
+iseq_calls_count_original_value@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:65	16
+iseq_calls_count_merge_outer_joins@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:152	119971
+iseq_calls_count_block in initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/settings.rb:113	121
+iseq_calls_count_extension_api_version@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems.rb:510	16
+iseq_calls_count_block in changed_attribute_names@/home/user/w/rails-main/activemodel/lib/active_model/attribute_mutation_tracker.rb:15	13
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/relation/where_clause.rb:11	120031
+iseq_calls_count_block in <top (required)>@/home/user/workspace/repo/bench/upstream/rails-open/cpu_open.rb:63	119971
+iseq_calls_count_missing_extensions?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:56	240
+iseq_calls_count_maybe_visit@/home/user/w/rails-main/activerecord/lib/arel/visitors/to_sql.rb:917	2
+iseq_calls_count_to_s@<internal:symbol>:13	107
+iseq_calls_count_cast_value@/home/user/w/rails-main/activemodel/lib/active_model/type/integer.rb:126	12
+iseq_calls_count_serialize_cast_value_compatible?@/home/user/w/rails-main/activemodel/lib/active_model/type/serialize_cast_value.rb:10	22
+iseq_calls_count_write@/home/user/w/rails-main/activerecord/lib/active_record/association_route.rb:286	1
+iseq_calls_count_block in expand_from_hash@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:147	119972
+iseq_calls_count_extensions@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:191	258
+iseq_calls_count_global_current_scope@/home/user/w/rails-main/activerecord/lib/active_record/scoping.rb:81	119971
+iseq_calls_count_relation_delegate_class@/home/user/w/rails-main/activerecord/lib/active_record/relation/delegation.rb:28	359973
+iseq_calls_count_match_spec?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:33	4
+iseq_calls_count_parse@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:104	266
+iseq_calls_count_block in <module:URI>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/uri/lib/uri/common.rb:352	227
+iseq_calls_count_scope@/home/user/w/rails-main/activerecord/lib/active_record/associations/association_scope.rb:21	119971
+iseq_calls_count_keep_owner_conditions@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:265	119971
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:34	22
+iseq_calls_count_make_shareable@/home/user/w/rails-main/activesupport/lib/active_support/ractors.rb:133	10
+iseq_calls_count_block in _resort!@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:854	1391
+iseq_calls_count_platform@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:180	57
+iseq_calls_count_type_map@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:1356	18
+iseq_calls_count_association_route@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:703	119987
+iseq_calls_count_block in <class:OptionMerger>@/home/user/w/rails-main/activesupport/lib/active_support/option_merger.rb:8	41
+iseq_calls_count_association_route_chain@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:695	119971
+iseq_calls_count_block in perform_query@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb:150	56
+iseq_calls_count_pump_retries@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:371	27
+iseq_calls_count_block in create@/home/user/w/rails-main/activerecord/lib/active_record/associations/association_scope.rb:11	119971
+iseq_calls_count_block (2 levels) in validate_deps@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:117	102
+iseq_calls_count_silenced?@/home/user/w/rails-main/activesupport/lib/active_support/structured_event_subscriber.rb:64	27
+iseq_calls_count_block in visit_Arel_Nodes_InsertStatement@/home/user/w/rails-main/activerecord/lib/arel/visitors/to_sql.rb:77	5
+iseq_calls_count_lookup@/home/user/w/rails-main/activerecord/lib/active_record/type/type_map.rb:15	20
+iseq_calls_count_invoke_before@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:599	10
+iseq_calls_count_values_for_merge@/home/user/w/rails-main/activerecord/lib/active_record/relation.rb:1351	120000
+iseq_calls_count_block in <module:URI>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/uri/lib/uri/common.rb:345	227
+iseq_calls_count_create@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:205	322
+iseq_calls_count_ractor_connection_handler@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:156	50
+iseq_calls_count_block in status_code@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/errors.rb:7	751
+iseq_calls_count_preprocess_query@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:428	34
+iseq_calls_count_debug_mode?@/home/user/w/rails-main/activesupport/lib/active_support/event_reporter.rb:517	45
+iseq_calls_count_call@/home/user/w/rails-main/activesupport/lib/active_support/subscriber.rb:150	27
+iseq_calls_count_clear@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/non_concurrent_map_backend.rb:95	6
+iseq_calls_count_block in use@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/index.rb:116	27
+iseq_calls_count_block in _assign_attributes@/home/user/w/rails-main/activerecord/lib/active_record/attribute_assignment.rb:13	1
+iseq_calls_count_have_extensions?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:373	50
+iseq_calls_count_fallback_order_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119973
+iseq_calls_count_dirty?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:198	7
+iseq_calls_count_references@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:57	119972
+iseq_calls_count_block in apply_inflections@/home/user/w/rails-main/activesupport/lib/active_support/inflector/methods.rb:421	753
+iseq_calls_count_present?@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/object/blank.rb:77	94
+iseq_calls_count_preload_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119972
+iseq_calls_count_empty@/home/user/w/rails-main/activerecord/lib/active_record/result.rb:50	8
+iseq_calls_count_finish_intent_log@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:854	27
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/name_tuple.rb:10	42
+iseq_calls_count_data@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_ext.rb:434	1372
+iseq_calls_count_fetch@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/map.rb:183	76
+iseq_calls_count_block in <module:URI>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/uri/lib/uri/rfc2396_parser.rb:543	2
+iseq_calls_count_runtime?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/dependency.rb:165	167
+iseq_calls_count_deliver_result@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:247	27
+iseq_calls_count_scope@/home/user/w/rails-main/activerecord/lib/active_record/associations/association.rb:112	119971
+iseq_calls_count_internal_init@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:234	5
+iseq_calls_count_current_preventing_writes@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/connection_handler.rb:77	22
+iseq_calls_count_content_address_locked_for_running_ruby?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:263	28
+iseq_calls_count_version@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:198	253
+iseq_calls_count_create@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:56	269
+iseq_calls_count_block in match_platforms?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/platform.rb:25	297
+iseq_calls_count_block in tsort_each_child@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:402	210
+iseq_calls_count_find_for@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/override.rb:8	104
+iseq_calls_count_block (2 levels) in each_strongly_connected_component_from@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/tsort/lib/tsort.rb:425	411
+iseq_calls_count_initialize@<internal:pathname_builtin>:386	79
+iseq_calls_count_descendants@/home/user/w/rails-main/activesupport/lib/active_support/descendants_tracker.rb:67	5
+iseq_calls_count__reflect_on_association@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:154	27
+iseq_calls_count_content_addressed_row?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/content_address.rb:127	377
+iseq_calls_count_dangerous_attribute_methods@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods.rb:45	186
+iseq_calls_count_define_proxy_call@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:441	120
+iseq_calls_count_serialize_cast_value@/home/user/w/rails-main/activemodel/lib/active_model/type/integer.rb:96	8
+iseq_calls_count_main?@/home/user/w/rails-main/activesupport/lib/active_support/ractors.rb:125	54
+iseq_calls_count_joins_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119973
+iseq_calls_count_local_platform@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler.rb:434	54
+iseq_calls_count_block (2 levels) in replace_require@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundled_gems.rb:66	1289
+iseq_calls_count_where_and_having_clauses_empty?@/home/user/w/rails-main/activerecord/lib/active_record/relation/merger.rb:104	119980
+iseq_calls_count_global_current_scope@/home/user/w/rails-main/activerecord/lib/active_record/scoping.rb:111	119971
+iseq_calls_count_find_default_spec@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems.rb:1366	22
+iseq_calls_count_block in required_ruby_version=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:699	11
+iseq_calls_count_lock_name@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_ext.rb:538	41
+iseq_calls_count_stale_state@/home/user/w/rails-main/activerecord/lib/active_record/associations/belongs_to_association.rb:217	29
+iseq_calls_count_create@/home/user/w/rails-main/activerecord/lib/active_record/relation/delegation.rb:146	359973
+iseq_calls_count_block in tsort_each@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/tsort/lib/tsort.rb:230	112
+iseq_calls_count_require_paths=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:535	13
+iseq_calls_count_initialize@<internal:hash>:37	172
+iseq_calls_count_visit@/home/user/w/rails-main/activerecord/lib/arel/visitors/visitor.rb:34	107
+iseq_calls_count_validate_deps@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:109	41
+iseq_calls_count_clear@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/mri_map_backend.rb:62	6
+iseq_calls_count_cache_quoted_name@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/quoting.rb:85	115
+iseq_calls_count_auto_increment?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/sqlite3/column.rb:17	6
+iseq_calls_count_debug@/home/user/w/rails-main/activesupport/lib/active_support/event_reporter.rb:533	16
+iseq_calls_count_block in register_checksum@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:270	12
+iseq_calls_count_type@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/dependency.rb:161	240
+iseq_calls_count_dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/remote_specification.rb:92	54
+iseq_calls_count_block in index_with@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/enumerable.rb:94	77
+iseq_calls_count_platforms@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems.rb:747	343
+iseq_calls_count_redefine@/home/user/w/rails-main/activesupport/lib/active_support/class_attribute.rb:7	71
+iseq_calls_count_from_clause@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	31
+iseq_calls_count_initialize@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:54	142
+iseq_calls_count_block (2 levels) in deprecate_methods@/home/user/w/rails-main/activesupport/lib/active_support/deprecation/method_wrappers.rb:48	1
+iseq_calls_count_left_outer_joins_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119973
+iseq_calls_count_default_value@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1760	109
+iseq_calls_count_register_type@/home/user/w/rails-main/activerecord/lib/active_record/type/type_map.rb:24	6
+iseq_calls_count_delegate@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/module/delegation.rb:191	4
+iseq_calls_count__read_attribute@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods/read.rb:57	46
+iseq_calls_count_map@<internal:array>:284	607
+iseq_calls_count_block in insert@/home/user/w/rails-main/activerecord/lib/arel/insert_manager.rb:34	5
+iseq_calls_count_extended@/home/user/w/rails-main/activesupport/lib/active_support/concern.rb:137	45
+iseq_calls_count_runtime_dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/remote_specification.rb:105	31
+iseq_calls_count_redefine_method@/home/user/w/rails-main/activesupport/lib/active_support/class_attribute.rb:27	66
+iseq_calls_count_build_bind_attribute@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:129	119972
+iseq_calls_count_instance_or_fallback@/home/user/w/rails-main/activesupport/lib/active_support/inflector/inflections.rb:105	337
+iseq_calls_count_block in add_constraints@/home/user/w/rails-main/activerecord/lib/active_record/associations/association_scope.rb:137	119971
+iseq_calls_count_block in initialize_copy@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:2008	127
+iseq_calls_count_autoload@/home/user/w/rails-main/activesupport/lib/active_support/dependencies/autoload.rb:35	229
+iseq_calls_count_retry_deadline@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:316	10
+iseq_calls_count_check_for_activated_spec!@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/runtime.rb:395	42
+iseq_calls_count_compute_sort_key@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:445	208
+iseq_calls_count_registry@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/deduplicable.rb:10	8
+iseq_calls_count_destination_fixed_values@/home/user/w/rails-main/activerecord/lib/active_record/association_route.rb:344	119971
+iseq_calls_count_with_value_from_user@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:96	13
+iseq_calls_count_<<@/home/user/w/rails-main/activerecord/lib/arel/collectors/plain_string.rb:15	53
+iseq_calls_count_empty@/home/user/w/rails-main/activerecord/lib/active_record/relation/from_clause.rb:22	239942
+iseq_calls_count_composite?@/home/user/w/rails-main/activerecord/lib/active_record/key.rb:177	31
+iseq_calls_count_method_name@/home/user/w/rails-main/activemodel/lib/active_model/attribute_methods.rb:518	181
+iseq_calls_count_prerelease?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:317	34
+iseq_calls_count_block (4 levels) in class_attribute@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/class/attribute.rb:131	54
+iseq_calls_count_extensions_dir@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/basic_specification.rb:122	16
+iseq_calls_count_local!@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/source/rubygems.rb:57	36
+iseq_calls_count_ruby_platform_materializes_to_ruby_platform?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:254	36
+iseq_calls_count_loaded?@/home/user/w/rails-main/activerecord/lib/active_record/associations/association.rb:87	45
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:124	27
+iseq_calls_count_block (2 levels) in setup@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/runtime.rb:30	57
+iseq_calls_count__reflections@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:13	43
+iseq_calls_count_cast@/home/user/w/rails-main/activemodel/lib/active_model/type/helpers/numeric.rb:18	13
+iseq_calls_count_duration@/home/user/w/rails-main/activesupport/lib/active_support/notifications/instrumenter.rb:231	21
+iseq_calls_count_with_values@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119973
+iseq_calls_count_build@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:100	119972
+iseq_calls_count_dangerous_attribute_method?@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods/primary_key.rb:78	186
+iseq_calls_count_block in search_by_spec@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/index.rb:197	41
+iseq_calls_count_+@/home/user/w/rails-main/activerecord/lib/active_record/relation/where_clause.rb:15	119972
+iseq_calls_count__tilde_requirements@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:291	16
+iseq_calls_count_add_duplicate@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/index.rb:174	4
+iseq_calls_count_pool@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/pool_config.rb:74	64
+iseq_calls_count_complete?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/materialization.rb:19	70
+iseq_calls_count_type_caster@/home/user/w/rails-main/activerecord/lib/arel/attributes/attribute.rb:13	239974
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/arel/nodes/binary.rb:9	3
+iseq_calls_count_options@/home/user/w/rails-main/activerecord/lib/active_record/associations/association.rb:44	119971
+iseq_calls_count_dirty_current_transaction@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:599	4
+iseq_calls_count_current_scope@/home/user/w/rails-main/activerecord/lib/active_record/scoping.rb:25	239986
+iseq_calls_count_required_rubygems_version=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:711	3
+iseq_calls_count_block in strings@/home/user/workspace/repo/bench/upstream/rails-open/cpu_open.rb:38	38
+iseq_calls_count__segments@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:464	3
+iseq_calls_count_version=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:2604	16
+iseq_calls_count_block in initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:141	272
+iseq_calls_count_initialize@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:40	382
+iseq_calls_count_processed_sql@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:206	98
+iseq_calls_count_connection_lease@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb:981	58
+iseq_calls_count_instance_method_already_implemented?@/home/user/w/rails-main/activerecord/lib/active_record/attribute_methods.rb:238	176
+iseq_calls_count_deduplicate@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/deduplicable.rb:20	8
+iseq_calls_count_default_attribute@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:623	13
+iseq_calls_count_collection?@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:1144	10
+iseq_calls_count_initialize@<internal:thread_sync>:336	72
+iseq_calls_count_synchronize@/home/user/w/rails-main/activesupport/lib/active_support/concurrency/null_lock.rb:9	74
+iseq_calls_count_block in build@/home/user/w/rails-main/activesupport/lib/active_support/deprecated_formats.rb:18	3
+iseq_calls_count_add@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/index.rb:75	604
+iseq_calls_count_included@/home/user/w/rails-main/activesupport/lib/active_support/concern.rb:170	145
+iseq_calls_count_final?@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:591	13
+iseq_calls_count_release@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:332	37
+iseq_calls_count_association_cache@/home/user/w/rails-main/activerecord/lib/active_record/associations.rb:85	17
+iseq_calls_count_with_recursive_value@/home/user/w/rails-main/activerecord/lib/active_record/relation/query_methods.rb:193	119971
+iseq_calls_count_block in delete_by_name@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:212	41
+iseq_calls_count_loaded_mapped_table@/home/user/w/rails-main/activerecord/lib/active_record/model_schema.rb:228	210
+iseq_calls_count_block (4 levels) in class_attribute@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/class/attribute.rb:126	58
+iseq_calls_count_value_at!@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set.rb:555	120132
+iseq_calls_count_block in load@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1117	3
+iseq_calls_count_block in convert_dot_notation_to_hash@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:31	119972
+iseq_calls_count_select_all_platform_match@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/match_platform.rb:58	54
+iseq_calls_count_connected?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb:272	30
+iseq_calls_count_presence@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/object/blank.rb:59	23
+iseq_calls_count_block in satisfied_by?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/requirement.rb:251	130
+iseq_calls_count_match?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/content_address.rb:34	5
+iseq_calls_count_generate@/home/user/w/rails-main/activesupport/lib/active_support/delegation.rb:39	5
+iseq_calls_count_default_role@/home/user/w/rails-main/activerecord/lib/active_record/core.rb:108	11
+iseq_calls_count_initialize@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:319	27
+iseq_calls_count_store_if_absent@<internal:ractor>:553	9
+iseq_calls_count_resolve_name@/home/user/w/rails-main/activesupport/lib/active_support/event_reporter.rb:689	16
+iseq_calls_count_block (4 levels) in class_attribute@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/class/attribute.rb:154	38
+iseq_calls_count_missing?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:212	41
+iseq_calls_count_block in stubs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification_record.rb:82	293
+iseq_calls_count_define_element@/home/user/w/rails-main/actionview/lib/action_view/helpers/tag_helper.rb:1343	71
+iseq_calls_count_default_force_ruby_platform@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/force_platform.rb:11	111
+iseq_calls_count_block in require@<internal:/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/core_ext/kernel_require.rb>:40	8
+iseq_calls_count_glob@<internal:dir>:239	17
+iseq_calls_count_groups_for@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:273	42
+iseq_calls_count_define_cached_method@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:66	365
+iseq_calls_count_segments@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:342	38
+iseq_calls_count_to_sql_and_binds@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:23	8
+iseq_calls_count_type_key_at?@/home/user/w/rails-main/activemodel/lib/active_model/attribute_set/builder.rb:36	13
+iseq_calls_count_mark_loaded@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_integration.rb:42	42
+iseq_calls_count_add_bind@/home/user/w/rails-main/activerecord/lib/arel/collectors/composite.rb:27	1
+iseq_calls_count_block in materialize_dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/spec_set.rb:269	107
+iseq_calls_count_merge!@/home/user/w/rails-main/activerecord/lib/active_record/relation/spawn_methods.rb:48	239971
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:192	6
+iseq_calls_count_block in with_transaction_returning_status@/home/user/w/rails-main/activerecord/lib/active_record/transactions.rb:462	3
+iseq_calls_count_klass@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:1625	119971
+iseq_calls_count_null_scope?@/home/user/w/rails-main/activerecord/lib/active_record/associations/collection_association.rb:301	3
+iseq_calls_count_singleton_method_added@/home/user/w/rails-main/activerecord/lib/active_record/scoping/named.rb:251	153
+iseq_calls_count_synchronize@<internal:thread_sync>:557	57
+iseq_calls_count_load_paths@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/stub_specification.rb:106	1
+iseq_calls_count_partially_missing_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/materialization.rb:49	41
+iseq_calls_count_block in execute@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:71	408
+iseq_calls_count_[]@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/concurrent-ruby-1.3.8/lib/concurrent-ruby/concurrent/collection/map/non_concurrent_map_backend.rb:22	170
+iseq_calls_count_check_conditionals@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:340	1
+iseq_calls_count_compile@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:662	7
+iseq_calls_count_authors=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:276	14
+iseq_calls_count_block in notify@/home/user/w/rails-main/activesupport/lib/active_support/event_reporter.rb:450	16
+iseq_calls_count_empty?@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:222	41
+iseq_calls_count_date=@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1741	1
+iseq_calls_count_block in bind_params@/home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/statement.rb:77	5
+iseq_calls_count_initialized?@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:129	10
+iseq_calls_count_to_hexdigest@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/checksum.rb:42	27
+iseq_calls_count_block in validate_array_attribute@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification_policy.rb:332	2495
+iseq_calls_count_block in stale_state@/home/user/w/rails-main/activerecord/lib/active_record/associations/belongs_to_association.rb:218	1
+iseq_calls_count_hash@/home/user/w/rails-main/activerecord/lib/active_record/key.rb:56	1
+iseq_calls_count_verified!@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/abstract_adapter.rb:1259	27
+iseq_calls_count_block in choose_compatible@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:282	41
+iseq_calls_count_empty?@/home/user/w/rails-main/activerecord/lib/active_record/relation/where_clause.rb:8	1079976
+iseq_calls_count_platform@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:2171	78
+iseq_calls_count_==@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/specification.rb:1374	36
+iseq_calls_count_on_main@/home/user/w/rails-main/activesupport/lib/active_support/ractors.rb:114	4
+iseq_calls_count_partition_segments@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:468	24
+iseq_calls_count_block in groups_for@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:283	27
+iseq_calls_count_block in installed_specs@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/rubygems_integration.rb:427	250
+iseq_calls_count_spec@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/stub_specification.rb:209	6
+iseq_calls_count_initialize@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:1618	119971
+iseq_calls_count_block in current_time_from_proper_timezone@/home/user/w/rails-main/activerecord/lib/active_record/timestamp.rb:91	3
+iseq_calls_count_initialize@<internal:string>:87	14
+iseq_calls_count_advance!@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lockfile_parser.rb:15	545
+iseq_calls_count_validate_dependencies@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/bundler/lazy_specification.rb:309	41
+iseq_calls_count_block in class_attribute@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/class/attribute.rb:112	58
+iseq_calls_count_start@/home/user/w/rails-main/activesupport/lib/active_support/notifications/fanout.rb:327	27
+iseq_calls_count_changed_from_assignment?@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:187	8
+iseq_calls_count__klass@/home/user/w/rails-main/activerecord/lib/active_record/reflection.rb:534	839980
+iseq_calls_count_block in apply@/home/user/w/rails-main/activesupport/lib/active_support/code_generator.rb:35	507
+iseq_calls_count_has_binds?@/home/user/w/rails-main/activerecord/lib/active_record/connection_adapters/query_intent.rb:218	22
+iseq_calls_count_visit_ActiveModel_Attribute@/home/user/w/rails-main/activerecord/lib/arel/visitors/to_sql.rb:774	4
+iseq_calls_count_empty@/home/user/w/rails-main/activerecord/lib/active_record/relation/where_clause.rb:103	239972
+iseq_calls_count_<=>@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/version.rb:367	318
+iseq_calls_count_bind_block@/home/user/w/rails-main/activerecord/lib/arel/visitors/to_sql.rb:771	1
+iseq_calls_count___callbacks@/home/user/w/rails-main/activesupport/lib/active_support/callbacks.rb:73	7
+iseq_calls_count_block in handler_for@/home/user/w/rails-main/activerecord/lib/active_record/relation/predicate_builder.rb:251	599976
+iseq_calls_count_initialize_dup@/home/user/w/rails-main/activemodel/lib/active_model/attribute.rb:181	13
+iseq_calls_count_block in each_strongly_connected_component@/home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/rubygems/vendor/tsort/lib/tsort.rb:351	83
+iseq_calls_count_scope@/home/user/w/rails-main/activerecord/lib/active_record/associations/collection_association.rb:293	119971
+iseq_calls_count_blank?@/home/user/w/rails-main/activesupport/lib/active_support/core_ext/object/blank.rb:73	8

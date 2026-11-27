@@ -1,0 +1,4 @@
+      3 /tmp/z/fva/railsbench-h6-5c4239a16d.iseqs:cast_value@rails-main/activemodel/lib/active_model/attribute_set.rb:594
+      1 /tmp/z/fva/railsbench-h6-5c4239a16d.iseqs:fetch_value_at!@rails-main/activemodel/lib/active_model/attribute_set.rb:419
+      4 /tmp/z/fva/shipit-h6-5c4239a16d.iseqs:cast_value@rails-main/activemodel/lib/active_model/attribute_set.rb:594
+      4 /tmp/z/fva/shipit-h6-5c4239a16d.iseqs:fetch_value_at!@rails-main/activemodel/lib/active_model/attribute_set.rb:419
