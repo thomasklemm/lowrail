@@ -23,6 +23,7 @@ note: "2026-11-27 rebased by hand onto master 277e88e as 6b6f67b (the CHANGELOG 
 ownership: {date: 2026-11-27, checked: ["open PRs naming to_hash that change CHANGELOG.md, lib/hashie/hash.rb"], hits: []}
 passes:
   - {reviewer: astra, head: "6b6f67b39c4f839154209f4d94ceadb416f82ddb", date: 2026-11-27, orb: T-01a21f3c-2ef1-726e-be84-05ebf5389576, verdict: changes, open: "Public value/key callbacks and synchronized mutation change results or exceptions without overriding []; copying readers expose first-copy state. Restore the reads for exactness, or explicitly accept the broader snapshot contract. Repros, claim audit and reach checks in round2 README and astra-HM5-6b6f67b.tar.gz."}
+  - {reviewer: thermos-sol, head: "6b6f67b39c4f839154209f4d94ceadb416f82ddb", date: 2026-11-27, orb: T-01a21f3c-226a-77d4-8978-cd852e1e46ae, verdict: changes, open: "R1 reentrant public callbacks change results without a [] override; restore two reads or explicitly accept the broader contract. R2 qualify every-Mash reach; IndifferentAccess bypasses the helper. Performance follow-up: repeat the diagnostic large-Array master/ZJIT loss on a1.xxlarge. Record and raw archive in hashie_perf/round2. Both rubrics applied here without delegation."}
 ---
 
 # Read each value once in Hashie::Hash#to_hash

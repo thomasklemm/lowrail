@@ -661,3 +661,114 @@ All four repositories are unarchived. Downloaded OmniAuth's latest released gem,
 `confirm.sh` then measured those two input shapes with distinct call sites and a scalar Mash control using `script/upstream-bench --wall 30 --wall-windows 5 --wall-ms 10 --warmup 10000`, again pinned to core 1, separately on 4.0.10/YJIT and master/ZJIT. Each cohort has 90 fresh processes, a repeated-base control, passing A/A intervals, and unchanged JIT counters in every measured window. **Neither selected slowdown reproduced in the isolated confirmation.** The single-scalar Hash and Mash were faster in both; the empty subclass was within noise on master/ZJIT and had a very small faster-side interval on YJIT. This does not prove that every mixed-profile workload is free of a regression: the broad screen shares call sites, while confirmation isolates the selected shapes. Exact estimates, confidence intervals and all commands are retained in `confirm-yjit/` and `confirm-zjit/`.
 
 **Host limitation:** this orb has two CPUs, not the required a1.xxlarge timing host. These new measurements are diagnostic only, not publication-approved timing evidence; no new percentage from them belongs in the upstream body. No separate measurement thread was created. The audit of the body's reported Duel ratios stands on its retained exact-head logs; the changes verdict stands on demonstrated result/exception differences, not on a speculative slowdown.
+
+## thermos-sol HM5: changes on 6b6f67b39c4f839154209f4d94ceadb416f82ddb
+
+2026-11-27, orb `T-01a21f3c-226a-77d4-8978-cd852e1e46ae`. Loaded Thermos and both correctness/security and maintainability rubrics and applied them here, without other threads or subagents, as requested. Verified the fork branch and its one-commit parent `277e88e6ccc317497e6c20fb8b9e35abebc0fe19`; reviewed the entire diff, HM5 title/body/impact, commit message and CHANGELOG entry. No Hashie source edit, fork push or upstream post was made.
+
+**Verdict: changes under the requested strict equivalence contract.** Ordinary stored values agree in the new differential. Reentrant public callbacks can nevertheless change results without overriding `[]`; accepting only a subclass's reduced read count is not a complete compatibility boundary. This is not a demonstrated failure in OmniAuth or an identified security vulnerability. The coordinator can instead explicitly accept and disclose the broader boundary. The implementation itself is L0 and structurally sound.
+
+Scripts, raw outputs and source/API evidence are in [`thermos-sol-HM5-6b6f67b.tar.gz`](thermos-sol-HM5-6b6f67b.tar.gz). Paths below refer to that archive; `RUNS.md` gives reproduction commands and toolchain/measurement limitations. The candidate was not silently corrected.
+
+### R1 — P2: reentrant callbacks change the returned value, not just a subclass's read count
+
+At `lib/hashie/hash.rb:41–49`, base looks up the value again after its first result's public `is_a?` callback. Head retains the first result. Minimal repro, run with `ruby -I BASE/lib repro.rb` and `ruby -I HEAD/lib repro.rb`:
+
+```ruby
+require 'hashie'
+h = Hashie::Hash.new
+v = Object.new
+v.define_singleton_method(:is_a?) do |type|
+  h[:item] = :replacement if type == Hashie::Array
+  super(type)
+end
+h[:item] = v
+p h.to_hash[:item].equal?(v)
+```
+
+Base prints `false` (the output value is `:replacement`); head prints `true` (the original object). Neither the hash nor its class overrides `[]`. A `Hashie::Array` value replacing itself with `[29]` during the same type check serializes `[29]` on base and its original `[17]` on head, including through `to_json`. Deleting itself instead changes base's `NoMethodError` into a successful conversion on head. Frozen mutation failures agree. A fiber suspended at the type check and resumed after deleting or replacing the entry shows the same distinction. `repros.rb`, `edge_diff.rb` and their per-version outputs retain these runs.
+
+There is also a core Hash-key callback version, without any value-method override:
+
+```ruby
+require 'hashie'
+h = Hashie::Hash.new(:fallback)
+n = 0
+k = Object.new
+k.define_singleton_method(:hash) { h.clear if (n += 1) == 3; 13 }
+h[k] = :stored
+p h.to_hash.values
+```
+
+Base: `[:fallback]`; head: `[:stored]`. The key returns a stable integer hash; its callback deletes the receiver during lookup/output insertion. `repros.rb` uses an explicitly armed counter to keep setup separate. These are reachable public custom-value/key boundaries, not global core redefinitions or private-helper overrides. They require deliberately reentrant callbacks; no named released consumer was found to use them. Ordinary callbacks that do not replace/delete the current entry did not expose an additional result difference.
+
+`more_edges.rb` also demonstrates the same lookup-count consequence when a custom public `each_key` yields an absent key with a stateful default proc: Hashie::Hash returns 2 on base and 1 on head; Mash returns 4 and 2 because each missing-key read invokes its proc through two paths. A copying reader returns its second fresh object on base and its first on head. The latter is the already acknowledged custom-reader boundary, made observable by identity rather than printed contents; it is not a separate defect.
+
+**Smallest strict correction:** restore the original two `self[k]` expressions in the conversion branches and remove `value = self[k]`, i.e. revert the runtime hunk. That loses this optimization and gives exactly the already-tested base implementation. No speculative type/owner guard is proposed. If read-once snapshot semantics are acceptable instead, explicitly accept that callbacks or mutation between the old lookups can change results even without a `[]` override, and describe that boundary rather than asserting universal equivalence. That is a contract decision, not a proven optimization-preserving fix.
+
+### R2 — P3: qualify the reach, not the valid OmniAuth example
+
+`impact` says “every Mash that is serialized again”. A supported mixin can bypass this helper entirely:
+
+```ruby
+klass = Class.new(Hashie::Mash) { include Hashie::Extensions::IndifferentAccess }
+h = klass.new(item: 17)
+p h.method(:to_hash).owner # Hashie::Extensions::IndifferentAccess
+```
+
+Counting `[]` across `h.to_hash` and `h.to_json` gives zero on both trees (`evidence/indifferent-mash-reach.txt`); that module exports with `each_pair`. Dash/Trash use their own `to_hash` alias, Clash inherits core Hash conversion, and Rash delegates to its backing hash. They are compatibility controls, not additional beneficiaries. Say “serializations through Hashie::Hash#to_hash, including Mash and OmniAuth's subclasses” instead of promising every Mash/API response. No project needs to be removed from the concrete reach example.
+
+Live GitHub/RubyGems checks on 2026-11-27 (`sources/omniauth-*.json`) found OmniAuth unarchived, **8,102 stars**, **235,361,860 total gem downloads**, latest **2.4.2**, released **2026-11-18**, last repository push **2026-11-27**. Its released dependency is `hashie >= 3.5.2`, so Hashie 6 is allowed; the current default-branch gemspec agrees. The 235M rounded figure is supported, not a unique-installation or serialization-frequency estimate. OmniAuth is the only consumer project named in HM5's impact.
+
+Downloaded the actual 2.4.2 gem and compared `auth_hash.rb` byte-for-byte with its release commit `2045f32693592360488c833b1505658dceddcd03`: [KeyStore derives from Mash](https://github.com/omniauth/omniauth/blob/2045f32693592360488c833b1505658dceddcd03/lib/omniauth/key_store.rb#L5), [AuthHash derives from KeyStore](https://github.com/omniauth/omniauth/blob/2045f32693592360488c833b1505658dceddcd03/lib/omniauth/auth_hash.rb#L8), and [InfoHash#to_hash calls super](https://github.com/omniauth/omniauth/blob/2045f32693592360488c833b1505658dceddcd03/lib/omniauth/auth_hash.rb#L64-L68). Executed released AuthHash/InfoHash conversion and JSON examples against both Hashie trees; values and calculated names match (`evidence/omniauth-2.4.2.txt`). Its continued eligibility and real call path are verified, not just its dependency declaration.
+
+### Sentence-by-sentence upstream text audit
+
+| Text | Executed check and conclusion |
+| --- | --- |
+| Title and CHANGELOG: read each value once in Hashie::Hash#to_hash | Exact diff, method owners, original counted-read probe and new identity probe support one lookup instead of two on this helper's normal per-key path. No added code-comment line exists. |
+| Body sentence 1 and commit sentence 1: two `self[k]` reads, type test then conversion | Read both complete method bodies and ran the supplied differential. Lexically `Array` here is `Hashie::Array` after `require 'hashie'`; behavior for core Arrays is unchanged. This does not mean all Ruby Arrays are traversed by that branch. |
+| Body sentence 2 and commit sentence 2: Mash converts the key and looks for a default proc on each read; to_json calls to_hash | Read `Mash#custom_reader`, `convert_key`, `alias [] custom_reader`, and Hashie::Hash#to_json. Executed both serialization paths, defaults, direct method owners and fresh-process require variants. Supported on this helper's path; R2 qualifies overriding serializers. |
+| Body sentence 3 and commit final sentence: read once and convert what was read | Exact runtime diff and independent outputs support this. It is the first lookup's value, including across reentrant mutation; R1 is the resulting strict-contract limitation. |
+| Body sentence 4: an overriding subclass's `[]` sees one read per key rather than two | Supplied counting probe and `more_edges.rb` confirm it. Correct, but not an exhaustive list of affected public callbacks; R1. |
+| Duel introduction and YJIT 0.84 / ZJIT 0.69 table | Opened run 46077588957's API record and both kept raw logs, not only summaries. Exact head is `6b6f67b`, base `277e88e`, actual Ruby 4.0.10; CPU ratios are 0.838 [0.833, 0.842] and 0.688 [0.680, 0.694], both `faster`. Rounding is correct. Duel 0.3.1's clock implementation measures CPU time, not instructions or allocations. |
+| Body: allocations are unchanged | Both Duel logs give 10 for the nested-Mash case. Independent base/head/base allocation measurements on 4.0.10/YJIT give the same 100,001 objects per 10,000 calls, including one shared instrumentation object; JSON likewise agrees at 13 objects/call. This is the measured fixture, not a promise for allocating custom readers. |
+| Commit subject and complete message | Same source/read-path checks as the title and first three body rows; no additional factual claim or trailer. Author/committer are Thomas Klemm. No new comment, helper, test or dependency is hidden in the diff. |
+| CHANGELOG attribution and prospective 662 link | Checked commit attribution and fetched upstream's current latest issues/PRs: latest visible number 661, no open upstream PR, GET pull/662 is 404, including the final repeat. **662 still appears to be next**, not an existing link or a reservation. These reads cannot rule out deleted numbers or reserve GitHub's counter; recheck/replace on opening. |
+
+No factual sentence in those four upstream text surfaces was left silently unchecked. The body does not assert a universal speedup. Its numeric table reports the demonstrated Duel fixture, not the older Callgrind/wall cohorts. Those older cohorts used `e10dce0` on `9e313f3`; they were inspected as context, not relabeled exact-head runs.
+
+**Duel provenance:** closed fork PR 33 names exactly this head and parent. The checkout log identifies test merge `a52a15e2b6dddaeae2626e561cb82ed8893a9898`. Fetched that object and compared the `lib`, `spec`, `benchmarks` trees and `.duel.rb` blob: test merge matches the reviewed head, unchanged benchmark/spec/config trees match base. Both logs report 27 benchmarks, zero regressed/errors/unsettled. The per-CPU limit is 1.05 in `.duel.rb`, not the generic header's 1.02. After the independent audit, fetched PR 33's conversation, inline comments and reviews (all empty) and current upstream open PRs (none); no external reviewer finding was imported.
+
+### Correctness coverage and probe sensitivity
+
+`public_diff.rb` is an independent **35,280-row** probe per side/configuration: 21 receiver flavors, 28 value shapes, five options, frozen/unfrozen, ordinary/default/default-proc, and `to_hash`/`to_json`. It covers Hashie::Hash, Mash, a named subclass, InfoHash-style override, all nine Mash extensions, Dash, Trash, Clash, Rash, IndifferentAccess, singleton/extended/prepended readers; Hash/Array/String subclasses, Hashie::Array, private/singleton/arity-0/1/optional/rest/two-required/keyword/`method_missing` conversions and frozen conversion results. It records return/error, input after conversion, source identity, classes, frozen state, string bytes/encoding, default/default-proc presence, identity-hash mode and the Ruby keyword flag. Only object addresses and checkout prefixes in diagnostics are normalized; arbitrary Hash metadata is not reduced to printed pairs.
+
+Executed release cells: 3.0.7 interpreter; 3.1.7, 3.2.10, 3.3.10, 3.4.7 interpreter/YJIT; 4.0.10 interpreter/YJIT/ZJIT, plus 4.0.7 interpreter. Built Ruby master `0d399335b733776187e43a783e5f950c18ad881c` and ran interpreter/YJIT/ZJIT too: **all 16 configurations have 35,280 ordinary-input snapshots per side and zero differences.** The two minimal R1 repros also differ on every release pin and master. `edge_diff.rb` adds 49 callback/mutation/fiber/key-collision cases, and `more_edges.rb` adds 30 conversion/metadata/default/identity cases. Their differences are R1 and its acknowledged read-count consequences, not an undiscovered keyword-flag change. The supplied `to_hash_diff.rb` gives its original 2,340 identical matrix rows and the same two expected differing footer rows; its stored-key default-proc footer agrees.
+
+**Negative control for the earlier blind spot:** `flag_control.rb` deliberately marks returned Hashes with Ruby's keyword flag, without editing the candidate. The supplied probe's entire output stays identical to head; the new probe changes **11,700 rows**. Thus the old probe really is blind to that property, while the new one observes it. The candidate itself does not introduce that flag change. This is probe validation, not a candidate finding.
+
+Exactness checklist: (1) singleton/private/extend/prepend/missing-method hooks exercised; (2) container subclasses, Array iteration overrides and colliding output keys exercised; (3) public/private and arity-sensitive conversions, plus their events, exercised; (4) no new user call, but skipped lookups skip public callbacks and change mutation ordering (R1); (5) ordinary source/result identity and conversion-result metadata agree, with first-versus-second fresh lookup identity explicitly recorded; (6) live deletion/replacement and fiber suspension exercised; (7) frozen receivers, containers and results plus error class/message exercised; (8) fresh-process standalone `hashie/hash`, `hashie/mash` and `hashie` loads agree. The no-JSON-require error was also seen on both trees before rerunning the OmniAuth example with `require 'json'`; it is not an introduced bug.
+
+Independently on **Ruby 4.0.10**, `bundle exec rake spec`: base **1,076/0**, head **1,076/0**; `bundle exec rake rubocop`: **156 files, no offenses**; `bundle exec rake docs:examples`: **359/0**. Same head results also passed on 4.0.7. An initial attempt to reuse another Ruby installation's native gems failed dependency loading on base and head; installing the proper 4.0.10 bundle resolved it, without changing source/tests. Other release Rubies ran the differential probes, not their whole suites.
+
+### Maintainability rubric
+
+Cold read: compute the requested output key; obtain one value; iterate a Hashie::Array's elements through the existing conversion helper, otherwise convert the value through that helper; return the new ordinary Hash. The key conditions implement the existing option precedence, and the Array branch preserves the existing element-wise conversion rule. The change belongs in the canonical shared helper, not a Mash-only fast path. No extra wrapper, type/owner guard, branch, duplication, sequential orchestration, mutable shared state, feature gate or new dependency. No coherent simplification would improve these few lines by adding another abstraction. **L0, maintainability approve.**
+
+Measured separately with flog 4.10.0 and RuboCop 1.91.0 (`evidence/flog-{base,head}.txt`, `metrics-*.json`): flog **24.4 → 21.5**, ABC **20.15 → 18.84**, cyclomatic **8 → 8**, perceived **10 → 10**, method length **20 → 21**, parameter count **1 → 1**. The extra line is the named local; branching and indirection do not grow. `hash.rb` is **78 → 79 lines**, so no 1,000-line threshold is crossed. There are zero added comment lines and no added implementation-count test to reject. Lower metrics do not establish semantic equivalence across R1's reentrant boundary.
+
+### Slowest measured input and timing limitation
+
+**Diagnostic only, not approved upstream timing:** this review's orb has two vCPUs, not DECISIONS' required a1.xxlarge. The request prohibited other threads. All new raw samples, including failed gates and preliminary cohorts, are retained; they are not promoted into the body or used as a policy-compliant performance blocker.
+
+The initial twelve-case Ruby 4.0.10/ZJIT screen used five base/head/base rounds; its missing `compiled_side_exit_count` made every timing unclaimable. On master `0d399335b733776187e43a783e5f950c18ad881c`/ZJIT, ran the same twelve cases through `script/upstream-bench --wall 30 --wall-windows 5 --wall-ms 10 --warmup 10000 --core 1`: empty Hashie/Mash, scalar Symbol/String keys, core/Hashie Arrays, 20-key Hashie/Mash, stringify/symbolize and JSON. All measured windows were JIT-flat. No ordinary-case cell claimed a loss; the worst relative point estimate there was empty Mash, −0.05% [−1.13%, +0.95%], A/A −0.18% [−2.14%, +1.57%]. These intervals do not show a slowdown.
+
+Extended the Hashie::Array sweep to 0, 1, 20 and **131,072 elements** (1 MiB of raw references), first three rounds and then a complete **30-round** confirmation, five GC-off windows/process, CPU 1, all six base/head/base2 orders. Used the unchanged harness's wall worker with bounded call counts, and its actual `wall_cell`/bootstrap estimator for analysis (`run-large.sh`, `large_body.rb`, `large_summary.rb`). Every cell remained JIT-flat in 90 processes. The slowest absolute **and** worst relative input in this bounded sweep was:
+
+```ruby
+h = Hashie::Hash[item: Hashie::Array.new(131_072, 17)]
+h.to_hash
+```
+
+Head: **3.621 ms/call**; paired change **+1.25% [ +0.80%, +1.70% ]**; A/A **−0.26% [−0.63%, +0.58%]**. This local cohort does pass the statistical and JIT gates for a small loss; unlike its preliminary three-round result it must not be dismissed as merely inside its confidence interval. **Repeat this row on a1.xxlarge before clearing the performance follow-up.** The orb size prevents treating it as DECISIONS' blocking-loss measurement. No cause or optimization-preserving correction is established, and no speculative large-Array branch is recommended. This is not a universal worst-case proof over arbitrary Ruby callbacks. The candidate's body reports only its nested-Mash fixture, whose Duel claim was verified separately.
