@@ -2,8 +2,10 @@
 
 A deeper look after dblock's four leads ([round 1](../README.md)): which hashie classes the popular dependents use,
 where a realistic API workload spends objects and time, and which exact changes follow. Three candidates were built:
-HM4 is in review; HM3 and HM5 are held after review (not exact in cases their own differentials never recorded);
-the rest are held with their numbers.
+All three are held after review, each not exact in a case its own differential never recorded (HM5 waits for
+Thomas's decision); the rest are held with their numbers. **No hashie PR was opened in this round.**
+`candidates.bundle` holds the three final heads and HM4's two earlier forms (`git fetch candidates.bundle
+'refs/heads/held/*:refs/heads/held/*'` in a hashie clone).
 
 Setup: hashie master `9e313f3`. Rubies 4.0.10 `a704b7cd95` and master `0d399335b7`, both built with YJIT and ZJIT;
 suites also on 3.0.7 and 3.4.7. Duel ran on fork PRs (thomasklemm/hashie #27–#29, #32) against `perf-base-zjit`
@@ -74,7 +76,7 @@ built: it is a fix in another repository; lead for the coordinator.
 
 | # | Idea | Reach | Gain | State |
 |---|---|---|---|---|
-| 1 | HM4: skip the conflict check when a subclass disabled warnings | omniauth, elasticsearch-model, zendesk_api now; restforce and chef-zero once they allow hashie 6 | quiet `Mash.new` CPU 0.46 (YJIT) and 0.66 (ZJIT) in Duel; `[]=`, `dup`, `merge` alike locally; plain Mash 1.01 | rebuilt as two lines in the shared check on `277e88e`, in review; see [HM4](#hm4-skip-the-conflict-check-when-warnings-are-disabled) |
+| 1 | HM4: skip the conflict check when a subclass disabled warnings | omniauth, elasticsearch-model, zendesk_api now; restforce and chef-zero once they allow hashie 6 | quiet `Mash.new` CPU 0.46 (YJIT) and 0.66 (ZJIT) in Duel; `[]=`, `dup`, `merge` alike locally; plain Mash 1.01 | **held after review**: a quiet subclass built in a non-main Ractor raises, and an overridden `disabled_warnings` reader is ignored; no measured form is exact ([below](#hm4-skip-the-conflict-check-when-warnings-are-disabled)) |
 | 2 | HM3: `method_missing` without the arguments Array | every Mash, Ruby ≥ 4.0 | 1 object per method-style read; reads CPU 0.91–0.95 in Duel; setters 1.01–1.02 | **held after review**: a forwarded keyword Hash is stored with its keyword flag ([below](#hm3-method_missing-without-the-arguments-array)) |
 | 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.84 (YJIT) and 0.69 (ZJIT) in Duel | **held after review, needs Thomas**: a callback that changes the receiver during `to_hash` gets a different result ([below](#hm5-to_hash-reads-each-value-once)) |
 | 4 | `Hash#dup` before `self.class.new(val)` in `convert_value` | every nested hash in `Mash.new` | 101 of 774 objects; time not measured | held: a subclass `initialize` would receive the caller's Hash instead of a copy |
@@ -212,6 +214,27 @@ and master with ZJIT has the same 2,340 identical rows and the same two expected
 `to_hash` code is the same on both bases.
 
 ## HM4: skip the conflict check when warnings are disabled
+
+**Held, not exact (2026-11-27).** Astra returned "changes" on `10a9303` (its section at the end);
+`probes/quiet_ractor_and_reader.rb` (`out/quiet-ractor-and-reader.txt`) repeats its two blocking repros on 4.0.10 and
+master.
+
+1. **Ractor.** `class Quiet < Hashie::Mash; disable_warnings; end; Ractor.new { Quiet.new(fresh: 3).to_hash }` returns
+   the Hash on master and raises Ractor::IsolationError on the branch. Asking the class for every key reads
+   `@disabled_warnings`, an unshareable Array, from a non-main Ractor; master reads it only for a key that conflicts
+   with a method. The module form, the reorder and flag first raise the same way, so **no form measured here is
+   exact**, and none can be while the per-key path reads that Array.
+2. **Overridden reader.** `def self.disabled_warnings; [:size]; end` on a subclass: master's `disable_warnings?(:size)`
+   is true and nothing is logged; the branch's guard reads the instance variables, answers false and logs the
+   warning. Removing the guard fixes this and brings back the reorder's 3–5% on every plain Mash.
+
+Astra also showed that the calls listed as accepted below are not only counts: a `respond_to?` or
+`respond_to_missing?` with side effects, or a raising `disable_warnings?`, changes what is stored or raised; a frozen
+class goes from FrozenError to a stored key; and merely reading `Mash.disabled_warnings` once creates
+`@disabled_warnings` and defeats the fast return (plain `Mash.new` up to +12.7% under YJIT in its diagnostic sweep
+on a 2-CPU orb). An exact form would have to keep class state out of the per-key path or store it shareable, which
+is a design change to `KeyConflictWarning`, not a small performance change. Nothing was opened or posted. The
+record below is as it stood before review; its exactness section missed Ractors and reader overrides.
 
 Branch `thomasklemm/skip-disabled-conflict-check`, head `10a9303` on `277e88e`, two added lines and one removed:
 `Mash#_log_collision?` asks `self.class.disable_warnings?(method_key)` before `respond_to?` instead of after it, and

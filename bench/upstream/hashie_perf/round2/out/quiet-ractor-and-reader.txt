@@ -1,0 +1,19 @@
+== master 277e88e
+ruby 4.0.10: quiet subclass in a Ractor: {"fresh" => 3}
+ruby 4.0.10: overridden disabled_warnings reader: disable_warnings?(:size) true, warnings logged 0
+ruby master: quiet subclass in a Ractor: {"fresh" => 3}
+ruby master: overridden disabled_warnings reader: disable_warnings?(:size) true, warnings logged 0
+== HM4 10a9303
+ruby 4.0.10: quiet subclass in a Ractor: "Ractor::RemoteError: Ractor::IsolationError"
+ruby 4.0.10: overridden disabled_warnings reader: disable_warnings?(:size) false, warnings logged 1
+ruby master: quiet subclass in a Ractor: "Ractor::RemoteError: Ractor::IsolationError"
+ruby master: overridden disabled_warnings reader: disable_warnings?(:size) false, warnings logged 1
+== refused form: reorder only (patch on 9e313f3)
+ruby 4.0.10: quiet subclass in a Ractor: "Ractor::RemoteError: Ractor::IsolationError"
+ruby 4.0.10: overridden disabled_warnings reader: disable_warnings?(:size) true, warnings logged 0
+== refused form: flag first (patch on 9e313f3)
+ruby 4.0.10: quiet subclass in a Ractor: "Ractor::RemoteError: Ractor::IsolationError"
+ruby 4.0.10: overridden disabled_warnings reader: disable_warnings?(:size) false, warnings logged 1
+== refused form: module f41c3b2
+ruby 4.0.10: quiet subclass in a Ractor: "Ractor::RemoteError: Ractor::IsolationError"
+ruby 4.0.10: overridden disabled_warnings reader: disable_warnings?(:size) true, warnings logged 0
