@@ -12,7 +12,7 @@ NameError: uninitialized constant Pathname::SEPARATOR_PAT
   .../gems/bundler-2.6.9/lib/bundler/source/path.rb:218:in 'block in Bundler::Source::Path#generate_bin'
 ```
 
-Bundler switches to the version in `BUNDLED WITH`, and Bundler 2.6.9 reads `Pathname::SEPARATOR_PAT` while checking the files of a path or git gem ([path.rb:218](https://github.com/ruby/rubygems/blob/8a2a14d63da701e980f856d8772d273fd448b8a1/bundler/lib/bundler/source/path.rb#L218)). 4e243c709e made the constant private and a5996718f3 removed it; Bundler 4.0.12 removed this use (https://github.com/ruby/rubygems/pull/9529). Lockfiles with only rubygems.org gems still install. Plain `bundle update --bundler` runs the old Bundler and fails the same way; `bundle _4.1.1_ update --bundler` updates the lockfile.
+By default, Bundler switches to the version in `BUNDLED WITH`, and Bundler 2.6.9 reads `Pathname::SEPARATOR_PAT` while checking the files of a path or git gem ([path.rb:218](https://github.com/ruby/rubygems/blob/8a2a14d63da701e980f856d8772d273fd448b8a1/bundler/lib/bundler/source/path.rb#L218)). 4e243c709e made the constant private and a5996718f3 removed it; Bundler 4.0.12 removed this use (https://github.com/ruby/rubygems/pull/9529). Rubygems-only sources do not use this constant. Outside frozen or deployment mode, `bundle _4.1.1_ update --bundler` updates the lockfile. With Bundler 4.1, `BUNDLE_VERSION=system bundle install` avoids the version switch.
 
 To reproduce (Ruby 4.0 installs, master raises):
 

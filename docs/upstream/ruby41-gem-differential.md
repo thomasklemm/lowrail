@@ -59,7 +59,7 @@ BUNDLED WITH 2.4.2, 2.6.9, 4.0.7, 4.0.11 and 4.0.12 on 4.0.10, master and master
   reinstall the older Bundler is not discussed in either place; no Redmine ticket or rubygems issue covers it.
 * Reach: in this differential every committed lock with Bundler < 4.0.12 and a PATH section fails, and no other lock
   does. Apps with git gems have the same shape, e.g. forem's main lock (BUNDLED WITH 2.4.17, two GIT/PATH sections).
-  The fix per repository is `bundle _4.1.1_ update --bundler`; plain `bundle update --bundler` runs the old Bundler and fails. The affected versions are not one interval (2.2.34 and 2.6.9 fail only on master; 2.3.0 and 2.0 to 2.2.33 already fail on 4.0.10), and only gems that list files hit the read.
+  The fix per repository is `bundle _4.1.1_ update --bundler` outside frozen or deployment mode, or `BUNDLE_VERSION=system bundle install` with Bundler 4.1; plain `bundle update --bundler` can rerun the old Bundler and fail. The affected versions are not one interval (2.2.34 and 2.6.9 fail only on master; 2.3.0 and 2.0 to 2.2.33 already fail on 4.0.10), and only gems that list files hit the read.
 * Scope: lockfiles with only rubygems.org gems still install on master after Bundler switches to 2.4.2, 2.6.9 or
   4.0.11 ([`separator_pat_rubygems_only.sh`](../../bench/upstream/gem-differential/repros/separator_pat_rubygems_only.sh)).
   Master tip `274cfe719a` changes none of the files involved since `a1a9f45587`.
