@@ -1,0 +1,4 @@
+Inflector#apply_inflections: 722241 Ir/op self in matching frames (7.30% of the window's work)
+   722241 100.0%  activesupport/lib/active_support/inflector/methods.rb:56 ActiveSupport::Inflector#singularize <- activesupport/lib/active_support/core_ext/string/inflections.rb:69 String#singularize
+Hash#extract!: 122830 Ir/op self in matching frames (1.24% of the window's work)
+   122830 100.0%  gems/inertia_rails-3.23.0/lib/inertia_rails/configuration.rb:130 InertiaRails::Configuration#initialize <- gems/inertia_rails-3.23.0/lib/inertia_rails/configuration.rb:138 InertiaRails::Configuration#bind_controller

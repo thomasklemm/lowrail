@@ -1,0 +1,61 @@
+# c12m interpreter by line: 71 workloads; mean share, reach (workloads >= 0.1%), apps, max share, score = mean x reach/71
+  1  0.602% reach 68/71 apps 8 max  1.474% (blog PATCH article.json) score 0.576  activesupport/lib/active_support/isolated_execution_state.rb:32 ActiveSupport::IsolatedExecutionState.[]
+  2  0.506% reach 57/71 apps 8 max  1.729% (writebook GET books) score 0.406  activesupport/lib/active_support/ordered_options.rb:108 ActiveSupport::InheritableOptions#initialize
+  3  0.786% reach 29/71 apps 4 max  7.452% (react-starter-kit GET dashboard (Inertia JSON) score 0.321  activesupport/lib/active_support/core_ext/hash/slice.rb:31 Hash#extract!
+  4  0.386% reach 51/71 apps 8 max  3.514% (hackatime PATCH display name (Inertia redirec) score 0.277  activesupport/lib/active_support/parameter_filter.rb:198 ActiveSupport::ParameterFilter#value_for_key
+  5  0.263% reach 67/71 apps 8 max  0.570% (blog GET article.json) score 0.248  activesupport/lib/active_support/isolated_execution_state.rb:33 ActiveSupport::IsolatedExecutionState.[]
+  6  0.314% reach 56/71 apps 8 max  0.838% (blog PATCH article (redirect)) score 0.248  activesupport/lib/active_support/core_ext/hash/keys.rb:39 Hash#symbolize_keys!
+  7  0.324% reach 48/71 apps 8 max  2.821% (blog GET article.json) score 0.219  railties/lib/rails/engine.rb:851 Rails::Engine#build_request
+  8  0.319% reach 47/71 apps 8 max  1.585% (blog GET article) score 0.211  actionpack/lib/action_controller/metal/request_forgery_protection.rb:850 ActionController::RequestForgeryProtection#xor_byte_strings
+  9  0.241% reach 62/71 apps 8 max  0.572% (casa GET casa case edit) score 0.210  activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb:90 ActiveRecord::ConnectionAdapters::QueryCache::Store#compute_if_absent
+ 10  0.404% reach 35/71 apps 4 max  5.529% (pingcrm GET contact edit) score 0.199  activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:256 ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#cast_result
+ 11  0.225% reach 62/71 apps 8 max  0.495% (writebook perform Turbo::Streams::BroadcastJo) score 0.196  activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb:98 ActiveRecord::ConnectionAdapters::QueryCache::Store#compute_if_absent
+ 12  0.263% reach 50/71 apps 8 max  1.936% (hackatime perform DashboardRollupRefreshJob) score 0.185  activesupport/lib/active_support/core_ext/hash/keys.rb:13 Hash#stringify_keys
+ 13  0.269% reach 46/71 apps 8 max  1.062% (blog GET article) score 0.174  activesupport/lib/active_support/core_ext/object/blank.rb:193 String#blank?
+ 14  0.246% reach 48/71 apps 7 max  1.455% (writebook perform Turbo::Streams::BroadcastJo) score 0.166  activerecord/lib/arel/collectors/plain_string.rb:15 Arel::Collectors::PlainString#<<
+ 15  0.202% reach 55/71 apps 8 max  0.500% (casa GET dashboard) score 0.157  activemodel/lib/active_model/type/value.rb:131 ActiveModel::Type::Value#hash
+ 16  0.306% reach 36/71 apps 7 max  1.493% (blog GET article) score 0.155  activesupport/lib/active_support/core_ext/erb/util.rb:160 ERB::Util.xml_name_escape
+ 17  0.210% reach 51/71 apps 8 max  0.611% (writebook perform Turbo::Streams::BroadcastJo) score 0.151  activerecord/lib/active_record/relation/query_attribute.rb:61 ActiveRecord::Relation::QueryAttribute#hash
+ 18  0.243% reach 42/71 apps 8 max  1.437% (hackatime PATCH display name (Inertia redirec) score 0.144  activemodel/lib/active_model/attribute_set.rb:498 ActiveModel::LazyIndexedAttributeSet#index_for_name
+ 19  0.484% reach 21/71 apps 4 max  3.335% (hackatime GET leaderboards) score 0.143  activesupport/lib/active_support/core_ext/object/deep_dup.rb:18 Object#deep_dup
+ 20  0.208% reach 47/71 apps 8 max  0.524% (casa GET supervisors) score 0.138  activerecord/lib/active_record/relation/predicate_builder.rb:251 ActiveRecord::PredicateBuilder#handler_for
+ 21  0.159% reach 59/71 apps 8 max  0.319% (casa PATCH casa case (redirect)) score 0.132  activesupport/lib/active_support/class_attribute.rb:12 redefine
+ 22  0.178% reach 52/71 apps 8 max  0.685% (casa GET dashboard) score 0.131  activemodel/lib/active_model/attribute.rb:149 ActiveModel::Attribute#hash
+ 23  0.181% reach 49/71 apps 8 max  0.737% (hackatime perform DashboardRollupRefreshJob) score 0.125  activerecord/lib/arel/visitors/visitor.rb:37 Arel::Visitors::Visitor#visit
+ 24  0.220% reach 36/71 apps 7 max  1.278% (redprints-cfp GET home) score 0.112  activesupport/lib/active_support/core_ext/erb/util.rb:16 ActiveSupport::CoreExt::ERBUtil#html_escape
+ 25  0.164% reach 47/71 apps 8 max  0.458% (casa GET supervisors) score 0.108  activerecord/lib/active_record/relation/where_clause.rb:8 ActiveRecord::Relation::WhereClause#empty?
+ 26  0.157% reach 48/71 apps 8 max  0.456% (writebook PATCH page (turbo_stream)) score 0.106  activerecord/lib/active_record/connection_handling.rb:370 ActiveRecord::ConnectionHandling#connection_specification_name
+ 27  0.202% reach 37/71 apps 7 max  0.833% (blog GET article) score 0.105  activesupport/lib/active_support/core_ext/string/output_safety.rb:245 String#html_safe
+ 28  0.170% reach 42/71 apps 7 max  0.674% (hackatime perform DashboardRollupRefreshJob) score 0.101  activerecord/lib/arel/visitors/visitor.rb:35 Arel::Visitors::Visitor#visit
+ 29  0.192% reach 37/71 apps 8 max  0.701% (blog GET articles) score 0.100  activesupport/lib/active_support/core_ext/object/blank.rb:192 String#blank?
+ 30  0.142% reach 50/71 apps 8 max  0.420% (blog GET article.json) score 0.100  activesupport/lib/active_support/structured_event_subscriber.rb:64 ActiveSupport::StructuredEventSubscriber#silenced?
+ 31  0.334% reach 21/71 apps 4 max  2.188% (hackatime GET leaderboards) score 0.099  activesupport/lib/active_support/core_ext/object/deep_dup.rb:34 Array#deep_dup
+ 32  0.164% reach 42/71 apps 7 max  0.615% (codetriage perform SendSingleTriageEmailJob) score 0.097  activerecord/lib/arel/collectors/composite.rb:21 Arel::Collectors::Composite#<<
+ 33  0.179% reach 38/71 apps 8 max  0.833% (blog GET article) score 0.096  actionpack/lib/action_controller/metal/request_forgery_protection.rb:842 ActionController::RequestForgeryProtection#csrf_token_hmac
+ 34  0.145% reach 46/71 apps 8 max  0.466% (hackatime GET statusbar today) score 0.094  activerecord/lib/active_record/result.rb:275 ActiveRecord::Result::RowLayout#initialize
+ 35  0.350% reach 19/71 apps 5 max  4.764% (pingcrm POST contact invalid (Inertia errors)) score 0.094  activesupport/lib/active_support/inflector/methods.rb:422 ActiveSupport::Inflector#apply_inflections
+ 36  0.140% reach 46/71 apps 8 max  0.516% (codetriage GET home) score 0.090  activesupport/lib/active_support/notifications/fanout.rb:25 ActiveSupport::Notifications::FanoutIteration#iterate_guarding_exceptions
+ 37  0.145% reach 44/71 apps 8 max  0.546% (hackatime GET statusbar today) score 0.090  activerecord/lib/active_record/result.rb:276 ActiveRecord::Result::RowLayout#initialize
+ 38  0.147% reach 43/71 apps 7 max  0.544% (codetriage perform SendSingleTriageEmailJob) score 0.089  activerecord/lib/arel/collectors/composite.rb:22 Arel::Collectors::Composite#<<
+ 39  0.179% reach 34/71 apps 7 max  0.937% (writebook GET books) score 0.085  actionview/lib/action_view/helpers/tag_helper.rb:1554 ActionView::Helpers::TagHelper::TagBuilder#tag_options
+ 40  0.171% reach 34/71 apps 7 max  1.110% (pingcrm GET contact edit) score 0.082  activemodel/lib/active_model/type/string.rb:40 ActiveModel::Type::String#cast_value
+ 41  0.157% reach 37/71 apps 8 max  0.634% (blog GET article edit) score 0.082  activesupport/lib/active_support/core_ext/string/output_safety.rb:73 ActiveSupport::SafeBuffer#initialize
+ 42  0.146% reach 39/71 apps 8 max  0.448% (redprints-cfp GET home) score 0.080  activesupport/lib/active_support/message_encryptor.rb:379 ActiveSupport::MessageEncryptor#new_cipher
+ 43  0.139% reach 41/71 apps 8 max  0.492% (casa GET supervisors) score 0.080  activerecord/lib/active_record/relation/delegation.rb:146 ActiveRecord::Delegation::ClassMethods#create
+ 44  0.183% reach 31/71 apps 6 max  4.490% (blog perform Turbo::Streams::ActionBroadcastJ) score 0.080  activesupport/lib/active_support/json/encoding.rb:272 ActiveSupport::JSON::Encoding::JSONGemCoderEncoder#escape!
+ 45  0.127% reach 44/71 apps 8 max  0.276% (react-starter-kit PATCH profile (Inertia redi) score 0.079  activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb:215 ActiveRecord::ConnectionAdapters::ConnectionPool::LeaseRegistry#lease
+ 46  0.149% reach 36/71 apps 8 max  0.487% (react-starter-kit PATCH profile (Inertia redi) score 0.075  actionpack/lib/action_controller/metal/request_forgery_protection.rb:838 ActionController::RequestForgeryProtection#csrf_token_hmac
+ 47  0.152% reach 35/71 apps 8 max  0.750% (pingcrm GET contact edit) score 0.075  activemodel/lib/active_model/indexed_row.rb:24 ActiveModel::IndexedRow.key_at?
+ 48  0.136% reach 38/71 apps 8 max  0.430% (blog GET article) score 0.073  activesupport/lib/active_support/ordered_options.rb:49 ActiveSupport::OrderedOptions#[]
+ 49  0.118% reach 42/71 apps 8 max  0.302% (writebook PATCH page (turbo_stream)) score 0.070  activerecord/lib/active_record/connection_handling.rb:369 ActiveRecord::ConnectionHandling#connection_specification_name
+ 50  0.122% reach 40/71 apps 7 max  0.412% (casa GET supervisors) score 0.069  activerecord/lib/active_record/relation.rb:102 ActiveRecord::Relation#initialize_copy
+ 51  0.134% reach 35/71 apps 8 max  0.552% (codetriage perform SendSingleTriageEmailJob) score 0.066  activerecord/lib/arel/table.rb:105 Arel::Table#[]
+ 52  0.120% reach 38/71 apps 8 max  0.347% (casa GET casa case edit) score 0.064  activerecord/lib/active_record/relation/query_methods.rb:193 ActiveRecord::QueryMethods#where_clause
+ 53  0.113% reach 40/71 apps 8 max  0.250% (casa GET casa case edit) score 0.064  activerecord/lib/arel.rb:76 Arel.arel_node?
+ 54  0.138% reach 32/71 apps 4 max  0.622% (codetriage perform SendSingleTriageEmailJob) score 0.062  activerecord/lib/active_record/type/hash_lookup_type_map.rb:67 ActiveRecord::Type::HashLookupTypeMap#key?
+ 55  0.115% reach 37/71 apps 8 max  0.364% (casa GET supervisors) score 0.060  activerecord/lib/active_record/relation/predicate_builder.rb:146 ActiveRecord::PredicateBuilder#expand_from_hash
+ 56  0.114% reach 37/71 apps 8 max  0.465% (hackatime POST heartbeat) score 0.059  activemodel/lib/active_model/attribute_methods.rb:64 ActiveRecord::Base.attribute_aliases
+ 57  0.129% reach 32/71 apps 7 max  0.605% (blog GET article) score 0.058  actionview/lib/action_view/helpers/tag_helper.rb:1640 ActionView::Helpers::TagHelper::TagBuilder#append_tag_option
+ 58  0.157% reach 26/71 apps 4 max  1.372% (react-starter-kit GET dashboard (Inertia JSON) score 0.057  activesupport/lib/active_support/core_ext/hash/slice.rb:30 Hash#extract!
+ 59  0.144% reach 28/71 apps 7 max  0.788% (blog GET article) score 0.057  actionview/lib/action_view/helpers/tag_helper.rb:1547 ActionView::Helpers::TagHelper::TagBuilder#tag_options
+ 60  0.119% reach 33/71 apps 4 max  0.615% (codetriage perform SendSingleTriageEmailJob) score 0.056  activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:228 ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#cast_result

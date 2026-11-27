@@ -1,0 +1,147 @@
+open rails/rails PRs fetched 2026-11-27T12:08:22Z (1289); --refresh to refetch
+  1 activerecord/lib/active_record/relation/query_methods.rb:193           apps  8 Ir/op   209294
+      file: 35 more (#39445 #40401 #41622 #42602 #45231 #45613 #45724 #45864 ...)
+  7 activesupport/lib/active_support/core_ext/object/blank.rb:193          apps  8 Ir/op    79269
+      file: 2 more (#56383 #56874)
+  8 activesupport/lib/active_support/core_ext/time/calculations.rb:173     apps  8 Ir/op    77611
+      file: 6 more (#45902 #51575 #56758 #57114 #57117 #59923)
+  9 activemodel/lib/active_model/attribute_set.rb:498                      apps  8 Ir/op    77283
+      file: 2 more (#53344 #58380)
+ 10 activerecord/lib/active_record/connection_adapters/abstract/query_cach apps  8 Ir/op    74334
+      file: 2 more (#55939 #57089)
+ 11 activerecord/lib/active_record/relation/predicate_builder.rb:251       apps  8 Ir/op    68086
+      file: 8 more (#39863 #48538 #50829 #54753 #57694 #58074 #58465 #59031)
+ 13 activesupport/lib/active_support/parameter_filter.rb:198               apps  8 Ir/op    65818
+      line: #58958 Cache ParameterFilter regexp matches within arrays (rwalters44)
+      file: 2 more (#45545 #59395)
+ 14 activerecord/lib/active_record/relation/query_attribute.rb:61          apps  8 Ir/op    64628
+      line: #59518 Memoize QueryAttribute#hash (sampokuokkanen)
+      file: 3 more (#47804 #58841 #59632)
+ 16 actionview/lib/action_view/buffers.rb:47                               apps  7 Ir/op    63825
+      file: 1 more (#46805)
+ 18 activemodel/lib/active_model/type/value.rb:131                         apps  8 Ir/op    61497
+      line: #51421 Add Active Model `Collection` attribute type (rafaelfranca)
+      file: 1 more (#59662)
+ 19 activerecord/lib/active_record/connection_adapters/abstract/query_cach apps  8 Ir/op    61466
+      file: 2 more (#55939 #57089)
+ 20 activesupport/lib/active_support/core_ext/string/output_safety.rb:245  apps  8 Ir/op    61112
+      file: 3 more (#45236 #46893 #59432)
+ 21 activerecord/lib/arel/collectors/composite.rb:21                       apps  8 Ir/op    60862
+      file: 1 more (#57694)
+ 23 activesupport/lib/active_support/core_ext/object/blank.rb:192          apps  8 Ir/op    59298
+      file: 2 more (#56383 #56874)
+ 24 activerecord/lib/active_record/relation/where_clause.rb:8              apps  8 Ir/op    55284
+      line: #46805 Reduce usage of method delegations to gain more speed (amatsuda)
+      file: 3 more (#48284 #48531 #54946)
+ 25 activemodel/lib/active_model/attribute.rb:149                          apps  8 Ir/op    53187
+      file: 5 more (#47088 #47804 #48562 #53344 #59662)
+ 26 activerecord/lib/arel/collectors/composite.rb:22                       apps  8 Ir/op    53117
+      file: 1 more (#57694)
+ 27 actionview/lib/action_view/helpers/tag_helper.rb:1554                  apps  8 Ir/op    52305
+      file: 10 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 28 actionpack/lib/action_controller/metal/request_forgery_protection.rb:8 apps  8 Ir/op    52240
+      file: 8 more (#54948 #55535 #58233 #58947 #58989 #59500 #59547 #59778)
+ 29 activerecord/lib/arel/table.rb:105                                     apps  8 Ir/op    52023
+      file: 3 more (#48932 #59768 #59773)
+ 30 activerecord/lib/active_record/relation/delegation.rb:146              apps  8 Ir/op    50321
+      file: 4 more (#46805 #47686 #56793 #57123)
+ 31 actionview/lib/action_view/helpers/tag_helper.rb:1540                  apps  8 Ir/op    47101
+      line: #57999 Avoid intermediate strings for tag attributes (ikraamg)
+      file: 9 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 33 activerecord/lib/active_record/relation.rb:102                         apps  7 Ir/op    45340
+      line: #57123 Add durable named default scopes (AIndrewn617)
+      file: 29 more (#37724 #41622 #45161 #45231 #45413 #45565 #45724 #46524 ...)
+ 34 activesupport/lib/active_support/core_ext/string/output_safety.rb:73   apps  8 Ir/op    44220
+      file: 3 more (#45236 #46893 #59432)
+ 36 activemodel/lib/active_model/attribute_set.rb:530                      apps  8 Ir/op    43917
+      file: 2 more (#53344 #58380)
+ 39 activerecord/lib/active_record/result.rb:276                           apps  7 Ir/op    42424
+      file: 1 more (#53999)
+ 40 activerecord/lib/active_record/relation/predicate_builder.rb:146       apps  8 Ir/op    41146
+      file: 8 more (#39863 #48538 #50829 #54753 #57694 #58074 #58465 #59031)
+ 41 activemodel/lib/active_model/attribute_methods.rb:64                   apps  8 Ir/op    40811
+      line: #53886 Backport `#[]` and `#[]=` to Active Model (seanpdoyle)
+      file: 1 more (#39487)
+ 42 activerecord/lib/active_record/connection_handling.rb:370              apps  8 Ir/op    40799
+      file: 7 more (#43510 #47755 #49584 #56850 #58731 #59029 #59135)
+ 43 actionview/lib/action_view/helpers/tag_helper.rb:1547                  apps  8 Ir/op    39792
+      line: #57999 Avoid intermediate strings for tag attributes (ikraamg)
+      file: 9 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 44 activerecord/lib/active_record/result.rb:275                           apps  8 Ir/op    38631
+      file: 1 more (#53999)
+ 45 actionview/lib/action_view/helpers/tag_helper.rb:1640                  apps  8 Ir/op    37786
+      file: 10 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 46 activesupport/lib/active_support/core_ext/object/blank.rb:187          apps  8 Ir/op    36828
+      file: 2 more (#56383 #56874)
+ 47 actionview/lib/action_view/helpers/tag_helper.rb:1550                  apps  8 Ir/op    36330
+      line: #57999 Avoid intermediate strings for tag attributes (ikraamg)
+      file: 9 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 48 railties/lib/rails/engine.rb:851                                       apps  8 Ir/op    35376
+      file: 7 more (#45565 #46805 #51223 #54916 #56477 #57230 #58951)
+ 49 activerecord/lib/active_record/reflection.rb:154                       apps  7 Ir/op    35117
+      file: 10 more (#39487 #47000 #49425 #53007 #54786 #56000 #56004 #56224 ...)
+ 50 activerecord/lib/active_record/reflection.rb:13                        apps  8 Ir/op    33951
+      line: #39487 Add `update_heritable_value_of` (jonathanhefner)
+      file: 9 more (#47000 #49425 #53007 #54786 #56000 #56004 #56224 #59255 ...)
+ 51 activerecord/lib/arel.rb:76                                            apps  8 Ir/op    33629
+      file: 2 more (#45379 #57694)
+ 53 activemodel/lib/active_model/attribute_set.rb:531                      apps  8 Ir/op    31770
+      file: 2 more (#53344 #58380)
+ 54 activesupport/lib/active_support/notifications/fanout.rb:25            apps  8 Ir/op    31538
+      line: #45122 ActiveSupport::Inspect: easily set up constrained inspect output (matthewd, draft)
+      file: 3 more (#44506 #49425 #58366)
+ 55 activerecord/lib/active_record/connection_adapters/abstract/connection apps  8 Ir/op    31371
+      file: 20 more (#44478 #45122 #46409 #46805 #49337 #49425 #55792 #57089 ...)
+ 56 activerecord/lib/active_record/connection_handling.rb:369              apps  8 Ir/op    31223
+      file: 7 more (#43510 #47755 #49584 #56850 #58731 #59029 #59135)
+ 57 actionview/lib/action_view/helpers/tag_helper.rb:1660                  apps  8 Ir/op    31222
+      file: 10 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 58 activesupport/lib/active_support/notifications/fanout.rb:379           apps  8 Ir/op    31202
+      file: 4 more (#44506 #45122 #49425 #58366)
+ 59 actionview/lib/action_view/helpers/tag_helper.rb:1656                  apps  8 Ir/op    30610
+      file: 10 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 60 activemodel/lib/active_model/attribute_methods.rb:427                  apps  8 Ir/op    30547
+      file: 2 more (#39487 #53886)
+ 61 activerecord/lib/active_record/connection_adapters/abstract/database_s apps  8 Ir/op    30374
+      line: #53487 fix incorrect notification order in raw_execute (zvkemp)
+      file: 17 more (#44518 #44716 #46805 #48247 #48418 #51354 #53740 #55792 ...)
+ 62 actionpack/lib/action_controller/metal/request_forgery_protection.rb:8 apps  8 Ir/op    29931
+      file: 8 more (#54948 #55535 #58233 #58947 #58989 #59500 #59547 #59778)
+ 63 activerecord/lib/active_record/relation/merger.rb:66                   apps  8 Ir/op    29762
+      line: #56205 Generate correct CTE while using merge with with_recursive modifier, fixes #5614 (tahsin352)
+      file: 6 more (#44831 #50886 #53454 #53895 #57123 #59416)
+ 64 activerecord/lib/active_record/relation/where_clause.rb:22             apps  8 Ir/op    29563
+      file: 4 more (#46805 #48284 #48531 #54946)
+ 65 activemodel/lib/active_model/attribute_set.rb:312                      apps  7 Ir/op    29477
+      file: 2 more (#53344 #58380)
+ 66 activemodel/lib/active_model/attribute_set.rb:570                      apps  8 Ir/op    29341
+      file: 2 more (#53344 #58380)
+ 67 activesupport/lib/active_support/structured_event_subscriber.rb:64     apps  8 Ir/op    28590
+      line: #58957 Skip structured event handlers whose event nobody consumes (linyiru)
+ 69 actionview/lib/action_view/helpers/asset_url_helper.rb:194             apps  7 Ir/op    27722
+      file: 3 more (#51646 #56053 #58935)
+ 70 actionview/lib/action_view/helpers/tag_helper.rb:1877                  apps  7 Ir/op    26478
+      file: 10 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 71 activerecord/lib/active_record/relation/predicate_builder.rb:31        apps  8 Ir/op    26156
+      line: #50829 Fix query references for non-hash association where clause values (ezekg)
+      file: 7 more (#39863 #48538 #54753 #57694 #58074 #58465 #59031)
+ 72 actionview/lib/action_view/helpers/tag_helper.rb:1553                  apps  8 Ir/op    25875
+      file: 10 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 73 actionview/lib/action_view/helpers/tag_helper.rb:1645                  apps  8 Ir/op    25067
+      file: 10 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 74 activesupport/lib/active_support/core_ext/time/conversions.rb:49       apps  8 Ir/op    24951
+      file: 1 more (#57326)
+ 75 activerecord/lib/active_record/associations.rb:98                      apps  7 Ir/op    24828
+      file: 14 more (#44599 #45231 #45724 #48480 #49801 #51738 #55041 #58338 ...)
+ 76 actionview/lib/action_view/helpers/tag_helper.rb:1548                  apps  8 Ir/op    24521
+      line: #57999 Avoid intermediate strings for tag attributes (ikraamg)
+      file: 9 more (#45236 #47159 #47163 #49377 #51646 #52365 #54042 #56596 ...)
+ 77 activemodel/lib/active_model/attribute_set.rb:409                      apps  7 Ir/op    24055
+      file: 2 more (#53344 #58380)
+ 78 activesupport/lib/active_support/notifications/fanout.rb:200           apps  8 Ir/op    24041
+      file: 4 more (#44506 #45122 #49425 #58366)
+ 79 activerecord/lib/active_record/model_schema.rb:210                     apps  7 Ir/op    23938
+      file: 7 more (#46205 #48434 #48932 #56804 #57785 #58591 #59643)
+ 80 actionpack/lib/action_dispatch/routing/route_set.rb:935                apps  7 Ir/op    23325
+      file: 9 more (#47341 #49614 #54784 #54942 #55259 #55403 #59372 #59512 ...)
+EXIT 0

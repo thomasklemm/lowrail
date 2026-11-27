@@ -1,0 +1,20 @@
+Object#deep_dup|Array#deep_dup|Hash#deep_dup: 1735617 Ir/op self in matching frames (6.40% of the window's work)
+  1456049  83.9%  gems/sentry-ruby-6.7.0/lib/sentry/breadcrumb_buffer.rb:60 Sentry::BreadcrumbBuffer#dup <- gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:136 Sentry::Scope#dup
+    98382   5.7%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:137 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:103 Sentry::Hub#push_scope
+    95922   5.5%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:137 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:75 Sentry::Hub#clone
+    10658   0.6%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:146 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:103 Sentry::Hub#push_scope
+     9018   0.5%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:139 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:103 Sentry::Hub#push_scope
+     8198   0.5%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:146 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:75 Sentry::Hub#clone
+     8198   0.5%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:149 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:103 Sentry::Hub#push_scope
+     6559   0.4%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:138 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:75 Sentry::Hub#clone
+     6559   0.4%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:149 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:75 Sentry::Hub#clone
+     5739   0.3%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:139 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:75 Sentry::Hub#clone
+     5739   0.3%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:140 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:75 Sentry::Hub#clone
+     5739   0.3%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:138 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:103 Sentry::Hub#push_scope
+     5739   0.3%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:140 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:103 Sentry::Hub#push_scope
+     4099   0.2%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:144 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:103 Sentry::Hub#push_scope
+     3279   0.2%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:143 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:75 Sentry::Hub#clone
+     2460   0.1%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:145 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:103 Sentry::Hub#push_scope
+     1640   0.1%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:144 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:75 Sentry::Hub#clone
+      820   0.0%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:145 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:75 Sentry::Hub#clone
+      820   0.0%  gems/sentry-ruby-6.7.0/lib/sentry/scope.rb:143 Sentry::Scope#dup <- gems/sentry-ruby-6.7.0/lib/sentry/hub.rb:103 Sentry::Hub#push_scope

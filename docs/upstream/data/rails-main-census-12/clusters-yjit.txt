@@ -1,0 +1,12 @@
+# c12m yjit: 38 workloads; cluster self Ir as % of each workload
+query cache key hashing                mean  1.426%  reach 34/38 (8 apps)  >=1%: 26  max  3.678% casa GET dashboard  score 1.276
+IsolatedExecutionState reads           mean  0.727%  reach 35/38 (8 apps)  >=1%:  8  max  1.854% blog PATCH article.json  score 0.670
+AR connection lookup                   mean  0.466%  reach 33/38 (8 apps)  >=1%:  3  max  1.332% casa PATCH casa case.json  score 0.404
+InheritableOptions parent reads        mean  0.851%  reach 33/38 (8 apps)  >=1%: 10  max  2.712% writebook GET books  score 0.739
+filtered parameters                    mean  0.821%  reach 34/38 (8 apps)  >=1%:  8  max  6.283% hackatime PATCH display name (Inertia redirect)  score 0.735
+notifications fan-out                  mean  1.077%  reach 37/38 (8 apps)  >=1%: 17  max  3.091% codetriage GET repo  score 1.049
+CSRF token masking                     mean  0.820%  reach 27/38 (8 apps)  >=1%: 16  max  3.045% blog GET article  score 0.583
+tag attribute building                 mean  1.743%  reach 20/38 (8 apps)  >=1%: 16  max 11.635% blog GET article  score 0.917
+env_config merge (build_request)       mean  0.285%  reach 28/38 (8 apps)  >=1%:  1  max  1.133% blog GET article.json  score 0.210
+inertia_rails config (Hash#extract!)   mean  1.240%  reach 18/38 (4 apps)  >=1%: 13  max  9.112% react-starter-kit GET dashboard (Inertia JSON)  score 0.588
+cache_quoted_name (since census 11)    mean  0.010%  reach  0/38 (0 apps)  >=1%:  0  max  0.051% codetriage perform SendSingleTriageEmailJob  score 0.000

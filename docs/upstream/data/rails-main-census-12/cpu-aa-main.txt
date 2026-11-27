@@ -1,0 +1,127 @@
+# c12m -> c12m2, interpreter: 71 workloads, 0 left out as not JIT-flat in some label
+blog                10 wl  median   +0.01%  min   -0.20%  max   +0.34%  objects median     +0.0
+casa                10 wl  median   -0.01%  min   -0.11%  max   +0.16%  objects median     +0.5
+codetriage           7 wl  median   -0.02%  min   -0.13%  max   +0.03%  objects median     +0.7
+hackatime           12 wl  median   -0.04%  min   -1.58%  max   +0.63%  objects median     +0.0
+pingcrm              8 wl  median   +0.19%  min   -0.47%  max   +0.36%  objects median     +8.0
+react-starter-kit    8 wl  median   -0.07%  min   -0.32%  max   +0.66%  objects median     +0.6
+redprints-cfp        8 wl  median   -0.06%  min   -0.29%  max   +0.28%  objects median     -1.3
+writebook            8 wl  median   +0.01%  min   -0.20%  max   +0.26%  objects median     +3.9
+ALL 71 workloads: median -0.02%, faster 1, slower 0 (beyond 1%)
+
+# workloads, change and A/A
+  +0.66%    Ir/op      6225517 ->      6266711  obj   +12.1  react-starter-kit PATCH profile (Inertia redirect)
+  +0.63%    Ir/op     11231728 ->     11302750  obj    +2.7  hackatime GET leaderboard entries (deferred)
+  +0.36%    Ir/op     10803562 ->     10842945  obj   +11.7  pingcrm GET organizations (Inertia JSON)
+  +0.34%    Ir/op      7774852 ->      7801145  obj  -188.2  blog POST comment (redirect)
+  +0.31%    Ir/op     12153792 ->     12191897  obj   +11.3  pingcrm GET organizations
+  +0.30%    Ir/op      7399047 ->      7421144  obj    +8.5  pingcrm GET dashboard
+  +0.28%    Ir/op      6214868 ->      6232010  obj    -0.6  redprints-cfp GET home
+  +0.27%    Ir/op      7750580 ->      7771481  obj    +1.0  react-starter-kit GET home
+  +0.26%    Ir/op     14773120 ->     14811922  obj    +2.0  writebook GET leaf.md
+  +0.24%    Ir/op     13458658 ->     13490956  obj   +10.9  pingcrm GET contacts (Inertia JSON)
+  +0.16%    Ir/op     22959156 ->     22995508  obj    +2.2  casa GET dashboard
+  +0.14%    Ir/op     14857115 ->     14878512  obj    +7.5  pingcrm GET contacts
+  +0.13%    Ir/op     26298604 ->     26333243  obj    +6.7  casa PATCH casa case.json
+  +0.12%    Ir/op      8569413 ->      8579504  obj    +3.9  react-starter-kit GET settings sessions
+  +0.11%    Ir/op      9936008 ->      9946652  obj    +4.5  pingcrm POST contact invalid (Inertia errors)
+  +0.08%    Ir/op     10219130 ->     10227399  obj    +1.5  redprints-cfp GET proposal
+  +0.07%    Ir/op     19779736 ->     19793335  obj   +10.9  writebook POST search
+  +0.06%    Ir/op     29607433 ->     29626611  obj    +5.8  writebook POST page (turbo_stream)
+  +0.05%    Ir/op     11251215 ->     11257091  obj    +0.8  hackatime GET statusbar today
+  +0.03%    Ir/op     15792088 ->     15797556  obj    +0.4  blog POST article invalid (422)
+  +0.03%    Ir/op      7518971 ->      7521356  obj    +1.5  codetriage GET repo info.json
+  +0.03%    Ir/op     17702488 ->     17708099  obj    +2.1  pingcrm GET contact edit
+  +0.03%    Ir/op      2705848 ->      2706588  obj    +0.0  blog GET article.json
+  +0.03%    Ir/op      5563526 ->      5564998  obj    -3.4  blog PATCH article (redirect)
+  +0.02%    Ir/op      2797184 ->      2797699  obj    -0.3  writebook perform Turbo::Streams::BroadcastJob
+  +0.02%    Ir/op      9570516 ->      9572212  obj    +2.1  blog GET articles
+  +0.01%    Ir/op     33691557 ->     33695329  obj    +6.6  hackatime GET projects
+  +0.01%    Ir/op     40891354 ->     40895260  obj   -10.3  writebook GET leaf
+  +0.00%    Ir/op      4712308 ->      4712519  obj    +0.0  blog GET articles.json
+  +0.00%    Ir/op    137464034 ->    137465254  obj    +4.6  casa GET casa case edit
+  -0.00%    Ir/op    472047766 ->    472047702  obj    +0.2  casa POST api sign_in.json
+  -0.01%    Ir/op     14045451 ->     14044326  obj    +0.7  codetriage GET user edit (signed in)
+  -0.01%    Ir/op    197347464 ->    197325443  obj    +4.5  casa GET case contacts
+  -0.01%    Ir/op     15009419 ->     15007406  obj    -2.9  codetriage PATCH repo subscription (redirect)
+  -0.02%    Ir/op      3207109 ->      3206612  obj  +324.0  blog perform Turbo::Streams::ActionBroadcastJob
+  -0.02%    Ir/op     99754103 ->     99736249  obj    -2.0  casa GET casa case
+  -0.02%    Ir/op      6584915 ->      6583443  obj    -0.3  blog GET article edit
+  -0.02%    Ir/op     15376153 ->     15372687  obj    +1.4  codetriage GET repo
+  -0.02%    Ir/op     53708786 ->     53696400  obj    -1.8  casa GET supervisors
+  -0.02%    Ir/op     62447282 ->     62432562  obj   -10.7  hackatime perform DashboardRollupRefreshJob
+  -0.02%    Ir/op     23263437 ->     23257710  obj    -3.4  hackatime POST heartbeat
+  -0.03%    Ir/op     29417500 ->     29409880  obj    -4.4  writebook GET book
+  -0.03%    Ir/op     88904745 ->     88879484  obj    -5.3  casa GET volunteers
+  -0.03%    Ir/op     11587888 ->     11584298  obj    +0.0  codetriage perform SendSingleTriageEmailJob
+  -0.03%    Ir/op      4478070 ->      4476674  obj    +0.1  react-starter-kit deliver UserMailer#email_verification
+  -0.03%    Ir/op      9770253 ->      9767126  obj    -2.0  redprints-cfp PATCH proposal (Inertia redirect)
+  -0.04%    Ir/op     27090272 ->     27080736  obj    +2.2  hackatime GET leaderboards
+  -0.04%    Ir/op      5755654 ->      5753626  obj    +0.1  redprints-cfp deliver ProposalMailer#proposal_submitted
+  -0.04%    Ir/op     39127760 ->     39112182  obj    +5.8  hackatime PATCH username invalid (Inertia 422)
+  -0.05%    Ir/op     16920193 ->     16911674  obj    -0.8  hackatime PATCH display name (Inertia redirect)
+  -0.06%    Ir/op     60224266 ->     60185455  obj    +0.9  casa GET casa cases
+  -0.06%    Ir/op     38936601 ->     38911360  obj    -1.0  hackatime GET settings profile
+  -0.07%    Ir/op      8928653 ->      8922705  obj    -1.9  blog GET article
+  -0.07%    Ir/op     38270951 ->     38244998  obj    +5.8  writebook PATCH page (turbo_stream)
+  -0.09%    Ir/op     11436986 ->     11426395  obj    -2.6  redprints-cfp POST proposal invalid (Inertia errors)
+  -0.11%    Ir/op      6717651 ->      6710564  obj    +9.0  react-starter-kit PATCH profile invalid (Inertia errors)
+  -0.11%    Ir/op     10461776 ->     10450060  obj    -5.5  redprints-cfp GET proposal edit
+  -0.11%    Ir/op     12839378 ->     12824992  obj    +3.6  codetriage GET subscribers
+  -0.11%    Ir/op     27767946 ->     27736542  obj    -1.5  casa PATCH casa case (redirect)
+  -0.13%    Ir/op     14446100 ->     14426864  obj    -2.7  codetriage GET home
+  -0.20%    Ir/op      4710488 ->      4701095  obj   +11.1  blog PATCH article.json
+  -0.20%    Ir/op     18714454 ->     18676834  obj    +8.0  writebook GET books
+  -0.21%    Ir/op      7737469 ->      7721507  obj    -4.0  react-starter-kit GET dashboard
+  -0.21%    Ir/op      7715886 ->      7699719  obj   -14.8  react-starter-kit GET settings profile
+  -0.23%    Ir/op     46736939 ->     46628543  obj    +5.7  hackatime GET dashboard (Inertia XHR)
+  -0.26%    Ir/op      6313679 ->      6297153  obj    -5.9  redprints-cfp GET proposals (Inertia JSON)
+  -0.29%    Ir/op      7458577 ->      7436808  obj    +6.9  redprints-cfp GET proposals
+  -0.32%    Ir/op     51099363 ->     50937985  obj   -21.1  hackatime GET dashboard
+  -0.32%    Ir/op      5786801 ->      5768518  obj    -5.0  react-starter-kit GET dashboard (Inertia JSON)
+  -0.47%    Ir/op      8070534 ->      8032918  obj    +1.2  pingcrm PUT contact (Inertia redirect)
+  -1.58%    Ir/op     37546043 ->     36950962  obj   -96.2  hackatime GET dashboard stats (deferred)
+
+# grew: net self Ir by method, % of all c12m instructions
+  +0.011% 8 apps  RAILS/activerecord/lib/arel/collectors/plain_string.rb Arel::Collectors::PlainString#<<
+  +0.008% 8 apps  RUBY/monitor.rb MonitorMixin#mon_synchronize
+  +0.008% 8 apps  GEM/4.0.0/gems/uri/lib/uri/common.rb URI._decode_uri_component
+  +0.006% 8 apps  RAILS/actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#append_tag_option
+  +0.006% 8 apps  GEM/4.0.0/gems/rack-test/lib/rack/test/cookie_jar.rb Rack::Test::CookieJar#for
+  +0.006% 7 apps  RAILS/activerecord/lib/active_record/relation/query_methods.rb ActiveRecord::QueryMethods#build_arel
+  +0.005% 8 apps  RAILS/activerecord/lib/active_record/model_schema.rb ActiveRecord::ModelSchema::ClassMethods#schema_context
+  +0.005% 8 apps  RAILS/activerecord/lib/active_record/relation/delegation.rb ActiveRecord::Delegation::ClassMethods#create
+  +0.005% 8 apps  RAILS/activemodel/lib/active_model/type/value.rb ActiveModel::Type::Value#hash
+  +0.005% 8 apps  RAILS/activesupport/lib/active_support/hash_with_indifferent_access.rb ActiveSupport::HashWithIndifferentAccess#[]
+  +0.005% 8 apps  RAILS/activerecord/lib/active_record/connection_handling.rb ActiveRecord::ConnectionHandling#connection_specification_name
+  +0.005% 8 apps  <internal:thread_sync> Thread::Mutex#synchronize
+  +0.005% 8 apps  RAILS/activerecord/lib/active_record/connection_adapters/query_intent.rb ActiveRecord::ConnectionAdapters::QueryIntent#initialize
+  +0.005% 4 apps  RAILS/activerecord/lib/active_record/connection_adapters/sqlite3/database_statements.rb ActiveRecord::ConnectionAdapters::SQLite3::DatabaseStatements#perform_query
+  +0.005% 8 apps  RAILS/activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout#build_handle
+  +0.004% 8 apps  RAILS/actionview/lib/action_view/buffers.rb ActionView::OutputBuffer#safe_concat
+  +0.004% 8 apps  GEM/4.0.0/gems/uri/lib/uri/common.rb URI._encode_uri_component
+  +0.004% 8 apps  RAILS/activerecord/lib/active_record/connection_handling.rb ActiveRecord::ConnectionHandling#connection_pool
+  +0.004% 8 apps  RAILS/activerecord/lib/active_record/associations/belongs_to_association.rb ActiveRecord::Associations::BelongsToAssociation#initialize
+  +0.004% 8 apps  RAILS/activerecord/lib/arel/attributes/attribute.rb Arel::Attributes::Attribute#type_caster
+
+# shrank: net self Ir by method, % of all c12m instructions
+  -0.014% 4 apps  GEM/4.0.0/gems/pg/lib/pg/connection.rb PG::Connection#get_result
+  -0.011% 8 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#fetch_value_at!
+  -0.010% 8 apps  RAILS/activesupport/lib/active_support/core_ext/erb/util.rb ActiveSupport::CoreExt::ERBUtil#html_escape
+  -0.009% 8 apps  RAILS/activesupport/lib/active_support/isolated_execution_state.rb ActiveSupport::IsolatedExecutionState.[]
+  -0.007% 8 apps  GEM/4.0.0/gems/uri/lib/uri/rfc3986_parser.rb URI::RFC3986_Parser#split
+  -0.007% 8 apps  RAILS/activerecord/lib/arel/collectors/composite.rb Arel::Collectors::Composite#<<
+  -0.006% 8 apps  RAILS/activesupport/lib/active_support/core_ext/hash/keys.rb Hash#stringify_keys
+  -0.006% 4 apps  RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb ActiveRecord::ConnectionAdapters::PostgreSQL::DatabaseStatements#cast_result
+  -0.006% 8 apps  GEM/4.0.0/gems/concurrent-ruby/lib/concurrent-ruby/concurrent/collection/map/non_concurrent_map_backend.rb Concurrent::Collection::NonConcurrentMapBackend#[]
+  -0.006% 7 apps  RAILS/activerecord/lib/arel/visitors/to_sql.rb Arel::Visitors::ToSql#visit_Arel_Attributes_Attribute
+  -0.005% 8 apps  RAILS/activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout::BaseTimeGroup#finish
+  -0.005% 8 apps  RAILS/activerecord/lib/active_record/reflection.rb ActiveRecord::Reflection::ClassMethods#_reflect_on_association
+  -0.005% 1 apps  APP/app/services/dashboard_stats.rb DashboardStats#rollup_total_row
+  -0.005% 2 apps  GEM/4.0.0/gems/sentry-ruby/lib/sentry/utils/sample_rand.rb Sentry::Utils::SampleRand#random_from_trace_id
+  -0.005% 4 apps  RAILS/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb ActiveRecord::ConnectionAdapters::PostgreSQLAdapter#get_oid_type
+  -0.005% 8 apps  RAILS/actionview/lib/action_view/helpers/tag_helper.rb ActionView::Helpers::TagHelper::TagBuilder#tag_options
+  -0.005% 8 apps  RAILS/activerecord/lib/arel/table.rb Arel::Table#name
+  -0.005% 8 apps  RAILS/activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence::ClassMethods#instantiate_instance_of
+  -0.004% 8 apps  RAILS/activemodel/lib/active_model/attribute_methods.rb ActiveRecord::Base.attribute_aliases
+  -0.004% 8 apps  GEM/4.0.0/gems/i18n/lib/i18n.rb I18n::Base#config

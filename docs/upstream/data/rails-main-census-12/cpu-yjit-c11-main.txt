@@ -1,0 +1,75 @@
+# c12c11 -> c12m (A/A c12m2), yjit: 20 workloads, 50 left out as not JIT-flat in some label
+blog                 4 wl  median   -0.91%  min   -1.59%  max   -0.01%  A/A median 0.07%  objects median     -4.3
+casa                 1 wl  median   -1.72%  min   -1.72%  max   -1.72%  A/A median 0.13%  objects median    -44.9
+codetriage           1 wl  median   -0.94%  min   -0.94%  max   -0.94%  A/A median 0.01%  objects median    -21.0
+hackatime            2 wl  median   -1.56%  min   -2.43%  max   -0.68%  A/A median 0.16%  objects median    -29.8
+pingcrm              4 wl  median   -0.95%  min   -0.99%  max   -0.41%  A/A median 0.21%  objects median    -15.9
+react-starter-kit    4 wl  median   -0.99%  min   -1.56%  max   -0.06%  A/A median 0.16%  objects median     -5.1
+redprints-cfp        4 wl  median   -1.38%  min   -2.43%  max   -0.01%  A/A median 0.19%  objects median    -14.4
+ALL 20 workloads: median -0.95%, faster 8, slower 0 (beyond 1%)
+
+# workloads, change and A/A
+  -0.01% (2nd   +0.01%, A/A  +0.02%)    Ir/op      2471409 ->      2471208  obj    +0.0  blog GET articles.json
+  -0.01% (2nd   +0.15%, A/A  +0.16%)    Ir/op      3427074 ->      3426666  obj    -0.9  redprints-cfp deliver ProposalMailer#proposal_submitted
+  -0.06% (2nd   +0.05%, A/A  +0.11%)    Ir/op      2560787 ->      2559321  obj    -1.1  react-starter-kit deliver UserMailer#email_verification
+  -0.41% (2nd   -1.11%, A/A  -0.70%)    Ir/op      4783273 ->      4763579  obj    +1.5  pingcrm PUT contact (Inertia redirect)
+  -0.60% (2nd   -0.39%, A/A  +0.21%)    Ir/op      4431302 ->      4404631  obj    -9.3  redprints-cfp GET proposals
+  -0.68% (2nd   -0.68%, A/A  -0.00%)    Ir/op     26350143 ->     26170862  obj   -40.3  hackatime GET settings profile
+  -0.80% (2nd   -0.77%, A/A  +0.03%)    Ir/op      2423315 ->      2403955  obj    +8.1  blog PATCH article.json
+  -0.92% (2nd   -0.72%, A/A  +0.20%)    Ir/op      5173500 ->      5125900  obj    -9.1  react-starter-kit GET dashboard
+  -0.92% (2nd   -0.98%, A/A  -0.06%)    Ir/op      6302506 ->      6244212  obj   -16.6  pingcrm GET organizations (Inertia JSON)
+  -0.94% (2nd   -0.93%, A/A  +0.01%)    Ir/op      6495500 ->      6434361  obj   -21.0  codetriage perform SendSingleTriageEmailJob
+  -0.97% (2nd   -1.21%, A/A  -0.25%)    Ir/op      9921229 ->      9825231  obj   -28.7  pingcrm GET contact edit
+  -0.99% (2nd   -1.16%, A/A  -0.17%)    Ir/op      4440625 ->      4396584  obj   -15.2  pingcrm GET dashboard
+  -1.03% (2nd   -0.92%, A/A  +0.11%)    Ir/op      3238783 ->      3205536  obj    -8.6  blog PATCH article (redirect)
+  -1.06% (2nd   -1.34%, A/A  -0.28%) *  Ir/op      5163660 ->      5108855  obj    -0.5  react-starter-kit GET home
+  -1.56% (2nd   -1.59%, A/A  -0.03%) *  Ir/op      5548499 ->      5462115  obj   -15.1  react-starter-kit GET settings sessions
+  -1.59% (2nd   -1.76%, A/A  -0.17%) *  Ir/op      5186204 ->      5103753  obj   -63.8  blog GET article
+  -1.72% (2nd   -1.59%, A/A  +0.13%) *  Ir/op     13276765 ->     13048746  obj   -44.9  casa GET dashboard
+  -2.16% (2nd   -1.83%, A/A  +0.33%) *  Ir/op      5877973 ->      5751090  obj   -28.6  redprints-cfp GET proposal edit
+  -2.43% (2nd   -2.51%, A/A  -0.08%) *  Ir/op      5046862 ->      4924402  obj   -19.4  redprints-cfp PATCH proposal (Inertia redirect)
+  -2.43% (2nd   -2.74%, A/A  -0.31%) *  Ir/op      9813224 ->      9574593  obj   -19.3  hackatime PATCH display name (Inertia redirect)
+
+# grew: net self Ir by method, % of all c12c11 instructions (A/A: c12m -> c12m2)
+  +0.071% (A/A  -0.019%) 7 apps  RAILS/activerecord/lib/active_record/connection_adapters/abstract/connection_pool.rb ActiveRecord::ConnectionAdapters::ConnectionPool::LeaseRegistry#lease
+  +0.028% (A/A  -0.042%) 2 apps  RAILS/activesupport/lib/active_support/core_ext/object/deep_dup.rb Object#deep_dup
+  +0.026% (A/A  -0.016%) 7 apps  RAILS/activemodel/lib/active_model/attribute_methods.rb ActiveModel::AttributeMethods::ClassMethods#resolve_attribute_name
+  +0.025% (A/A  -0.017%) 5 apps  RAILS/activerecord/lib/active_record/persistence.rb ActiveRecord::Persistence::ClassMethods#instantiate_instance_of
+  +0.024% (A/A  -0.011%) 7 apps  GEM/4.0.0/gems/concurrent-ruby/lib/concurrent-ruby/concurrent/collection/map/non_concurrent_map_backend.rb Concurrent::Collection::NonConcurrentMapBackend#[]
+  +0.024% (A/A  -0.007%) 5 apps  RAILS/activesupport/lib/active_support/callbacks.rb ActiveRecord::Base.__callbacks
+  +0.021% (A/A  -0.016%) 7 apps  RAILS/activerecord/lib/arel/visitors/visitor.rb Arel::Visitors::Visitor#visit
+  +0.021% (A/A  -0.019%) 6 apps  RAILS/activesupport/lib/active_support/core_ext/erb/util.rb ERB::Util.xml_name_escape
+  +0.020% (A/A  +0.001%) 1 apps  RAILS/activerecord/lib/active_record/core.rb ActiveRecord::Base.connection_class_for_self
+  +0.020% (A/A  -0.001%) 5 apps  RAILS/actionview/lib/action_view/helpers/controller_helper.rb ActionView::Helpers::ControllerHelper#respond_to?
+  +0.020% (A/A  -0.010%) 7 apps  RAILS/activerecord/lib/active_record/connection_adapters/abstract/query_cache.rb ActiveRecord::ConnectionAdapters::QueryCache::Store#compute_if_absent
+  +0.019% (A/A  -0.009%) 6 apps  GEM/4.0.0/gems/rack-session/lib/rack/session/abstract/id.rb Rack::Session::Abstract::Persisted#commit_session
+  +0.019% (A/A  -0.005%) 6 apps  RAILS/actionview/lib/action_view/lookup_context.rb ActionView::LookupContext#initialize_details
+  +0.019% (A/A  -0.020%) 6 apps  GEM/4.0.0/gems/rack/lib/rack/query_parser.rb Rack::QueryParser#make_params
+  +0.019% (A/A  -0.007%) 6 apps  GEM/4.0.0/gems/uri/lib/uri/rfc3986_parser.rb URI::RFC3986_Parser#split
+  +0.019% (A/A  -0.006%) 7 apps  RAILS/activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout#groups_for
+  +0.018% (A/A  -0.013%) 6 apps  RUBY/random/formatter.rb Random::Formatter#uuid
+  +0.017% (A/A  -0.004%) 3 apps  GEM/4.0.0/gems/sqlite3/lib/sqlite3/statement.rb SQLite3::Statement#each
+  +0.017% (A/A  +0.002%) 7 apps  RAILS/activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout::MonotonicTimedGroup#now
+  +0.017% (A/A  +0.008%) 6 apps  RAILS/activesupport/lib/active_support/callbacks.rb ActiveSupport::Callbacks::CallbackChain::DefaultTerminator#call_direct
+
+# shrank: net self Ir by method, % of all c12c11 instructions (A/A: c12m -> c12m2)
+  -0.251% (A/A  +0.006%) 6 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#keys
+  -0.203% (A/A  +0.013%) 7 apps  RAILS/activesupport/lib/active_support/weak_key_map.rb ActiveSupport::WeakKeyMap#fetch_or_store
+  -0.189% (A/A  -0.000%) 7 apps  RAILS/activerecord/lib/active_record/relation/merger.rb ActiveRecord::Relation::Merger#merge
+  -0.153% (A/A  -0.007%) 7 apps  <internal:thread_sync> Thread::Mutex#synchronize
+  -0.076% (A/A  +0.052%) 7 apps  RAILS/activesupport/lib/active_support/isolated_execution_state.rb ActiveSupport::IsolatedExecutionState.[]
+  -0.050% (A/A  +0.014%) 7 apps  RAILS/activemodel/lib/active_model/attribute_set.rb ActiveModel::LazyIndexedAttributeSet#index_for_name
+  -0.048% (A/A  -0.010%) 6 apps  GEM/4.0.0/gems/uri/lib/uri/common.rb URI._decode_uri_component
+  -0.048% (A/A  +0.004%) 6 apps  RAILS/activesupport/lib/active_support/core_ext/string/output_safety.rb ActiveSupport::SafeBuffer#initialize
+  -0.036% (A/A  -0.002%) 7 apps  RAILS/activerecord/lib/active_record/relation/where_clause.rb ActiveRecord::Relation::WhereClause#merge
+  -0.035% (A/A  -0.009%) 6 apps  GEM/4.0.0/gems/rack/lib/rack/headers.rb Rack::Headers#[]=
+  -0.032% (A/A  +0.016%) 6 apps  RAILS/activemodel/lib/active_model/attribute.rb ActiveModel::Attribute#hash
+  -0.031% (A/A  +0.033%) 7 apps  <internal:array> Array#map
+  -0.030% (A/A  -0.016%) 6 apps  GEM/4.0.0/gems/concurrent-ruby/lib/concurrent-ruby/concurrent/collection/map/non_concurrent_map_backend.rb Concurrent::Collection::NonConcurrentMapBackend#get_or_default
+  -0.029% (A/A  -0.000%) 7 apps  RAILS/activesupport/lib/active_support/notifications/fanout.rb ActiveSupport::Notifications::Fanout::Handle#ensure_state!
+  -0.025% (A/A  +0.009%) 7 apps  RAILS/activesupport/lib/active_support/structured_event_subscriber.rb ActiveSupport::StructuredEventSubscriber#silenced?
+  -0.025% (A/A  +0.019%) 7 apps  RAILS/activesupport/lib/active_support/callbacks.rb ActiveSupport::Callbacks#run_callbacks
+  -0.022% (A/A  +0.027%) 1 apps  GEM/4.0.0/gems/countries/lib/countries/country/class_methods.rb ISO3166::CountryClassMethods#new
+  -0.022% (A/A  +0.007%) 6 apps  GEM/4.0.0/gems/uri/lib/uri/common.rb URI::Schemes.escape
+  -0.020% (A/A  -0.003%) 6 apps  <internal:array> Array#each
+  -0.020% (A/A  +0.030%) 7 apps  RAILS/activesupport/lib/active_support/callbacks.rb ActiveSupport::Callbacks::Filters::Before#call

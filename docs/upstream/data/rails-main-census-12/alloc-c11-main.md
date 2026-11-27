@@ -1,0 +1,61 @@
+a12c11: Rails rails/rails@cf0325a832a1594f01d866da1e4ad23d962d886b cf0325a832, ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+a12m: Rails rails/rails@088fc0cf61e4ba0c7987decafacc69adb3e22eec 088fc0cf61, ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+a12m2: Rails rails/rails@088fc0cf61e4ba0c7987decafacc69adb3e22eec 088fc0cf61, ["ruby"]
+| App | a12m | a12m2 |
+| --- | ---: | ---: |
+| blog | −3.0 / −5.2 | −3.0 / −8.0 |
+| casa | −128.3 / −125.9 | −127.4 / −126.3 |
+| codetriage | −22.1 / −21.4 | −21.0 / −24.8 |
+| hackatime | −22.9 / −21.9 | −22.7 / −20.7 |
+| pingcrm | −10.7 / −10.8 | −12.3 / −11.5 |
+| react-starter-kit | −8.7 / −7.7 | −9.1 / −8.3 |
+| redprints-cfp | −11.9 / −10.7 | −10.1 / −11.0 |
+| writebook | −54.8 / −56.5 | −56.3 / −58.4 |
+| **All workloads** | **−19.3 / −18.1** | **−18.6 / −17.6** |
+| Moved ≤ −1 / ≥ +1 | 64 / 3 · 65 / 2 | 63 / 4 · 65 / 2 |
+
+a12c11: Rails rails/rails@cf0325a832a1594f01d866da1e4ad23d962d886b cf0325a832, ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+a12m: Rails rails/rails@088fc0cf61e4ba0c7987decafacc69adb3e22eec 088fc0cf61, ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +PRISM [x86_64-linux]
+a12m2: Rails rails/rails@088fc0cf61e4ba0c7987decafacc69adb3e22eec 088fc0cf61, ["ruby"]
+== a12m vs a12c11
+blog-interpreter               moved  7/10 median   -3.0 min   -66.7 | GET articles -7.2; GET article -63.3; GET article edit -66.7; GET articles.json +0.0; GET article.json +0.0; PATCH article (redirect) -2.4; POST article invalid (422) -30.2; POST comment (redirect) -4.0; PATCH article.json -3.0; perform Turbo::Streams::ActionBroadcastJob +25.8
+blog-yjit                      moved  7/10 median   -5.2 min   -65.3 | GET articles -10.1; GET article -65.3; GET article edit -64.8; GET articles.json +0.0; GET article.json +0.0; PATCH article (redirect) -5.2; POST article invalid (422) -30.3; POST comment (redirect) +0.5; PATCH article.json -3.0; perform Turbo::Streams::ActionBroadcastJob -8.1
+casa-interpreter               moved  9/10 median -128.3 min -1186.6 | GET dashboard -53.3; GET casa cases -71.8; GET casa case -329.1; GET casa case edit -1186.6; GET volunteers +60.9; GET supervisors -163.7; GET case contacts -312.5; POST api sign_in.json -10.5; PATCH casa case (redirect) -134.2; PATCH casa case.json -128.3
+casa-yjit                      moved  9/10 median -125.9 min -1189.3 | GET dashboard -51.5; GET casa cases -71.4; GET casa case -327.3; GET casa case edit -1189.3; GET volunteers +98.7; GET supervisors -166.9; GET case contacts -312.9; POST api sign_in.json -7.0; PATCH casa case (redirect) -129.3; PATCH casa case.json -125.9
+codetriage-interpreter         moved  7/ 7 median  -22.1 min  -137.8 | GET home -8.6; GET repo -67.0; GET subscribers -22.1; GET user edit (signed in) -137.8; GET repo info.json -9.1; PATCH repo subscription (redirect) -30.8; perform SendSingleTriageEmailJob -21.0
+codetriage-yjit                moved  7/ 7 median  -21.4 min  -141.5 | GET home -7.5; GET repo -68.8; GET subscribers -21.4; GET user edit (signed in) -141.5; GET repo info.json -8.5; PATCH repo subscription (redirect) -30.4; perform SendSingleTriageEmailJob -21.0
+hackatime-interpreter          moved 12/12 median  -22.9 min   -39.6 | GET dashboard -37.0; GET projects -39.6; GET leaderboards -19.3; GET settings profile -28.6; GET dashboard (Inertia XHR) -32.1; GET dashboard stats (deferred) -26.9; GET leaderboard entries (deferred) -10.4; PATCH display name (Inertia redirect) -14.6; PATCH username invalid (Inertia 422) -25.1; GET statusbar today -22.9; POST heartbeat -21.2; perform DashboardRollupRefreshJob -8.6
+hackatime-yjit                 moved 12/12 median  -21.9 min   -43.6 | GET dashboard -35.9; GET projects -43.6; GET leaderboards -18.8; GET settings profile -38.8; GET dashboard (Inertia XHR) -33.2; GET dashboard stats (deferred) -30.7; GET leaderboard entries (deferred) -9.1; PATCH display name (Inertia redirect) -12.9; PATCH username invalid (Inertia 422) -24.2; GET statusbar today -21.9; POST heartbeat -19.1; perform DashboardRollupRefreshJob -10.2
+pingcrm-interpreter            moved  8/ 8 median  -10.7 min   -19.6 | GET dashboard -16.6; GET contacts -17.7; GET organizations -15.3; GET contact edit -19.6; GET contacts (Inertia JSON) -10.7; GET organizations (Inertia JSON) -9.3; PUT contact (Inertia redirect) -9.3; POST contact invalid (Inertia errors) -8.5
+pingcrm-yjit                   moved  8/ 8 median  -10.8 min   -24.8 | GET dashboard -15.0; GET contacts -16.4; GET organizations -17.7; GET contact edit -24.8; GET contacts (Inertia JSON) -10.7; GET organizations (Inertia JSON) -9.0; PUT contact (Inertia redirect) -10.8; POST contact invalid (Inertia errors) -6.8
+react-starter-kit-interpreter  moved  7/ 8 median   -8.7 min   -19.4 | GET home -10.5; GET dashboard -8.9; GET settings profile -12.8; GET settings sessions -19.4; GET dashboard (Inertia JSON) -6.8; PATCH profile (Inertia redirect) -8.7; PATCH profile invalid (Inertia errors) -4.6; deliver UserMailer#email_verification +0.1
+react-starter-kit-yjit         moved  8/ 8 median   -7.7 min   -18.1 | GET home -9.2; GET dashboard -7.8; GET settings profile -7.7; GET settings sessions -18.1; GET dashboard (Inertia JSON) -6.4; PATCH profile (Inertia redirect) -9.7; PATCH profile invalid (Inertia errors) -7.1; deliver UserMailer#email_verification -1.0
+redprints-cfp-interpreter      moved  6/ 8 median  -11.9 min   -30.7 | GET home +1.8; GET proposals -11.9; GET proposal -30.7; GET proposal edit -22.3; GET proposals (Inertia JSON) -5.5; PATCH proposal (Inertia redirect) -26.7; POST proposal invalid (Inertia errors) -14.6; deliver ProposalMailer#proposal_submitted +0.0
+redprints-cfp-yjit             moved  7/ 8 median  -10.7 min   -26.3 | GET home -5.0; GET proposals -12.9; GET proposal -26.2; GET proposal edit -22.0; GET proposals (Inertia JSON) -4.6; PATCH proposal (Inertia redirect) -26.3; POST proposal invalid (Inertia errors) -10.7; deliver ProposalMailer#proposal_submitted +0.0
+writebook-interpreter          moved  8/ 8 median  -54.8 min  -142.1 | GET books -62.5; GET book -102.2; GET leaf -142.1; GET leaf.md -37.0; PATCH page (turbo_stream) -79.2; POST search -54.8; POST page (turbo_stream) -1.6; perform Turbo::Streams::BroadcastJob -1.0
+writebook-yjit                 moved  7/ 8 median  -56.5 min  -140.3 | GET books -61.6; GET book -104.3; GET leaf -140.3; GET leaf.md -35.0; PATCH page (turbo_stream) -73.4; POST search -56.5; POST page (turbo_stream) +3.4; perform Turbo::Streams::BroadcastJob -1.0
+ALL interpreter workloads  71  median -19.3  moved<=-1:  64  moved>=+1:   3
+ALL yjit        workloads  71  median -18.1  moved<=-1:  65  moved>=+1:   2
+SQL interpreter workloads  71  changed SQL:   1
+SQL yjit        workloads  71  changed SQL:   1
+== a12m2 vs a12c11
+blog-interpreter               moved  7/10 median   -3.0 min   -66.4 | GET articles -8.4; GET article -66.0; GET article edit -66.4; GET articles.json +0.0; GET article.json +0.0; PATCH article (redirect) -2.8; POST article invalid (422) -27.4; POST comment (redirect) -10.6; PATCH article.json -3.0; perform Turbo::Streams::ActionBroadcastJob +20.9
+blog-yjit                      moved  8/10 median   -8.0 min  -123.8 | GET articles -8.5; GET article -66.8; GET article edit -66.2; GET articles.json +0.0; GET article.json +0.0; PATCH article (redirect) -6.9; POST article invalid (422) -31.1; POST comment (redirect) -123.8; PATCH article.json -3.0; perform Turbo::Streams::ActionBroadcastJob -8.0
+casa-interpreter               moved  9/10 median -127.4 min -1185.0 | GET dashboard -56.9; GET casa cases -72.5; GET casa case -329.1; GET casa case edit -1185.0; GET volunteers +60.8; GET supervisors -165.9; GET case contacts -309.7; POST api sign_in.json -10.5; PATCH casa case (redirect) -137.6; PATCH casa case.json -127.4
+casa-yjit                      moved  9/10 median -126.3 min -1187.8 | GET dashboard -52.1; GET casa cases -69.9; GET casa case -323.8; GET casa case edit -1187.8; GET volunteers +95.8; GET supervisors -168.2; GET case contacts -312.0; POST api sign_in.json -7.0; PATCH casa case (redirect) -130.8; PATCH casa case.json -126.3
+codetriage-interpreter         moved  7/ 7 median  -21.0 min  -139.7 | GET home -7.6; GET repo -67.6; GET subscribers -20.9; GET user edit (signed in) -139.7; GET repo info.json -9.8; PATCH repo subscription (redirect) -28.4; perform SendSingleTriageEmailJob -21.0
+codetriage-yjit                moved  7/ 7 median  -24.8 min  -138.8 | GET home -8.3; GET repo -68.7; GET subscribers -24.8; GET user edit (signed in) -138.8; GET repo info.json -9.4; PATCH repo subscription (redirect) -28.8; perform SendSingleTriageEmailJob -21.0
+hackatime-interpreter          moved 12/12 median  -22.7 min   -43.8 | GET dashboard -37.7; GET projects -43.8; GET leaderboards -17.6; GET settings profile -29.2; GET dashboard (Inertia XHR) -31.4; GET dashboard stats (deferred) -26.4; GET leaderboard entries (deferred) -5.8; PATCH display name (Inertia redirect) -14.0; PATCH username invalid (Inertia 422) -26.4; GET statusbar today -20.9; POST heartbeat -22.7; perform DashboardRollupRefreshJob -6.9
+hackatime-yjit                 moved 12/12 median  -20.7 min   -43.9 | GET dashboard -36.9; GET projects -43.9; GET leaderboards -17.3; GET settings profile -34.5; GET dashboard (Inertia XHR) -33.8; GET dashboard stats (deferred) -29.4; GET leaderboard entries (deferred) -5.0; PATCH display name (Inertia redirect) -17.5; PATCH username invalid (Inertia 422) -20.7; GET statusbar today -23.7; POST heartbeat -18.4; perform DashboardRollupRefreshJob -10.2
+pingcrm-interpreter            moved  8/ 8 median  -12.3 min   -21.4 | GET dashboard -18.1; GET contacts -21.4; GET organizations -12.7; GET contact edit -20.0; GET contacts (Inertia JSON) -12.3; GET organizations (Inertia JSON) -7.1; PUT contact (Inertia redirect) -6.3; POST contact invalid (Inertia errors) -7.8
+pingcrm-yjit                   moved  8/ 8 median  -11.5 min   -23.5 | GET dashboard -13.8; GET contacts -17.6; GET organizations -17.2; GET contact edit -23.5; GET contacts (Inertia JSON) -11.5; GET organizations (Inertia JSON) -8.1; PUT contact (Inertia redirect) -11.1; POST contact invalid (Inertia errors) -6.5
+react-starter-kit-interpreter  moved  7/ 8 median   -9.1 min   -18.6 | GET home -12.3; GET dashboard -9.3; GET settings profile -9.1; GET settings sessions -18.6; GET dashboard (Inertia JSON) -7.1; PATCH profile (Inertia redirect) -11.0; PATCH profile invalid (Inertia errors) -5.1; deliver UserMailer#email_verification -0.8
+react-starter-kit-yjit         moved  7/ 8 median   -8.3 min   -17.0 | GET home -11.0; GET dashboard -8.9; GET settings profile -8.3; GET settings sessions -17.0; GET dashboard (Inertia JSON) -6.4; PATCH profile (Inertia redirect) -10.0; PATCH profile invalid (Inertia errors) -6.5; deliver UserMailer#email_verification +0.0
+redprints-cfp-interpreter      moved  6/ 8 median  -10.1 min   -28.8 | GET home +1.8; GET proposals -10.1; GET proposal -28.8; GET proposal edit -24.5; GET proposals (Inertia JSON) -9.3; PATCH proposal (Inertia redirect) -24.8; POST proposal invalid (Inertia errors) -14.8; deliver ProposalMailer#proposal_submitted -0.1
+redprints-cfp-yjit             moved  7/ 8 median  -11.0 min   -25.5 | GET home -6.7; GET proposals -11.0; GET proposal -25.5; GET proposal edit -22.4; GET proposals (Inertia JSON) -4.1; PATCH proposal (Inertia redirect) -22.7; POST proposal invalid (Inertia errors) -14.1; deliver ProposalMailer#proposal_submitted +0.0
+writebook-interpreter          moved  7/ 8 median  -56.3 min  -141.3 | GET books -58.8; GET book -102.1; GET leaf -141.3; GET leaf.md -38.0; PATCH page (turbo_stream) -76.6; POST search -56.3; POST page (turbo_stream) +4.0; perform Turbo::Streams::BroadcastJob -1.0
+writebook-yjit                 moved  7/ 8 median  -58.4 min  -138.7 | GET books -62.8; GET book -105.1; GET leaf -138.7; GET leaf.md -36.0; PATCH page (turbo_stream) -72.9; POST search -58.4; POST page (turbo_stream) +3.8; perform Turbo::Streams::BroadcastJob -1.0
+ALL interpreter workloads  71  median -18.6  moved<=-1:  63  moved>=+1:   4
+ALL yjit        workloads  71  median -17.6  moved<=-1:  65  moved>=+1:   2
+SQL interpreter workloads  71  changed SQL:   1
+SQL yjit        workloads  71  changed SQL:   1

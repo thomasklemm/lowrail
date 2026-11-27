@@ -1,0 +1,8 @@
+deliver ProposalMailer#proposal_submitted	cf0325a832a1594f01d866da1e4ad23d962d886b	5610522.7	2093.6	Merge pull request #59918 from yahonda/check-constraint-lookup-by-name
+deliver ProposalMailer#proposal_submitted	088fc0cf61e4ba0c7987decafacc69adb3e22eec	5742259.0	2093.3	Merge pull request #59999 from wintan1418/fix-attribute-method-affix-example
+deliver ProposalMailer#proposal_submitted	2a0b79554a41af6edf53399f835b1d2ad98cf124	5742253.5	2102.6	Merge pull request #59915 from carlosdanielpohlod/truncate-bytes-safe-buffer
+deliver ProposalMailer#proposal_submitted	f785381cca8621772cba659ff93f825eb7f99942	5676731.5	2102.4	Merge pull request #59982 from kamipo/disable-joins-apply-rest-of-scope
+deliver ProposalMailer#proposal_submitted	b5a1d7f4afb737de89fa21a830707f4773b0e952	5618902.4	2101.5	Merge pull request #59960 from wintan1418/fix-datetime-type-docs
+deliver ProposalMailer#proposal_submitted	5f98db3562d5cb9f2d3363d0e08fae90ab58a9c6	5740067.6	2093.5	Merge pull request #59906 from 55728/fix-order-sql-literal-ordering-references
+deliver ProposalMailer#proposal_submitted	1b1a809125aea2978776f7c14aeacfcd49112b14	5741440.8	2101.3	Merge pull request #59956 from bruno-costanzo/eager-load-outer-join-aliases
+deliver ProposalMailer#proposal_submitted	59388990b10e9d0262b03663d911abf6e9b0ad89	5615349.2	2101.6	Merge pull request #59965 from bruno-costanzo/redis-cache-store-rescue-command-errors

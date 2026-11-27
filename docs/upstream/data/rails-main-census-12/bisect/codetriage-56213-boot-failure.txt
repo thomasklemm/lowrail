@@ -1,0 +1,4 @@
+
+          ::Rails::CodeStatistics.register_extension("slim")
+                                 ^^^^^^^^^^^^^^^^^^^
+Did you mean?  register_directory

@@ -1,0 +1,12 @@
+# c12m interpreter: 71 workloads; cluster self Ir as % of each workload
+query cache key hashing                mean  1.094%  reach 67/71 (8 apps)  >=1%: 36  max  2.566% casa GET dashboard  score 1.032
+IsolatedExecutionState reads           mean  1.009%  reach 68/71 (8 apps)  >=1%: 39  max  2.081% blog PATCH article.json  score 0.967
+AR connection lookup                   mean  0.808%  reach 68/71 (8 apps)  >=1%: 23  max  1.941% writebook PATCH page (turbo_stream)  score 0.774
+InheritableOptions parent reads        mean  0.729%  reach 62/71 (8 apps)  >=1%: 19  max  2.600% writebook GET books  score 0.637
+filtered parameters                    mean  0.495%  reach 58/71 (8 apps)  >=1%: 10  max  3.794% hackatime PATCH display name (Inertia redirect)  score 0.404
+notifications fan-out                  mean  2.073%  reach 70/71 (8 apps)  >=1%: 56  max  6.823% codetriage GET home  score 2.044
+CSRF token masking                     mean  0.764%  reach 52/71 (8 apps)  >=1%: 25  max  3.306% blog GET article  score 0.560
+tag attribute building                 mean  2.430%  reach 41/71 (8 apps)  >=1%: 36  max 11.357% blog GET article  score 1.403
+env_config merge (build_request)       mean  0.347%  reach 48/71 (8 apps)  >=1%:  4  max  2.971% blog GET article.json  score 0.235
+inertia_rails config (Hash#extract!)   mean  0.990%  reach 32/71 (5 apps)  >=1%: 21  max  9.191% react-starter-kit GET dashboard (Inertia JSON)  score 0.446
+cache_quoted_name (since census 11)    mean  0.046%  reach  7/71 (4 apps)  >=1%:  0  max  0.194% hackatime POST heartbeat  score 0.004

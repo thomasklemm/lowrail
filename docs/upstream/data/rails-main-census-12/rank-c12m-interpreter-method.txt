@@ -1,0 +1,81 @@
+8 runs, 8 apps, 71 workloads (interpreter, by method); 0 not JIT-flat, left out
+  1 actionview/lib/action_view/helpers/tag_helper.rb:1543 ActionView::Help apps  8 share  56% Ir/op   276655 ( 0.91%) incl    850167
+  2 activesupport/lib/active_support/core_ext/object/blank.rb:186 String#b apps  8 share  94% Ir/op   220353 ( 0.73%) incl    220353
+  3 activesupport/lib/active_support/isolated_execution_state.rb:31 Active apps  8 share  97% Ir/op   211015 ( 0.69%) incl    211015
+  4 actionview/lib/action_view/helpers/tag_helper.rb:1639 ActionView::Help apps  8 share  56% Ir/op   207199 ( 0.68%) incl    460576
+  5 activesupport/lib/active_support/core_ext/time/calculations.rb:150 Tim apps  8 share  48% Ir/op   167835 ( 0.55%) incl    167835
+  6 activerecord/lib/arel/visitors/visitor.rb:34 Arel::Visitors::Visitor#v apps  8 share  82% Ir/op   150507 ( 0.50%) incl   1036099
+  7 activerecord/lib/active_record/connection_adapters/abstract/query_cach apps  8 share  96% Ir/op   148651 ( 0.49%) incl   2462744
+  8 activerecord/lib/arel/collectors/composite.rb:20 Arel::Collectors::Com apps  8 share  82% Ir/op   123349 ( 0.41%) incl    223655
+  9 activesupport/lib/active_support/core_ext/erb/util.rb:157 ERB::Util.xm apps  8 share  56% Ir/op   116698 ( 0.38%) incl    156193
+ 10 activesupport/lib/active_support/core_ext/erb/util.rb:11 ActiveSupport apps  8 share  56% Ir/op   113692 ( 0.37%) incl    125267
+ 11 activesupport/lib/active_support/core_ext/hash/slice.rb:28 Hash#extrac apps  8 share  63% Ir/op   112327 ( 0.37%) incl    113400
+ 12 actionview/lib/action_view/buffers.rb:44 ActionView::OutputBuffer#<<   apps  7 share  52% Ir/op   102943 ( 0.34%) incl    147167
+ 13 activerecord/lib/arel/collectors/plain_string.rb:14 Arel::Collectors:: apps  8 share  79% Ir/op    97952 ( 0.32%) incl     97952
+ 14 activerecord/lib/active_record/result.rb:269 ActiveRecord::Result::Row apps  8 share  96% Ir/op    97897 ( 0.32%) incl     98094
+ 15 activerecord/lib/active_record/relation/merger.rb:59 ActiveRecord::Rel apps  8 share  80% Ir/op    97500 ( 0.32%) incl    331459
+ 16 activesupport/lib/active_support/ordered_options.rb:104 ActiveSupport: apps  8 share  87% Ir/op    96939 ( 0.32%) incl     98670
+ 17 activesupport/lib/active_support/notifications/fanout.rb:21 ActiveSupp apps  8 share  96% Ir/op    96480 ( 0.32%) incl    979561
+ 18 actionpack/lib/action_dispatch/routing/route_set.rb:227 ActionDispatch apps  8 share  62% Ir/op    91790 ( 0.30%) incl    408378
+ 19 activemodel/lib/active_model/attribute_set.rb:529 ActiveModel::LazyInd apps  8 share  72% Ir/op    88016 ( 0.29%) incl    152423
+ 20 activesupport/lib/active_support/core_ext/hash/keys.rb:12 Hash#stringi apps  8 share  89% Ir/op    86392 ( 0.28%) incl     86392
+ 21 activemodel/lib/active_model/attribute_set.rb:497 ActiveModel::LazyInd apps  8 share  73% Ir/op    85473 ( 0.28%) incl     87833
+ 22 activerecord/lib/arel/table.rb:102 Arel::Table#[]                      apps  8 share  79% Ir/op    84458 ( 0.28%) incl    105409
+ 23 activerecord/lib/active_record/relation/query_methods.rb:2000 ActiveRe apps  8 share  80% Ir/op    81053 ( 0.27%) incl    756900
+ 24 activesupport/lib/active_support/notifications/fanout.rb:371 ActiveSup apps  8 share  96% Ir/op    75575 ( 0.25%) incl    236314
+ 25 activesupport/lib/active_support/notifications/fanout.rb:272 ActiveSup apps  8 share  97% Ir/op    75329 ( 0.25%) incl    134823
+ 26 activerecord/lib/active_record/connection_handling.rb:368 ActiveRecord apps  8 share  93% Ir/op    75060 ( 0.25%) incl     75060
+ 27 activesupport/lib/active_support/parameter_filter.rb:184 ActiveSupport apps  8 share  93% Ir/op    73305 ( 0.24%) incl     75808
+ 28 activerecord/lib/active_record/relation/predicate_builder.rb:250 Activ apps  8 share  82% Ir/op    68709 ( 0.23%) incl     68709
+ 29 activerecord/lib/active_record/relation.rb:81 ActiveRecord::Relation#i apps  8 share  82% Ir/op    68654 ( 0.23%) incl     85858
+ 30 activerecord/lib/active_record/relation/predicate_builder.rb:143 Activ apps  8 share  79% Ir/op    67915 ( 0.22%) incl    595267
+ 31 activerecord/lib/active_record/relation/query_attribute.rb:60 ActiveRe apps  8 share  86% Ir/op    65644 ( 0.22%) incl    132925
+ 32 activerecord/lib/active_record/reflection.rb:703 ActiveRecord::Reflect apps  8 share  55% Ir/op    65400 ( 0.22%) incl    166727
+ 33 activesupport/lib/active_support/core_ext/string/output_safety.rb:244  apps  8 share  58% Ir/op    63122 ( 0.21%) incl    113096
+ 34 activemodel/lib/active_model/type/value.rb:130 ActiveModel::Type::Valu apps  8 share  87% Ir/op    62987 ( 0.21%) incl     62987
+ 35 actionview/lib/action_view/helpers/asset_url_helper.rb:189 ActionView: apps  7 share  48% Ir/op    61874 ( 0.20%) incl    233786
+ 36 actionpack/lib/action_controller/metal/request_forgery_protection.rb:8 apps  8 share  73% Ir/op    61347 ( 0.20%) incl     61347
+ 37 actionpack/lib/action_dispatch/journey/visitors.rb:38 ActionDispatch:: apps  7 share  54% Ir/op    58020 ( 0.19%) incl     77198
+ 38 actionview/lib/action_view/helpers/tag_helper.rb:1532 ActionView::Help apps  8 share  58% Ir/op    57766 ( 0.19%) incl    627354
+ 39 activemodel/lib/active_model/attribute_set.rb:408 ActiveModel::LazyInd apps  8 share  76% Ir/op    56588 ( 0.19%) incl    222384
+ 40 activerecord/lib/active_record/relation/where_clause.rb:8 ActiveRecord apps  8 share  76% Ir/op    55284 ( 0.18%) incl     55284
+ 41 activemodel/lib/active_model/attribute.rb:148 ActiveModel::Attribute#h apps  8 share  87% Ir/op    54054 ( 0.18%) incl     81237
+ 42 actionpack/lib/action_controller/metal/request_forgery_protection.rb:8 apps  8 share  73% Ir/op    52188 ( 0.17%) incl     95989
+ 43 activesupport/lib/active_support/core_ext/string/output_safety.rb:72 A apps  8 share  61% Ir/op    51797 ( 0.17%) incl     51797
+ 44 activerecord/lib/active_record/relation/delegation.rb:145 ActiveRecord apps  8 share  77% Ir/op    51476 ( 0.17%) incl    315294
+ 45 activerecord/lib/active_record/relation.rb:1256 ActiveRecord::Relation apps  7 share  70% Ir/op    50464 ( 0.17%) incl     50464
+ 46 activerecord/lib/active_record/associations.rb:55 ActiveRecord::Associ apps  7 share  51% Ir/op    50130 ( 0.16%) incl    296308
+ 47 activerecord/lib/active_record/relation.rb:101 ActiveRecord::Relation# apps  7 share  66% Ir/op    49337 ( 0.16%) incl     99627
+ 48 activemodel/lib/active_model/type/string.rb:38 ActiveModel::Type::Stri apps  8 share  75% Ir/op    48779 ( 0.16%) incl     48779
+ 49 activerecord/lib/active_record/reflection.rb:959 ActiveRecord::Reflect apps  8 share  54% Ir/op    48348 ( 0.16%) incl     75407
+ 50 activemodel/lib/active_model/indexed_row.rb:23 ActiveModel::IndexedRow apps  8 share  75% Ir/op    47474 ( 0.16%) incl     47474
+ 51 activerecord/lib/active_record/scoping.rb:121 ActiveRecord::Scoping::S apps  8 share  76% Ir/op    46481 ( 0.15%) incl     46481
+ 52 activemodel/lib/active_model/attribute_set.rb:303 ActiveModel::LazyInd apps  8 share  54% Ir/op    46231 ( 0.15%) incl     50447
+ 53 activerecord/lib/active_record/connection_adapters/abstract/quoting.rb apps  8 share  90% Ir/op    46115 ( 0.15%) incl     65253
+ 54 activemodel/lib/active_model/attribute_set.rb:568 ActiveModel::LazyInd apps  8 share  69% Ir/op    45365 ( 0.15%) incl    235813
+ 55 activesupport/lib/active_support/class_attribute.rb:12 redefine        apps  8 share  92% Ir/op    44209 ( 0.15%) incl     44209
+ 56 activesupport/lib/active_support/notifications/fanout.rb:209 ActiveSup apps  7 share  52% Ir/op    43576 ( 0.14%) incl    513055
+ 57 activesupport/lib/active_support/core_ext/hash/keys.rb:38 Hash#symboli apps  8 share  86% Ir/op    43303 ( 0.14%) incl     45218
+ 58 activerecord/lib/active_record/relation/query_methods.rb:192 ActiveRec apps  8 share  73% Ir/op    42124 ( 0.14%) incl     52683
+ 59 activerecord/lib/active_record/connection_adapters/abstract/database_s apps  8 share  92% Ir/op    41289 ( 0.14%) incl    240392
+ 60 activemodel/lib/active_model/attribute_methods.rb:64 ActiveRecord::Bas apps  8 share  69% Ir/op    40811 ( 0.13%) incl     50378
+ 61 activerecord/lib/active_record/relation/query_methods.rb:2098 ActiveRe apps  7 share  61% Ir/op    38993 ( 0.13%) incl    608158
+ 62 actionview/lib/action_view/helpers/controller_helper.rb:39 ActionView: apps  8 share  51% Ir/op    38240 ( 0.13%) incl     40273
+ 63 activerecord/lib/active_record/connection_adapters/abstract/database_s apps  8 share  87% Ir/op    38237 ( 0.13%) incl   1017507
+ 64 actionview/lib/action_view/buffers.rb:58 ActionView::OutputBuffer#safe apps  7 share  44% Ir/op    38228 ( 0.13%) incl     38228
+ 65 activerecord/lib/active_record/reflection.rb:153 ActiveRecord::Reflect apps  7 share  62% Ir/op    38030 ( 0.13%) incl     84729
+ 66 activerecord/lib/active_record/scoping/default.rb:167 ActiveRecord::Sc apps  8 share  66% Ir/op    37105 ( 0.12%) incl    220877
+ 67 railties/lib/rails/engine.rb:850 Rails::Engine#build_request           apps  8 share  92% Ir/op    36506 ( 0.12%) incl     44040
+ 68 activerecord/lib/arel/visitors/to_sql.rb:922 Arel::Visitors::ToSql#inj apps  7 share  63% Ir/op    35694 ( 0.12%) incl    686121
+ 69 activesupport/lib/active_support/weak_key_map.rb:38 ActiveSupport::Wea apps  7 share  39% Ir/op    35080 ( 0.12%) incl     54172
+ 70 activerecord/lib/arel.rb:75 Arel.arel_node?                            apps  8 share  77% Ir/op    35050 ( 0.12%) incl     36519
+ 71 activerecord/lib/active_record/reflection.rb:13 ActiveRecord::Base._re apps  8 share  59% Ir/op    33951 ( 0.11%) incl     41244
+ 72 activemodel/lib/active_model/attribute_set.rb:385 ActiveModel::LazyInd apps  7 share  44% Ir/op    33885 ( 0.11%) incl    239470
+ 73 activerecord/lib/active_record/connection_adapters/abstract/connection apps  8 share  90% Ir/op    32919 ( 0.11%) incl     32919
+ 74 activesupport/lib/active_support/callbacks.rb:177 ActiveSupport::Callb apps  8 share  97% Ir/op    32595 ( 0.11%) incl   3192554
+ 75 actionpack/lib/abstract_controller/rendering.rb:60 AbstractController: apps  8 share  70% Ir/op    32312 ( 0.11%) incl     32473
+ 76 activerecord/lib/active_record/core.rb:921 ActiveRecord::Core#init_int apps  8 share  58% Ir/op    31981 ( 0.11%) incl     70814
+ 77 activemodel/lib/active_model/attribute_methods.rb:426 ActiveModel::Att apps  8 share  68% Ir/op    31968 ( 0.11%) incl     60575
+ 78 activerecord/lib/active_record/connection_adapters/query_intent.rb:72  apps  8 share  89% Ir/op    31796 ( 0.10%) incl     31796
+ 79 activerecord/lib/active_record/relation/predicate_builder.rb:30 Active apps  8 share  61% Ir/op    31626 ( 0.10%) incl     31626
+ 80 activerecord/lib/arel/visitors/to_sql.rb:763 Arel::Visitors::ToSql#vis apps  7 share  59% Ir/op    30402 ( 0.10%) incl    269017

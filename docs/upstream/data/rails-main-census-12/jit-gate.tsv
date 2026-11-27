@@ -1,0 +1,284 @@
+label	app	workload	jit_flat	warmup	compiled_iseq_count	compiled_block_count	invalidation_count	code_gc_count
+c12m	blog	GET articles	false	230	1	62	0	0
+c12m	blog	GET article	true	230	0	0	0	0
+c12m	blog	GET article edit	false	230	1	52	0	0
+c12m	blog	GET articles.json	true	230	0	0	0	0
+c12m	blog	GET article.json	true	230	0	0	0	0
+c12m	blog	PATCH article (redirect)	true	230	0	0	0	0
+c12m	blog	POST article invalid (422)	true	230	0	0	0	0
+c12m	blog	POST comment (redirect)	false	240	9	147	0	0
+c12m	blog	PATCH article.json	true	230	0	0	0	0
+c12m	blog	perform Turbo::Streams::ActionBroadcastJob	false	230	8	239	0	0
+c12m	casa	GET dashboard	true	230	0	0	0	0
+c12m	casa	GET casa cases	false	230	0	27	0	0
+c12m	casa	GET casa case	false	700	1	69	50	0
+c12m	casa	GET casa case edit	false	700	0	10	10	0
+c12m	casa	GET volunteers	false	230	0	15	0	0
+c12m	casa	GET supervisors	true	240	0	0	0	0
+c12m	casa	GET case contacts	false	700	0	141	120	0
+c12m	casa	POST api sign_in.json	true	230	0	0	0	0
+c12m	casa	PATCH casa case (redirect)	false	230	0	1	0	0
+c12m	casa	PATCH casa case.json	true	230	0	0	0	0
+c12m	codetriage	GET home	false	700	3	87	20	0
+c12m	codetriage	GET repo	true	230	0	0	0	0
+c12m	codetriage	GET subscribers	false	700	0	22	20	0
+c12m	codetriage	GET user edit (signed in)	false	230	0	32	0	0
+c12m	codetriage	GET repo info.json	false	230	0	27	0	0
+c12m	codetriage	PATCH repo subscription (redirect)	false	230	0	9	0	0
+c12m	codetriage	perform SendSingleTriageEmailJob	true	270	0	0	0	0
+c12m	hackatime	GET dashboard	false	260	2	30	0	0
+c12m	hackatime	GET projects	true	230	0	0	0	0
+c12m	hackatime	GET leaderboards	true	240	0	0	0	0
+c12m	hackatime	GET settings profile	true	230	0	0	0	0
+c12m	hackatime	GET dashboard (Inertia XHR)	true	230	0	0	0	0
+c12m	hackatime	GET dashboard stats (deferred)	false	230	0	4	0	0
+c12m	hackatime	GET leaderboard entries (deferred)	false	230	0	6	0	0
+c12m	hackatime	PATCH display name (Inertia redirect)	true	240	0	0	0	0
+c12m	hackatime	PATCH username invalid (Inertia 422)	false	230	0	45	0	0
+c12m	hackatime	GET statusbar today	true	230	0	0	0	0
+c12m	hackatime	POST heartbeat	false	230	0	5	0	0
+c12m	hackatime	perform DashboardRollupRefreshJob	false	230	0	6	0	0
+c12m	pingcrm	GET dashboard	true	230	0	0	0	0
+c12m	pingcrm	GET contacts	false	230	0	54	0	0
+c12m	pingcrm	GET organizations	false	230	1	3	0	0
+c12m	pingcrm	GET contact edit	true	230	0	0	0	0
+c12m	pingcrm	GET contacts (Inertia JSON)	false	230	1	14	0	0
+c12m	pingcrm	GET organizations (Inertia JSON)	true	230	0	0	0	0
+c12m	pingcrm	PUT contact (Inertia redirect)	true	230	0	0	0	0
+c12m	pingcrm	POST contact invalid (Inertia errors)	false	230	0	4	0	0
+c12m	react-starter-kit	GET home	true	230	0	0	0	0
+c12m	react-starter-kit	GET dashboard	true	230	0	0	0	0
+c12m	react-starter-kit	GET settings profile	false	230	1	3	0	0
+c12m	react-starter-kit	GET settings sessions	true	230	0	0	0	0
+c12m	react-starter-kit	GET dashboard (Inertia JSON)	true	230	0	0	0	0
+c12m	react-starter-kit	PATCH profile (Inertia redirect)	false	230	0	1	0	0
+c12m	react-starter-kit	PATCH profile invalid (Inertia errors)	true	230	0	0	0	0
+c12m	react-starter-kit	deliver UserMailer#email_verification	true	230	0	0	0	0
+c12m	redprints-cfp	GET home	true	230	0	0	0	0
+c12m	redprints-cfp	GET proposals	true	230	0	0	0	0
+c12m	redprints-cfp	GET proposal	false	230	1	3	0	0
+c12m	redprints-cfp	GET proposal edit	true	230	0	0	0	0
+c12m	redprints-cfp	GET proposals (Inertia JSON)	true	230	0	0	0	0
+c12m	redprints-cfp	PATCH proposal (Inertia redirect)	true	230	0	0	0	0
+c12m	redprints-cfp	POST proposal invalid (Inertia errors)	false	230	0	13	0	0
+c12m	redprints-cfp	deliver ProposalMailer#proposal_submitted	true	230	0	0	0	0
+c12m	writebook	GET books	true	230	0	0	0	0
+c12m	writebook	GET book	true	230	0	0	0	0
+c12m	writebook	GET leaf	false	230	1	13	0	0
+c12m	writebook	GET leaf.md	true	230	0	0	0	0
+c12m	writebook	PATCH page (turbo_stream)	true	230	0	0	0	0
+c12m	writebook	POST search	false	230	0	89	0	0
+c12m	writebook	POST page (turbo_stream)	false	250	0	5	0	0
+c12m	writebook	perform Turbo::Streams::BroadcastJob	false	230	0	6	0	0
+c12m2	blog	GET articles	true	230	0	0	0	0
+c12m2	blog	GET article	true	230	0	0	0	0
+c12m2	blog	GET article edit	false	230	1	3	0	0
+c12m2	blog	GET articles.json	true	230	0	0	0	0
+c12m2	blog	GET article.json	false	230	1	38	0	0
+c12m2	blog	PATCH article (redirect)	true	230	0	0	0	0
+c12m2	blog	POST article invalid (422)	false	230	0	37	0	0
+c12m2	blog	POST comment (redirect)	false	280	2	207	0	0
+c12m2	blog	PATCH article.json	true	230	0	0	0	0
+c12m2	blog	perform Turbo::Streams::ActionBroadcastJob	false	230	6	48	0	0
+c12m2	casa	GET dashboard	true	230	0	0	0	0
+c12m2	casa	GET casa cases	false	230	0	48	0	0
+c12m2	casa	GET casa case	false	700	2	80	50	0
+c12m2	casa	GET casa case edit	false	700	1	27	10	0
+c12m2	casa	GET volunteers	false	230	0	1	0	0
+c12m2	casa	GET supervisors	true	240	0	0	0	0
+c12m2	casa	GET case contacts	false	700	0	142	120	0
+c12m2	casa	POST api sign_in.json	false	240	1	5	0	0
+c12m2	casa	PATCH casa case (redirect)	false	230	6	86	0	0
+c12m2	casa	PATCH casa case.json	false	230	3	28	0	0
+c12m2	codetriage	GET home	false	700	3	66	20	0
+c12m2	codetriage	GET repo	false	230	0	2	0	0
+c12m2	codetriage	GET subscribers	false	700	0	43	20	0
+c12m2	codetriage	GET user edit (signed in)	false	230	0	41	0	0
+c12m2	codetriage	GET repo info.json	false	230	0	16	0	0
+c12m2	codetriage	PATCH repo subscription (redirect)	true	230	0	0	0	0
+c12m2	codetriage	perform SendSingleTriageEmailJob	true	270	0	0	0	0
+c12m2	hackatime	GET dashboard	false	260	2	30	0	0
+c12m2	hackatime	GET projects	false	230	0	19	0	0
+c12m2	hackatime	GET leaderboards	true	240	0	0	0	0
+c12m2	hackatime	GET settings profile	true	230	0	0	0	0
+c12m2	hackatime	GET dashboard (Inertia XHR)	false	230	0	28	0	0
+c12m2	hackatime	GET dashboard stats (deferred)	false	230	30	842	6	0
+c12m2	hackatime	GET leaderboard entries (deferred)	true	230	0	0	0	0
+c12m2	hackatime	PATCH display name (Inertia redirect)	true	240	0	0	0	0
+c12m2	hackatime	PATCH username invalid (Inertia 422)	false	230	0	1	0	0
+c12m2	hackatime	GET statusbar today	false	260	0	31	0	0
+c12m2	hackatime	POST heartbeat	false	230	5	62	0	0
+c12m2	hackatime	perform DashboardRollupRefreshJob	true	260	0	0	0	0
+c12m2	pingcrm	GET dashboard	true	230	0	0	0	0
+c12m2	pingcrm	GET contacts	true	240	0	0	0	0
+c12m2	pingcrm	GET organizations	true	260	0	0	0	0
+c12m2	pingcrm	GET contact edit	true	230	0	0	0	0
+c12m2	pingcrm	GET contacts (Inertia JSON)	false	230	1	9	0	0
+c12m2	pingcrm	GET organizations (Inertia JSON)	true	230	0	0	0	0
+c12m2	pingcrm	PUT contact (Inertia redirect)	true	230	0	0	0	0
+c12m2	pingcrm	POST contact invalid (Inertia errors)	true	230	0	0	0	0
+c12m2	react-starter-kit	GET home	true	230	0	0	0	0
+c12m2	react-starter-kit	GET dashboard	true	230	0	0	0	0
+c12m2	react-starter-kit	GET settings profile	false	230	1	3	0	0
+c12m2	react-starter-kit	GET settings sessions	true	230	0	0	0	0
+c12m2	react-starter-kit	GET dashboard (Inertia JSON)	false	230	1	30	0	0
+c12m2	react-starter-kit	PATCH profile (Inertia redirect)	false	230	0	1	0	0
+c12m2	react-starter-kit	PATCH profile invalid (Inertia errors)	false	230	0	50	0	0
+c12m2	react-starter-kit	deliver UserMailer#email_verification	true	230	0	0	0	0
+c12m2	redprints-cfp	GET home	true	230	0	0	0	0
+c12m2	redprints-cfp	GET proposals	true	230	0	0	0	0
+c12m2	redprints-cfp	GET proposal	false	230	2	12	0	0
+c12m2	redprints-cfp	GET proposal edit	true	230	0	0	0	0
+c12m2	redprints-cfp	GET proposals (Inertia JSON)	false	230	0	92	0	0
+c12m2	redprints-cfp	PATCH proposal (Inertia redirect)	true	230	0	0	0	0
+c12m2	redprints-cfp	POST proposal invalid (Inertia errors)	false	230	0	57	0	0
+c12m2	redprints-cfp	deliver ProposalMailer#proposal_submitted	true	230	0	0	0	0
+c12m2	writebook	GET books	true	230	0	0	0	0
+c12m2	writebook	GET book	false	230	0	15	0	0
+c12m2	writebook	GET leaf	false	230	1	7	0	0
+c12m2	writebook	GET leaf.md	false	230	0	5	0	0
+c12m2	writebook	PATCH page (turbo_stream)	false	230	0	6	0	0
+c12m2	writebook	POST search	true	230	0	0	0	0
+c12m2	writebook	POST page (turbo_stream)	true	250	0	0	0	0
+c12m2	writebook	perform Turbo::Streams::BroadcastJob	true	230	0	0	0	0
+c12s	blog	GET articles	true	240	0	0	0	0
+c12s	blog	GET article	true	230	0	0	0	0
+c12s	blog	GET article edit	true	260	0	0	0	0
+c12s	blog	GET articles.json	true	230	0	0	0	0
+c12s	blog	GET article.json	true	230	0	0	0	0
+c12s	blog	PATCH article (redirect)	true	230	0	0	0	0
+c12s	blog	POST article invalid (422)	false	230	0	13	0	0
+c12s	blog	POST comment (redirect)	false	340	1	140	0	0
+c12s	blog	PATCH article.json	true	230	0	0	0	0
+c12s	blog	perform Turbo::Streams::ActionBroadcastJob	false	230	9	96	0	0
+c12s	casa	GET dashboard	false	230	0	2	0	0
+c12s	casa	GET casa cases	false	230	0	142	0	0
+c12s	casa	GET casa case	false	700	0	63	60	0
+c12s	casa	GET casa case edit	false	700	28	258	10	0
+c12s	casa	GET volunteers	false	230	0	15	0	0
+c12s	casa	GET supervisors	false	230	4	57	0	0
+c12s	casa	GET case contacts	false	700	5	201	112	0
+c12s	casa	POST api sign_in.json	false	240	3	18	0	0
+c12s	casa	PATCH casa case (redirect)	false	700	0	20	20	0
+c12s	casa	PATCH casa case.json	false	700	0	20	20	0
+c12s	codetriage	GET home	false	700	4	124	20	0
+c12s	codetriage	GET repo	true	230	0	0	0	0
+c12s	codetriage	GET subscribers	false	700	0	20	20	0
+c12s	codetriage	GET user edit (signed in)	false	230	0	12	0	0
+c12s	codetriage	GET repo info.json	true	230	0	0	0	0
+c12s	codetriage	PATCH repo subscription (redirect)	false	230	0	22	0	0
+c12s	codetriage	perform SendSingleTriageEmailJob	true	270	0	0	0	0
+c12s	hackatime	GET dashboard	false	230	13	430	0	0
+c12s	hackatime	GET projects	true	230	0	0	0	0
+c12s	hackatime	GET leaderboards	false	230	1	3	0	0
+c12s	hackatime	GET settings profile	false	230	0	11	0	0
+c12s	hackatime	GET dashboard (Inertia XHR)	true	230	0	0	0	0
+c12s	hackatime	GET dashboard stats (deferred)	false	230	2	16	0	0
+c12s	hackatime	GET leaderboard entries (deferred)	true	230	0	0	0	0
+c12s	hackatime	PATCH display name (Inertia redirect)	false	230	1	9	0	0
+c12s	hackatime	PATCH username invalid (Inertia 422)	true	230	0	0	0	0
+c12s	hackatime	GET statusbar today	true	230	0	0	0	0
+c12s	hackatime	POST heartbeat	false	230	4	88	0	0
+c12s	hackatime	perform DashboardRollupRefreshJob	true	230	0	0	0	0
+c12s	pingcrm	GET dashboard	true	230	0	0	0	0
+c12s	pingcrm	GET contacts	true	230	0	0	0	0
+c12s	pingcrm	GET organizations	false	230	1	3	0	0
+c12s	pingcrm	GET contact edit	true	230	0	0	0	0
+c12s	pingcrm	GET contacts (Inertia JSON)	true	230	0	0	0	0
+c12s	pingcrm	GET organizations (Inertia JSON)	true	230	0	0	0	0
+c12s	pingcrm	PUT contact (Inertia redirect)	true	230	0	0	0	0
+c12s	pingcrm	POST contact invalid (Inertia errors)	true	230	0	0	0	0
+c12s	react-starter-kit	GET home	true	230	0	0	0	0
+c12s	react-starter-kit	GET dashboard	true	230	0	0	0	0
+c12s	react-starter-kit	GET settings profile	false	230	1	3	0	0
+c12s	react-starter-kit	GET settings sessions	true	230	0	0	0	0
+c12s	react-starter-kit	GET dashboard (Inertia JSON)	false	230	0	23	0	0
+c12s	react-starter-kit	PATCH profile (Inertia redirect)	true	230	0	0	0	0
+c12s	react-starter-kit	PATCH profile invalid (Inertia errors)	false	230	1	21	0	0
+c12s	react-starter-kit	deliver UserMailer#email_verification	true	230	0	0	0	0
+c12s	redprints-cfp	GET home	true	250	0	0	0	0
+c12s	redprints-cfp	GET proposals	true	230	0	0	0	0
+c12s	redprints-cfp	GET proposal	false	250	1	15	0	0
+c12s	redprints-cfp	GET proposal edit	true	230	0	0	0	0
+c12s	redprints-cfp	GET proposals (Inertia JSON)	false	230	0	112	0	0
+c12s	redprints-cfp	PATCH proposal (Inertia redirect)	true	230	0	0	0	0
+c12s	redprints-cfp	POST proposal invalid (Inertia errors)	true	230	0	0	0	0
+c12s	redprints-cfp	deliver ProposalMailer#proposal_submitted	true	230	0	0	0	0
+c12s	writebook	GET books	false	230	0	1	0	0
+c12s	writebook	GET book	false	230	0	18	0	0
+c12s	writebook	GET leaf	false	230	1	3	0	0
+c12s	writebook	GET leaf.md	true	230	0	0	0	0
+c12s	writebook	PATCH page (turbo_stream)	true	230	0	0	0	0
+c12s	writebook	POST search	false	230	0	1	0	0
+c12s	writebook	POST page (turbo_stream)	true	230	0	0	0	0
+c12s	writebook	perform Turbo::Streams::BroadcastJob	true	230	0	0	0	0
+c12c11	blog	GET articles	false	230	0	7	0	0
+c12c11	blog	GET article	true	230	0	0	0	0
+c12c11	blog	GET article edit	false	230	1	3	0	0
+c12c11	blog	GET articles.json	true	230	0	0	0	0
+c12c11	blog	GET article.json	true	230	0	0	0	0
+c12c11	blog	PATCH article (redirect)	true	230	0	0	0	0
+c12c11	blog	POST article invalid (422)	false	230	0	34	0	0
+c12c11	blog	POST comment (redirect)	false	280	2	197	0	0
+c12c11	blog	PATCH article.json	true	230	0	0	0	0
+c12c11	blog	perform Turbo::Streams::ActionBroadcastJob	false	230	14	158	0	0
+c12c11	casa	GET dashboard	true	250	0	0	0	0
+c12c11	casa	GET casa cases	false	230	0	37	0	0
+c12c11	casa	GET casa case	false	700	1	55	50	0
+c12c11	casa	GET casa case edit	false	700	1	23	10	0
+c12c11	casa	GET volunteers	true	230	0	0	0	0
+c12c11	casa	GET supervisors	false	230	2	21	0	0
+c12c11	casa	GET case contacts	false	700	0	141	120	0
+c12c11	casa	POST api sign_in.json	false	240	1	5	0	0
+c12c11	casa	PATCH casa case (redirect)	false	230	0	1	0	0
+c12c11	casa	PATCH casa case.json	true	250	0	0	0	0
+c12c11	codetriage	GET home	false	700	3	120	40	0
+c12c11	codetriage	GET repo	false	230	1	48	0	0
+c12c11	codetriage	GET subscribers	false	700	0	103	30	0
+c12c11	codetriage	GET user edit (signed in)	false	230	0	76	0	0
+c12c11	codetriage	GET repo info.json	false	230	0	7	0	0
+c12c11	codetriage	PATCH repo subscription (redirect)	false	230	0	15	0	0
+c12c11	codetriage	perform SendSingleTriageEmailJob	true	250	0	0	0	0
+c12c11	hackatime	GET dashboard	false	230	38	947	1	0
+c12c11	hackatime	GET projects	true	230	0	0	0	0
+c12c11	hackatime	GET leaderboards	false	230	1	3	0	0
+c12c11	hackatime	GET settings profile	true	230	0	0	0	0
+c12c11	hackatime	GET dashboard (Inertia XHR)	true	230	0	0	0	0
+c12c11	hackatime	GET dashboard stats (deferred)	false	230	2	16	0	0
+c12c11	hackatime	GET leaderboard entries (deferred)	true	230	0	0	0	0
+c12c11	hackatime	PATCH display name (Inertia redirect)	true	230	0	0	0	0
+c12c11	hackatime	PATCH username invalid (Inertia 422)	false	230	0	14	0	0
+c12c11	hackatime	GET statusbar today	true	230	0	0	0	0
+c12c11	hackatime	POST heartbeat	false	230	6	71	0	0
+c12c11	pingcrm	GET dashboard	true	230	0	0	0	0
+c12c11	pingcrm	GET contacts	true	230	0	0	0	0
+c12c11	pingcrm	GET organizations	false	230	1	3	0	0
+c12c11	pingcrm	GET contact edit	true	230	0	0	0	0
+c12c11	pingcrm	GET contacts (Inertia JSON)	false	230	1	9	0	0
+c12c11	pingcrm	GET organizations (Inertia JSON)	true	230	0	0	0	0
+c12c11	pingcrm	PUT contact (Inertia redirect)	true	230	0	0	0	0
+c12c11	pingcrm	POST contact invalid (Inertia errors)	true	230	0	0	0	0
+c12c11	react-starter-kit	GET home	true	230	0	0	0	0
+c12c11	react-starter-kit	GET dashboard	true	230	0	0	0	0
+c12c11	react-starter-kit	GET settings profile	false	230	1	3	0	0
+c12c11	react-starter-kit	GET settings sessions	true	230	0	0	0	0
+c12c11	react-starter-kit	GET dashboard (Inertia JSON)	false	230	0	22	0	0
+c12c11	react-starter-kit	PATCH profile (Inertia redirect)	false	230	0	1	0	0
+c12c11	react-starter-kit	PATCH profile invalid (Inertia errors)	false	230	0	27	0	0
+c12c11	react-starter-kit	deliver UserMailer#email_verification	true	230	0	0	0	0
+c12c11	redprints-cfp	GET home	false	230	0	52	0	0
+c12c11	redprints-cfp	GET proposals	true	230	0	0	0	0
+c12c11	redprints-cfp	GET proposal	false	270	1	26	0	0
+c12c11	redprints-cfp	GET proposal edit	true	230	0	0	0	0
+c12c11	redprints-cfp	GET proposals (Inertia JSON)	false	230	0	20	0	0
+c12c11	redprints-cfp	PATCH proposal (Inertia redirect)	true	230	0	0	0	0
+c12c11	redprints-cfp	POST proposal invalid (Inertia errors)	true	230	0	0	0	0
+c12c11	redprints-cfp	deliver ProposalMailer#proposal_submitted	true	230	0	0	0	0
+c12c11	writebook	GET books	false	260	1	33	0	0
+c12c11	writebook	GET book	true	230	0	0	0	0
+c12c11	writebook	GET leaf	false	240	0	11	0	0
+c12c11	writebook	GET leaf.md	false	230	0	64	0	0
+c12c11	writebook	PATCH page (turbo_stream)	false	230	0	3	0	0
+c12c11	writebook	POST search	false	230	0	1	0	0
+c12c11	writebook	POST page (turbo_stream)	true	230	0	0	0	0
+c12c11	writebook	perform Turbo::Streams::BroadcastJob	true	230	0	0	0	0
