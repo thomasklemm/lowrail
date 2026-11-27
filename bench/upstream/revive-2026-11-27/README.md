@@ -91,6 +91,5 @@ FH2's effect on a whole form is about 0.4% in the interpreter and YJIT and none 
 
 Checked 2026-11-27. Spree: 15.9k stars, about 3.0M downloads, pushed today. rails_admin: 8.0k stars, about 13.6M
 downloads, pushed 2026-11-26. rspec-rails 8.0.5 is superseded by 8.1.0, which has the fix, so its bullet is dropped.
-Permalinks now pin current default-branch commits: Spree `fab75f9047` (L65 and L182) and rails_admin `893306d190` (L47),
-both 200. Spree stays first although rails_admin has more downloads, because its line runs in every Spree store's
+The rule's permalinks follow Line permalinks for callers (DECISIONS 6252c567), so the links stay on the latest releases, named in the text: Spree 6.0.6 `314dcb7784` (L65 and L182) and rails_admin 3.3.1 `ab5ae55428` (L44). A first draft that pinned default-branch commits was corrected after Astra's confirm pass. Spree stays first although rails_admin has more downloads, because its line runs in every Spree store's
 mailer, while rails_admin's runs only in rails_admin's own suite.
