@@ -350,3 +350,32 @@ Exactness and suites on `f70d3e0917`: thermos-sol's `exactness_extension.rb` (71
 SQLite and PostgreSQL 17 ([sha256](results/rebuild-2026-11-27/extended-probe-sha256.txt)); Active Model 1,277 runs,
 Active Record SQLite 10,460 and PostgreSQL 17 11,392 runs, 0 failures; the 4 SQLite errors needed the `sqlite3` CLI
 and `sqlite_rake_test.rb` passes once it is installed ([suites.txt](results/rebuild-2026-11-27/suites.txt)).
+
+## Snapshot fix for `values_before_type_cast` (2026-11-27)
+
+thermos-sol on `f70d3e0917` showed that `values_before_type_cast` read the live attribute Array, and that
+`Attribute::UserProvidedDefault#value_before_type_cast` runs a callable default: a default that assigns a later
+attribute changed the returned Hash (main David, head Mary;
+[repro](results/review-thermos-sol-2026-11-27/callable_default_repro.rb)). `41af869c78` reads from
+`@attributes&.dup` there too, adds a callable-default test (fails on `f70d3e0917`, passes on main and head) and
+asserts the record's value in the first test. Both methods now allocate 2 objects instead of 4.
+
+On `41af869c78` ([results/rebuild2-2026-11-27](results/rebuild2-2026-11-27)): the 718-line extended probe is identical
+to main on SQLite and PostgreSQL 17 and the repro prints David; Active Model 1,277, Active Record SQLite 10,461 and
+PostgreSQL 17 11,393 runs, 0 failures.
+
+Callgrind, 30 columns ([body/L3b-2026-11-27](body/L3b-2026-11-27/table.md)):
+
+| | interp main → branch | A/A | YJIT main → branch | A/A |
+| --- | ---: | ---: | ---: | ---: |
+| `Marshal.dump` | 319,456 → 259,947 (−18.6%) | 0.04% | 259,976 → 213,977 (−17.7%) | 0.03% |
+| `attributes_for_database` | 161,916 → 102,716 (−36.6%) | 0.14% | 107,019 → 61,088 (−42.9%) | 0.15% |
+| `attributes_before_type_cast` | 124,061 → 65,797 (−47.0%) | 0.03% | 95,748 → 51,169 (−46.6%) | 0.59% |
+| MessagePack dump | 190,762 → 131,188 (−31.2%) | 0.08% | 130,282 → 84,461 (−35.2%) | 0.09% |
+
+benchmark-ips for the body, YJIT, 6 full interleaved rounds of main, L3 and main2 on core 1
+([body-ips.txt](results/rebuild2-2026-11-27/body-ips.txt)): best rounds Marshal.dump 36,872 → 44,549 i/s (+20.8%),
+attributes_for_database 91,454 → 160,185 (+75.2%); main2 −0.4% and −0.6%. Every L3 round is above every main round
+(slowest L3 40,053 and 132,956 against the fastest main 36,872 and 91,454). The earlier `rebuild-2026-11-27/body-ips.txt`
+kept only 3 complete rounds, as thermos-sol noted; it is superseded. The 6/102-column and master × ZJIT runs above are
+from `f70d3e0917` and were not repeated.
