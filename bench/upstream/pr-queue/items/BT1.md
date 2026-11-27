@@ -256,6 +256,19 @@ passes:
       build or test rerun for this text delta. No ZJIT sentence is present or pre-approved. The internal
       README rounding nit does not block this body. Details: evidence/backtrace-format/astra/review.md,
       Representative-run caption confirm. No upstream action.
+  - reviewer: thermos-sol
+    orb: T-01a21dd5-050e-70b3-9097-842e5d974661
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      No must-fixes. Caption-only confirm at Lowrail 1682d8a9. Exact parsed/copied body SHA-256
+      05fff894a630389800fcccad1b1f94521e8bb3a82f755f5485e27885c8041909. Verified byte-for-byte that replacing
+      'median of 10 runs' with 'one representative run' is the sole change from reviewed body 411777fb5b.
+      This fixes the preceding caption finding; the genuine table, all audited figures and full ranges are
+      unchanged, so the prior evidence review applies without remeasurement. Ruby head remains 5fc1871eec;
+      prior source/parser/differential approval is unchanged. No rebuild or test rerun for this text-only
+      confirm. Approval covers this body, not the later separate ZJIT sentence. No upstream post or Ruby fork push.
 ---
 
 # Append backtrace location strings by length

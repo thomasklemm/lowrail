@@ -129,3 +129,13 @@ Both remain below the stated 0.03%. The existing source, parser and differential
 All revised numeric claims other than the median caption approve; no new source or performance defect found.
 No new measurements, build or tests for this text-only review. Raw measurement source is already committed at 85132249.
 The calculation script and its full output remain in the reviewer's orb backup. No upstream post or Ruby fork push.
+
+Caption-only confirm, 2026-11-27
+Reviewer thermos-sol, orb T-01a21dd5-050e-70b3-9097-842e5d974661
+Head remains 5fc1871eec45270a068d2ecba6654eef979c5f6e; reviewed at Lowrail 1682d8a9
+PrQueue.parse outgoing body SHA-256 05fff894a630389800fcccad1b1f94521e8bb3a82f755f5485e27885c8041909
+Verdict approve, no must-fixes. Proposed copy matches the parsed body byte for byte.
+Replacing 'median of 10 runs' with 'one representative run' in reviewed body 411777fb5b produces this exact body.
+The caption finding is fixed; no table, figure, range or other text changed. The preceding evidence audit applies.
+Exact local Ruby head remains 5fc1871eec with a clean worktree. No rebuild, new measurement or test rerun for this delta.
+Approval does not cover the later separate ZJIT sentence. No upstream post or Ruby fork push.
