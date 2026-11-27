@@ -1,0 +1,24 @@
+# bad: [e289fe1d65a06f3f1b6f17a787c13ad477592183] [Misc #22206] Move thread model option to `run`
+# good: [92888064ac7638e64c33d05ab0b0d080b48f92b2] [DOC] Harmonize lutime methods
+git bisect start 'e289fe1d65' '92888064ac'
+# good: [a1c3f8101b4d648b393ccbf34e42bdff63f40a5f] [ruby/openssl] provider: fix potential memory leak in .load
+git bisect good a1c3f8101b4d648b393ccbf34e42bdff63f40a5f
+# bad: [e8219853ad185d34aaa87450033b2e737d13ed8f] [ruby/rubygems] Fall back to rubygems/tsort instead of activating the tsort default gem
+git bisect bad e8219853ad185d34aaa87450033b2e737d13ed8f
+# good: [a8a6890b71e0d1f7741b0706d1cff5b984374946] Remove obj_free_object_id
+git bisect good a8a6890b71e0d1f7741b0706d1cff5b984374946
+# good: [b796b99a1e9a3debfa88a398d278cddd25e0615a] [ruby/json] Release 2.21.0
+git bisect good b796b99a1e9a3debfa88a398d278cddd25e0615a
+# good: [f7462782e34f4e58e2475bdc60620bf7f44d0dc8] Split -I option with File::PATH_SEPARATOR in test runner
+git bisect good f7462782e34f4e58e2475bdc60620bf7f44d0dc8
+# good: [5b8f6a2265a6ebfb0921472c717b1512043ff13f] ZJIT: Fix keyword-to-hash argument count fallback
+git bisect good 5b8f6a2265a6ebfb0921472c717b1512043ff13f
+# good: [d6464c280ad5465690ddb96de0b7456ed5183ab3] Count every Ractor barrier joiner again
+git bisect good d6464c280ad5465690ddb96de0b7456ed5183ab3
+# good: [fc6ff6fbcc9d6a7b3b2f091790898204a5517c6d] ractor: guard the port VALUE across receive/send
+git bisect good fc6ff6fbcc9d6a7b3b2f091790898204a5517c6d
+# bad: [e0083cffa31ae58f6326fb7a62199f4e59d86e87] Refactor RObject to use T_IMEMO/fields_obj on overflow
+git bisect bad e0083cffa31ae58f6326fb7a62199f4e59d86e87
+# good: [d418ff687054ee1ff90ff81d97cf45e22d153331] Add a test for forking while other Ractors are alive
+git bisect good d418ff687054ee1ff90ff81d97cf45e22d153331
+# first 'bad' commit: [e0083cffa31ae58f6326fb7a62199f4e59d86e87] Refactor RObject to use T_IMEMO/fields_obj on overflow

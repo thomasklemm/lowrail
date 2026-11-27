@@ -1,0 +1,9 @@
+iv2.rb, Callgrind Ir per op (4 calls) from 20000/60000-op difference; installed rubies v4.0.9 and master f3e180b5eb
+--yjit v4.0.9 none 826
+--yjit v4.0.9 set3 1094
+--yjit master-f3e180b5eb none 884
+--yjit master-f3e180b5eb set3 1152
+--zjit v4.0.9 none 855
+--zjit v4.0.9 set3 1271
+--zjit master-f3e180b5eb none 920
+--zjit master-f3e180b5eb set3 1031
