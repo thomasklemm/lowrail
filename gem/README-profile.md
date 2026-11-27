@@ -8,7 +8,7 @@ there, and whether an upstream pull request already changes that line.
 It counts objects. It does not measure time, CPU, retained memory or SQL, and it never changes or lowers your app.
 For time, pair it with [vernier](https://github.com/jhawthorn/vernier) or your APM.
 
-Experimental release candidate (0.1.0.rc1). Supported: Ruby 3.3, 3.4 and 4.0; Rails 7.2, 8.0 and 8.1; Linux and
+Experimental (0.1.1). Supported: Ruby 3.3, 3.4 and 4.0; Rails 7.2, 8.0 and 8.1; Linux and
 macOS. Windows is refused with a message.
 
 ## Install
@@ -18,11 +18,11 @@ macOS. Windows is refused with a message.
 gem "lowrail-profile", group: [:development, :test], require: false
 ```
 
-Until 0.1 is on rubygems.org, build the release candidate from a Lowrail checkout. The gemspec's file list is
+Until 0.1.1 is on rubygems.org, build it from a Lowrail checkout. The gemspec's file list is
 relative to `gem/`, so build it there:
 
 ```sh
-cd lowrail/gem && gem build lowrail-profile.gemspec && gem install --local lowrail-profile-0.1.0.rc1.gem
+cd lowrail/gem && gem build lowrail-profile.gemspec && gem install --local lowrail-profile-0.1.1.gem
 ```
 
 Or let Bundler take it from GitHub:

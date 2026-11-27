@@ -307,3 +307,23 @@ About three weeks of work before M6. M1 and M3 can run in parallel; M4 needs M1 
    request (network access from a profiler).
 6. **Proof apps.** Recommended: Campfire, Lobsters, CodeTriage, plus a floor-version app if CodeTriage cannot run
    there.
+
+## 8. Release checklist: 0.1.1 (prepared 2026-11-27, not published)
+
+0.1.0 was never published; 0.1.1 replaces it as the first release. Every step up to publishing is done by an agent
+and recorded here; publishing and tagging need Thomas.
+
+- [x] Version `0.1.1` in `gem/lib/lowrail/profile_version.rb`; CHANGELOG heading dated; README install line names
+  `lowrail-profile-0.1.1.gem`.
+- [x] Compare's one-process false alarms fixed and recorded
+  ([record](../bench/upstream/profile_release/2026-11-27-one-process-noise/)); Thermos approved.
+- [ ] Second field test's issues fixed or deferred with reasons (CHANGELOG 0.1.1); Thermos review of the exact head.
+- [x] `gem build lowrail-profile.gemspec` from `gem/`: 14 files, 88,576 bytes, no lowering code.
+- [x] `gem install --local` into an empty gem home, then a new Rails 8.1.4 app (`rails new --minimal`, one
+  scaffold): `bundle exec lowrail-profile --version` prints 0.1.1; two captures of `bin/rails test` exit 0;
+  compare of the two exits 0; compare with the base as its own A/A report exits 2.
+- [ ] CI green on the exact release commit (the `profile` job's Ruby 3.3/3.4/4.0 × Rails 7.2/8.0/8.1 matrix and macOS).
+- [ ] Thomas: build from that commit, check the gem's SHA-256 against the CI-built one, `gem push
+  lowrail-profile-0.1.1.gem` from an account with MFA, tag the commit `lowrail-profile-v0.1.1` and push the tag.
+- [ ] After publishing: `gem install lowrail-profile -v 0.1.1` from rubygems.org in a new app, and the README's
+  "Until 0.1.1 is on rubygems.org" paragraph removed.

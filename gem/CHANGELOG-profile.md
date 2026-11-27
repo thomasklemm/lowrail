@@ -1,6 +1,6 @@
 # lowrail-profile changelog
 
-## 0.1.1 (unreleased)
+## 0.1.1 (2026-11-27, not published)
 
 * An engine profiled in place, whose own directory is both the app root and a path gem, keeps the files under a
   directory named `gems` (such as `app/views/gems/index.html.erb`) as app lines, like its other files; 0.1 ranked them
@@ -28,7 +28,8 @@
   CASA's `ChecklistItemsController#new` read 3,511 warm objects per request with record IDs from 9,000 and 3,494
   from 100,000, so captures that continue each other's IDs differ.
 * A file `ActionDispatch::Static` serves before routing is a request named `ActionDispatch::FileHandler#serve`, not
-  one with no action name, and the header says how many there were and the objects per request without them. In a
+  one with no action name, and the header says how many there were and the other requests' objects per request,
+  counted as the Actions table counts them (none when every request was a file). In a
   field test most of a system-test slice's requests were the browser fetching such files. report.json has
   `static_requests` and `objects_per_dynamic_request` per run.
 * The header's table gives objects per request warm too (each line's first request per process left out, as the
