@@ -16,8 +16,8 @@ impact: "By default (query cache on, the Rails 8 cable template's 0.1 s polling)
 evidence: [bench/upstream/solid_stack/body/SC1, bench/upstream/solid_stack/body/SC1-xxl, bench/upstream/solid_stack/body/SC1-zjit, bench/upstream/solid_stack/body/SC1-zjit-wall, bench/upstream/solid_stack/raw/probes-p1-p2.tar.gz, bench/upstream/solid_stack/sc1_differential.rb, bench/upstream/solid_stack/raw/scb1-thermos-sol-20261127.tar.gz, bench/upstream/solid_stack/raw/scb1-confirm-155a2fbe-20261127.tar.gz, bench/upstream/solid_stack/raw/scb1-confirm-2cb18420-20261127.tar.gz, bench/upstream/solid_stack/raw/scb1-astra-20261127.tar.gz]
 rank: 1
 risky: true
-state: built
-pr:
+state: ready
+pr: 105
 note: "2026-11-27 (T-01a21e77, after the thermos-sol confirm on 155a2fbe): head 2cb1842043 rewords the commit message again (no one-bind-per-channel claim), tree and parent unchanged; impact gives the 998/999/65,536 points. Earlier, after thermos-sol changes on ef534cc: head 155a2fbe98 amends only the commit message (tree identical, same parent 40dd29ffdc); body, impact and For Thomas qualified (default cache, started listener, the pool Solid Cable uses, shared primary pool), scaling sentence cut, body leads with benchmark-ips from SC1-xxl. ZJIT --wall on a1.xxlarge is committed in body/SC1-zjit-wall and verified by the final thermos-sol confirm. Earlier: built from the Rails 8 default stack census (docs/upstream/solid-stack-census.md). risky: query caching and connection state on the listener thread (critical per DECISIONS), so Astra runs adversarially after thermos-sol approves. Differential identical on SQLite and PostgreSQL; suite 47/47 on SQLite, PostgreSQL, Rails 7.2, Rails main."
 ownership: {date: 2026-11-27, checked: ["open PRs naming listen that change lib/action_cable/subscription_adapter/solid_cable.rb"], hits: []}
 passes:

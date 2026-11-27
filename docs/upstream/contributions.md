@@ -457,7 +457,9 @@ state and rank; `script/pr-queue next` the next one to open. The table that stoo
 history (d25db64).
 
 - **Rails 8 default stack census (2026-11-27, [record](solid-stack-census.md)):** SCB1 (solid_cable, the listener polls
-  without the query cache; idle poll −14.5% / −23% instructions interp / YJIT) built and queued. Held: SSQ1 (Solid
+  without the query cache; idle poll −14.5% / −23.2% / −23.7% instructions interp / YJIT / ZJIT, benchmark-ips +15.9%)
+  opened ready as [rails/solid_cable#105](https://github.com/rails/solid_cable/pull/105) on 2026-11-27 after thermos-sol and
+  Astra approved head `2cb1842043`. Held: SSQ1 (Solid
   Queue enqueue without `create_or_find_by!`'s savepoint, −62 objects and −6.3% instructions per enqueue; shared,
   deliberately idempotent `ready` path and open solid_queue#833 next to it), SSQ2 (worker re-reads pauses and
   prefix queues every poll; that is how pauses take effect, not exact). Dropped as native or covered: Solid Cache
