@@ -7,13 +7,13 @@ uri_component decodes + | 4.0.10 no C decoder | 3 tests, 42 assertions, 0 failur
 uri_component decodes + | 2.5.9 | 3 tests, 42 assertions, 0 failures, 0 errors | 
 uri_component decodes + | truffleruby-40.0.0 | 3 tests, 42 assertions, 0 failures, 0 errors | 
 www_form keeps + | 4.0.10 | 3 tests, 31 assertions, 1 failures, 0 errors | www_form_component:205
-www_form keeps + | 4.0.10 no C decoder | 3 tests, 30 assertions, 0 failures, 1 errors | www_form_component:206
-www_form keeps + | 2.5.9 | 3 tests, 30 assertions, 0 failures, 1 errors | www_form_component:206
-www_form keeps + | truffleruby-40.0.0 | 3 tests, 31 assertions, 1 failures, 0 errors | www_form_component:205
+www_form keeps + | 4.0.10 no C decoder | 3 tests, 42 assertions, 0 failures, 0 errors | 
+www_form keeps + | 2.5.9 | 3 tests, 42 assertions, 0 failures, 0 errors | 
+www_form keeps + | truffleruby-40.0.0 | 3 tests, 42 assertions, 0 failures, 0 errors | 
 CGI picks the result encoding | 4.0.10 | 3 tests, 25 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:214
-CGI picks the result encoding | 4.0.10 no C decoder | 3 tests, 25 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:214
-CGI picks the result encoding | 2.5.9 | 3 tests, 25 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:214
-CGI picks the result encoding | truffleruby-40.0.0 | 3 tests, 25 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:214
+CGI picks the result encoding | 4.0.10 no C decoder | 3 tests, 22 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:209
+CGI picks the result encoding | 2.5.9 | 3 tests, 22 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:209
+CGI picks the result encoding | truffleruby-40.0.0 | 3 tests, 22 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:209
 no force_encoding | 4.0.10 | 3 tests, 22 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:209
 no force_encoding | 4.0.10 no C decoder | 3 tests, 22 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:209
 no force_encoding | 2.5.9 | 3 tests, 22 assertions, 2 failures, 0 errors | uri_component:268 www_form_component:209
@@ -27,10 +27,9 @@ lone % check misses %zz | 4.0.10 no C decoder | 3 tests, 38 assertions, 2 failur
 lone % check misses %zz | 2.5.9 | 3 tests, 38 assertions, 2 failures, 0 errors | uri_component:280 www_form_component:221
 lone % check misses %zz | truffleruby-40.0.0 | 3 tests, 38 assertions, 2 failures, 0 errors | uri_component:280 www_form_component:221
 no b copy | 4.0.10 | 3 tests, 34 assertions, 2 failures, 0 errors | uri_component:277 www_form_component:218
-no b copy | 4.0.10 no C decoder | 3 tests, 28 assertions, 1 failures, 1 errors | uri_component:271 www_form_component:218
-no b copy | 2.5.9 | 3 tests, 28 assertions, 1 failures, 1 errors | uri_component:271 www_form_component:218
-no b copy | truffleruby-40.0.0 | from /home/user/.local/share/mise/installs/ruby/truffleruby-40.0.0/lib/gems/gems/test-unit-3.7.9/lib/test/unit.rb:543:in 'block (2 levels) in <top (required)>'
-``` | uri_component:271 www_form_component:216
+no b copy | 4.0.10 no C decoder | 3 tests, 22 assertions, 0 failures, 2 errors | uri_component:271 www_form_component:212
+no b copy | 2.5.9 | 3 tests, 22 assertions, 0 failures, 2 errors | uri_component:271 www_form_component:212
+no b copy | truffleruby-40.0.0 | 3 tests, 22 assertions, 0 failures, 2 errors | uri_component:271 www_form_component:212
 lone % check takes \w for hex | 4.0.10 | 3 tests, 40 assertions, 2 failures, 0 errors | uri_component:281 www_form_component:222
 lone % check takes \w for hex | 4.0.10 no C decoder | 3 tests, 40 assertions, 2 failures, 0 errors | uri_component:281 www_form_component:222
 lone % check takes \w for hex | 2.5.9 | 3 tests, 40 assertions, 2 failures, 0 errors | uri_component:281 www_form_component:222
@@ -47,6 +46,10 @@ fallback upper-case hex only | 4.0.10 | 3 tests, 42 assertions, 0 failures, 0 er
 fallback upper-case hex only | 4.0.10 no C decoder | 3 tests, 34 assertions, 1 failures, 1 errors | uri_component:272
 fallback upper-case hex only | 2.5.9 | 3 tests, 34 assertions, 1 failures, 1 errors | uri_component:272
 fallback upper-case hex only | truffleruby-40.0.0 | 3 tests, 34 assertions, 1 failures, 1 errors | uri_component:272
+www-form fallback keeps + | 4.0.10 | 3 tests, 42 assertions, 0 failures, 0 errors | 
+www-form fallback keeps + | 4.0.10 no C decoder | 3 tests, 31 assertions, 1 failures, 0 errors | www_form_component:205
+www-form fallback keeps + | 2.5.9 | 3 tests, 31 assertions, 1 failures, 0 errors | www_form_component:205
+www-form fallback keeps + | truffleruby-40.0.0 | 3 tests, 31 assertions, 1 failures, 0 errors | www_form_component:205
 native check dropped (Ruby decoder used) | 4.0.10 | 3 tests, 42 assertions, 0 failures, 0 errors | 
 native check dropped (Ruby decoder used) | 4.0.10 no C decoder | 3 tests, 42 assertions, 0 failures, 0 errors | 
 native check dropped (Ruby decoder used) | 2.5.9 | 3 tests, 42 assertions, 0 failures, 0 errors | 

@@ -1,0 +1,25 @@
+== prelude: 
+4.0.10: 94 tests, 3070 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+2.5.9: 94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+3.1.2: 94 tests, 3051 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+3.4.12: 94 tests, 3070 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+jruby-10.1.3.0: 94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+truffleruby-40.0.0: 94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+master: 94 tests, 3070 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+== prelude: no_c_decoder.rb
+4.0.10: 94 tests, 3070 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+2.5.9: 94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+3.1.2: 94 tests, 3051 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+3.4.12: 94 tests, 3070 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+jruby-10.1.3.0: 94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+truffleruby-40.0.0: 94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+master: 94 tests, 3070 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+== prelude: ruby_decoder.rb
+4.0.10: 94 tests, 3070 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+2.5.9: 94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+3.1.2: 94 tests, 3051 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+3.4.12: 94 tests, 3070 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+jruby-10.1.3.0: 94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+truffleruby-40.0.0: 94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications
+master: 94 tests, 3070 assertions, 0 failures, 0 errors, 0 pendings, 0 omissions, 0 notifications
+94 tests, 3048 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications

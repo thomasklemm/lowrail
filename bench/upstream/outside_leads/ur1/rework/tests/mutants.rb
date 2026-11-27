@@ -6,9 +6,9 @@ here = __dir__
 BASE_LIB = `git -C #{src} show 48cda77:lib/uri/common.rb`
 M = {
   "base (48cda77 lib, new tests)" => [:base],
-  "uri_component decodes +" => ["CGI.unescapeURIComponent(bytes, Encoding::BINARY)", "CGI.unescape(bytes, Encoding::BINARY)"],
-  "www_form keeps +" => ["CGI.unescape(bytes, Encoding::BINARY)", "CGI.unescapeURIComponent(bytes, Encoding::BINARY)"],
-  "CGI picks the result encoding" => [["yield(str.b).force_encoding(enc)", "yield(str.b, enc)"], ["{|bytes| CGI.unescape(bytes, Encoding::BINARY) }", "{|bytes, e| CGI.unescape(bytes, e) }"]],
+  "uri_component decodes +" => ["CGI.unescapeURIComponent(bytes, Encoding::ASCII_8BIT)", "CGI.unescape(bytes, Encoding::ASCII_8BIT)"],
+  "www_form keeps +" => ["CGI.unescape(bytes, Encoding::ASCII_8BIT)", "CGI.unescapeURIComponent(bytes, Encoding::ASCII_8BIT)"],
+  "CGI picks the result encoding" => [["yield(str.b).force_encoding(enc)", "yield(str.b, enc)"], ["{|bytes| CGI.unescape(bytes, Encoding::ASCII_8BIT) }", "{|bytes, e| CGI.unescape(bytes, e) }"]],
   "no force_encoding" => ["yield(str.b).force_encoding(enc)", "yield(str.b)"],
   "lone % accepted" => ["    raise ArgumentError, \"invalid %-encoding (\#{str})\" if /%(?!\\h\\h)/.match?(str)\n", ""],
   "lone % check misses %zz" => ["/%(?!\\h\\h)/", "/%(?!\\h?\\h)/"],
@@ -17,6 +17,7 @@ M = {
   "fallback gsub! (nil when nothing to decode)" => ["bytes.gsub(/%\\h\\h/, TBLDECWWWCOMP_)", "bytes.gsub!(/%\\h\\h/, TBLDECWWWCOMP_)"],
   "fallback decodes +" => ["bytes.gsub(/%\\h\\h/, TBLDECWWWCOMP_)", "bytes.gsub(/\\+|%\\h\\h/, TBLDECWWWCOMP_)"],
   "fallback upper-case hex only" => ["bytes.gsub(/%\\h\\h/, TBLDECWWWCOMP_)", "bytes.gsub(/%[0-9A-F]{2}/, TBLDECWWWCOMP_)"],
+  "www-form fallback keeps +" => ["bytes.gsub(/\\+|%\\h\\h/, TBLDECWWWCOMP_)", "bytes.gsub(/%\\h\\h/, TBLDECWWWCOMP_)"],
   "native check dropped (Ruby decoder used)" => [" && !CGI.method(:unescapeURIComponent).source_location", ""],
 }
 RUNS = { "4.0.10" => "", "4.0.10 no C decoder" => "-r#{here}/no_c_decoder.rb", "2.5.9" => "", "truffleruby-40.0.0" => "" }

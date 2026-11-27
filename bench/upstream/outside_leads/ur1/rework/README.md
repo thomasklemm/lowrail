@@ -31,3 +31,21 @@ unescapeURIComponent). JRuby 9.4.16.0: one failure, the subclass assertion of de
 `mutants_by_assert.txt` evaluates each assertion of the two decode tests alone against base and 13 mutants on
 4.0.10, 4.0.10 without the C decoder, 2.5.9 and TruffleRuby: base passes all; every mutant fails at least one new
 assertion wherever its code path runs. Fork CI on d09ffb7: run 46071505445, every job green.
+
+## Final head d4ce0b0 (after the Fable round, 2026-11-27)
+
+Fable (`../fable-b0f2bb7-2026-11-27.md`) found decode_www_form_component 2x to 15x slower on TruffleRuby, where
+CGI.unescape is Ruby code starting with `tr`. d4ce0b0 (tree 3621b78834) puts both methods under the one load-time
+check (Fable's v-native): without a native unescapeURIComponent both keep master's `gsub`. This also removes the JRuby
+9.4 subclass difference (its cgi 0.3.x has no unescapeURIComponent): the full suite passes on JRuby 9.4.16.0 now.
+Taken from Fable too: `Encoding::ASCII_8BIT` as lib/uri spells it, the reason on the `else`, the helper comment,
+`assert_instance_of`, the `gsub` cost wording, a body that says uri now requires cgi/escape. Not taken: dropping the
+GB18030 (the non-UTF-8 source case) and `%zz` assertions. Not changed: the top-level `require "cgi/escape"` that
+Fable raised for RubyGems' vendored Gem::URI (read, not run); c43954f already had it and both reviewers accepted
+cgi/escape loading with uri.
+
+`diff/` now holds d4ce0b0's run: 0 differences in all 28 logs (both methods; diff.rb on 4.0.10, master, 3.4.12,
+pure CGI, JRuby 10.1.3.0, TruffleRuby 40; probe.rb also on 2.5.9 and 3.1.2). `tests/suite-final.txt`: 21 suite runs
+green (7 Rubies x native / no C decoder / Ruby decoder) plus JRuby 9.4.16.0 green. `tests/mutants_by_assert.txt`: base
+passes every assertion; 14 mutants each caught wherever their path runs. Fork CI run 46082238611 green (the first
+JRuby/ubuntu attempt failed in Bundler's jar dependency resolution before tests; rerun green).

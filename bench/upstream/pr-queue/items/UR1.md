@@ -6,7 +6,7 @@ kind: perf
 area: URI.decode_www_form_component
 reviewer: hsbt
 branch: thomasklemm/decode-www-form-component-cgi
-head: "b0f2bb74984ed7c581020198e57469409cb8881f"
+head: "d4ce0b0376d0b1bbbf853c87ad0dd506ef6dc70c"
 base: master
 built_on: "48cda77031"
 depends_on: []
@@ -288,9 +288,9 @@ passes:
 
 # Decode URI components with cgi/escape
 
-`URI.decode_www_form_component` and `URI.decode_uri_component` copy the string with `b` and then run `gsub` with a regexp and a hash table, so every `+` and `%XX` is matched and looked up in Ruby. Rack decodes query strings and cookies with `decode_www_form_component` ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes query parameters and URL-encoded form fields with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
+`URI.decode_www_form_component` and `URI.decode_uri_component` copy the string with `b` and then run `gsub` with a regexp and a Hash, which costs a match, a substring and a Hash lookup for every `+` and `%XX`. Rack decodes query strings and cookies with `decode_www_form_component` ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes query parameters and URL-encoded form fields with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
 
-The shared helper keeps the check for an invalid `%`, the `b` copy and the final `force_encoding`, and now takes the decoding step as a block. `decode_www_form_component` passes `CGI.unescape`, and `decode_uri_component` passes `CGI.unescapeURIComponent`, which keeps `+`; both decode in one pass in native code. Where cgi/escape has no native `unescapeURIComponent` (cgi before 0.3.3, TruffleRuby), `decode_uri_component` keeps the `gsub`. Results have the same class, bytes and encoding as before. The one exception is JRuby 9.4, whose `String#b` keeps a String subclass: there, `decode_www_form_component` returns a subclass with nothing to decode as that subclass.
+The shared helper now yields the checked copy to `CGI.unescape` or `CGI.unescapeURIComponent`, which decode in one pass in C (in Java on JRuby). Results have the same class, bytes and encoding as before. Where cgi/escape has no native `unescapeURIComponent` (cgi before 0.3.3, TruffleRuby), both methods keep the `gsub`. uri now requires cgi/escape, which every supported Ruby ships.
 
 | benchmark-ips, Ruby 4.0.10 | Before | After |
 | --- | ---: | ---: |
