@@ -99,8 +99,9 @@ Under ZJIT: 0.984, same. Not opened. Converting only the first key per level is 
 Hash would get Symbol keys where it got Strings.
 
 `method_missing(method_name, *args, &blk)`: an empty `*args` allocates 1 Array per call on 4.0.9, 4.0.10 and master in
-every mode (`probes/mm_probe.rb`). `...` or a fixed `value = nil` avoids it, but extra arguments, which the current
-signature ignores, would raise ArgumentError, and subclasses call `super` with the arguments. Not exact; not built.
+every mode (`probes/mm_probe.rb`). `...` avoids it and still accepts extra arguments (mm_probe C), but the `=` branch needs the first argument, which
+`...` cannot name. A fixed `value = nil` names it, but would make the extra arguments that the current signature ignores
+raise ArgumentError. Not exact; not built.
 
 ## Ownership
 
@@ -115,8 +116,8 @@ For both reviewers' approval of the exact text; `#661` is HM2's number if nothin
 ```text
 Thanks for digging these up. I measured each one on master with Duel (YJIT and ZJIT) and locally:
 
-1. #661 reads suffixed names from `Symbol#name`, one String fewer per call: "read keys with suffixes" goes from 16 to 13 objects, CPU time the same.
+1. #661 finds the suffix in `Symbol#name`, one String fewer per split: "read keys with suffixes" goes from 16 to 13 objects, CPU time the same.
 2. Copying already converted values in `dup` makes `deep_merge` about three times faster (31 to 13 objects), but it skips the subclass's `initialize`, which `MethodAccessWithOverride`'s `dup` specs need, and stops re-logging key conflict warnings. Keeping both means keeping the per-key conflict check, which is where the time goes, so I left it.
-3. `Mash.new` allocates about 25 objects for the fixture here, not 56. Eight of them are Strings for the conflict warning on the two licenses' `key` fields, built even though the benchmarks' logger discards it.
-4. `dig` with `map!` saves two objects but Duel found it 12% slower under YJIT, and removing `*args` from `method_missing` would make extra arguments raise, so neither changed.
+3. `Mash.new` allocates about 25 objects for the fixture in Duel, not 56. Without a JIT it is 20, and 10 of them build the conflict warning for the two licenses' `key` fields, even though the benchmarks' logger discards it.
+4. `dig` with `map!` saves two objects, but Duel found the `[]` and `dig` benchmark 12% slower under YJIT. I left `method_missing`'s `*args` too: the setter needs the argument, and a fixed arity would reject the extra arguments it accepts today.
 ```

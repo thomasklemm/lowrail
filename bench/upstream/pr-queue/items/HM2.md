@@ -28,7 +28,7 @@ passes: []
 
 A suffixed method call on a `Mash`, such as `mash.private?`, `mash.owner!` or `mash.name = 'x'`, splits the method name into a key and a suffix. The split started from `Symbol#to_s`, which copies the name on every call.
 
-This looks for the suffix in `Symbol#name` instead, the Symbol's own frozen String, as `_method_suffix` already does since #656. A name without a suffix is still returned as a new String, since `DefineAccessors` can pass it to a default proc that modifies it. Each suffixed call allocates one object fewer, in Duel's allocation counts per iteration:
+This looks for the suffix in `Symbol#name` instead, the Symbol's own frozen String, as `_method_suffix` already does since #656. A name without a suffix is still returned as a new String, since `DefineAccessors` can pass it to a default proc that modifies it. Splitting a suffixed name now allocates one object fewer, in Duel's allocation counts per iteration:
 
 | Benchmark | master | this branch |
 | --- | ---: | ---: |
@@ -36,4 +36,4 @@ This looks for the suffix in `Symbol#name` instead, the Symbol's own frozen Stri
 | Mash: write new keys as methods | 5 | 4 |
 | Mash: overwrite a key as a method | 6 | 5 |
 
-Duel reports CPU time the same under YJIT and ZJIT. In a local benchmark on Ruby 4.0 with YJIT, the suffixed reads take about 4% less time.
+Duel reports CPU time the same under YJIT and ZJIT.
