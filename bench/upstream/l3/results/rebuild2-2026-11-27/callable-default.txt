@@ -1,0 +1,4 @@
+main before_type_cast={"id" => nil, "title" => "title", "author_name" => "David"}
+main author_name_after="Mary"
+l3 before_type_cast={"id" => nil, "title" => "title", "author_name" => "David"}
+l3 author_name_after="Mary"
