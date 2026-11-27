@@ -219,6 +219,29 @@ passes:
       retain their prior audit. Nonblocking record nit: README's '19/20 within 2%' is 18/20 unrounded
       (aa2-5 is 2.1487%, aa-5 is 5.5674%). No new code finding, runtime rerun or upstream action.
       Details and arithmetic: evidence/backtrace-format/astra/review.md, Large-orb benchmark body delta.
+  - reviewer: thermos-sol
+    orb: T-01a21dd5-050e-70b3-9097-842e5d974661
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      One caption-only must-fix in body 411777fb5b39c31e762c3df95aa00ce38420ff369f0fce327c6e900417d580b2
+      at Lowrail 492931e8: change 'median of 10 runs' to 'a representative run from 10 runs'. The copied
+      hb2-6 table is real and correct, but ranks fourth of ten by both speedup and candidate throughput,
+      not at the median. The middle speedup runs are hb2-3 and hb2-2, whose ratio median is 1.208471924x
+      (rounds to 1.21x), not the shown hb2-6 ratio 1.203127433x. No need to change the table or remeasure.
+      All other revised claims approve under DECISIONS b8bb21a0. Verified exact parsed/copy hash and the
+      posted b1ab8a6ba7 hash; earlier text is unchanged. Read all 50 make-benchmark outputs and checked
+      their version lines. The shown version lines/table are copied exactly from hb2-6: 44.957k/54.089k
+      i/s, 1.20x. All ten exact-head hb2 ratios span 1.180680813x to 1.226719913x, rounding to 1.18x-1.23x;
+      all twenty aa/aa2 faster-side ratios span 1.000022591x to 1.055674217x, rounding to 1.00x-1.06x.
+      The release comparison is appropriately approximate: vh built/compare spans 0.983136752x to
+      1.048528762x, so either side can win within the full A/A spread. Verified identical vm_backtrace.c
+      and benchmark blobs between the measured e75b1f0109 and current head. Remaining Callgrind numbers
+      and the 0.03% repeat bound also check out. No new code, benchmark or performance finding; prior
+      exact-head correctness/parser/differential approval applies. No new measurements or test reruns
+      for this text-only review. Arithmetic and source paths: evidence/backtrace-format/thermos-sol/results.txt.
+      Probe script stays in this orb backup. No upstream post or Ruby fork push.
 ---
 
 # Append backtrace location strings by length

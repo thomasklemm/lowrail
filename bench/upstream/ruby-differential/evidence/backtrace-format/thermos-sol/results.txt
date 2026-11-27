@@ -95,3 +95,37 @@ Re-read body-bench-2026-11-27/SUMMARY.txt: A/A spans 1.00x to 1.16x, supporting 
 comparison on that VM. Its 'try to add' language asserts neither a new measurement nor a delivery deadline.
 The exact local Ruby checkout is still 5fc1871eec and clean. Prior source/parser/differential/benchmark approval applies.
 No new measurement, rebuild or test rerun for this text-only confirm; no upstream post or Ruby fork push.
+
+Second performance-section delta confirm, 2026-11-27
+Reviewer thermos-sol, orb T-01a21dd5-050e-70b3-9097-842e5d974661
+Head remains 5fc1871eec45270a068d2ecba6654eef979c5f6e; reviewed at Lowrail 492931e8c7d88b2587d9583aed121c14fe5f1cb6
+PrQueue.parse outgoing body SHA-256 411777fb5b39c31e762c3df95aa00ce38420ff369f0fce327c6e900417d580b2
+The proposed copy is byte-identical. The posted copy hashes to b1ab8a6ba7c9d2860daa0139dc47630c37e5d8a8b0befc39fe687c78a8fb898b.
+Earlier text before the performance section is unchanged. DECISIONS b8bb21a0 still applies.
+Verdict changes: only the caption 'median of 10 runs' is incorrect. Smallest fix: 'a representative run from 10 runs'.
+The shown hb2-6 output is real and its version lines/table are copied exactly, but its speedup ranks fourth of ten:
+  hb2-4, hb2-9, hb2-7, hb2-6, hb2-3, hb2-2, hb2-5, hb2-8, hb2-10, hb2-1
+It is fourth by candidate throughput too. The two middle speedups are 1.203877971x (hb2-3) and 1.213065877x (hb2-2);
+their median is 1.208471924x, rounding to 1.21x. hb2-6 gives 54.089k / 44.957k = 1.203127433x, rounding to 1.20x.
+No table change, new benchmark or remeasurement is needed if the caption is corrected.
+
+Read README.md, machine.txt, build.sh, mb.sh and mb2.sh under body-bench-xxlarge-2026-11-27.
+Read and parsed all 50 make-benchmark raw files (aa, aa2, hb, hb2, vh, ten each), checking each version line.
+The scripts pin timed processes to CPU 14; the retained machine topology identifies 14/15 as SMT siblings.
+Exact-head hb2 built/compare ratios by run 1-10:
+  1.226719913 1.213065877 1.203877971 1.180680813 1.216439819
+  1.203127433 1.194116739 1.219042572 1.183558960 1.221701197
+Their complete range 1.180680813x-1.226719913x rounds to the body's 1.18x-1.23x.
+The 20 aa/aa2 faster-side ratios range from 1.000022591x to 1.055674217x, rounding to 1.00x-1.06x.
+The conservative full A/A includes aa-5; none is discarded. Every exact-head change is outside that full range.
+The 10 vh head/release ratios range from 0.983136752x to 1.048528762x: release up to 1.017152494x faster,
+head up to 1.048528762x faster. 'About the same speed' is supported; this is not proof of statistical equivalence.
+Verified vm_backtrace.c blob 4de49ef81254e86b71504c5b8b68d7ab9f29bb52 and benchmark blob
+1c284efa00933a848d09d23dd52643f76387e230 are identical between e75b1f0109 and the current head.
+Recomputed remaining Callgrind rounding and repeat bounds from callgrind-body-line.txt:
+  caller base/head 1.09M/0.85M, largest pair spread 0.016234%
+  backtrace base/head 1.10M/0.86M, largest pair spread 0.004985%
+Both remain below the stated 0.03%. The existing source, parser and differential review still applies.
+All revised numeric claims other than the median caption approve; no new source or performance defect found.
+No new measurements, build or tests for this text-only review. Raw measurement source is already committed at 85132249.
+The calculation script and its full output remain in the reviewer's orb backup. No upstream post or Ruby fork push.
