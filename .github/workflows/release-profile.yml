@@ -28,6 +28,8 @@ jobs:
           sha256sum "lowrail-profile-$version.gem"
           echo "GEM=lowrail-profile-$version.gem" >> "$GITHUB_ENV"
       - uses: rubygems/configure-rubygems-credentials@v2.2.0
+        with:
+          owner: "61730"
       - name: Push
         working-directory: gem
         run: gem push "$GEM"

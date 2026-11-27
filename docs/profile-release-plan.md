@@ -329,8 +329,9 @@ publishing is done by an agent and recorded here; publishing and tagging need Th
 - [ ] Publishing runs in GitHub Actions through RubyGems trusted publishing (`.github/workflows/release-profile.yml`,
   environment `release`, which admits only `lowrail-profile-v*` tags): no API key is stored anywhere. Once, Thomas
   adds a pending trusted publisher on rubygems.org (gem `lowrail-profile`, repository `thomasklemm/lowrail`, workflow
-  `release-profile.yml`, environment `release`). Then, with his OK, the tag `lowrail-profile-v0.1.2` is pushed on
-  `9dcde6df`, the first commit with the workflow (its `gem/` is identical to the release commit's); the workflow builds with Ruby 4.0.7 and RubyGems 4.0.20, checks the tag against the version,
+  `release-profile.yml`, environment `release`; done 2026-11-27). The first push names the owning account with
+  `owner: "61730"` (Thomas's rubygems.org account ID), which rubygems.org requires for a pending publisher. Then, with his OK, the tag `lowrail-profile-v0.1.2` is pushed on
+  the commit that adds the `owner` input to the workflow (its `gem/` is identical to the release commit's); the workflow builds with Ruby 4.0.7 and RubyGems 4.0.20, checks the tag against the version,
   prints the SHA-256 (must be the one above) and pushes the gem.
 - [ ] After publishing: `gem install lowrail-profile -v 0.1.2` from rubygems.org in a new app, and the README's
   "Until 0.1.2 is on rubygems.org" paragraph removed.
