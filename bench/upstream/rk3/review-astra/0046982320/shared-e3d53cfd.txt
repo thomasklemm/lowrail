@@ -1,0 +1,34 @@
+2.7.3 independent probes: only owner name and added file changed from 0046982320
+2.7.3 0046982320 to e3d53cfd replay: {'object address noise': 2}
+2.7.3 e26338b40a to e3d53cfd replay: {'message encoding': 9764, 'object address noise': 2, 'parameter name': 1}
+2.7.3 constant/reopening/thread/standalone helper scenarios verified
+3.0.7 independent probes: only owner name and added file changed from 0046982320
+3.0.7 0046982320 to e3d53cfd replay: {'object address noise': 2}
+3.0.7 e26338b40a to e3d53cfd replay: {'message encoding': 9764, 'object address noise': 2, 'parameter name': 1}
+3.0.7 constant/reopening/thread/standalone helper scenarios verified
+3.1.7 independent probes: only owner name and added file changed from 0046982320
+3.1.7 0046982320 to e3d53cfd replay: {'object address noise': 2, 'error_highlight source excerpt': 12}
+3.1.7 e26338b40a to e3d53cfd replay: {'message encoding': 9764, 'object address noise': 2, 'error_highlight source excerpt': 6, 'parameter name': 1}
+3.1.7 constant/reopening/thread/standalone helper scenarios verified
+3.2.9 independent probes: only owner name and added file changed from 0046982320
+3.2.9 0046982320 to e3d53cfd replay: {'object address noise': 2}
+3.2.9 e26338b40a to e3d53cfd replay: {'message encoding': 9764, 'object address noise': 2, 'parameter name': 1}
+3.2.9 constant/reopening/thread/standalone helper scenarios verified
+3.3.9 independent probes: only owner name and added file changed from 0046982320
+3.3.9 0046982320 to e3d53cfd replay: {'object address noise': 2}
+3.3.9 e26338b40a to e3d53cfd replay: {'message encoding': 9764, 'object address noise': 2, 'parameter name': 1}
+3.3.9 constant/reopening/thread/standalone helper scenarios verified
+3.4.6 independent probes: only owner name and added file changed from 0046982320
+3.4.6 0046982320 to e3d53cfd replay: {'object address noise': 2}
+3.4.6 e26338b40a to e3d53cfd replay: {'message encoding': 9764, 'object address noise': 2, 'parameter name': 1}
+3.4.6 constant/reopening/thread/standalone helper scenarios verified
+4.0.9 independent probes: only owner name and added file changed from 0046982320
+4.0.9 0046982320 to e3d53cfd replay: {'object address noise': 2}
+4.0.9 e26338b40a to e3d53cfd replay: {'message encoding': 9764, 'object address noise': 2, 'parameter name': 1}
+4.0.9 constant/reopening/thread/standalone helper scenarios verified
+2.7.3 120 common orders equal step-by-step except new file; 720 orders pass without eager consumers
+4.0.9 120 common orders equal step-by-step except new file; 720 orders pass without eager consumers
+yard documentation changes versus 3ca13466: ['Rack::QueryParser::Unescape', 'Rack::QueryParser::Unescape#unescape', 'Rack::Unescape', 'Rack::Unescape#unescape']
+rdoc-7.0.4 documentation changes versus 3ca13466: []
+rdoc-7.2.0 documentation changes versus 3ca13466: []
+rdoc-8.1.0 documentation changes versus 3ca13466: []

@@ -1,8 +1,11 @@
 # RK3 adversarial Astra review and confirmations
 
-**Current verdict: approve `3ca13466d56965731d4419cd465ad6e33dce9ace`.** The remaining YARD documentation finding
-is fixed. No new must-fix or nit, and no additional runtime compatibility change. The original demonstrated
-method-lookup/reflection differences remain recorded below and do not require another fix.
+**Current verdict: approve `e3d53cfdb2f9689646dc754ea20885bf29169e6a`.** The standalone `Rack::Unescape` extraction
+passes the renewed adversarial load-order, input, lookup, Ractor and documentation checks below. No must-fix or nit.
+The explicitly recorded error-message, lookup and namespace boundaries are not a claim of total Ruby equivalence.
+
+**Previous verdict: approve `3ca13466d56965731d4419cd465ad6e33dce9ace`.** The YARD documentation finding was fixed;
+the later move to a standalone module responds to Thomas's placement preference, not an additional docs defect.
 
 **Earlier verdict on fc894812: changes, for missing YARD API documentation.** The redundant comment was fixed and
 RDoc 8.1.0 documentation was restored, but YARD still produced an undocumented, parameterless stub.
@@ -13,6 +16,85 @@ method-table differences below are recorded explicitly; none establishes a norma
 Original reviewed head: `0046982320094e11d80d2ec19bf0ab69f05ba41b`, whose sole parent is
 `e26338b40a0c5bc83cb4eba645e5954fc264b699`. This pass covers only that third commit, not a new performance review of
 the earlier CGI changes. Self-performed in thread `T-01a21cee-55cd-73c2-8f95-9e7cd65e2243`; no delegation.
+
+## Standalone-module review on e3d53cfd
+
+Reviewed exact head `e3d53cfdb2f9689646dc754ea20885bf29169e6a`, fork branch `unescape-cgi-8`, with the single parent
+`e26338b40a0c5bc83cb4eba645e5954fc264b699`. The first two commits are therefore unchanged. Compared with 3ca13466,
+the private module moves to `lib/rack/unescape.rb`, is renamed `Rack::Unescape`, owns the URI/CGI requirements, and
+is explicitly required/included by both consumers. No `rack.rb` autoload is added. No Rack files were edited here.
+
+**No new ordinary-call or request regression demonstrated.** Fresh 204,073-record clean replays on 2.7.3, 3.0.7,
+3.1.7, 3.2.9, 3.3.9, 3.4.6 and 4.0.9 reproduce the same 9,764 ASCII-only error-message encoding differences and one
+parameter-name difference per pin against e26338b40a. Two Object-address lines are fixture noise. On 3.1.7 there are
+now six different error_highlight excerpts versus base, not the original head's twelve: the moved decoder's
+indentation now matches Utils' original indentation, while the QueryParser parameter spelling still changes.
+Versus 0046982320 there are twelve indentation-only excerpt changes. No other replay output differs.
+
+Fresh independent probes on all seven pins cover the original encoding sweep, overrides, prepends, aliases,
+custom default parsers, frozen inputs/receivers, conversions, fibers and method visibility. Against 0046982320 their
+only differences are the owner's name and one added loaded file. All original lookup findings below still apply,
+with owner `Rack::Unescape`: replacing a local definition with `super` now reaches an ancestor; `remove_method`
+fails on inherited methods; the constructed subclass-plus-Utils include collision still selects the parent
+override. These do not justify a wrapper, guard, or opaque self-alias without an actual affected caller.
+
+`load-surface.rb` runs fresh forked processes without URI preloaded. On **both 2.7.3 and 4.0.9**, every one of the
+120 permutations of `rack`, `rack/query_parser`, `rack/utils`, `rack/request` and `rack/mock_request` matches base
+step-by-step: the entire ordered loaded-feature list, consumer defined/autoload states and final decoding/escaping/
+query results match after removing only the new `rack/unescape.rb` feature. All **720** permutations including the
+new entry point pass; requiring the helper never eagerly defines or autoloads either consumer. Standalone helper
+loading works, keeps its method private, and subsequent `require 'rack'` installs the expected consumer autoloads.
+`require 'rack'` alone still leaves `Rack::Unescape` unavailable; this is intentional for an internal dependency.
+
+Additional executed namespace boundaries, not inferred failures:
+
+| Repro in `load-surface.rb` | Base → e3d53cfd | Disposition / smallest remedy |
+| --- | --- | --- |
+| Predefine `Rack::Unescape = 17` or `Class.new`, then require Utils | Ordinary calls succeed → `TypeError: Unescape is not a module`. | A newly owned Rack constant can collide with an application's invented constant. No known caller or documented extension point; no Rack guard requested. Such an application should rename its foreign constant. |
+| Predefine `Rack::Unescape = Module.new.freeze`, then require Utils | Ordinary calls succeed → `FrozenError`. | Same namespace boundary, not a failure on a frozen decoder input/receiver. No Rack shim. |
+| Predefine a mutable module with `included` callback, then require Utils | Callback never runs → callback sees QueryParser then Utils; decoding still correct. | Expected inclusion semantics. No fix requested. |
+| Require helper, redefine its private `unescape`, then load Utils | New entry point unavailable on base; new head returns the replacement through all three consumers. | New internal monkey-patch surface, not an old caller regression. |
+| After loading Utils, redefine the helper's private method | Base has no helper to reopen; new head changes QueryParser/includer dispatch but not Utils' singleton copy. | Verified `module_function` snapshot behavior. Patch the desired consumer, or explicitly re-export, if replacing it intentionally. No runtime wrapper requested. |
+
+The namespace failure controls were run against base on 2.7.3 and 4.0.9; all new-head special scenarios were run
+on every pin. Concurrent requires pass on all pins. Both the original opt-in Rack Ractor probe and a new standalone
+helper-only Ractor probe pass on 3.0.7–4.0.9. The latter decodes correctly without loading Utils or QueryParser;
+Ruby 2.7.3 has no Ractor. This is not a universal Ractor-safety claim for configurable Rack globals.
+
+Six fresh full `CI=spec bundle exec rake` runs on **this exact head**, 2.7.3/3.4.6/4.0.9 × clean/`-rcgi/util`, pass:
+1,315 runs / 5,725 assertions on 2.7.3; 1,317 / 6,421 on the other two; zero failures/errors, two skips each, and
+every separate test file passes. Version-specific lockfiles match the retained base suite lockfiles. The other
+four pins received new input/lookup/Ractor probes, not fresh full suites in this follow-up. Broad util/pure-CGI
+replays, hosted CI, non-MRI engines and benchmarks were not rerun here; earlier results stay attributed to their heads.
+
+Full-library YARD 0.9.46 dumps retain exactly the approved Utils singleton and instance documentation/parameters/
+visibility; only the internal module and method names change versus 3ca13466. RDoc 7.0.4, 7.2.0 and 8.1.0 dumps
+are byte-for-byte equal as parsed JSON to that approved head. Public API docs remain restored. The new file adds
+only the frozen-string directive and `:nodoc:` comment; retained Utils directives are functional documentation.
+The existing exact-class/ASCII-compatible and malformed-percent guards are unchanged; no new guard is warranted.
+
+**Name and placement:** `Rack::Unescape` in `rack/unescape.rb` is clear for a one-method internal mixin shared by
+two peers. QueryParser's top-of-class include is conventional and independent of the surrounding constants.
+Removing its direct URI require is sound because the explicitly required helper loads URI before its method can
+run. Keeping the explicit helper require in Utils makes that dependency visible even though QueryParser already
+loads it. No autoload is needed for an internal module that both consumers explicitly require. Rack's shared
+helpers and standalone internal files support this shape, but `BadRequest` does have an autoload: it is not an
+exact no-autoload precedent. This is a maintainer-style judgment, not a claim that ioquatix or jeremyevans approved
+the new name. Thomas's requested neutral placement is satisfied without a forwarding wrapper.
+
+**Commit and reply:** the commit's mechanism, visibility, subclass-override and documentation claims were checked
+against the source and fresh probes. The latest reply below is accurate and plain; no correction or nit remains:
+
+> Moved `unescape` into a `Rack::Unescape` module in its own file, which `QueryParser` and `Utils` include; `Utils`
+> exports it with `module_function :unescape` (e3d53cf). For ASCII-only strings with invalid %-encoding, this also
+> restores URI's error-message encoding; the local raise in `utils.rb` had made it binary.
+
+`shared-e3d53cfd.txt` contains the assertion-backed comparison summary. `shared-e3d53cfd.tar.xz` retains the new
+load-surface and comparison scripts, documentation script/dumps, complete independent/special/permutation outputs,
+suite logs, head/message/diff, and replay deltas plus SHA-256 hashes. Reconstruct replay outputs from the original
+archive's `results/rack-VERSION-clean-replay.txt` with the matching unified delta; all other fresh outputs are kept
+in full. Run `ruby -I /path/to/rack/lib load-surface.rb common`, `six`, or `special` for the isolated new probes.
+No fork/PR push, GitHub post, queue edit, or new thread was made by this review.
 
 ## Short confirmation on 3ca13466
 
