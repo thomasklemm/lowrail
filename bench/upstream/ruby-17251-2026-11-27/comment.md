@@ -1,5 +1,5 @@
 Draft follow-up on ruby/ruby#17251 (not posted; Thomas approves the text). Numbers: [README](README.md). Text as
-approved by Astra on 255deaf8 (replacing the first draft); pending thermos-sol.
+approved by Astra (255deaf8 review) and thermos-sol (69d69b29), unchanged.
 
 ---
 

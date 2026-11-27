@@ -4,7 +4,7 @@ The rebased comparison our 2026-11-25 comment said was missing
 ([comment](https://github.com/ruby/ruby/pull/17251#issuecomment-7152413475),
 [record](../../../docs/upstream/ruby-4.1-regression-watch.md#against-rubyruby17251-new-head-57eb4b4274-2026-11-24-re-tested-2026-11-25)).
 
-**Result: on its current base the PR no longer lowers major counts; GC time differs by mode.** Base `f6278067b6`
+**Result: against its current base, the GC patch does not lower shipit's major count; GC time differs by mode.** Base `f6278067b6`
 runs median 6–7 shipit majors (range 6–8; all completed records `nofree`) and at most 3 per round on the 35 Rails
 workloads. (The 11-25 base `dec1bb786f` ran medians 28–29, range 27–31, on a different orb and sequentially, so the
 cross-run change is not attributed to Ruby alone.) On shipit the head runs 8–9 majors, 76 of 77 completed records
@@ -42,8 +42,7 @@ median, not every round) and blanket "inside the A/A" claims were cut.
   of RSS after each app's last window (`rss_kb_end`); peak = `VmHWM`.
 * **Difference from 11-25:** a 16-CPU, 31 GB orb instead of 2 CPUs and 3.9 GB, and four lanes at once (shipit, and one
   Rails lane per mode, each in its own app copies `census5`, `census5y`, `census5z`), each lane sequential with
-  builds alternating. Every comparison is within one lane, so lane contention hits all builds of a lane alike;
-  absolute times are not comparable with 11-25's. All three Rails lanes append to one `meta.json` per label (may
+  builds alternating. Every comparison is within one lane, with rotated build order and an A/A control; concurrent load is not held constant. Absolute times are not comparable with 11-25's. All three Rails lanes append to one `meta.json` per label (may
   lose entries); the report reads only the per-app JSONs. 20:41–22:50 UTC, no cell failed, no orb pause.
 
 ## shipit (6 rounds; median, min–max)
@@ -122,3 +121,16 @@ JSONs with per-GC records, census JSONs and logs per workload, queue logs):
 ## Draft comment (not posted; Thomas approves)
 
 See [`comment.md`](comment.md).
+
+## Reviews
+
+* **Astra** (`openai/gpt-6-astra`, thread T-01a21f36-880d-739c-b8ad-d36b9b7a2c1d) on 255deaf8: changes required, with an
+  exact replacement text, which is now comment.md verbatim. Recomputed all 36 table cells from the receipts and
+  regenerated report.txt byte for byte. Cut the "about 6%" (a paired median), the blanket A/A claims and the cross-run
+  comparison; found the two interpreter majors without a record.
+* **thermos-sol** (`openai/gpt-6.1-sol` xhigh, thread T-01a21f36-8145-734d-9ddd-667ca327cdc9) on 69d69b29: comment
+  approved unchanged under both rubrics; two README edits applied (headline scoped to shipit, no claim of equal lane
+  contention). Re-verified the cells, every paired direction, the attribution counts and head.diff against both Ruby
+  pins. [Review](https://ampcode.com/artifacts/ruby-follow-up-review-28678b13-a8be-4e50-a677-7fbed7063285).
+
+Both approve the same comment text. Not posted: ruby/ruby, Thomas approves first.
