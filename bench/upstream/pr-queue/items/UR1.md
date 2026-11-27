@@ -12,7 +12,7 @@ built_on: "48cda77031"
 depends_on: []
 stacked_on:
 alternative_of:
-evidence: [bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz]
+evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz]
 impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
@@ -144,6 +144,27 @@ passes:
       success does not reproduce that runtime-specific failure. No fresh benchmarks/master/ZJIT runs.
       Full results in bench/upstream/outside_leads/ur1/astra-2026-11-27.md; raw reruns and sources in
       bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz.
+  - reviewer: astra
+    head: "7da6979b27b2aba69c4076d8f01939e5a8c0f1f6"
+    orb: T-01a21e96-8207-76d7-8f64-404eb741d298
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None. Final body confirm at Lowrail bd73cb73; UR1 body unchanged since 4d8669b6. Parsed outgoing body
+      SHA256 21c8b7f7a9adbb754d0023fb96471c43959418a5c703b77df4f421ec77cdb83f.
+      Verified 7da6979 and tested cecaed1 have identical tree b4d512787702911904b7ec8d51b0ec07744ec7c9 and parent
+      48cda77031e343d35213c36fe164b2a46ffbefa7. Only commit-message wording changed: pure-Ruby fallback and
+      URL-encoded form fields are accurate; prior code probes and suite evidence apply without rerunning.
+      The body now describes the retained b copy, drops the false per-escape MatchData claim and obsolete
+      input-hook boundary, and limits form claims to URL-encoded fields. Remaining CGI/private-URI override
+      boundaries retain the explicit assessment from the preceding code pass; no new guard requested.
+      Independently recalculated all four body rows from raw object logs and Callgrind N-minus-zero totals,
+      plus A/A averages/spreads and rounding. Also checked all 16 micro cells across the two pins and unchanged
+      counters in all 48 measured YJIT/ZJIT windows. Every body number matches, including the 248-byte cookie.
+      Live-rechecked Rails 8.1.4.1 and Rack 3.2.9 currency/reach and all three exact caller permalinks;
+      Rack-first order remains appropriate. Added current measurement directories to evidence, retaining old runs.
+      This was a text/evidence confirm, not a fresh benchmark or new engine run. Checker, output, exact body,
+      commit/tree receipts and citation snapshot: bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz.
 ---
 
 # Decode www-form components with cgi/escape
