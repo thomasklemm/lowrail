@@ -1,0 +1,17 @@
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index be317e9fb1..71cb523a2f 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,9 +1,9 @@
+ *   Bump the minimum supported SQLite version to 3.37.0.
+ 
+     SQLite 3.37.0 introduced `pragma_table_list`, which the SQLite3 adapter
+-    has used to list tables and views since Rails 8.0 (#52354). On older
+-    versions `table_exists?`, `tables`, migrations and the schema cache fail
+-    with "no such table: pragma_table_list"; make the requirement explicit.
++    has used to list tables and views since Rails 8.0 (#52354). On SQLite 3.35
++    and 3.36, table listing and uncached schema discovery fail with
++    "no such table: pragma_table_list"; make the requirement explicit.
+ 
+     *Thomas Klemm*
+ 

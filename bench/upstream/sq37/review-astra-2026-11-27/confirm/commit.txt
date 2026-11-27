@@ -1,0 +1,21 @@
+commit e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Fri Nov 27 10:59:15 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Fri Nov 27 12:40:02 2026 +0000
+
+    Bump the minimum supported SQLite version to 3.37.0
+    
+    SQLite 3.37.0 introduced the `pragma_table_list` table-valued function.
+    The SQLite3 adapter has read it in `data_source_sql` since #52354
+    (released in Rails 8.0), which backs `table_exists?`, `data_sources`,
+    `tables`, `views` and the schema cache.
+    
+    On SQLite 3.35.x and 3.36.x, which `check_version` still accepts,
+    uncached schema discovery fails with "no such table: pragma_table_list".
+    This breaks `db:prepare` and model operations that need that information.
+    
+    Make the requirement explicit by raising in `check_version` when the
+    server is older than 3.37.0. Raw SQL and model operations using a
+    preloaded schema cache can still work on those versions; this change
+    refuses those connections too.

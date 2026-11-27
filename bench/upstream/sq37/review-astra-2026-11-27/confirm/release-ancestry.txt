@@ -1,0 +1,5 @@
+Previous-floor merge ancestor of latest stable v8.1.4.1: exit=1 (1=not ancestor)
+      def check_version # :nodoc:
+        if database_version < "3.23.0"
+          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.23.0."
+        end
