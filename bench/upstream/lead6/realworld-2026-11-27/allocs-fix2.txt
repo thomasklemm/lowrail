@@ -1,0 +1,11 @@
+main COLS=10 proto=false update=187.0 find_update=252.9 find_changed=64.0 serializable_hash=12.0 find_read_update=253.9
+l6 COLS=10 proto=false update=186.9 find_update=253.0 find_changed=64.0 serializable_hash=12.0 find_read_update=254.0
+fix2 COLS=10 proto=false update=181.0 find_update=239.0 find_changed=53.0 serializable_hash=12.0 find_read_update=244.0
+main COLS=30 proto=false update=208.0 find_update=300.0 find_changed=90.0 serializable_hash=32.0 find_read_update=301.0
+l6 COLS=30 proto=false update=208.0 find_update=299.9 find_changed=90.0 serializable_hash=32.0 find_read_update=301.0
+fix2 COLS=30 proto=false update=182.0 find_update=246.0 find_changed=59.0 serializable_hash=32.0 find_read_update=250.9
+main COLS=100 proto=false update=278.0 find_update=465.9 find_changed=184.0 serializable_hash=102.0 find_read_update=467.0
+l6 COLS=100 proto=false update=278.0 find_update=466.0 find_changed=184.0 serializable_hash=102.0 find_read_update=467.0
+fix2 COLS=100 proto=false update=182.0 find_update=272.0 find_changed=83.0 serializable_hash=102.0 find_read_update=277.0
+zjit main COLS=30 proto=false update=209.9 find_update=300.0 find_changed=88.0 serializable_hash=32.0 find_read_update=301.0
+zjit fix2 COLS=30 proto=false update=184.0 find_update=246.0 find_changed=57.0 serializable_hash=32.0 find_read_update=251.0

@@ -1,0 +1,33 @@
+## COLS=10
+update: 187.16
+find_changed: 64.0
+serializable_hash: 12.0
+set class: ActiveModel::LazyIndexedAttributeSet
+keys (loaded, untouched): 1.0
+find alone: 51.01
+find + changed?: 64.0 (changed? alone ~ 12.99)
+find + attribute_names: 1.0
+find + changed_attribute_names_to_save: 14.0
+assigned: changed_attribute_names_to_save 2.05, has_changes_to_save? 1.01
+## COLS=30
+update: 208.01
+find_changed: 90.0
+serializable_hash: 32.0
+set class: ActiveModel::LazyIndexedAttributeSet
+keys (loaded, untouched): 1.0
+find alone: 57.01
+find + changed?: 90.0 (changed? alone ~ 32.99)
+find + attribute_names: 1.0
+find + changed_attribute_names_to_save: 34.0
+assigned: changed_attribute_names_to_save 2.15, has_changes_to_save? 1.01
+## COLS=100
+update: 278.01
+find_changed: 184.0
+serializable_hash: 102.0
+set class: ActiveModel::LazyIndexedAttributeSet
+keys (loaded, untouched): 1.0
+find alone: 81.01
+find + changed?: 184.0 (changed? alone ~ 102.99)
+find + attribute_names: 1.0
+find + changed_attribute_names_to_save: 104.0
+assigned: changed_attribute_names_to_save 2.5, has_changes_to_save? 1.01

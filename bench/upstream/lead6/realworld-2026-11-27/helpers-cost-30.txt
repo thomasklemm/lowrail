@@ -1,0 +1,36 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux], 30 names
+  empty                      0.00 ns per element (loop 30.1 ns subtracted)
+  index_for_name            38.08 ns per element (loop 30.1 ns subtracted)
+  indexes[name]             25.82 ns per element (loop 30.1 ns subtracted)
+  @indexes[name]            24.66 ns per element (loop 30.1 ns subtracted)
+  @indexes                   0.50 ns per element (loop 30.1 ns subtracted)
+  lookup                    20.47 ns per element (loop 30.1 ns subtracted)
+  @attributes&.[]            6.78 ns per element (loop 30.1 ns subtracted)
+  attribute_at              40.75 ns per element (loop 30.1 ns subtracted)
+  attribute_at inline       16.13 ns per element (loop 30.1 ns subtracted)
+  row_keys (per #keys)        127.1 ns per call
+  keys (per #keys)           3842.3 ns per call
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux], 30 names
+  empty                      0.00 ns per element (loop 6.6 ns subtracted)
+  index_for_name            21.03 ns per element (loop 6.6 ns subtracted)
+  indexes[name]             16.47 ns per element (loop 6.6 ns subtracted)
+  @indexes[name]            18.56 ns per element (loop 6.6 ns subtracted)
+  @indexes                  -0.27 ns per element (loop 6.6 ns subtracted)
+  lookup                     7.06 ns per element (loop 6.6 ns subtracted)
+  @attributes&.[]            2.33 ns per element (loop 6.6 ns subtracted)
+  attribute_at              28.43 ns per element (loop 6.6 ns subtracted)
+  attribute_at inline       22.88 ns per element (loop 6.6 ns subtracted)
+  row_keys (per #keys)         95.9 ns per call
+  keys (per #keys)           1959.7 ns per call
+ruby 4.1.0dev (2026-11-25T19:18:44Z HEAD 42a644f6e0) +ZJIT +PRISM [x86_64-linux], 30 names
+  empty                      0.00 ns per element (loop 5.9 ns subtracted)
+  index_for_name            17.31 ns per element (loop 5.9 ns subtracted)
+  indexes[name]             15.89 ns per element (loop 5.9 ns subtracted)
+  @indexes[name]            15.93 ns per element (loop 5.9 ns subtracted)
+  @indexes                   0.21 ns per element (loop 5.9 ns subtracted)
+  lookup                     3.62 ns per element (loop 5.9 ns subtracted)
+  @attributes&.[]            1.79 ns per element (loop 5.9 ns subtracted)
+  attribute_at              29.02 ns per element (loop 5.9 ns subtracted)
+  attribute_at inline       24.44 ns per element (loop 5.9 ns subtracted)
+  row_keys (per #keys)        101.4 ns per call
+  keys (per #keys)           1707.6 ns per call

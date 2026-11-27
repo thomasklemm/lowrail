@@ -1,0 +1,33 @@
+++ mise where ruby@4.0.10
++ export PATH=/home/user/.local/share/mise/installs/ruby/4.0.10/bin:/home/user/.local/share/mise/installs/ruby/4.0.10/bin:/home/user/.amp/bin:/opt/git/bin:/home/user/.cargo/bin:/home/user/.nix-profile/bin:/usr/local/games:/usr/games:/home/user/.cargo/bin:/home/user/.nix-profile/bin:/usr/local/games:/usr/games:/home/user/.cargo/bin:/home/user/.nix-profile/bin:/usr/local/games:/usr/games:/home/user/.cargo/bin:/home/user/.nix-profile/bin:/usr/local/games:/usr/games:/home/user/.local/bin:/home/user/.nix-profile/bin:/usr/local/bin:/usr/local/games:/usr/games:/usr/bin:/bin
++ PATH=/home/user/.local/share/mise/installs/ruby/4.0.10/bin:/home/user/.local/share/mise/installs/ruby/4.0.10/bin:/home/user/.amp/bin:/opt/git/bin:/home/user/.cargo/bin:/home/user/.nix-profile/bin:/usr/local/games:/usr/games:/home/user/.cargo/bin:/home/user/.nix-profile/bin:/usr/local/games:/usr/games:/home/user/.cargo/bin:/home/user/.nix-profile/bin:/usr/local/games:/usr/games:/home/user/.cargo/bin:/home/user/.nix-profile/bin:/usr/local/games:/usr/games:/home/user/.local/bin:/home/user/.nix-profile/bin:/usr/local/bin:/usr/local/games:/usr/games:/usr/bin:/bin
++ G=/home/user/workspace/repo/.amp/in/orb-backup/l6rw/gt/Gemfile
++ cd /home/user/w/fix2/activemodel
++ RAILS_TREE=/home/user/w/fix2
++ tail -3
++ BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/l6rw/gt/Gemfile
++ taskset -c 0 bundle exec ruby -Itest -e 'Dir["test/cases/**/*_test.rb"].reject { _1.include?("secure_password") }.each { |f| require File.expand_path(f) }'
+Finished in 1.699961s, 719.4283 runs/s, 3285.3696 assertions/s.
+
+1223 runs, 5585 assertions, 0 failures, 0 errors, 0 skips
++ cd /home/user/w/fix2/activerecord
++ ARCONN=sqlite3
++ RAILS_TREE=/home/user/w/fix2
++ BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/l6rw/gt/Gemfile
++ taskset -c 0 bundle exec ruby -Itest -Ilib -e 'Dir["test/cases/**/*_test.rb"].reject { |f| f.include?("/adapters/") && !f.include?("/adapters/sqlite3/") }.sort.each { |f| require File.expand_path(f) }'
++ tail -4 /tmp/ar-fix2-sqlite.log
+
+10459 runs, 37373 assertions, 0 failures, 4 errors, 52 skips
+
+You have skipped tests. Run with --verbose for details.
++ cd /home/user/w/fix2/activerecord
++ ARCONN=postgresql
++ RAILS_TREE=/home/user/w/fix2
++ BUNDLE_GEMFILE=/home/user/workspace/repo/.amp/in/orb-backup/l6rw/gt/Gemfile
++ taskset -c 0 bundle exec ruby -Itest -Ilib -e 'Dir["test/cases/**/*_test.rb"].reject { |f| f.include?("/adapters/") && !f.include?("/adapters/postgresql/") }.sort.each { |f| require File.expand_path(f) }'
++ tail -4 /tmp/ar-fix2-pg.log
+
+11391 runs, 41334 assertions, 0 failures, 0 errors, 31 skips
+
+You have skipped tests. Run with --verbose for details.
+DONE

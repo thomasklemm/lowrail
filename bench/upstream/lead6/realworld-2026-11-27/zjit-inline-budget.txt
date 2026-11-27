@@ -1,0 +1,6 @@
+r0 default: update=97049 find_update=132208 find_changed=33427
+r0 --zjit-inline-budget=2000: update=97680 find_update=137088 find_changed=32588
+r1 default: update=98213 find_update=137038 find_changed=32985
+r1 --zjit-inline-budget=2000: update=99840 find_update=139521 find_changed=33005
+r2 default: update=98788 find_update=133930 find_changed=33987
+r2 --zjit-inline-budget=2000: update=96534 find_update=133210 find_changed=32894

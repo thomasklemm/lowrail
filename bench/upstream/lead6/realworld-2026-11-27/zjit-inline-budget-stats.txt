@@ -1,0 +1,14 @@
+== default
+  budget_exceeded: 589 (71.6%)
+        too_large: 231 (28.1%)
+                    inline_method_count:       504 ( 0.0%)
+dynamic_getivar_count:                                             2,284
+zjit_insn_count:                                              25,347,450
+                                                    index_for_name@/home/user/w/main/activemodel/lib/active_model/attribute_set.rb:498: 57,120 ( 3.9%)
+                                                      attribute_at@/home/user/w/main/activemodel/lib/active_model/attribute_set.rb:552: 57,025 ( 3.8%)
+== --zjit-inline-budget=2000
+        too_large: 842 (76.1%)
+  budget_exceeded: 238 (21.5%)
+                    inline_method_count:     1,200 ( 0.0%)
+dynamic_getivar_count:                                              400
+zjit_insn_count:                                             25,345,845

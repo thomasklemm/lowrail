@@ -1,0 +1,30 @@
+== update (COLS=30, 4.0.10, main)
+  []: 41
+  attribute_at: 43
+  index_for_name: 140
+  keys: 3
+  lookup: 133
+  row_keys: 3
+  [] x30  activemodel/active_model/attribute_mutation_tracker.rb:79:ActiveModel::AttributeMutationTracker#attribute_changed? <- activemodel/active_model/attribute_mutation_tracker.rb:45:ActiveModel::AttributeMutationTracker#changed? <- activemodel/active_model/attribute_mutation_tracker.rb:15:block in ActiveModel::AttributeMutationTracker#changed_attribute_names
+  [] x6  activemodel/active_model/attribute_mutation_tracker.rb:79:ActiveModel::AttributeMutationTracker#attribute_changed? <- activemodel/active_model/attribute_mutation_tracker.rb:45:ActiveModel::AttributeMutationTracker#changed? <- activemodel/active_model/attribute_mutation_tracker.rb:41:block in ActiveModel::AttributeMutationTracker#any_changes?
+  [] x2  activemodel/active_model/attribute_mutation_tracker.rb:79:ActiveModel::AttributeMutationTracker#attribute_changed? <- activemodel/active_model/attribute_mutation_tracker.rb:45:ActiveModel::AttributeMutationTracker#changed? <- activerecord/active_record/attribute_methods/dirty.rb:152:ActiveRecord::AttributeMethods::Dirty#will_save_change_to_attribute?
+  [] x2  activerecord/active_record/attribute_methods.rb:586:block in ActiveRecord::AttributeMethods#attributes_with_values <- activesupport/active_support/core_ext/enumerable.rb:331:block in Array#index_with <- activesupport/active_support/core_ext/enumerable.rb:331:Array#to_h
+  [] x1  activemodel/active_model/attribute_mutation_tracker.rb:60:ActiveModel::AttributeMutationTracker#original_value <- activerecord/active_record/attribute_methods/dirty.rb:180:ActiveRecord::AttributeMethods::Dirty#attribute_in_database <- activerecord/active_record/attribute_methods/primary_key.rb:54:ActiveRecord::AttributeMethods::PrimaryKey#id_in_database
+  keys x2  activemodel/active_model/attribute_mutation_tracker.rb:75:ActiveModel::AttributeMutationTracker#attr_names <- activemodel/active_model/attribute_mutation_tracker.rb:41:ActiveModel::AttributeMutationTracker#any_changes? <- activerecord/active_record/attribute_methods/dirty.rb:186:ActiveRecord::AttributeMethods::Dirty#has_changes_to_save?
+  keys x1  activemodel/active_model/attribute_mutation_tracker.rb:75:ActiveModel::AttributeMutationTracker#attr_names <- activemodel/active_model/attribute_mutation_tracker.rb:15:ActiveModel::AttributeMutationTracker#changed_attribute_names <- activerecord/active_record/attribute_methods/dirty.rb:200:ActiveRecord::AttributeMethods::Dirty#changed_attribute_names_to_save
+== find_changed (COLS=30, 4.0.10, main)
+  []: 30
+  attribute_at: 30
+  default_attribute: 30
+  index_for_name: 60
+  keys: 1
+  lookup: 60
+  row_keys: 1
+  [] x30  activemodel/active_model/attribute_mutation_tracker.rb:79:ActiveModel::AttributeMutationTracker#attribute_changed? <- activemodel/active_model/attribute_mutation_tracker.rb:45:ActiveModel::AttributeMutationTracker#changed? <- activemodel/active_model/attribute_mutation_tracker.rb:41:block in ActiveModel::AttributeMutationTracker#any_changes?
+  keys x1  activemodel/active_model/attribute_mutation_tracker.rb:75:ActiveModel::AttributeMutationTracker#attr_names <- activemodel/active_model/attribute_mutation_tracker.rb:41:ActiveModel::AttributeMutationTracker#any_changes? <- activemodel/active_model/dirty.rb:332:ActiveModel::Dirty#changed?
+== serializable_hash (COLS=30, 4.0.10, main)
+  index_for_name: 31
+  keys: 1
+  lookup: 30
+  row_keys: 1
+  keys x1  activerecord/active_record/attribute_methods.rb:437:ActiveRecord::AttributeMethods#attribute_names <- activerecord/active_record/serialization.rb:31:ActiveRecord::Serialization#attribute_names_for_serialization <- activemodel/active_model/serialization.rb:141:ActiveModel::Serialization#serializable_hash

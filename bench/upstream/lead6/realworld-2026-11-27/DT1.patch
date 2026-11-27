@@ -1,0 +1,132 @@
+diff --git a/activemodel/lib/active_model/attribute_mutation_tracker.rb b/activemodel/lib/active_model/attribute_mutation_tracker.rb
+index f8755c2e56..ab0eef3776 100644
+--- a/activemodel/lib/active_model/attribute_mutation_tracker.rb
++++ b/activemodel/lib/active_model/attribute_mutation_tracker.rb
+@@ -72,7 +72,7 @@ def forced_changes
+       end
+ 
+       def attr_names
+-        attributes.keys
++        attributes.touched_keys
+       end
+ 
+       def attribute_changed?(attr_name)
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 441e74635a..639b35c341 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -138,6 +138,12 @@ def keys
+       keys
+     end
+ 
++    # The keys whose attributes can have changed since they were loaded.
++    #: () -> Array[String]
++    def touched_keys
++      keys
++    end
++
+     def fetch_value(name, &block)
+       self[name].value(&block)
+     end
+@@ -232,6 +238,11 @@ def map(&block)
+       AttributeSet.new(new_attributes)
+     end
+ 
++    #: () -> ActiveModel::AttributeSet
++    def forgetting_assignments
++      map(&:forgetting_assignment)
++    end
++
+     def values
+       attributes.values
+     end
+@@ -355,6 +366,20 @@ def keys
+       end
+     end
+ 
++    # Like #keys, without the attributes that are still only values in the
++    # row, which haven't changed.
++    #: () -> Array[String]
++    def touched_keys
++      row_keys.keep_if do |name|
++        index = index_for_name(name)
++        if attribute = lookup(index)
++          attribute.initialized?
++        else
++          !untouched?(index) && attribute_at(name, index).initialized?
++        end
++      end
++    end
++
+     # Same keys, in the same order, as #keys. Values the row has are read
+     # like the generated readers do, without building an Attribute for each.
+     #: () -> Hash[String, untyped]
+@@ -453,6 +478,18 @@ def map(&block)
+       dup.transform_attributes!(&block)
+     end
+ 
++    # Attributes that are still only values in the row stay unbuilt, since
++    # forgetting the assignment of one built from the row gives the same
++    # attribute.
++    #: () -> ActiveModel::LazyIndexedAttributeSet
++    def forgetting_assignments
++      row_keys.each do |name|
++        index = index_for_name(name)
++        attribute_at(name, index) unless untouched?(index)
++      end
++      dup.transform_attributes!(&:forgetting_assignment)
++    end
++
+     protected
+       # An IndexedRow of every attribute, for the methods that work on all
+       # of them. Built on each call, so writes must go through #store.
+@@ -552,6 +589,12 @@ def attribute_at(name, index)
+         lookup(index) || default_attribute(name, index)
+       end
+ 
++      # Not built and not cast, so it still holds the value it was loaded with.
++      #: (Integer) -> bool
++      def untouched?(index)
++        !lookup(index) && IndexedRow.key_at?(@row, index) && UNCAST.equal?(@casted_values[index])
++      end
++
+       # Stores the block's result for the attribute +name+. Unknown names
+       # get Attribute::Null, which raises before anything is stored.
+       #: (String) { (ActiveModel::Attribute) -> ActiveModel::Attribute } -> ActiveModel::Attribute
+@@ -716,6 +759,11 @@ def keys
+       @shared.keys | own_only(@own.keys)
+     end
+ 
++    #: () -> Array[String]
++    def touched_keys
++      @shared.touched_keys | own_only(@own.touched_keys)
++    end
++
+     #: (String) ?{ (String) -> untyped } -> untyped
+     def fetch_value(name, &block)
+       set_for(name).fetch_value(name, &block)
+@@ -816,6 +864,11 @@ def map(&block)
+       self.class.new(@shared.map(&block), @own.map(&block))
+     end
+ 
++    #: () -> ActiveModel::ReindexedAttributeSet
++    def forgetting_assignments
++      self.class.new(@shared.forgetting_assignments, @own.forgetting_assignments)
++    end
++
+     #: () -> ActiveModel::ReindexedAttributeSet
+     def deep_dup
+       self.class.new(@shared.deep_dup, @own.deep_dup)
+diff --git a/activemodel/lib/active_model/dirty.rb b/activemodel/lib/active_model/dirty.rb
+index 7359c3f2e2..f2309fb629 100644
+--- a/activemodel/lib/active_model/dirty.rb
++++ b/activemodel/lib/active_model/dirty.rb
+@@ -451,7 +451,7 @@ def mutations_from_database
+       end
+ 
+       def forget_attribute_assignments
+-        @attributes = @attributes.map(&:forgetting_assignment) if defined?(@attributes)
++        @attributes = @attributes.forgetting_assignments if defined?(@attributes)
+       end
+ 
+       def mutations_before_last_save

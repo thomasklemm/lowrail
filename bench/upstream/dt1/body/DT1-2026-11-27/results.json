@@ -1,0 +1,332 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/dt1/dt1_body.rb",
+  "at": "2026-11-27T15:05:32Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/main",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "088fc0cf61e4ba0c7987decafacc69adb3e22eec",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/fix2",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "4e635c7ca5aa5e66f51bbf6b1c5b9c9ae3a0ed57",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp find, then update! of one column": {
+      "base": 299.987,
+      "base1": 299.975,
+      "base2": 299.999,
+      "candidate": 245.987,
+      "change": -0.18000780033801478,
+      "aa": 0.00008000346681689842,
+      "claim": true
+    },
+    "interp find, then changed?": {
+      "base": 90.0,
+      "base1": 90.0,
+      "base2": 90.0,
+      "candidate": 59.0,
+      "change": -0.34444444444444444,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit find, then update! of one column": {
+      "base": 301.96900000000005,
+      "base1": 301.963,
+      "base2": 301.975,
+      "candidate": 248.011,
+      "change": -0.17868721623742845,
+      "aa": 0.00003973917852494942,
+      "claim": true
+    },
+    "yjit find, then changed?": {
+      "base": 90.0,
+      "base1": 90.0,
+      "base2": 90.0,
+      "candidate": 59.0,
+      "change": -0.34444444444444444,
+      "aa": 0.0,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "interp find, then update! of one column": {
+      "base": 2111005.37775,
+      "base1": 2110408.197,
+      "base2": 2111602.5585,
+      "candidate": 1871399.156,
+      "change": -0.1135033687149497,
+      "aa": 0.0005657785207883513,
+      "claim": true
+    },
+    "interp find, then changed?": {
+      "base": 712854.352,
+      "base1": 712997.393,
+      "base2": 712711.311,
+      "candidate": 486625.722,
+      "change": -0.3173560340415793,
+      "aa": 0.00040131900604578635,
+      "claim": true
+    },
+    "yjit find, then update! of one column": {
+      "base": 1012316.84525,
+      "base1": 1011231.9995,
+      "base2": 1013401.691,
+      "candidate": 875219.3295,
+      "change": -0.13542945214562996,
+      "aa": 0.002143292893110095,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "candidate n2000 compiled_block_count +1",
+          "base2 n2000 compiled_iseq_count +1",
+          "base2 n2000 compiled_block_count +10"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1196,
+                1196
+              ],
+              "compiled_block_count": [
+                16543,
+                16543
+              ],
+              "invalidation_count": [
+                301,
+                301
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1195,
+                1195
+              ],
+              "compiled_block_count": [
+                16506,
+                16506
+              ],
+              "invalidation_count": [
+                295,
+                295
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1197,
+                1197
+              ],
+              "compiled_block_count": [
+                16585,
+                16585
+              ],
+              "invalidation_count": [
+                302,
+                302
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1195,
+                1195
+              ],
+              "compiled_block_count": [
+                16504,
+                16505
+              ],
+              "invalidation_count": [
+                302,
+                302
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1196,
+                1196
+              ],
+              "compiled_block_count": [
+                16533,
+                16533
+              ],
+              "invalidation_count": [
+                301,
+                301
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                1194,
+                1195
+              ],
+              "compiled_block_count": [
+                16497,
+                16507
+              ],
+              "invalidation_count": [
+                295,
+                295
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit find, then changed?": {
+      "base": 356775.37325,
+      "base1": 357098.804,
+      "base2": 356451.9425,
+      "candidate": 234848.072,
+      "change": -0.3417480868685491,
+      "aa": 0.001813077775260933,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n2000 compiled_block_count +10",
+          "candidate n2000 compiled_block_count +8"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                936,
+                936
+              ],
+              "compiled_block_count": [
+                13515,
+                13515
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                936,
+                936
+              ],
+              "compiled_block_count": [
+                13515,
+                13525
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                916,
+                916
+              ],
+              "compiled_block_count": [
+                13081,
+                13081
+              ],
+              "invalidation_count": [
+                294,
+                294
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                932,
+                932
+              ],
+              "compiled_block_count": [
+                13373,
+                13381
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                936,
+                936
+              ],
+              "compiled_block_count": [
+                13515,
+                13515
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                936,
+                936
+              ],
+              "compiled_block_count": [
+                13514,
+                13514
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {}
+}

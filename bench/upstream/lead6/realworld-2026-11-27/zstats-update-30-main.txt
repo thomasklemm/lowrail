@@ -1,0 +1,177 @@
+***ZJIT: Printing ZJIT statistics on exit***
+Top-20 not inlined C methods (55.4% of total 1,102,675):
+                           Array#reverse_each: 67,975 ( 6.2%)
+                                   Hash#fetch: 60,880 ( 5.5%)
+                        Process.clock_gettime: 59,998 ( 5.4%)
+                   ObjectSpace::WeakKeyMap#[]: 35,970 ( 3.3%)
+                                 Array#freeze: 35,960 ( 3.3%)
+                    SQLite3::Database#closed?: 31,998 ( 2.9%)
+                                    Hash#each: 28,290 ( 2.6%)
+                               Array#include?: 28,134 ( 2.6%)
+                                   Array#any?: 27,999 ( 2.5%)
+                                   Kernel#dup: 27,992 ( 2.5%)
+                             Class#superclass: 24,561 ( 2.2%)
+                                  Array#fetch: 24,223 ( 2.2%)
+  RubyVM::FrozenCore.core#hash_merge_bang_kwd: 23,962 ( 2.2%)
+              SQLite3::Database#total_changes: 23,960 ( 2.2%)
+                                  Hash#freeze: 23,958 ( 2.2%)
+                                    Time#nsec: 19,964 ( 1.8%)
+                   Enumerable#each_with_index: 19,956 ( 1.8%)
+                                   Array#to_h: 15,986 ( 1.4%)
+                                   Integer#**: 15,973 ( 1.4%)
+                           String#start_with?: 13,193 ( 1.2%)
+Top-20 calls to C functions from JIT code (71.8% of total 5,117,297):
+                  rb_hash_aref: 1,198,491 (23.4%)
+                   rb_ivar_get:   815,848 (15.9%)
+             rb_vm_invokeblock:   228,260 ( 4.5%)
+             rb_obj_is_kind_of:   200,359 ( 3.9%)
+  rb_vm_opt_send_without_block:   189,559 ( 3.7%)
+                    rb_vm_send:   149,547 ( 2.9%)
+        rb_vm_yield_with_cfunc:   137,606 ( 2.7%)
+                   rb_ary_push:    87,710 ( 1.7%)
+             rb_vm_sendforward:    75,859 ( 1.5%)
+             rb_str_buf_append:    72,112 ( 1.4%)
+            Array#reverse_each:    67,975 ( 1.3%)
+           rb_hash_bulk_insert:    63,835 ( 1.2%)
+                    Hash#fetch:    60,880 ( 1.2%)
+               rb_vm_env_write:    60,041 ( 1.2%)
+         Process.clock_gettime:    59,998 ( 1.2%)
+                  rb_hash_aset:    56,524 ( 1.1%)
+                        _bi567:    40,017 ( 0.8%)
+                  rb_obj_alloc:    36,184 ( 0.7%)
+          rb_zjit_defined_ivar:    36,044 ( 0.7%)
+    ObjectSpace::WeakKeyMap#[]:    35,970 ( 0.7%)
+Top-20 most called JIT functions (42.5% of total 5,519,445):
+                                             block in keys@/home/user/w/main/activemodel/lib/active_model/attribute_set.rb:349: 359,972 ( 6.5%)
+                                            index_for_name@/home/user/w/main/activemodel/lib/active_model/attribute_set.rb:498: 180,068 ( 3.3%)
+                                              attribute_at@/home/user/w/main/activemodel/lib/active_model/attribute_set.rb:552: 155,996 ( 2.8%)
+                                      changed?@/home/user/w/main/activemodel/lib/active_model/attribute_mutation_tracker.rb:44: 152,001 ( 2.8%)
+                            attribute_changed?@/home/user/w/main/activemodel/lib/active_model/attribute_mutation_tracker.rb:79: 151,996 ( 2.8%)
+                                      changed_from_assignment?@/home/user/w/main/activemodel/lib/active_model/attribute.rb:187: 151,992 ( 2.8%)
+                                                     initialize@/home/user/w/main/activemodel/lib/active_model/attribute.rb:34: 132,090 ( 2.4%)
+                                              changed_in_place?@/home/user/w/main/activemodel/lib/active_model/attribute.rb:88: 131,996 ( 2.4%)
+              block in changed_attribute_names@/home/user/w/main/activemodel/lib/active_model/attribute_mutation_tracker.rb:15: 120,001 ( 2.2%)
+                            block in transform_attributes!@/home/user/w/main/activemodel/lib/active_model/attribute_set.rb:477: 119,972 ( 2.2%)
+                                                   from_database@/home/user/w/main/activemodel/lib/active_model/attribute.rb:9: 112,059 ( 2.0%)
+                                                has_been_read?@/home/user/w/main/activemodel/lib/active_model/attribute.rb:137: 111,976 ( 2.0%)
+                                         forgetting_assignment@/home/user/w/main/activemodel/lib/active_model/attribute.rb:209: 111,971 ( 2.0%)
+                                               connected_to_stack@/home/user/w/main/activerecord/lib/active_record/core.rb:241:  68,033 ( 1.2%)
+                                                                                                     each@<internal:array>:266:  65,422 ( 1.2%)
+          current_transaction@/home/user/w/main/activerecord/lib/active_record/connection_adapters/abstract/transaction.rb:708:  56,023 ( 1.0%)
+  current_transaction@/home/user/w/main/activerecord/lib/active_record/connection_adapters/abstract/database_statements.rb:552:  47,992 ( 0.9%)
+                                                          visit@/home/user/w/main/activerecord/lib/arel/visitors/visitor.rb:34:  44,003 ( 0.8%)
+                                          []@/home/user/w/main/activesupport/lib/active_support/isolated_execution_state.rb:32:  36,233 ( 0.7%)
+                     iterate_guarding_exceptions@/home/user/w/main/activesupport/lib/active_support/notifications/fanout.rb:22:  36,022 ( 0.7%)
+Top-2 not optimized method types for send (100.0% of total 76,241):
+  optimized_send: 72,269 (94.8%)
+       optimized:  3,972 ( 5.2%)
+Top-1 not optimized method types for super (100.0% of total 70):
+  attrset: 70 (100.0%)
+Top-18 send fallback reasons (100.0% of total 683,505):
+               invokeblock_not_specialized: 146,158 (21.4%)
+                    send_block_arg_not_nil: 108,866 (15.9%)
+              one_or_more_complex_arg_pass:  88,599 (13.0%)
+              invokeblock_polymorphic_miss:  82,102 (12.0%)
+               sendforward_not_specialized:  75,859 (11.1%)
+  send_not_optimized_method_type_optimized:  72,269 (10.6%)
+                 send_polymorphic_fallback:  58,887 ( 8.6%)
+                   super_complex_args_pass:  15,934 ( 2.3%)
+                          super_from_block:  15,933 ( 2.3%)
+        invokesuperforward_not_specialized:   7,945 ( 1.2%)
+        send_not_optimized_need_permission:   4,117 ( 0.6%)
+            send_not_optimized_method_type:   3,972 ( 0.6%)
+                      singleton_class_seen:   2,249 ( 0.3%)
+                         super_polymorphic:     387 ( 0.1%)
+                          send_megamorphic:      91 ( 0.0%)
+           super_not_optimized_method_type:      70 ( 0.0%)
+                          send_polymorphic:      56 ( 0.0%)
+                     super_call_with_block:      11 ( 0.0%)
+Top-1 SendDirect fallback contexts (100.0% of total 23,930):
+  send: 23,930 (100.0%)
+Top-4 setivar fallback reasons (100.0% of total 32,075):
+               not_t_object: 32,002 (99.8%)
+           shape_transition:     27 ( 0.1%)
+              no_side_exits:     27 ( 0.1%)
+  new_shape_needs_extension:     19 ( 0.1%)
+Top-2 getivar fallback reasons (100.0% of total 820,060):
+  no_profile_missing_ic: 807,815 (98.5%)
+          no_side_exits:  12,245 ( 1.5%)
+Top-3 HIR-level inlining rejection reasons (100.0% of total 1,195):
+  budget_exceeded: 859 (71.9%)
+        too_large: 321 (26.9%)
+   complex_params:  15 ( 1.3%)
+Top-4 popular complex argument-parameter features not optimized (100.0% of total 63,822):
+  caller_kw_splat: 35,915 (56.3%)
+     param_kwrest: 23,930 (37.5%)
+  caller_blockarg:  3,972 ( 6.2%)
+     caller_kwarg:      5 ( 0.0%)
+Top-11 side exit reasons (100.0% of total 6,485):
+       guard_not_shared_failure: 3,998 (61.6%)
+             guard_type_failure: 1,245 (19.2%)
+     function_stub_not_profiled:   688 (10.6%)
+            guard_shape_failure:   263 ( 4.1%)
+                no_profile_send:   177 ( 2.7%)
+             no_profile_getivar:    80 ( 1.2%)
+      invoke_block_iseq_changed:    15 ( 0.2%)
+             no_profile_setivar:    15 ( 0.2%)
+  invoke_block_handler_not_iseq:     2 ( 0.0%)
+             guard_less_failure:     1 ( 0.0%)
+                      interrupt:     1 ( 0.0%)
+                             send_count: 18,242,798
+                     dynamic_send_count:    683,505 ( 3.7%)
+                   optimized_send_count: 17,559,293 (96.3%)
+              iseq_optimized_send_count:  3,882,637 (21.3%)
+      inline_cfunc_optimized_send_count:  6,980,647 (38.3%)
+       inline_iseq_optimized_send_count:  5,286,049 (29.0%)
+                    inline_method_count:        786 ( 0.0%)
+               empty_inline_frame_count:          0 ( 0.0%)
+non_variadic_cfunc_optimized_send_count:    797,387 ( 4.4%)
+    variadic_cfunc_optimized_send_count:    305,288 ( 1.7%)
+                 caller_splat_optimized:          0 ( 0.0%)
+dynamic_setivar_count:                                             32,075
+dynamic_getivar_count:                                            820,060
+dynamic_definedivar_count:                                              0
+compiled_iseq_count:                                                  990
+compiled_side_exit_count:                                          16,925
+failed_iseq_count:                                                      0
+compile_time:                                                       518ms
+compile_side_exit_time:                                              31ms
+compile_side_exit_time_ratio:                                        6.1%
+compile_hir_time:                                                   177ms
+compile_hir_build_time:                                              45ms
+compile_hir_strength_reduce_time:                                    32ms
+compile_hir_inline_methods_time:                                     13ms
+compile_hir_remove_trivial_block_params_time:                         7ms
+compile_hir_optimize_load_store_time:                                14ms
+compile_hir_canonicalize_time:                                       24ms
+compile_hir_fold_constants_time:                                      8ms
+compile_hir_clean_cfg_time:                                           7ms
+compile_hir_remove_redundant_patch_points_time:                       5ms
+compile_hir_remove_duplicate_check_interrupts_time:                   3ms
+compile_hir_eliminate_empty_inline_frames_time:                       1ms
+compile_hir_eliminate_dead_code_time:                                 9ms
+compile_lir_time:                                                   315ms
+profile_time:                                                         5ms
+gc_time:                                                              9ms
+invalidation_time:                                                    2ms
+vm_write_jit_frame_count:                                      12,450,194
+vm_write_sp_count:                                             12,450,194
+vm_write_stack_count:                                           1,962,992
+vm_write_to_parent_iseq_local_count:                               88,107
+guard_type_count:                                              10,434,890
+guard_type_exit_ratio:                                               0.0%
+guard_shape_count:                                              6,167,666
+guard_shape_exit_ratio:                                              0.0%
+load_field_count:                                              20,047,894
+store_field_count:                                              4,342,438
+throw_count:                                                            7
+side_exit_size_bytes:                                           1,132,475
+side_exit_size_ratio:                                               39.4%
+jit_frame_heap_bytes:                                                   0
+jit_frame_region_bytes:                                           753,664
+code_region_bytes:                                              2,871,296
+zjit_alloc_bytes:                                               2,854,309
+total_mem_bytes:                                                6,479,269
+total_native_stack_bytes:                                               0
+side_exit_count:                                                    6,485
+zjit_insn_count:                                               89,009,055
