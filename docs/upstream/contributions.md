@@ -962,6 +962,7 @@ ActionView.eager_load!   # vorher: LoadError: cannot load such file -- prism
 All entries in this section are **open, not merged; checked on 2026-11-02**, and rechecked against live GitHub (state, draft, head, CI, comments) on 2026-11-04 09:00 UTC ([status check](#status-check-2026-11-04-0900-utc)).
 Measurements are the PRs' own, from their original dates.
 
+- [ruby/uri#276](https://github.com/ruby/uri/pull/276) (UR1), decode www-form components with cgi/escape: `URI.decode_www_form_component` runs `gsub` with a regexp and a hash table over every `+` and `%XX`; `CGI.unescape` does the same in one pass in C (Rack query strings and cookies, Rails query parameters and form fields call it). Per call on 4.0.10, 509k to 3.72M i/s depending on input; 2 or 3 objects instead of 4 to 8 ([item](../../bench/upstream/pr-queue/items/UR1.md)). **Ready**, opened 2026-11-27 20:56 UTC, head `c43954f`, maintainer edits allowed; no comments yet.
 - [hashie/hashie#660](https://github.com/hashie/hashie/pull/660), Run Duel under ZJIT next to YJIT (follow-up to hashie#659). **Ready**, opened 2026-11-27, head `f6545d1dd3`; first CI run pending at 19:50 UTC, no comments from others yet.
 **Rechecked 2026-11-05 23:00 UTC** against `gh api graphql` (every PR by thomasklemm, state, draft, head): 78 Lowrail
 PRs are open, 14 of them drafts — rails/rails 27 (12 drafts: #59661–#59663, #59667, #59668, #59671–#59677), ruby/ruby 7,

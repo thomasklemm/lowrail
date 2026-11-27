@@ -15,3 +15,4 @@ https://github.com/rails/rails/pull/60020
 https://github.com/ruby/ruby/pull/20261
 https://github.com/hashie/hashie/pull/660
 https://github.com/hashie/hashie/pull/661
+https://github.com/ruby/uri/pull/276
