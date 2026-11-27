@@ -1,6 +1,8 @@
 # lowrail-profile changelog
 
-## 0.1.2 (unreleased)
+## 0.1.2 (2026-11-27)
+
+The first published release: it includes 0.1.1's changes below.
 
 From a field test of 0.1.0.rc1 with parallel workers:
 
@@ -15,7 +17,9 @@ From a field test of 0.1.0.rc1 with parallel workers:
   so `postgresql_adapter.rb:880` showed no ledger entry for a merged pull request that changes exactly that call.
   Matching was already by file, method and the line's code, not by line number.
 
-## 0.1.1 (2026-11-27, release commit 1455b3f2)
+## 0.1.1 (not published)
+
+Not published; its changes ship in 0.1.2.
 
 * An engine profiled in place, whose own directory is both the app root and a path gem, keeps the files under a
   directory named `gems` (such as `app/views/gems/index.html.erb`) as app lines, like its other files; 0.1 ranked them

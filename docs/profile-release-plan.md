@@ -308,9 +308,33 @@ About three weeks of work before M6. M1 and M3 can run in parallel; M4 needs M1 
 6. **Proof apps.** Recommended: Campfire, Lobsters, CodeTriage, plus a floor-version app if CodeTriage cannot run
    there.
 
-## 8. Release checklist: 0.1.1 (prepared 2026-11-27, not published)
+## 8. Release checklist: 0.1.2 (prepared 2026-11-27, not published)
 
-0.1.0 was never published; 0.1.1 replaces it as the first release. Every step up to publishing is done by an agent
+0.1.0 and 0.1.1 were never published; 0.1.2 is the first release and includes 0.1.1's changes. Every step up to
+publishing is done by an agent and recorded here; publishing and tagging need Thomas.
+
+- [x] Version `0.1.2` in `gem/lib/lowrail/profile_version.rb`; CHANGELOG heading dated, 0.1.1 marked not published;
+  README install line names `lowrail-profile-0.1.2.gem`.
+- [x] The parallel-worker field test's findings fixed (CHANGELOG 0.1.2): parallel-capture warning, minimum warm
+  sample, ledger match across Rails versions. thermos-sol and Astra approved `95faabeb` after one round of changes.
+- [x] `gem build lowrail-profile.gemspec` from `gem/` at `95faabeb`: 14 files, 89,600 bytes, no lowering code; two
+  builds byte-identical (Ruby 4.0.7, RubyGems 4.0.20), SHA-256
+  `8916211805cd2d4348f437ebcd6949fe8c417e22becabbc460302cafdf0ee3c2`. The packaged files (README included, not the
+  CHANGELOG) are the same in the release commit below; any change to them changes the hash: rebuild and record it.
+- [x] `gem install --local` into an empty gem home, then a new Rails 8.1.4 app (`rails new --minimal`, one
+  scaffold): `bundle exec lowrail-profile --version` prints 0.1.2; two captures of `bin/rails test` exit 0 with no
+  parallel warning; compare of the two exits 0; compare with the base as its own A/A report exits 2.
+- [x] CI green on `95faabeb`: run 46042156810, all 13 jobs (Ruby 3.3/3.4/4.0 × Rails 7.2/8.0/8.1, macOS 3.3 and
+  4.0, Ruby head, the `test` job). The release commit changes only Markdown after it, which CI does not run on.
+- [ ] Thomas: build from the release commit (`cd gem && gem build lowrail-profile.gemspec`), check the SHA-256 above,
+  `gem push lowrail-profile-0.1.2.gem` from an account with MFA, tag the release commit `lowrail-profile-v0.1.2` and
+  push the tag.
+- [ ] After publishing: `gem install lowrail-profile -v 0.1.2` from rubygems.org in a new app, and the README's
+  "Until 0.1.2 is on rubygems.org" paragraph removed.
+
+## 9. Release checklist: 0.1.1 (superseded by 0.1.2, never published)
+
+Superseded: 0.1.2 is released instead; the unchecked steps below are not to be done. 0.1.0 was never published; 0.1.1 was to replace it as the first release. Every step up to publishing is done by an agent
 and recorded here; publishing and tagging need Thomas.
 
 - [x] Version `0.1.1` in `gem/lib/lowrail/profile_version.rb`; CHANGELOG heading dated; README install line names
@@ -329,9 +353,9 @@ and recorded here; publishing and tagging need Thomas.
 - [x] CI green on the exact release commit (the `profile` job's Ruby 3.3/3.4/4.0 × Rails 7.2/8.0/8.1 matrix and macOS):
   release commit `1455b3f2`, run 46036991818, all 13 jobs (also Ruby head and the `test` job). Its `gem/` builds
   the SHA-256 above.
-- [ ] Thomas: build from that commit (`cd gem && gem build lowrail-profile.gemspec`), check the gem's SHA-256 against
+- [ ] ~~Superseded.~~ Thomas: build from that commit (`cd gem && gem build lowrail-profile.gemspec`), check the gem's SHA-256 against
   the one recorded here from independent builds of that commit (CI uploads no gem; builds are byte-identical with
   the same RubyGems), `gem push lowrail-profile-0.1.1.gem` from an account with MFA, tag the commit
   `lowrail-profile-v0.1.1` and push the tag.
-- [ ] After publishing: `gem install lowrail-profile -v 0.1.1` from rubygems.org in a new app, and the README's
+- [ ] ~~Superseded.~~ After publishing: `gem install lowrail-profile -v 0.1.1` from rubygems.org in a new app, and the README's
   "Until 0.1.1 is on rubygems.org" paragraph removed.
