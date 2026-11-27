@@ -1,0 +1,27 @@
+== Dash.new: 4 objects
+     1  hashie/dash.rb:285 Array
+     1  hashie/dash.rb:304 Hash
+== Dash read x4, write x2: 0 objects
+== Trash.new: 4 objects
+     1  hashie/dash.rb:304 Hash
+     1  hashie/extensions/dash/property_translation.rb:282 Hash
+== Dash.new coerced: 7 objects
+     2  hashie/extensions/coercion.rb:346 Array
+     1  hashie/dash.rb:304 Hash
+== Dash.new nested coercion: 16 objects
+     4  hashie/dash.rb:304 Hash
+     3  hashie/extensions/ignore_undeclared.rb:46 Array
+     3  hashie/extensions/ignore_undeclared.rb:48 Hash
+     2  hashie/extensions/coercion.rb:346 Array
+     2  hashie/extensions/coercion.rb:320 LicenseDash
+     1  hashie/extensions/coercion.rb:320 OwnerDash
+== IndifferentAccess.new: 252 objects
+    42  hashie/extensions/indifferent_access.rb:43 String
+    21  hashie/extensions/indifferent_access.rb:44 String
+     3  hashie/extensions/indifferent_access.rb:47 Array
+     3  hashie/extensions/indifferent_access.rb:42 Array
+     3  hashie/extensions/indifferent_access.rb:107 Array
+     3  hashie/extensions/indifferent_access.rb:51 Class
+     3  hashie/extensions/indifferent_access.rb:73 Class
+     2  hashie/extensions/indifferent_access.rb:121 Array
+== IndifferentAccess read x5: 0 objects

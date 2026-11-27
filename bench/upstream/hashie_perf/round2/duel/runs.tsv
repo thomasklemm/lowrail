@@ -1,0 +1,5 @@
+run	fork PR	branch	head	candidate
+46067769275	27	perfz2/mm	522b899	HM3 lib and spec of 202c478 on perf-base-zjit
+46067773112	28	perfz2/quiet	f7596e9	HM4 first head c28e722 on perf-base-zjit (module included for keyed classes too)
+46068675920	29	perfz2/th	0ad0c2c	HM5 lib of 39db98d on perf-base-zjit
+46071221821	32	perfz2/quiet2	a32fa70	HM4 f41c3b2 on perf-base-zjit (final module head)

@@ -1,0 +1,40 @@
+== base 3.4.7/bin/ruby
+mash.description = value         6.00 objects      2.030 us
+mash.private?                    5.00 objects      0.902 us
+mash.name                        1.00 objects      0.442 us
+mash.name(1)                     1.00 objects      0.470 us
+== base 3.4.7/bin/ruby --yjit
+mash.description = value         6.00 objects      1.218 us
+mash.private?                    5.00 objects      0.520 us
+mash.name                        1.00 objects      0.249 us
+mash.name(1)                     1.00 objects      0.250 us
+== mm 3.4.7/bin/ruby
+mash.description = value         6.00 objects      2.042 us
+mash.private?                    5.00 objects      0.924 us
+mash.name                        1.00 objects      0.470 us
+mash.name(1)                     1.00 objects      0.481 us
+== mm 3.4.7/bin/ruby --yjit
+mash.description = value         6.00 objects      1.249 us
+mash.private?                    5.00 objects      0.521 us
+mash.name                        1.00 objects      0.241 us
+mash.name(1)                     1.00 objects      0.261 us
+== base 3.4.7/bin/ruby
+mash.description = value         6.00 objects      2.060 us
+mash.private?                    5.00 objects      0.883 us
+mash.name                        1.00 objects      0.440 us
+mash.name(1)                     1.00 objects      0.462 us
+== base 3.4.7/bin/ruby --yjit
+mash.description = value         6.00 objects      1.112 us
+mash.private?                    5.00 objects      0.511 us
+mash.name                        1.00 objects      0.235 us
+mash.name(1)                     1.00 objects      0.251 us
+== mm 3.4.7/bin/ruby
+mash.description = value         6.00 objects      1.998 us
+mash.private?                    5.00 objects      0.898 us
+mash.name                        1.00 objects      0.448 us
+mash.name(1)                     1.00 objects      0.470 us
+== mm 3.4.7/bin/ruby --yjit
+mash.description = value         6.00 objects      1.121 us
+mash.private?                    5.00 objects      0.522 us
+mash.name                        1.00 objects      0.243 us
+mash.name(1)                     1.00 objects      0.263 us

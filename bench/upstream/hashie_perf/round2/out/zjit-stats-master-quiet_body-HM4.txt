@@ -1,0 +1,146 @@
+***ZJIT: Printing ZJIT statistics on exit***
+Top-20 not inlined C methods (100.0% of total 50,257,158):
+  Hashie::Mash#regular_writer: 13,463,953 (26.8%)
+          Kernel#instance_of?: 12,311,895 (24.5%)
+                   Array#any?:  9,576,123 (19.1%)
+                    Hash#key?:  4,607,956 ( 9.2%)
+           Kernel#respond_to?:  4,031,966 ( 8.0%)
+   Kernel#respond_to_missing?:  3,959,971 ( 7.9%)
+               Hash#each_pair:    647,976 ( 1.3%)
+                     Hash.new:    431,907 ( 0.9%)
+      UnboundMethod#bind_call:    359,978 ( 0.7%)
+                   Kernel#dup:    323,999 ( 0.6%)
+    Hashie::Mash#regular_key?:    143,984 ( 0.3%)
+                    Array.new:     71,999 ( 0.1%)
+  Hashie::Mash#regular_reader:     71,985 ( 0.1%)
+                Kernel#method:     71,981 ( 0.1%)
+                 Method#owner:     71,976 ( 0.1%)
+       Method#source_location:     71,976 ( 0.1%)
+            Hash#default_proc:     35,990 ( 0.1%)
+             Numeric#nonzero?:        260 ( 0.0%)
+                   String#<=>:        260 ( 0.0%)
+                Regexp#match?:        174 ( 0.0%)
+Top-20 calls to C functions from JIT code (98.6% of total 117,406,388):
+             rb_obj_is_kind_of: 19,728,150 (16.8%)
+                 rb_str_intern: 13,463,996 (11.5%)
+   Hashie::Mash#regular_writer: 13,463,953 (11.5%)
+           Kernel#instance_of?: 12,311,895 (10.5%)
+  rb_vm_opt_send_without_block:  9,864,155 ( 8.4%)
+                    Array#any?:  9,576,123 ( 8.2%)
+                         _bi13:  8,063,949 ( 6.9%)
+                     Hash#key?:  4,607,956 ( 3.9%)
+    rb_zjit_materialize_frames:  4,284,182 ( 3.6%)
+                exit_recompile:  4,284,110 ( 3.6%)
+             rb_vm_splat_array:  4,067,942 ( 3.5%)
+            Kernel#respond_to?:  4,031,966 ( 3.4%)
+    Kernel#respond_to_missing?:  3,959,971 ( 3.4%)
+           rb_vm_bh_to_procval:    755,976 ( 0.6%)
+                  rb_hash_init:    755,976 ( 0.6%)
+             rb_vm_invokesuper:    755,937 ( 0.6%)
+                Hash#each_pair:    647,976 ( 0.6%)
+                      Hash.new:    431,907 ( 0.4%)
+                    rb_vm_send:    396,014 ( 0.3%)
+       UnboundMethod#bind_call:    359,978 ( 0.3%)
+Top-20 most called JIT functions (99.6% of total 103,677,672):
+                                  convert_key@/home/user/w/hashie-quiet/lib/hashie/mash.rb:605: 26,928,224 (26.0%)
+                                convert_value@/home/user/w/hashie-quiet/lib/hashie/mash.rb:610: 14,220,075 (13.7%)
+                                custom_writer@/home/user/w/hashie-quiet/lib/hashie/mash.rb:204: 13,463,996 (13.0%)
+                        block in _deep_update@/home/user/w/hashie-quiet/lib/hashie/mash.rb:412: 13,463,996 (13.0%)
+  disable_warnings?@/home/user/w/hashie-quiet/lib/hashie/extensions/key_conflict_warning.rb:70:  9,576,074 ( 9.2%)
+    _log_collision?@/home/user/w/hashie-quiet/lib/hashie/extensions/key_conflict_warning.rb:58:  9,432,083 ( 9.1%)
+                               _method_suffix@/home/user/w/hashie-quiet/lib/hashie/mash.rb:596:  4,031,971 ( 3.9%)
+                              _log_collision?@/home/user/w/hashie-quiet/lib/hashie/mash.rb:644:  4,031,966 ( 3.9%)
+                          respond_to_missing?@/home/user/w/hashie-quiet/lib/hashie/mash.rb:473:  3,959,971 ( 3.8%)
+                                                                 initialize@<internal:hash>:37:    755,976 ( 0.7%)
+                                   initialize@/home/user/w/hashie-quiet/lib/hashie/mash.rb:138:    755,947 ( 0.7%)
+                         block in deep_update@/home/user/w/hashie-quiet/lib/hashie/mash.rb:378:    755,942 ( 0.7%)
+                       block in convert_value@/home/user/w/hashie-quiet/lib/hashie/mash.rb:622:    755,920 ( 0.7%)
+                                         key?@/home/user/w/hashie-quiet/lib/hashie/mash.rb:343:    647,990 ( 0.6%)
+                                          dup@/home/user/w/hashie-quiet/lib/hashie/mash.rb:327:    144,018 ( 0.1%)
+                                 _deep_update@/home/user/w/hashie-quiet/lib/hashie/mash.rb:411:     72,039 ( 0.1%)
+                                  deep_update@/home/user/w/hashie-quiet/lib/hashie/mash.rb:377:     72,005 ( 0.1%)
+                        _log_built_in_message@/home/user/w/hashie-quiet/lib/hashie/mash.rb:631:     71,981 ( 0.1%)
+                           method_information@/home/user/w/hashie-quiet/lib/hashie/utils.rb:17:     71,976 ( 0.1%)
+     warn@/home/user/w/rubies/master/lib/ruby/gems/4.1.0+7/gems/logger-1.7.0/lib/logger.rb:726:     71,971 ( 0.1%)
+Top-4 send fallback reasons (100.0% of total 11,016,164):
+     send_polymorphic_fallback: 6,012,184 (54.6%)
+  one_or_more_complex_arg_pass: 4,247,985 (38.6%)
+       super_complex_args_pass:   755,937 ( 6.9%)
+   invokeblock_not_specialized:        58 ( 0.0%)
+Top-1 setivar fallback reasons (100.0% of total 143,985):
+  not_t_object: 143,985 (100.0%)
+Top-2 HIR-level inlining rejection reasons (100.0% of total 105):
+  budget_exceeded: 74 (70.5%)
+        too_large: 31 (29.5%)
+Top-2 popular complex argument-parameter features not optimized (100.0% of total 71,942):
+     caller_splat: 35,971 (50.0%)
+  caller_blockarg: 35,971 (50.0%)
+Top-1 caller splat length profiles (100.0% of total 35,971):
+  monomorphic: 35,971 (100.0%)
+Top-6 side exit reasons (100.0% of total 4,284,182):
+          guard_type_failure: 4,284,053 (100.0%)
+  function_stub_not_profiled:        71 ( 0.0%)
+             no_profile_send:        40 ( 0.0%)
+         guard_shape_failure:        12 ( 0.0%)
+   invoke_block_iseq_changed:         5 ( 0.0%)
+                   interrupt:         1 ( 0.0%)
+                             send_count: 397,413,748
+                     dynamic_send_count:  11,016,164 ( 2.8%)
+                   optimized_send_count: 386,397,584 (97.2%)
+              iseq_optimized_send_count:  78,949,825 (19.9%)
+      inline_cfunc_optimized_send_count: 207,618,322 (52.2%)
+       inline_iseq_optimized_send_count:  48,744,303 (12.3%)
+                    inline_method_count:          38 ( 0.0%)
+      inline_block_optimized_send_count:      72,034 ( 0.0%)
+                     inline_block_count:           6 ( 0.0%)
+               empty_inline_frame_count:           0 ( 0.0%)
+non_variadic_cfunc_optimized_send_count:  35,784,501 ( 9.0%)
+    variadic_cfunc_optimized_send_count:  14,472,657 ( 3.6%)
+                 caller_splat_optimized:           0 ( 0.0%)
+dynamic_setivar_count:                                            143,985
+dynamic_getivar_count:                                                  0
+dynamic_definedivar_count:                                              0
+compiled_iseq_count:                                                   88
+compiled_side_exit_count:                                           1,420
+failed_iseq_count:                                                      0
+compile_time:                                                        50ms
+compile_side_exit_time:                                               2ms
+compile_side_exit_time_ratio:                                        5.8%
+compile_hir_time:                                                    16ms
+compile_hir_build_time:                                               5ms
+compile_hir_strength_reduce_time:                                     2ms
+compile_hir_inline_methods_time:                                      0ms
+compile_hir_remove_trivial_block_params_time:                         0ms
+compile_hir_optimize_load_store_time:                                 0ms
+compile_hir_canonicalize_time:                                        2ms
+compile_hir_fold_constants_time:                                      0ms
+compile_hir_clean_cfg_time:                                           0ms
+compile_hir_remove_redundant_patch_points_time:                       0ms
+compile_hir_remove_duplicate_check_interrupts_time:                   0ms
+compile_hir_eliminate_empty_inline_frames_time:                       0ms
+compile_hir_eliminate_dead_code_time:                                 0ms
+compile_lir_time:                                                    31ms
+profile_time:                                                         0ms
+gc_time:                                                              5ms
+invalidation_time:                                                    0ms
+vm_write_jit_frame_count:                                     189,335,654
+vm_write_sp_count:                                            189,335,654
+vm_write_stack_count:                                          61,395,268
+vm_write_to_parent_iseq_local_count:                                   94
+guard_type_count:                                             121,323,071
+guard_type_exit_ratio:                                               3.5%
+guard_shape_count:                                             19,298,193
+guard_shape_exit_ratio:                                              0.0%
+load_field_count:                                             154,771,807
+store_field_count:                                              5,510,928
+throw_count:                                                            0
+side_exit_size_bytes:                                              95,682
+side_exit_size_ratio:                                               37.1%
+jit_frame_heap_bytes:                                                   0
+jit_frame_region_bytes:                                            65,536
+code_region_bytes:                                                258,048
+zjit_alloc_bytes:                                                 291,046
+total_mem_bytes:                                                  614,630
+total_native_stack_bytes:                                               0
+side_exit_count:                                                4,284,182
+zjit_insn_count:                                            1,585,206,835

@@ -1,0 +1,33 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]
+mm o.foo: 0.0
+mm o.foo = 1: 1.0
+direct(:a): 0.0
+direct(:a, 1): 1.0
+noblk(:a, 1): 1.0
+req(:a, 1): 0.0
+direct(:a, 1, 2): 1.0
+*args: mm a.foo: 1.0
+*args: mm a.foo = 1: 1.0
+*args: direct(:a, 1): 1.0
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+mm o.foo: 0.0
+mm o.foo = 1: 1.0
+direct(:a): 0.0
+direct(:a, 1): 1.0
+noblk(:a, 1): 1.0
+req(:a, 1): 1.0
+direct(:a, 1, 2): 1.0
+*args: mm a.foo: 1.0
+*args: mm a.foo = 1: 1.0
+*args: direct(:a, 1): 1.0
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +ZJIT +PRISM [x86_64-linux]
+mm o.foo: 0.0
+mm o.foo = 1: 1.0
+direct(:a): 0.0
+direct(:a, 1): 1.0
+noblk(:a, 1): 1.0
+req(:a, 1): 0.0
+direct(:a, 1, 2): 1.0
+*args: mm a.foo: 1.0
+*args: mm a.foo = 1: 1.0
+*args: direct(:a, 1): 1.0

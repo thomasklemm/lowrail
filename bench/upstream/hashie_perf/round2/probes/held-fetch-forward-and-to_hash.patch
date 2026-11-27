@@ -1,0 +1,39 @@
+diff --git a/lib/hashie/hash.rb b/lib/hashie/hash.rb
+index 05af801..e95fa10 100644
+--- a/lib/hashie/hash.rb
++++ b/lib/hashie/hash.rb
+@@ -38,13 +38,14 @@ module Hashie
+           else
+             k
+           end
+-        if self[k].is_a?(Array)
+-          out[assignment_key] ||= []
+-          self[k].each do |array_object|
+-            out[assignment_key] << _maybe_convert_to_hash(array_object, options)
++        value = self[k]
++        if value.is_a?(Array)
++          array = out[assignment_key] ||= []
++          value.each do |array_object|
++            array << _maybe_convert_to_hash(array_object, options)
+           end
+         else
+-          out[assignment_key] = _maybe_convert_to_hash(self[k], options)
++          out[assignment_key] = _maybe_convert_to_hash(value, options)
+         end
+       end
+       out
+diff --git a/lib/hashie/mash.rb b/lib/hashie/mash.rb
+index a80d6bf..b1535a8 100644
+--- a/lib/hashie/mash.rb
++++ b/lib/hashie/mash.rb
+@@ -251,8 +251,8 @@ module Hashie
+     #   mash = Hashie::Mash.new(name: 'Ada')
+     #   mash.fetch(:name) # => 'Ada'
+     #   mash.fetch(:missing, 'unknown') # => 'unknown'
+-    def fetch(key, *args)
+-      super(convert_key(key), *args)
++    def fetch(key, ...)
++      super(convert_key(key), ...)
+     end
+ 
+     # @example Delete a string-backed key using a symbol

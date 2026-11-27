@@ -1,0 +1,108 @@
+== base bench_keys 4.0.10/bin/ruby
+Mash.new(repository)            24.82 objects    158.287 us
+quiet.new(repository)           14.82 objects    154.772 us
+mash['name'] x3                  0.00 objects      0.715 us
+mash.name x3                     4.00 objects      1.810 us
+key?('name'), fetch('name')      1.00 objects      0.420 us
+mash['description'] =            1.00 objects      1.237 us
+merge                           25.82 objects    163.108 us
+== base bench_keys 4.0.10/bin/ruby --yjit
+Mash.new(repository)            28.82 objects     67.164 us
+quiet.new(repository)           14.82 objects     67.005 us
+mash['name'] x3                  0.00 objects      0.122 us
+mash.name x3                     4.00 objects      0.942 us
+key?('name'), fetch('name')      1.00 objects      0.091 us
+mash['description'] =            1.00 objects      0.589 us
+merge                           29.82 objects     70.136 us
+== base bench_keys master/bin/ruby --zjit
+Mash.new(repository)            22.82 objects     83.167 us
+quiet.new(repository)           14.82 objects     86.896 us
+mash['name'] x3                  0.00 objects      0.133 us
+mash.name x3                     4.00 objects      0.990 us
+key?('name'), fetch('name')      1.00 objects      0.127 us
+mash['description'] =            0.00 objects      0.816 us
+merge                           21.82 objects     90.970 us
+== ck bench_keys 4.0.10/bin/ruby
+Mash.new(repository)            24.82 objects    150.991 us
+quiet.new(repository)           14.82 objects    147.487 us
+mash['name'] x3                  0.00 objects      0.614 us
+mash.name x3                     4.00 objects      1.812 us
+key?('name'), fetch('name')      1.00 objects      0.329 us
+mash['description'] =            1.00 objects      1.218 us
+merge                           25.82 objects    156.632 us
+== ck bench_keys 4.0.10/bin/ruby --yjit
+Mash.new(repository)            28.82 objects     67.671 us
+quiet.new(repository)           14.82 objects     66.988 us
+mash['name'] x3                  0.00 objects      0.125 us
+mash.name x3                     4.00 objects      0.945 us
+key?('name'), fetch('name')      1.00 objects      0.093 us
+mash['description'] =            1.00 objects      0.594 us
+merge                           29.82 objects     69.651 us
+== ck bench_keys master/bin/ruby --zjit
+Mash.new(repository)            22.82 objects     85.206 us
+quiet.new(repository)           14.82 objects     83.042 us
+mash['name'] x3                  0.00 objects      0.160 us
+mash.name x3                     4.00 objects      0.945 us
+key?('name'), fetch('name')      1.00 objects      0.147 us
+mash['description'] =            0.00 objects      0.822 us
+merge                           21.82 objects     87.896 us
+== base bench_keys 4.0.10/bin/ruby
+Mash.new(repository)            24.82 objects    156.051 us
+quiet.new(repository)           14.82 objects    152.183 us
+mash['name'] x3                  0.00 objects      0.693 us
+mash.name x3                     4.00 objects      1.777 us
+key?('name'), fetch('name')      1.00 objects      0.406 us
+mash['description'] =            1.00 objects      1.244 us
+merge                           25.82 objects    164.532 us
+== base bench_keys 4.0.10/bin/ruby --yjit
+Mash.new(repository)            28.82 objects     66.987 us
+quiet.new(repository)           14.82 objects     66.864 us
+mash['name'] x3                  0.00 objects      0.124 us
+mash.name x3                     4.00 objects      0.931 us
+key?('name'), fetch('name')      1.00 objects      0.091 us
+mash['description'] =            1.00 objects      0.577 us
+merge                           29.82 objects     70.074 us
+== base bench_keys master/bin/ruby --zjit
+Mash.new(repository)            22.82 objects     86.343 us
+quiet.new(repository)           14.82 objects     87.719 us
+mash['name'] x3                  0.00 objects      0.133 us
+mash.name x3                     4.00 objects      0.941 us
+key?('name'), fetch('name')      1.00 objects      0.128 us
+mash['description'] =            0.00 objects      0.827 us
+merge                           21.82 objects     94.025 us
+== base bench_fetch 4.0.10/bin/ruby
+fetch(:name)                     1.00 objects      0.228 us
+fetch(:missing, nil)             1.00 objects      0.220 us
+fetch(:missing) { 1 }            1.00 objects      0.265 us
+== base bench_fetch 4.0.10/bin/ruby --yjit
+fetch(:name)                     1.00 objects      0.115 us
+fetch(:missing, nil)             1.00 objects      0.099 us
+fetch(:missing) { 1 }            1.00 objects      0.121 us
+== base bench_fetch master/bin/ruby --zjit
+fetch(:name)                     1.00 objects      0.138 us
+fetch(:missing, nil)             1.00 objects      0.116 us
+fetch(:missing) { 1 }            1.00 objects      0.156 us
+== x bench_fetch 4.0.10/bin/ruby
+fetch(:name)                    -0.00 objects      0.224 us
+fetch(:missing, nil)             1.00 objects      0.232 us
+fetch(:missing) { 1 }            0.00 objects      0.262 us
+== x bench_fetch 4.0.10/bin/ruby --yjit
+fetch(:name)                     1.00 objects      0.147 us
+fetch(:missing, nil)             1.00 objects      0.136 us
+fetch(:missing) { 1 }            1.00 objects      0.161 us
+== x bench_fetch master/bin/ruby --zjit
+fetch(:name)                    -0.00 objects      0.194 us
+fetch(:missing, nil)             1.00 objects      0.211 us
+fetch(:missing) { 1 }            0.00 objects      0.230 us
+== base bench_fetch 4.0.10/bin/ruby
+fetch(:name)                     1.00 objects      0.224 us
+fetch(:missing, nil)             1.00 objects      0.217 us
+fetch(:missing) { 1 }            1.00 objects      0.264 us
+== base bench_fetch 4.0.10/bin/ruby --yjit
+fetch(:name)                     1.00 objects      0.111 us
+fetch(:missing, nil)             1.00 objects      0.105 us
+fetch(:missing) { 1 }            1.00 objects      0.125 us
+== base bench_fetch master/bin/ruby --zjit
+fetch(:name)                     1.00 objects      0.136 us
+fetch(:missing, nil)             1.00 objects      0.117 us
+fetch(:missing) { 1 }            1.00 objects      0.159 us

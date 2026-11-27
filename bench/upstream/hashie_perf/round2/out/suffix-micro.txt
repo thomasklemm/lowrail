@@ -1,0 +1,28 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]
+empty block                                    58.8 ns
+end_with?(*ALLOWED_SUFFIXES)                  133.6 ns
+end_with?('?', '!', '=', '_')                 121.1 ns
+match?(/[?!=_]\z/)                            143.4 ns
+getbyte(-1) case                              111.6 ns
+n[-1] if end_with?(*ALLOWED_SUFFIXES)         174.7 ns
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+empty block                                    34.0 ns
+end_with?(*ALLOWED_SUFFIXES)                  112.8 ns
+end_with?('?', '!', '=', '_')                  61.2 ns
+match?(/[?!=_]\z/)                            128.2 ns
+getbyte(-1) case                               91.1 ns
+n[-1] if end_with?(*ALLOWED_SUFFIXES)         123.6 ns
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +ZJIT +PRISM [x86_64-linux]
+empty block                                    61.7 ns
+end_with?(*ALLOWED_SUFFIXES)                  136.2 ns
+end_with?('?', '!', '=', '_')                 119.4 ns
+match?(/[?!=_]\z/)                            128.1 ns
+getbyte(-1) case                              119.0 ns
+n[-1] if end_with?(*ALLOWED_SUFFIXES)         162.3 ns
+ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +ZJIT +PRISM [x86_64-linux]
+empty block                                     9.5 ns
+end_with?(*ALLOWED_SUFFIXES)                   76.8 ns
+end_with?('?', '!', '=', '_')                  86.2 ns
+match?(/[?!=_]\z/)                            103.8 ns
+getbyte(-1) case                               38.3 ns
+n[-1] if end_with?(*ALLOWED_SUFFIXES)         130.7 ns

@@ -1,0 +1,88 @@
+== Mash.new x30 repos
+ 18.1% self  49.0% total  Kernel#respond_to?
+ 15.4% self  15.4% total  String#end_with?
+ 10.7% self  10.7% total  String#to_sym
+ 10.1% self  10.1% total  Hash#[]=
+  8.7% self  97.3% total  Hash#each_pair
+  6.0% self  29.5% total  Hashie::Mash#convert_value
+  5.4% self   5.4% total  Hash#key?
+  4.0% self  30.9% total  Hashie::Mash#respond_to_missing?
+  3.4% self  18.8% total  Hashie::Mash#_method_suffix
+  2.7% self  97.3% total  Hashie::Mash#initialize
+  2.7% self   2.7% total  Hashie::Mash#convert_key
+  2.7% self  97.3% total  Hashie::Mash#_deep_update
+  2.0% self   2.0% total  (sweeping)
+  2.0% self  76.5% total  Hashie::Mash#custom_writer
+== Mash.new x30 issues
+ 19.1% self  19.1% total  Hash#[]=
+ 15.7% self  45.2% total  Kernel#respond_to?
+ 13.0% self  13.0% total  String#end_with?
+  9.6% self  97.4% total  Hash#each_pair
+  7.8% self   7.8% total  Hash#key?
+  7.0% self  62.6% total  Hashie::Mash#convert_value
+  7.0% self  20.0% total  Hashie::Mash#_method_suffix
+  4.3% self   4.3% total  String#to_sym
+  3.5% self  97.4% total  Hashie::Mash#_deep_update
+  2.6% self   2.6% total  (sweeping)
+  1.7% self   1.7% total  Hashie::Mash#convert_key
+  1.7% self  74.8% total  Hashie::Mash#custom_writer
+  1.7% self   1.7% total  Kernel#dup
+  0.9% self   0.9% total  Kernel#respond_to_missing?
+== read 6 methods x30
+ 66.7% self 100.0% total  block (2 levels) in <main>
+ 33.3% self  33.3% total  Hashie::Mash#key?
+  0.0% self 100.0% total  Array#each
+  0.0% self 100.0% total  block in <main>
+  0.0% self 100.0% total  block (3 levels) in <main>
+  0.0% self 100.0% total  Integer#times
+  0.0% self 100.0% total  block (2 levels) in <main>
+  0.0% self 100.0% total  StackProf.run
+  0.0% self 100.0% total  block in <main>
+  0.0% self 100.0% total  Hash#each
+  0.0% self 100.0% total  <main>
+  0.0% self  33.3% total  Hashie::Mash#method_missing
+== to_hash x30
+ 49.1% self  94.7% total  Hashie::Hash#to_hash
+ 22.8% self  22.8% total  Hash#[]
+ 10.5% self  94.7% total  Hash#each_key
+  8.8% self  35.1% total  Hashie::Mash#custom_reader
+  5.3% self   5.3% total  (sweeping)
+  1.8% self   1.8% total  Hashie::Mash#convert_key
+  1.8% self   1.8% total  Hash#default_proc
+  0.0% self  94.7% total  Integer#times
+  0.0% self  94.7% total  block (2 levels) in <main>
+  0.0% self  94.7% total  StackProf.run
+  0.0% self  94.7% total  block in <main>
+  0.0% self  94.7% total  Hash#each
+  0.0% self  94.7% total  <main>
+  0.0% self  94.7% total  block (3 levels) in <main>
+== dup x30
+ 16.9% self  52.0% total  Kernel#respond_to?
+ 15.5% self  15.5% total  String#end_with?
+ 11.5% self  11.5% total  Hash#[]=
+ 10.8% self  94.6% total  Hash#each_pair
+  8.8% self   8.8% total  String#to_sym
+  8.1% self   8.1% total  Hash#key?
+  6.1% self  21.6% total  Hashie::Mash#_method_suffix
+  3.4% self   3.4% total  Hashie::Mash#convert_key
+  3.4% self   3.4% total  (sweeping)
+  2.7% self  35.1% total  Hashie::Mash#respond_to_missing?
+  2.7% self  94.6% total  Hashie::Mash#_deep_update
+  2.0% self  27.7% total  Hashie::Mash#convert_value
+  2.0% self  95.3% total  Hashie::Mash#initialize
+  1.4% self  95.3% total  Class#new
+== merge x30
+ 16.6% self  16.6% total  Hash#[]=
+ 15.3% self  15.3% total  String#end_with?
+ 15.3% self  47.9% total  Kernel#respond_to?
+ 14.1% self  14.1% total  String#to_sym
+  8.6% self   8.6% total  Hash#key?
+  6.1% self  96.3% total  Hash#each_pair
+  5.5% self  20.9% total  Hashie::Mash#_method_suffix
+  3.1% self  50.9% total  Hashie::Mash#_log_collision?
+  3.1% self   3.1% total  (sweeping)
+  2.5% self  32.5% total  Hashie::Mash#respond_to_missing?
+  2.5% self  96.3% total  Hashie::Mash#_deep_update
+  2.5% self  95.7% total  Class#new
+  2.5% self  33.1% total  Hashie::Mash#convert_value
+  1.2% self   1.2% total  Hashie::Mash#_log_built_in_message

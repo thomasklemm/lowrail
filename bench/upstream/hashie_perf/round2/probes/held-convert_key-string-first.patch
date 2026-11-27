@@ -1,0 +1,12 @@
+diff --git a/lib/hashie/mash.rb b/lib/hashie/mash.rb
+index a80d6bf..203f099 100644
+--- a/lib/hashie/mash.rb
++++ b/lib/hashie/mash.rb
+@@ -603,6 +603,7 @@ module Hashie
+     # Symbol#to_s allocates a new one on every read and write.
+     def convert_key(key) # :nodoc:
+       return key.name if key.is_a?(Symbol)
++      return key if key.instance_of?(String)
+ 
+       key.respond_to?(:to_sym) ? key.to_s : key
+     end

@@ -1,0 +1,34 @@
+diff --git a/lib/hashie/extensions/key_conflict_warning.rb b/lib/hashie/extensions/key_conflict_warning.rb
+index 0f55fa0..238b219 100644
+--- a/lib/hashie/extensions/key_conflict_warning.rb
++++ b/lib/hashie/extensions/key_conflict_warning.rb
+@@ -54,9 +54,10 @@ module Hashie
+       #   klass.disable_warnings
+       #   klass.disable_warnings?(:size) # => true
+       def disable_warnings?(method_key = nil)
++        return false unless @disable_warnings
+         return disabled_warnings.include?(method_key) if disabled_warnings.any? && method_key
+ 
+-        @disable_warnings ||= false
++        true
+       end
+ 
+       # Returns an array of methods that this class disables warnings for.
+diff --git a/lib/hashie/mash.rb b/lib/hashie/mash.rb
+index a80d6bf..d211800 100644
+--- a/lib/hashie/mash.rb
++++ b/lib/hashie/mash.rb
+@@ -642,12 +642,12 @@ module Hashie
+ 
+     def _log_collision?(method_key)
+       return false unless method_key.is_a?(String) || method_key.is_a?(Symbol)
++      return false if self.class.disable_warnings?(method_key)
+       return false unless respond_to?(method_key)
+ 
+       suffix = _method_suffix(method_key)
+ 
+       (!suffix || suffix == '=') &&
+-        !self.class.disable_warnings?(method_key) &&
+         !(regular_key?(method_key) || regular_key?(method_key.to_s))
+     end
+   end
