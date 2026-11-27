@@ -1,0 +1,187 @@
+# callgrind format
+version: 1
+creator: callgrind-3.19.0
+pid: 164533
+cmd:  /home/user/w/ruby-master-inst/bin/ruby -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/census13r/asc1_body.rb belongs_to load 0
+part: 1
+
+
+desc: I1 cache: 
+desc: D1 cache: 
+desc: LL cache: 
+
+desc: Timerange: Basic block 0 - 707291172
+desc: Trigger: Program termination
+
+positions: line
+events: Ir
+summary: 55
+
+
+ob=(2) /usr/lib/x86_64-linux-gnu/libc.so.6
+fl=(172) ./csu/../sysdeps/nptl/libc_start_call_main.h
+fn=(682) (below main)
+cob=(10) /home/user/w/ruby-master-inst/bin/ruby
+cfi=(176) /home/user/w/ruby-master/./main.c
+cfn=(690) main
+calls=1 53 
+58 55
+
+fl=(169) ./csu/../csu/libc-start.c
+fn=(658) __libc_start_main@@GLIBC_2.34
+cfi=(172)
+cfn=(682)
+calls=1 29 
+360 55
+
+ob=(1) /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+fl=(1) ???
+fn=(0) 0x000000000001d300
+cob=(10)
+cfi=(168) ???
+cfn=(656) (below main)
+calls=1 0 
+0 55
+
+ob=(10)
+fl=(248) /home/user/w/ruby-master/eval.c
+fn=(14832) ruby_run_node
+cfn=(14836) rb_ec_exec_node
+calls=1 293 
+338 55
+
+fn=(14836)
+cfi=(247) /home/user/w/ruby-master/vm.c
+cfn=(14842) rb_iseq_eval_main
+calls=1 3449 
+300 55
+
+fn=(6450) rb_block_given_p
+1042 1
+fi=(264) /home/user/w/ruby-master/vm_core.h
+2209 1
+cfi=(247)
+cfn=(1318) rb_current_ec
+calls=270778 752 
+* 2
+* 1
++19 1
+fe=(248)
+1043 2
+cfi=(247)
+cfn=(2870) rb_vm_frame_block_handler
+calls=270778 236 
+* 12
+* 2
++6 1
+-6 1
++6 1
+
+fl=(247)
+fn=(14842)
+cfn=(5374) rb_vm_exec
+calls=1 2933 
+3453 55
+
+fn=(1318)
+752 2
+
+fn=(5374)
+cfi=(315) /home/user/w/ruby-master/vm_exec.c
+cfn=(1368) vm_exec_core
+calls=30 46 
+2958 55
+
+fn=(2870)
+236 1
+fi=(264)
+1544 1
++2 2
+1684 4
+fe=(247)
+82 2
+fi=(264)
+1696 2
+fe=(247)
+
+fl=(168)
+fn=(656)
+cob=(2)
+cfi=(169)
+cfn=(658)
+calls=1 242 
+0 55
+
+fl=(315)
+fn=(1368)
+fi=(287) /home/user/w/ruby-master/vm_insnhelper.c
+cfi=(287)
+cfn=(5832) vm_call_general
+calls=19 5239 
+6459 55
+fe=(315)
+
+fl=(287)
+fn=(5468) vm_call_method
+cfn=(5472) vm_call_method_each_type
+calls=9350 5047 
+5206 55
+
+fn=(5476) vm_call_cfunc
+cfn=(5480) vm_call_cfunc_other
+calls=87 4028 
+4131 55
+
+fn=(5832)
+cfn=(5468)
+calls=22526 5186 
+5239 55
+
+fn=(5480)
+cfn=(5488) vm_call_cfunc_with_frame_
+calls=33085 3923 
+4023 55
+
+fn=(5488)
+cfn=(2942) ractor_safe_call_cfunc_m1
+calls=156127 3759 
+3952 55
+
+fn=(2942)
+cfi=(370) /home/user/w/ruby-master/array.c
+cfn=(35686) rb_ary_cycle
+calls=1 7259 
+3761 55
+
+fn=(5472)
+cfn=(5476)
+calls=87 4114 
+5069 55
+
+fl=(370)
+fn=(35686)
+7259 6
+fi=(365) /home/user/w/ruby-master/./include/ruby/internal/intern/error.h
+286 4
+fe=(370)
+7264 1
+cfi=(248)
+cfn=(6450)
+calls=1 1042 
+* 25
+* 2
++1 5
+fi=(449) /home/user/w/ruby-master/./include/ruby/internal/arithmetic/long.h
+152 3
+fe=(370)
+7270 2
++9 7
+
+fl=(176)
+fn=(690)
+cfi=(248)
+cfn=(14832)
+calls=1 331 
+42 55
+
+totals: 55

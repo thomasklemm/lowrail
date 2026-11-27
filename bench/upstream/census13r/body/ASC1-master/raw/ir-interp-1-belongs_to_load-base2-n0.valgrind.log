@@ -1,0 +1,95 @@
+==165591== Callgrind, a call-graph generating cache profiler
+==165591== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==165591== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==165591== Command: /home/user/w/ruby-master-inst/bin/ruby -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/census13r/asc1_body.rb belongs_to\ load 0
+==165591== Parent PID: 161678
+==165591== 
+--165591-- 
+--165591-- Valgrind options:
+--165591--    --verbose
+--165591--    --tool=callgrind
+--165591--    --collect-atstart=no
+--165591--    --toggle-collect=rb_ary_cycle
+--165591--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/census13r/body/ASC1-master/raw/ir-interp-1-belongs_to_load-base2-n0.callgrind
+--165591--    --log-file=/home/user/workspace/repo/bench/upstream/census13r/body/ASC1-master/raw/ir-interp-1-belongs_to_load-base2-n0.valgrind.log
+--165591-- Contents of /proc/version:
+--165591--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--165591-- 
+--165591-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--165591-- Page sizes: currently 4096, max supported 4096
+--165591-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==165591== For interactive control, run 'callgrind_control -h'.
+--165591-- Reading syms from /home/user/w/ruby-master-inst/bin/ruby
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--165591--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--165591--   .. build-id is valid
+--165591-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--165591--    object doesn't have a dynamic symbol table
+--165591-- Scheduler: using generic scheduler lock implementation.
+==165591== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-165591-by-user-on-???
+==165591== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-165591-by-user-on-???
+==165591== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-165591-by-user-on-???
+==165591== 
+==165591== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==165591== don't want to do, unless you know exactly what you're doing,
+==165591== or are doing some strange experiment):
+==165591==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=165591 ...command...
+==165591== 
+==165591== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==165591==   /path/to/gdb /home/user/w/ruby-master-inst/bin/ruby
+==165591== and then give GDB the following command
+==165591==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=165591
+==165591== --pid is optional if only one valgrind process is running
+==165591== 
+--165591-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--165591--    object doesn't have a symbol table
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0
+--165591--    object doesn't have a symbol table
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
+--165591--    object doesn't have a symbol table
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--165591--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--165591--   .. build-id is valid
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--165591--    object doesn't have a symbol table
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--165591--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--165591--   .. build-id is valid
+--165591-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/enc/encdb.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/transdb.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/gems/4.1.0+7/gems/date-3.6.0/lib/date_core.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/cgi/escape.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/etc.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/strscan.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/gems/4.1.0+7/gems/psych-5.5.0/lib/psych.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_16le.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/utf_16_32.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_16be.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_32le.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_32be.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/gems/4.1.0+7/extensions/x86_64-linux/4.1.0+7-static/bigdecimal-4.1.3/bigdecimal.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/openssl.so
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/libssl.so.3
+--165591--    object doesn't have a symbol table
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+--165591--    object doesn't have a symbol table
+--165591-- Reading syms from /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7
+--165591--    object doesn't have a symbol table
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/digest.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/socket.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/gems/4.1.0+7/gems/json-3.2.0/lib/json/ext/parser.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/gems/4.1.0+7/gems/json-3.2.0/lib/json/ext/generator.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/erb/escape.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/4.1.0+7/x86_64-linux/zlib.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/gems/4.1.0+7/gems/stringio-3.2.0/lib/stringio.so
+--165591-- Reading syms from /home/user/w/ruby-master-inst/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/sqlite3_native.so
+==165591== 
+--165591-- Start dumping at BB 716527675 (Prg.Term.)...
+--165591-- Dump to /home/user/workspace/repo/bench/upstream/census13r/body/ASC1-master/raw/ir-interp-1-belongs_to_load-base2-n0.callgrind
+--165591-- Dumping done.
+==165591== Events    : Ir
+==165591== Collected : 55
+==165591== 
+==165591== I   refs:      55
