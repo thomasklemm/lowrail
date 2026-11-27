@@ -95,6 +95,7 @@ Known reds that are not ours (don't report):
 
 Ours, open (watch CI, comments, state):
 - rails/rails: #60024 (ASC1, head ed1b28c5b9, opened ready 2026-11-27 21:38 UTC), #59565. (#60020 merged 2026-11-27, removed.)
+- rails/solid_cable#105 (SCB1, head 2cb1842043, opened ready 2026-11-27 22:18 UTC).
 - ruby/uri#276 (UR1, head c43954f, opened ready 2026-11-27 20:56 UTC).
 - ruby/ruby: #20266 (SHK1, head 2bda3f18fa, prism) and #20267 (URF1, head 151bebd34d, VM), both opened ready
   2026-11-27, no Redmine ticket by Thomas's choice; #20261 (BT1, e75b1f0109), #20208 (TN1, 2e061793aa; khasinski's commit is intended), #20169 (ZSV1,

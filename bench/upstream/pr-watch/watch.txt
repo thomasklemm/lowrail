@@ -18,3 +18,4 @@ https://github.com/ruby/uri/pull/276
 https://github.com/rails/rails/pull/60024
 https://github.com/ruby/ruby/pull/20266
 https://github.com/ruby/ruby/pull/20267
+https://github.com/rails/solid_cable/pull/105
