@@ -1,0 +1,92 @@
+# amp orb a1.xxlarge (E2B), 2026-11-27T18:12:24Z
+Linux e2b.local 6.1.189+ #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026 x86_64 GNU/Linux
+
+Architecture:                            x86_64
+CPU op-mode(s):                          32-bit, 64-bit
+Address sizes:                           46 bits physical, 48 bits virtual
+Byte Order:                              Little Endian
+CPU(s):                                  16
+On-line CPU(s) list:                     0-15
+Vendor ID:                               GenuineIntel
+Model name:                              Intel(R) Xeon(R) Processor @ 2.60GHz
+CPU family:                              6
+Model:                                   106
+Thread(s) per core:                      2
+Core(s) per socket:                      8
+Socket(s):                               1
+Stepping:                                6
+BogoMIPS:                                5200.04
+Flags:                                   fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ss ht syscall nx pdpe1gb rdtscp lm constant_tsc rep_good nopl xtopology nonstop_tsc cpuid tsc_known_freq pni pclmulqdq ssse3 fma cx16 pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand hypervisor lahf_lm abm 3dnowprefetch cpuid_fault invpcid_single ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 hle avx2 smep bmi2 erms invpcid rtm avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves arat avx512vbmi umip avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid fsrm md_clear arch_capabilities
+Hypervisor vendor:                       KVM
+Virtualization type:                     full
+L1d cache:                               384 KiB (8 instances)
+L1i cache:                               256 KiB (8 instances)
+L2 cache:                                10 MiB (8 instances)
+L3 cache:                                54 MiB (1 instance)
+NUMA node(s):                            1
+NUMA node0 CPU(s):                       0-15
+Vulnerability Gather data sampling:      Not affected
+Vulnerability Indirect target selection: Mitigation; Aligned branch/return thunks
+Vulnerability Itlb multihit:             Not affected
+Vulnerability L1tf:                      Not affected
+Vulnerability Mds:                       Not affected
+Vulnerability Meltdown:                  Not affected
+Vulnerability Mmio stale data:           Not affected
+Vulnerability Reg file data sampling:    Not affected
+Vulnerability Retbleed:                  Not affected
+Vulnerability Spec rstack overflow:      Not affected
+Vulnerability Spec store bypass:         Mitigation; Speculative Store Bypass disabled via prctl
+Vulnerability Spectre v1:                Mitigation; usercopy/swapgs barriers and __user pointer sanitization
+Vulnerability Spectre v2:                Mitigation; Enhanced / Automatic IBRS; IBPB conditional; PBRSB-eIBRS SW sequence; BHI SW loop, KVM SW loop
+Vulnerability Srbds:                     Not affected
+Vulnerability Tsa:                       Not affected
+Vulnerability Tsx async abort:           Not affected
+Vulnerability Vmscape:                   Not affected
+
+CPU NODE SOCKET CORE L1d:L1i:L2:L3 ONLINE
+  0    0      0    0 0:0:0:0          yes
+  1    0      0    0 0:0:0:0          yes
+  2    0      0    1 1:1:1:0          yes
+  3    0      0    1 1:1:1:0          yes
+  4    0      0    2 2:2:2:0          yes
+  5    0      0    2 2:2:2:0          yes
+  6    0      0    3 3:3:3:0          yes
+  7    0      0    3 3:3:3:0          yes
+  8    0      0    4 4:4:4:0          yes
+  9    0      0    4 4:4:4:0          yes
+ 10    0      0    5 5:5:5:0          yes
+ 11    0      0    5 5:5:5:0          yes
+ 12    0      0    6 6:6:6:0          yes
+ 13    0      0    6 6:6:6:0          yes
+ 14    0      0    7 7:7:7:0          yes
+ 15    0      0    7 7:7:7:0          yes
+
+# SMT siblings
+cpu0: 0-1
+cpu1: 0-1
+cpu2: 2-3
+cpu3: 2-3
+cpu4: 4-5
+cpu5: 4-5
+cpu6: 6-7
+cpu7: 6-7
+cpu8: 8-9
+cpu9: 8-9
+cpu10: 10-11
+cpu11: 10-11
+cpu12: 12-13
+cpu13: 12-13
+cpu14: 14-15
+cpu15: 14-15
+
+# Pinning: all timed runs use taskset -c 14; its SMT sibling cpu15 was idle (nothing pinned there; builds ran on 0-11 or before measuring).
+
+# Host-speed probe before measuring (probe.rb: integer loop and 50k float sort, thread CPU time, GC off)
+loop cpu14 n=1000 median 4.103 ms  p10/median 0.861  p90/median 1.101  max/median 1.210  slow(>1.05x median) 315
+sort cpu14 n=1000 median 8.743 ms  p10/median 0.977  p90/median 1.047  max/median 1.299  slow(>1.05x median) 90
+steal ticks on cpu14: 0
+
+# Host-speed probe after all runs
+loop cpu14 n=1000 median 4.332 ms  p10/median 0.883  p90/median 1.071  max/median 1.121  slow(>1.05x median) 180
+sort cpu14 n=1000 median 8.788 ms  p10/median 0.974  p90/median 1.041  max/median 1.219  slow(>1.05x median) 74
+steal ticks on cpu14: 1

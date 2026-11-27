@@ -1,0 +1,21 @@
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby --disable=gems "/home/user/w/head/tool/mkdepend.rb" --root="/home/user/w/head" \
+     --scope=core --output=.deps
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/ruby --disable=gems -rrubygems -I/home/user/w/head/benchmark/lib \
+    -e "files = %w[]" \
+    -e "files = Dir.glob(['vm_backtrace_to_s', '*vm_backtrace_to_s*.yml', '*vm_backtrace_to_s*.rb'], base: '/home/user/w/head/benchmark').reject(&:empty?).sort.uniq.map {|f| '/home/user/w/head/benchmark/' + f} if files.empty?" \
+    -e "if sep = File::ALT_SEPARATOR" \
+    -e   "ARGV.map! {|a| a.start_with?('--executables') ? a.gsub(sep, '/') : a}" \
+    -e "end" \
+    -e "ARGV.concat(files)" \
+    -e "load '/home/user/w/head/benchmark/benchmark-driver/exe/benchmark-driver'" -- \
+    --executables="compare-ruby::/home/user/w/rubies/base/bin/ruby -I.ext/common --disable-gem" \
+    --executables="built-ruby::./miniruby -I/home/user/w/head/lib -I. -I.ext/common  /home/user/w/head/tool/runruby.rb --extout=.ext  -- --disable-gems --disable-gem" \
+    --output=markdown --output-compare -v --repeat-count 10
+compare-ruby: ruby 4.1.0dev (2026-11-27T13:11:57Z HEAD 274cfe719a) +PRISM [x86_64-linux]
+built-ruby: ruby 4.1.0dev (2026-11-27T16:39:23Z HEAD e75b1f0109) +PRISM [x86_64-linux]
+# Iteration per second (i/s)
+
+|                   |compare-ruby|built-ruby|
+|:------------------|-----------:|---------:|
+|vm_backtrace_to_s  |     45.236k|   53.923k|
+|                   |           -|     1.19x|
