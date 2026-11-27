@@ -323,7 +323,7 @@ mise exec ruby@4.1.0-preview1 -- ruby -Igem/lib gem/test/loader_test.rb
 mise exec -- ruby -Igem/lib -Igem/test -e 'Dir["gem/test/*_test.rb"].sort.each { require_relative _1 }'
 ```
 
-Per-app verification results are recorded in [STATUS](STATUS.md); this
+Per-app verification results are recorded in [prototype.md](prototype.md#works-2026-10-20); this
 survey does not claim support for unexercised files or a performance gain.
 
 ## Deploy paths
