@@ -14,7 +14,7 @@ depends_on: []
 stacked_on:
 alternative_of:
 impact: "Mash subclasses that call disable_warnings without keys stop calling respond_to? for every key written (Mash.new, []=, merge, dup). On hashie 6 today that is the response object of omniauth (KeyStore and AuthHash, 235M downloads), elasticsearch-model (HashWrapper, 78M) and zendesk_api (SilentMash, 47M); restforce (60M) and chef-zero (23M) do the same, but their released versions require hashie < 6. Duel on Ruby 4.0.10, the exact head (run 46079366956): such a subclass built from the nested fixture, CPU 0.458 [0.456, 0.460] under YJIT and 0.655 [0.650, 0.662] under ZJIT, allocations unchanged; 28 benchmarks, 0 regressed. Cost: a Mash that disables nothing asks its class once per key written: Mash.new of the nested fixture 1.007 [1.003, 1.009] under YJIT and 1.006 [1.000, 1.012] under ZJIT, write new keys as methods 1.013 [1.010, 1.016] and 1.013 [1.009, 1.017], each 'same' for Duel."
-evidence: [bench/upstream/hashie_perf/round2, bench/upstream/hashie_perf/round2/duel, bench/upstream/hashie_perf/round2/wall, bench/upstream/hashie_perf/round2/body/HM4, bench/upstream/hashie_perf/round2/body/HM4-module-f41c3b2, bench/upstream/hashie_perf/round2/quiet]
+evidence: [bench/upstream/hashie_perf/round2, bench/upstream/hashie_perf/round2/duel, bench/upstream/hashie_perf/round2/wall, bench/upstream/hashie_perf/round2/body/HM4, bench/upstream/hashie_perf/round2/body/HM4-module-f41c3b2, bench/upstream/hashie_perf/round2/quiet, bench/upstream/hashie_perf/round2/thermos-sol-HM4-10a9303.tar.gz]
 rank: 1
 risky: true
 state: held
@@ -23,6 +23,7 @@ note: "2026-11-27 HELD, not exact (Astra: changes on 10a9303; reproduced in prob
 ownership: {date: 2026-11-27, checked: ["open PRs naming disable_warnings?, _log_collision? that change CHANGELOG.md, benchmarks/extensions_benchmark.rb, lib/hashie/extensions/key_conflict_warning.rb, lib/hashie/mash.rb"], hits: []}
 passes:
   - {reviewer: astra, head: "10a93033975136664d7b7231986663e9c7689d91", date: 2026-11-27, orb: "T-01a21f5c-5af9-70ac-9fd0-44b340063d1e", verdict: changes, open: "Ractor writes regress across Ruby 3.0–4.0/master, including plain Mash on 3.0; the ivar guard ignores overridden disabled_warnings; reordered hooks alter warnings, stored values and exceptions. Correct the body/commit claims and assumed CHANGELOG number. Merely inspecting the plain exclusions list defeats the fast path; repeat worst/mixed-state costs on a1.xxlarge. Full review and raw evidence in round2/astra-HM4-10a9303.tar.gz and the Astra HM4 README section."}
+  - {reviewer: thermos-sol, head: "10a93033975136664d7b7231986663e9c7689d91", date: 2026-11-27, orb: T-01a21f5c-5173-76cc-aa9a-676d6e5f0c2d, verdict: changes, open: "R1 Ractor writes now fail; R2 semipublic disabled_warnings overrides are bypassed. Text qualifications and current next PR number in round2 README; raw evidence thermos-sol-HM4-10a9303.tar.gz."}
 ---
 
 # Skip the key conflict check in Mash subclasses that disable warnings

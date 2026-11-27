@@ -1017,3 +1017,264 @@ The body's two callers are ordered by reach. Elasticsearch has over a year witho
 * `bundle exec rake spec` on 4.0.10: **1,076 examples, 0 failures on each tree**. Head `bundle exec rake rubocop`: **156 files, no offenses** (also the 124-file subtask); `bundle exec rake docs:examples`: **359 examples, 0 failures**. Earlier unbundled release-preparation failures were resolved by installing the complete bundle; their logs remain. No full suite on every Ruby or integration-app matrix is claimed.
 * The original probe covers every requested extension, `Mash.quiet`, none/some/all/String exclusions, repeated calls, inheritance/narrowing, late configuration, arbitrary keys/conversions, anonymous classes and frozen receivers. The additional probes cover the missed readers/prepends, effectful hooks, partial state after exceptions, direct ivars, mutable returned configuration, frozen-class writes, threads and Ractors.
 * Original-probe behavior differences remain 18 MethodAccessWithOverride rows and three accepted output lines. Ruby 3.1 additionally changes 72 source/caret lines in 36 NoMethodError highlights because the expression moved; those are not new semantic failures. Raw stdout has 66,999 lines normally (66,994 excluding five `accepted` lines), 67,107 on 3.1. All raw outputs and hashes are retained without filtering. This review establishes counterexamples, not equivalence for all remaining Ruby programs.
+
+## thermos-sol HM4: changes on 10a93033975136664d7b7231986663e9c7689d91
+
+2026-11-27, GPT-6.1 Sol, xhigh, thread `T-01a21f5c-5173-76cc-aa9a-676d6e5f0c2d`. Applied both Thermos
+rubrics directly in this thread, without delegation, as requested. Exact base
+`277e88e6ccc317497e6c20fb8b9e35abebc0fe19`, one candidate commit. Neither hashie checkout was changed; no fork push,
+upstream PR or upstream comment. The reviewed queue text is preserved in the evidence as `sources/HM4-reviewed.md`
+(SHA-256 `5cedeb6a5d6333475eb3dd74ccf9d025f94357d65b33ca8f99c0ddbcdc915ddb`).
+
+**Changes, not an exact optimization.** Two ordinary supported cases regress: Ractors cannot build configured
+subclasses that worked before, and a semipublic warning-list override is ignored. The cost is disclosed substantially
+fairly and is not the reason for this verdict. The existing differential's accepted call-count changes also have
+observable consequences beyond counts. The following are executed differences, not hypothetical ones.
+
+Evidence: [`thermos-sol-HM4-10a9303.tar.gz`](thermos-sol-HM4-10a9303.tar.gz), scripts and source/API snapshots at its
+top level, all raw outputs in the nested `raw-evidence.tar.xz`. Nested compression retains preliminary/noisy runs as
+well as final runs without exceeding 10 MB. `RUNS.md` gives commands, pins and the interpretation of each cohort.
+
+### R1 — P2: querying warning configuration on noncolliding keys breaks Ractors
+
+`lib/hashie/mash.rb:645` newly calls the class predicate even when `respond_to?` would return false. Both the new
+predicate and the old predicate then consult the mutable, unshareable class warning-list Array. Previously this
+class state was never touched for an ordinary new key. No override, private access or concurrent mutation is needed:
+
+```ruby
+require 'hashie'
+class QuietWorkerMash < Hashie::Mash
+  disable_warnings
+end
+QuietWorkerMash.new(name: 0)
+worker = Ractor.new { QuietWorkerMash.new(name: 7).to_h }
+worker.respond_to?(:value) ? worker.value : worker.take
+```
+
+Base: `{"name"=>7}`. Head: `Ractor::RemoteError` wrapping `Ractor::IsolationError` (the harness rescues inside the
+worker and records the underlying error). Demonstrated on Ruby **3.0.7, 3.1.7, 3.2.10, 3.3.10, 3.4.7, 4.0.10 and
+master**, including available YJIT/ZJIT modes. Master is `0d399335b733776187e43a783e5f950c18ad881c`.
+
+`edges.rb` also reproduces this with `disable_warnings(:size)` and a new `:name` key, and with an otherwise plain
+subclass whose public `disabled_warnings` was merely inspected before starting the Ractor. Unconfigured plain and
+unconfigured frozen classes are controls that still work. A real caller can prepare a warning-disabled response
+class in the main Ractor and build responses in workers. This is a write failing, not merely a query's different
+instance-variable side effect. The existing `quiet_diff.rb` never starts a Ractor.
+
+Smallest unquestionably exact remedy: restore the old predicate-call position. Removing only the new ivar guard
+does **not** solve this, because the old predicate also reads the Array. Do not freeze a public mutable list,
+rescue isolation errors into a different warning policy, or cache configuration that can still change. No such fix
+was applied in this review.
+
+### R2 — P2: the ivar shortcut bypasses the semipublic warning-list method
+
+`lib/hashie/extensions/key_conflict_warning.rb:57` infers an empty policy from the absence of two implementation
+ivars instead of asking `disabled_warnings`. That method is explicitly `@api semipublic`, not private/nodoc:
+
+```ruby
+require 'hashie'
+class ListPolicy < Hashie::Mash
+  def self.disabled_warnings
+    [:size]
+  end
+end
+p ListPolicy.disable_warnings?(:size)
+ListPolicy.new(size: 7)
+```
+
+Base: `true`, no collision warning. Head: `false`, one collision warning. Both store `{"size"=>7}`. The reproduction
+captures the logger and counts the actual warning, not calls to a private helper. This also reproduces on every
+Ruby above. Lazy policy storage in a differently named ivar, a `Thread.current`-backed list, singleton-class
+`prepend`, `extend` and inherited list methods reproduce the query change (`repros.rb`, `edges.rb`). A real policy
+provider or subclass can implement this method without using Hashie's ivar names. Directly filling the default
+`disabled_warnings` Array still works; that is a different case and does not validate overrides.
+
+Smallest fix for R2 alone: delete the added early return and remeasure. That is effectively the refused reorder-only
+form, which still has R1 and its measured plain-Mash cost. A method-owner check, extra cache or another one-caller
+module is not a smaller or demonstrated-exact solution. Taken together, R1/R2 favor holding this candidate rather
+than adding a stack of compatibility branches to save this check.
+
+### Judging the accepted differences, including what the probe did not record
+
+* **Skipped `respond_to?` / `respond_to_missing?`: intentional mechanism, but not just a count.** With warnings
+  disabled, either public hook can materialize state. A minimal override is
+  `def respond_to?(key, *rest); regular_writer('checked', true) if key == :name; super; end`.
+  `new(name: 7).to_h` is `{"checked"=>true,"name"=>7}` on base and `{"name"=>7}` on head. The equivalent
+  `respond_to_missing?` override does the same (`dynamic_policy.rb`). This is a real metaprogramming/lazy-property
+  caller shape, though not demonstrated in the named consumer gems. Skipping such hooks is inherent to the requested
+  optimization, so not an independent surprise blocker; accept it only as an explicit hook-contract change, not
+  evidence that stored state is identical for every caller. If pursued, the body should say that disabled keys no
+  longer invoke these hooks. Private `_log_collision?` override differences are within DECISIONS' accepted boundary.
+* **Extra `disable_warnings?` calls: disclosed cost, not unconditionally benign behavior.** `repros.rb`'s public
+  `FilterPolicy` returns `super` for nil/`:size` and raises `KeyError` for any other key. `new(name: 7)` stores the
+  value on base and now raises. A Boolean-returning policy also suffices: increment `@queries` and return
+  `(@queries % 3).zero?`; `new(name: 0, size: 7)` logs once on base and zero times on head, with identical stored
+  values (`dynamic_policy.rb`, master interpreter/ZJIT). A stateful warning budget or policy lookup can hit this.
+  These demonstrate the expanded invocation contract, not another failure of a pure predicate. The body already
+  says it asks earlier, but must not imply arbitrary custom policies keep the same warnings or errors.
+* **No query ivar assignment: accept the reduced mutation, but its consequence reaches writes.** For
+  `class F < Hashie::Mash; end; F.freeze`, `F.new(size: 7)` raises `FrozenError` on base; head stores the key and logs
+  once. `F.disable_warnings?` raises on base and answers false on head. A frozen unconfigured subclass is plausible;
+  this is a beneficial behavior change, not a correctness blocker, but the record's assertion that nothing is
+  returned/stored differently is too broad. Do not add an ivar detail to the body; disclose improved frozen-class
+  behavior if claiming comprehensive compatibility.
+* **The 18 `MethodAccessWithOverride` rows: accept the removed failure.** For a quiet subclass including that
+  extension, `new('respond_to?' => 1, 'name' => 2).to_h` raises `ArgumentError` on base and returns both keys on head.
+  This is a real response-key collision, not merely a count. An upstream body need not enumerate this one repaired
+  error path, but cannot claim all errors and stored state are unchanged. The current body does not make that claim
+  explicitly; the internal checklist does.
+
+These boundaries do not excuse R1 or R2: R1 uses only built-in configuration and ordinary keys; R2 uses an existing
+semipublic policy API, with no side effects needed.
+
+### Executed exactness, tests and limitations
+
+Ran `run-matrix.sh` across the seven Ruby pins above, interpreter everywhere, YJIT where available (3.1 onward),
+and ZJIT on 4.0.10/master. `repros.rb` records warnings, returned/stored state and underlying exceptions; `edges.rb`
+adds Ractors, configuration during key conversion, direct flag/list states and policy mixins. Four worker threads
+with configuration established before use agree on ordinary stored results. This is not a race-freedom proof for
+arbitrary simultaneous policy mutation, and none is claimed.
+
+The independent `public_diff.rb` has **12,242 rows per runtime**: no/all/some warnings, String settings, repeated
+calls, narrowing/widening/inheritance, direct ivars/list mutation, late configuration, anonymous/frozen classes,
+`Mash.quiet`, all seven requested extensions, public and private overrides, eight write/construction operations,
+String/Symbol/suffixed/numeric/nil/duck keys, defaults/default procs, frozen receivers, and Hash/Array/String
+subclasses. It records partial receiver state after exceptions, nested classes/frozen flags, String encodings and
+`Hash.ruby2_keywords_hash?`, rather than just a JSON representation of values. Corrected normalized runs are
+`public-final-*` and the master `public_diff-master-*`; earlier `public_diff-*`/`public-4.0.9-*` files retain
+address-normalization noise and are not evidence of further bugs. Ordinary pure-policy cases otherwise agree;
+the meaningful categories are the demonstrated policy, frozen-class and MethodAccessWithOverride differences,
+plus earlier failures from the deliberately private class predicate (accepted private boundary).
+Ruby 3.1 also records eight changed `error_highlight` source excerpts pointing to the moved query; exception type,
+underlying message, warning output and partial state are unchanged in those eight rows, not another semantic bug.
+
+Reran the original `quiet_diff.rb` on 4.0.10 and master, each in interpreter/YJIT/ZJIT. Each emits **66,999 lines**;
+21 differ, consisting of the 18 known MethodAccessWithOverride cases and three accepted-summary lines. This
+confirms why that differential missed R1/R2 and hook-induced state changes: it lacks the first two caller shapes
+and only counts the hooks in separate accepted summaries. It also does not preserve keyword flags in its value
+serialization. No keyword-flag regression was observed for HM4 in the independent harness.
+
+Ruby 4.0.10: targeted Mash/extension specs **254 examples, 0 failures on both base and head**; head executable
+documentation **359/0**. Full head suite **1,076 examples, 3 failures**, all release-preparation subprocess Bundler
+dependency resolution (missing `guard`); rerunning that spec on base reproduces all three. RuboCop inspects 156
+files and reports the **same two existing `RSpec/EmptyLineAfterSharedInclusion` offenses** on base/head with the
+installed 1.93.0/plugin versions. Thus this review does not reproduce the record's all-green full suite/lint in its
+own environment, and does not attribute those environmental/baseline failures to HM4. Raw logs are retained.
+No app integration suite, arm64 or alternate Ruby implementation was run.
+
+### Performance evidence and worst-input search
+
+`audit_raw.rb` recomputes all HM4 wall medians/bootstrap intervals/A/A and JIT-flat decisions from retained round
+arrays. `audit_files.py` cross-checks **every wall sample** against its archived worker log, Callgrind deltas against
+raw totals, and the exact-head Duel CPU summary rows against `duel/logs.tar.gz`. These checks pass. GitHub run
+46079366956's API and logs identify the exact head/base; fork PR 36 is closed. Its 28 benchmarks/zero regressed and
+the one YJIT unsettled read-only benchmark match the record; “same” is Duel's classification, not proof of zero cost.
+
+The body's rounded quiet CPU ratios **0.46/0.66**, plain nested **1.01/1.01**, and new-method writes **1.01/1.01**
+are supported by the unrounded intervals in the table above. The archived local master/ZJIT mixed-process loss
+recomputes to **+9.108% [+7.408, +9.836]**, A/A **+0.209% [−1.192, +2.606]**, all windows JIT-flat. It is honestly
+mentioned without promoting the local percentage into the body. The 4.0.10 ZJIT interval includes zero and lacks a
+side-exit counter, so it cannot establish the categorical sentence “Ruby 4.0 doesn't show this.” Say instead that
+the effect was not detected in the tested 4.0.10 mixed-process run. The dynamic-send explanation is supported by
+`probes/zjit_mixed.rb`/`out/zjit-mixed-order.txt` on earlier forms (20 versus 114 polymorphic fallbacks); those
+statistics are not a new exact-head causal experiment.
+
+**This review's orb is two vCPUs/3,931 MiB, not a1.xxlarge. All new timings are diagnostic only.** `perf.rb`/`perf.py`
+sweep 13 plain-Mash shapes, plain-only and quiet-first mixed processes: empty and integer-key controls, absent
+String/Symbol keys, `?`/`!`/`_`/`=` suffixes, overwrites, flat 20-key and 20-question-key Hashes and the repository
+fixture. Six randomized base/head/base2 rounds, pinned core, seven GC-off thread-CPU windows per process; all
+samples retained. This is a bounded adversarial input search, not a universal maximum over user callbacks.
+The initial 4.0.10/YJIT sweep overlapped Ruby builds and has a large unaffected-empty control change; it is retained
+but rejected as performance evidence, not rerun until green. The separate master/ZJIT sweep has its worst changed
+mixed-process point estimate at **20 question-suffixed keys, +2.67%, A/A −0.46%**; the empty control is noisy
+(+2.22%, A/A +5.80%). It does not reproduce the older master's +9.1% result on this later pin, and cannot refute it.
+The separate 4.0.10 interpreter sweep's largest loss is **overwriting an existing question-suffixed key in a mixed
+process, +4.29%, A/A +0.19%**: after warming the quiet subclass, `m = Hashie::Mash.new('ready?' => true)`, repeatedly
+`m['ready?'] = true`. For a plain-only process, new `{'ready?' => true}` is the largest point estimate, **+3.70%,
+A/A +0.16%**. These are diagnostic point estimates without a bootstrap/JIT-flat claim, not a basis for a new body
+number. The repository fixture is the slowest absolute operation in this bounded sweep; the cheap suffixed-key
+operations expose the extra-query cost without requiring an unusually large response.
+
+After this independent audit, fetched the concurrent Astra record and tested its additional caller state:
+**merely inspect `Hashie::Mash.disabled_warnings` before using plain Mash**, leaving the Array empty. This defeats
+the shortcut without disabling a warning. A separate six-round master/ZJIT sweep (`PRIME_LIST=1`, no outputs
+overwritten) has the largest changed mixed-process point estimate of this review: **`Mash.new('ready?' => true)`,
++10.70%, A/A +0.36%**. Plain-only, flat20 is +7.26%, A/A −0.69%; the repository fixture is +6.10%, A/A −0.22%.
+These remain diagnostic, not a statistical or policy-compliant blocking-loss claim. They independently confirm
+that “a class that never disabled a warning” does not necessarily use the fast return. The body's cost table is
+fair for its measured state, not a bound on all ordinary plain-Mash states. **Repeat the inspected-list and mixed
+cases on a1.xxlarge before clearing the general performance claim.** No larger loss over arbitrary mutable policy
+lists is claimed without running it.
+
+The refused forms do not supply a demonstrated better candidate: reorder-only preserves method-based list policies
+but still queries them for noncollisions and costs 3–5% in Duel; flag-first loses direct list configuration; the
+module form duplicates the shared check and has the archived **+19.039% [+18.239, +19.639] YJIT mixed-process loss**.
+Its early policy lookup has the same Ractor-sensitive dependency. Their local wall comparisons were recomputed
+and Duel CPU rows checked against raw logs, not silently substituted for exact-head runs. Do not revive one merely
+to get a nicer isolated Duel table. There is no measured, exact better form established here. Performance alone would not block the well-used
+quiet-class win given the fairly stated cost; correctness does. A replacement needs exactness first and mixed-class
+timing on a1.xxlarge before approval.
+
+### Sentence-by-sentence upstream text audit
+
+The archive preserves the exact title/body, `git show --format=fuller` with the commit message and CHANGELOG, live
+API metadata, released sources and linked-file snapshots. Every factual sentence was checked; findings are cuts
+or qualifications below, not unverified assertions passed through.
+
+| Text | Command/source checked | Judgment |
+| --- | --- | --- |
+| Title: skip the check in warning-disabled subclasses | Exact diff, quiet-class differential, Duel benchmark/logs | Accurate mechanism for the normal subclass; not a universal equivalence promise. |
+| Body/commit: “Every Mash write asks respond_to?” | `edges.rb` counts on `:size`, `:unseen`, `7`, nil; `custom_writer`/`_log_collision?` source | Overbroad: numeric/nil writes do not call the receiver hook. Qualify to checked String/Symbol keys; extension overrides can bypass this path too. |
+| Body/commit: an unset key runs respond_to_missing? | Same probe: absent built-in `:size` calls `respond_to?`, not `respond_to_missing?`; absent `:unseen` calls both | False without “when it is not already a method.” Cut the generalization. |
+| Body: “the most expensive step of building a Mash” | Read `out/profile-stackprof-4.0.10-yjit.txt`: `respond_to?` 49.0% inclusive, `respond_to_missing?` 30.9%; interpreter file and fixture | Profiling supports a hot path in this fixture, not a universal superlative. Cut “the most expensive step” or scope it to the profile. |
+| Body/commit: disabled subclasses do that work then discard it | Base `_log_collision?` and quiet-hook repros | True for those checked keys; keep only after the preceding qualification. |
+| OmniAuth KeyStore/AuthHash parentage, 2.4.2; elasticsearch-model HashWrapper, 8.0.1 | Fetched exact linked blobs, latest gem tarballs, release/tag and default-branch APIs | Both permalinks still contain the disabling call at the named line, match released code, and describe current released callers. Reach below. |
+| Body/commit: class query before respond_to?; fast false for unconfigured class | Exact diff, direct-ivar/query probes, primed-list sweep | Only falsy flag and list ivars take the shortcut; merely inspecting an empty list defeats it despite never disabling a warning. R2 also invalidates inferring policy from ivars for an override. |
+| Body/commit: new benchmark builds quiet subclass from nested fixture | Benchmark diff, repository fixture, Duel logs | Verified; no new comment or implementation-count test. |
+| “Duel on Ruby 4.0, CPU time relative to master” and all six cells | Run API, raw logs, `audit_files.py`, `runs.tsv`/summaries | Verified, 4.0.10, exact head versus exact base; table rounds correctly. |
+| Cost: one extra class query for every key | Hook-count probes and diff | Correct direction, overbroad domain: String/Symbol conflict-check path, not integers/nil or bypassing extensions. Also affects custom-policy behavior as demonstrated above. |
+| Master/ZJIT mixed-process slowdown and two receiver classes | Recomputed archived +9.108% cohort, earlier-form ZJIT stats | Cost disclosure is fair. Do not present earlier-form attribution as an exact-head experiment. |
+| “Ruby 4.0 doesn't show this” | 4.0.10 mixed raw cohort, missing JIT-flat counter; exact Duel CPU rows | Too categorical; qualify to the tested run and its lack of detected effect. |
+| CHANGELOG describes skipped conflict checks and credits Thomas | Exact diff, author/committer metadata | Mechanism/credit supported; no added explanatory code comments to reject. |
+| CHANGELOG assumes pull/663 | Latest issue API is 661; issue endpoints 662 and 663 return 404; upstream open-PR API empty | **Next number is 662 at this check, not 663.** HM5 opening first is an unfulfilled assumption. Recheck and fix before posting; no PR number can be reserved by this text. |
+
+The commit message repeats the first two overgeneralizations and “every key” scope; fix those in the commit as well
+as the body. The body need not become a catalogue of private overrides or repaired error cases. R1/R2 are blockers,
+not limitations to bury in additional prose. Keep the corrected body short rather than growing it to justify them.
+
+### Reach and currency checked against current releases
+
+Used GitHub repository APIs (stars, archived state, current branches), RubyGems gem APIs (latest version, release
+date, lifetime downloads and runtime requirement), downloaded latest `.gem` sources, and release-tag/linked-blob
+comparisons. Full responses and source files are archived. All five projects are non-archived; their latest released
+sources retain the disabling calls. Downloads are lifetime gem downloads, **not** counts of users running hashie 6.
+
+| Project/gem | Stars | Downloads | Latest release | Released hashie requirement | Reach supported now |
+| --- | ---: | ---: | --- | --- | --- |
+| omniauth | 8,102 | 235,368,604 | 2.4.2, 2026-11-18 | `>= 3.5.2` | Allows 6; KeyStore line 8 disables warnings, AuthHash inherits it. |
+| elasticsearch-rails / elasticsearch-model | 3,079 | 78,460,281 | 8.0.1, 2025-09-01 | `>= 0` | Allows 6; HashWrapper line 29 disables warnings. |
+| zendesk_api_client_rb / zendesk_api | 410 | 47,179,798 | 3.1.2, 2026-07-23 | `>= 3.5.2` | Allows 6; SilentMash disables warnings. |
+| restforce | 822 | 60,006,023 | 8.0.1, 2025-12-29 | `>= 1.2.0, < 6.0` | Same pattern, but not reachable through its released dependency constraint today. |
+| chef-zero | 530 | 22,642,721 | 15.1.11, 2026-05-28 | `>= 2.0, < 6.0` | Same pattern, likewise excluded today. |
+
+Hashie itself: 6.0.0 released 2026-11-11, 3,035 stars, 507,065,900 lifetime downloads. The impact's ordering of the
+three eligible consumers and its explicit `< 6` exclusion for the other two are supported; the body names the two
+strongest eligible examples. Do not add the excluded consumers' downloads to current affected reach. The impact's
+“every key written” wording needs the same domain qualification as the body.
+
+### Maintainability rubric
+
+Cold read: reject non-String/Symbol keys; ask whether the class disabled this warning; otherwise test whether the
+receiver responds; accept only a nonsuffixed/setter conflict that is not already a stored key. The query returns
+false for absent internal flags/list, otherwise uses the existing policy. This is short and in the canonical shared
+helper, with no new wrapper, public name, dependency, mode or duplicated check on the exact head. No convincing
+structural extraction or new policy layer would simplify it. **L0 structurally; no independent maintainability
+blocker.** The implicit ivar-to-policy equivalence is the concrete boundary error R2, not a reason for cosmetic
+refactoring. No security, feature-gate or devex regression was demonstrated beyond the runtime behavior above.
+
+RuboCop 1.93.0 metrics: `_log_collision?` ABC **14.46 → 13.64**, cyclomatic/perceived **8 → 8**;
+`disable_warnings?` ABC **5.10 → 6.48**, cyclomatic/perceived **4 → 6**. Flog 4.10.0: **19.9 → 17.5** and
+**5.6 → 6.6** respectively. The predicate grows because the shortcut adds a compound branch; that small increase
+is readable but buys the incorrect abstraction assumption above. Head files are 654, 91 and 112 lines respectively
+for Mash, KeyConflictWarning and the extension benchmarks; no 1,000-line threshold crossing. No added code comments
+or tests to trim. The new benchmark measures a useful public operation, but is not a regression test for R1/R2.
