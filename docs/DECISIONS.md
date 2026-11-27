@@ -107,7 +107,8 @@ lead. Each bet's doc is the source of truth for its state.
   from current behaviour and evidence rather than from years-old threads.
 * **Child orbs don't notify Thomas** (2026-11-04): they report only to the coordinating thread with
   send_thread_message, never notify_user, and are snoozed indefinitely. The coordinator relays.
-* **At most 8 working orbs at once** (Thomas, 2026-11-03).
+* **No fixed orb limit** (Thomas, 2026-11-27; replaces "at most 8 working orbs", 2026-11-03): run as many orbs as
+  the work needs in parallel, size each by `amp orb system-metrics` of similar tasks, and archive finished ones.
 * **No upstream references in Lowrail commit messages:** `owner/repo#N` or an issue or PR URL leaves a permanent entry
   on that upstream thread. Name upstream work in plain words or by queue item ID; numbers and links go in the docs.
   `script/commit` and `script/hooks/pre-push` refuse them (2026-11-15).
