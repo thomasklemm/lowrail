@@ -8,7 +8,7 @@ wins (FH2, LBL1), and because the four upgrade-guide PRs had no decision yet (SP
 | Item | Fork branch | Head | Outcome |
 | --- | --- | --- | --- |
 | TO1 | `thomasklemm/tag-attributes-own-string` | `7f1f0dce45` | held: ZJIT `f.text_field` +0.64% unexplained, and no form-level effect |
-| FH2 | `thomasklemm/form-builder-tag-copies` | `7401f9dac7` | rebuilt without AMT; PH keeps its bare `super`; sent to review |
+| FH2 | `thomasklemm/form-builder-tag-copies` | `7401f9dac7` | parked: Astra broke V and TR; the exact remainder (PH + SV) is within noise |
 | LBL1 | `thomasklemm/label-translation-key-once` | `4c64fb7898` | unchanged code and message; sent to review |
 | SP1 | `thomasklemm/upgrade-guide-frozen-default-url-options` | `d41b93d147` | the 2026-11-17 claude-code must-fixes applied; approved |
 
@@ -85,7 +85,7 @@ Tables: `results/{interp,yjit,zjit}_table.txt`; raw output: `results/{interp,yji
 Under ZJIT, TO1 runs `f.text_field` 0.64% slower, outside both the A/A and the cross-tree noise, while
 `text_field_tag`, which takes the same `tag()` path, is 0.89% faster. Nothing explains that yet, and DECISIONS blocks a
 ZJIT loss until it is explained. TO1 also moves no form outside noise, so it stays held.
-FH2's effect on a whole form is about 0.4% in the interpreter and YJIT and none under ZJIT. No change loses under ZJIT.
+FH2's five-field form uses 0.38% fewer interpreter instructions; its YJIT cell is not JIT-flat and doesn't count, and its ZJIT difference is within A/A. No whole-request effect was measured. No change loses under ZJIT.
 
 ## SP1 body and the citation rule (DECISIONS 2026-11-27)
 
@@ -93,3 +93,14 @@ Checked 2026-11-27. Spree: 15.9k stars, about 3.0M downloads, pushed today. rail
 downloads, pushed 2026-11-26. rspec-rails 8.0.5 is superseded by 8.1.0, which has the fix, so its bullet is dropped.
 The rule's permalinks follow Line permalinks for callers (DECISIONS 6252c567), so the links stay on the latest releases, named in the text: Spree 6.0.6 `314dcb7784` (L65 and L182) and rails_admin 3.3.1 `ab5ae55428` (L44). A first draft that pinned default-branch commits was corrected after Astra's confirm pass. Spree stays first although rails_admin has more downloads, because its line runs in every Spree store's
 mailer, while rails_admin's runs only in rails_admin's own suite.
+
+## FH2 after Astra (2026-11-27)
+
+Astra's pass on `7401f9dac7` (archive `astra-fh2/`) found two exactness breaks with public callbacks and mutable Strings.
+`value_before_type_cast` builds its method name after `value_came_from_user?` has run, and `Translator` keeps the
+caller's unfrozen object name instead of a copy. Both hunks have to go. What is left, PH (`(...)`) and SV
+(`sanitized_value` in place), is in a local tree, measured once interleaved with main and main2
+(`results/fh2_reduced_interp.txt`, N = 500, interpreter): `f.text_field` −0.54%, `f.text_area` −0.53%,
+`f.radio_button` −0.31%, `f.label` −0.14%, 5-field `form_with` −0.09% / −0.16%, with main/main2 A/A ≤ 0.07%. Objects:
+text_field 17 → 16, text_area 18 → 17, radio_button 21 → 19, label 90 → 88. That is within cross-tree noise at the form
+level and below the bar, so FH2 is parked and not opened.
