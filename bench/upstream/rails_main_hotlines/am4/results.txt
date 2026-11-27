@@ -1,0 +1,22 @@
+AM4: ActionMailer::TestHelper requires active_job (Rails main 088fc0cf61 vs fix 3c0cab74af), Ruby 4.0.9, 2026-11-27.
+Both probes hide activejob/lib from $LOAD_PATH, as an app whose bundle has actionmailer and no activejob (Discourse).
+Run from a Rails checkout's actionmailer/: bundle exec ruby PROBE.
+
+probe.rb (ActionMailer::TestHelper in an ActiveSupport::TestCase, outside Rails)
+  088fc0cf61: LoadError cannot load such file -- active_job (test_helper.rb:4)
+  3c0cab74af: 2 runs, 2 assertions, 0 failures (assert_emails with a block; ActiveJob not defined)
+  intermediate (include made conditional, capture_emails unchanged): NoMethodError perform_enqueued_jobs
+
+app_probe.rb (Rails app with action_controller and action_mailer railties: integration test and ActionMailer::TestCase)
+  088fc0cf61: LoadError cannot load such file -- active_job
+  3c0cab74af: 3 runs, 4 assertions, 0 failures
+
+Rails tests on 3c0cab74af:
+  railties test/application/integration_test_case_test.rb: 5 runs, 0 failures; the new test fails on 088fc0cf61
+    with "cannot load such file -- active_job" from bin/rails test
+  strict warnings (bench/upstream/am3/strict_ci.rb) on that file: 5 runs, 0 failures, no warnings
+  actionmailer bin/test: 291 runs, 927 assertions, 0 failures; test_helper_test.rb under strict warnings: 56 runs, 0 failures
+
+Found by the heavy-app slice: Discourse on main, spec/ LoadError from action_mailer/test_helper.rb:4 via
+action_mailer/railtie.rb:67 (on_load :action_dispatch_integration_test), loaded by require "rspec/rails";
+bisected to ed17c90871 (#59820). Record: bench/upstream/rails_main_hotlines/slice-casa-chatwoot-discourse-flow-loomio-mastodon-sure.md
