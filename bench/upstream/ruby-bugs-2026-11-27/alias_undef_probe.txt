@@ -1,0 +1,26 @@
+# head with unused refinement
+true
+true
+true
+false
+:C
+D
+false
+NoMethodError
+:C
+NameError
+NameError
+:C
+# master without refinement
+true
+true
+true
+false
+:C
+D
+false
+NoMethodError
+:C
+NameError
+NameError
+:C

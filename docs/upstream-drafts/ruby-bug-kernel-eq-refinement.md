@@ -4,7 +4,7 @@ Status, 2026-11-27: **draft, nothing posted.** Thomas posts the report (or appro
 PR. The PR cites the Redmine ticket, so the ticket goes first; replace `NNNNN` with its number in the PR body and add
 `[Bug #NNNNN]` to the commit subject before opening.
 
-Fix head: [`4939c8c7f9`](https://github.com/thomasklemm/ruby/commit/4939c8c7f9) on
+Fix head: [`07c745a4ab`](https://github.com/thomasklemm/ruby/commit/07c745a4ab) on
 `thomasklemm/ruby:fix-unused-module-refinement-funcall`, one commit on ruby/ruby master `0d399335b7`. Raw data, repros
 and probes: [bench/upstream/ruby-bugs-2026-11-27](../../bench/upstream/ruby-bugs-2026-11-27/).
 
@@ -40,9 +40,8 @@ Expected:
 :C
 ```
 
-`public_send` and calls from C with `rb_funcall` raise the same way, `method` raises NameError and `respond_to?`
-returns false. Since `Kernel` is a
-module, an unused refinement of `Kernel#==` breaks `!=`, which calls `==` from C:
+`public_send` and calls from C with `rb_funcall` raise the same way, `method`, `alias_method` and `undef_method` raise
+NameError, and `respond_to?` and `method_defined?` return false. Since `Kernel` is a module, an unused refinement of `Kernel#==` breaks `!=`, which calls `==` from C:
 
 ```ruby
 Module.new { refine(Kernel) { def ==(other) = true } }
@@ -68,42 +67,48 @@ When the refined entry has no original method, `resolve_refined_method` in vm_me
 
 [Bug #NNNNN](https://bugs.ruby-lang.org/issues/NNNNN)
 
-When a module has an unused refinement for a method it does not define itself, `send`, `respond_to?`, `method` and
-calls from C must find the method further up the receiver's ancestors. `resolve_refined_method` continued from the
-superclass of the module itself, so these lookups did not find the method while a direct call did: `send` and C
-calls raised NoMethodError, `method` raised NameError and `respond_to?` returned false. For example, an
-unused refinement of `Kernel#==` made `Object.new != 1` raise, since `BasicObject#!=` calls `==` from C.
+When a module has an unused refinement for a method it does not define itself, lookups other than a direct call must
+still find the method further up the receiver's ancestors. `resolve_refined_method` continued from the superclass of
+the module itself, so they did not: `send` and C calls raised NoMethodError, `method`, `alias_method` and
+`undef_method` raised NameError, and `respond_to?` and `method_defined?` returned false. For example, an unused
+refinement of `Kernel#==` made `Object.new != 1` raise, since `BasicObject#!=` calls `==` from C.
 
 This continues from the superclass of the class where the refined entry was found, as `search_refined_method` already
-does for direct calls ([Bug #14068](https://bugs.ruby-lang.org/issues/14068)). Callers that pass no class, such as
-`undef_method` and `alias_method`, keep the current behavior.
+does for direct calls ([Bug #14068](https://bugs.ruby-lang.org/issues/14068)), and has every caller in vm_method.c
+pass that class. Active refinements, including an `undef_method` in one, and refinements of classes resolve as
+before.
 
 **Commit message** (subject gets `[Bug #NNNNN]` once the ticket exists):
 
 ```
 Skip an unused module refinement from the include's superclass
 
-When a refinement of a module M is not active, a call to a method that
-M itself does not define has to continue the search after M in the
-receiver's ancestors. resolve_refined_method continued from
+When a refinement of a module M is not active, a lookup of a method that
+M itself does not define has to continue after M in the receiver's
+ancestors. resolve_refined_method continued from
 RCLASS_SUPER(me->owner), the superclass of the module M itself, which is
 usually empty, instead of from the iclass that includes M. Lookups that
 resolve refinements this way did not find the method, while a direct
 call did: send, public_send and calls from C via rb_funcall raised
-NoMethodError, Kernel#method raised NameError and respond_to? returned
-false.
+NoMethodError, Kernel#method, alias_method and undef_method raised
+NameError, and respond_to? and method_defined? returned false.
 
 For example, an unused refinement of Kernel#== made `obj != 1` raise,
 because BasicObject#!= calls #== with rb_funcall.
 
 Continue from the superclass of the class where the refined entry was
 found, as search_refined_method in vm_insnhelper.c already does for
-direct calls.
+direct calls, and have every caller in vm_method.c pass that class.
+An undef in an active refinement keeps resolving from the owner as
+before.
 ```
 
-**Diff:** `vm_method.c` (+2/-1: remember the class the entry was found in, use it instead of `me->owner` when it is
-known) and `test_unused_refinement_for_module_method_in_superclass` in `test/ruby/test_refinement.rb`
-([patch](../../bench/upstream/ruby-bugs-2026-11-27/4939c8c7f9.patch)).
+**Diff:** `vm_method.c` (+12/-6: `resolve_refined_method` continues after the class the entry was found in instead of
+`me->owner` when it is known, except after an undef in an active refinement, which resolves from the owner as before;
+`method_entry_resolve_refinement`, `rb_undef` and `rb_add_alias` pass that class) and two tests in
+`test/ruby/test_refinement.rb`, `test_unused_refinement_for_module_method_in_superclass` and
+`test_undef_in_active_refinement_for_module_method_in_superclass`
+([patch](../../bench/upstream/ruby-bugs-2026-11-27/07c745a4ab.patch)).
 
 ## Evidence
 
@@ -114,7 +119,7 @@ known) and `test_unused_refinement_for_module_method_in_superclass` in `test/rub
 | 3.4.13 | NoMethodError | NoMethodError | no ZJIT |
 | 4.0.10 | NoMethodError | NoMethodError | NoMethodError |
 | master `0d399335b7` | NoMethodError | NoMethodError | `true` |
-| head `4939c8c7f9` | `true` | `true` | `true` |
+| head `07c745a4ab` | `true` | `true` | `true` |
 
 Ruby 3.4.13 is mise's build; 4.0.10 and master were built from source (`a704b7cd95` and `0d399335b7`) with
 `--enable-yjit --enable-zjit`. On both, `RbConfig::CONFIG["ZJIT_SUPPORT"]` is `"yes"` and
@@ -130,15 +135,27 @@ error_highlight enabled (the default) the `!=` error prints only `NoMethodError`
 shouldn't change the output"). So ZJIT's `true` is correct and the interpreter and YJIT are wrong. Thomas's reading
 holds with one correction: the bug is not in `opt_neq` or in `!=` dispatch. The `!=` call itself resolves fine; it is
 `rb_funcall(obj, ==)` inside the C `BasicObject#!=` that fails. ZJIT on master avoids it only because
-`basic_object.rb` (81c5830a66, 2026-10-15) replaces `BasicObject#!=` with a Ruby method under ZJIT, so `==` is a VM
+`basic_object.rb` (81c5830a66) replaces `BasicObject#!=` with a Ruby method under ZJIT, so `==` is a VM
 call. ZJIT needs no change.
 
 **Cause, verified:** in `resolve_refined_method` (vm_method.c), a refined entry without `orig_me` (the module defines
 no `==` itself) continues at `RCLASS_SUPER(me->owner)`. For a module, `me->owner` is the module, whose superclass is 0,
 so the function returns NULL. `search_refined_method` (vm_insnhelper.c) uses `RCLASS_SUPER(refined_cme->defined_class)`,
-the iclass, which is the Bug #14068 fix (r60931). The fix makes send, public_send, method and respond_to? find the
-inherited method; `method_defined?` still returns false for these shapes on base and head, since it takes a lookup path
-that passes no class pointer and is unchanged.
+the iclass, which is the Bug #14068 fix (r60931). The other callers in vm_method.c (`method_defined?` through
+`method_entry_resolve_refinement`, `undef_method`, `alias_method`) passed no class at all, so they hit the same
+fallback; the head has them pass the class they found the entry in. `instance_methods` (class.c) also passes none
+but iterates each ancestor's own table, so it is unaffected and unchanged.
+
+**Undef in an active refinement (found by thermos-sol on `4939c8c7f9`):** `search_method_protect` turns an undef in the
+active refinement into NULL, so the lookup fell through to the fallback. On master that fallback found nothing for a
+module owner, and `send` raised. With only the superclass fix it reached `P#foo` instead: `send`, `method` and
+`respond_to?` returned `:parent`/`true` where master raises or returns false. The head looks the refinement up with
+`search_method` and, after an undef, resolves from the owner as master does. Master is not consistent here either: a
+direct call raises NoMethodError in all four shapes of
+[active_undef_shapes.rb](../../bench/upstream/ruby-bugs-2026-11-27/active_undef_shapes.rb), but `send`, `method` and
+`respond_to?` ignore the undef when the refined module defines the method itself or when a class is refined. The head
+keeps master's result in all 16 cases (4 shapes, 4 lookups); honoring the undef everywhere would be a separate change
+for active refinements, so it stays out of this PR.
 
 **Fix probe** ([refine_probe.rb](../../bench/upstream/ruby-bugs-2026-11-27/refine_probe.rb), base and head outputs in
 the same directory): 30 shapes (method in superclass, in a later module, in the class itself, behind a prepend, or
@@ -147,23 +164,26 @@ absent; refinement of an included module, of the class, of a prepended module; u
 private methods, instance_method, method_defined?, `&:sym`; real direct calls are covered by the repros and the
 reviewers' probes), plus
 refinements of Kernel and Comparable and alias/undef. All 349 lines are identical between base and head except the
-unused-module-refinement rows that raised or returned false on base and now find the method (`method_defined?` rows
-stay false); active refinements and
-refinements of classes are unchanged. `rb_resolve_refined_method` passes no class pointer, so `undef_method`,
-`alias_method` and `instance_methods` keep the old code path.
+unused-module-refinement rows that raised or returned false on base and now find the method, and the alias and undef
+rows, which raised NameError and now succeed; the probe's active-refinement and refined-class rows are unchanged. A script
+with `method_defined?`, `public_method_defined?`, `private_method_defined?`, `alias_method` on the inherited method,
+`undef_method`, and the same calls on a method nobody defines prints the same lines on the head with the unused
+refinement as on master without it ([alias_undef_probe.rb](../../bench/upstream/ruby-bugs-2026-11-27/alias_undef_probe.rb)).
 
-**Tests on the head** (build with `--enable-yjit --enable-zjit`; run on `333ec5b187`, which differs from the head only
-in the commit message):
+**Tests on the head** (build with `--enable-yjit --enable-zjit`):
 
-* New test fails without the fix (`NoMethodError: undefined method 'foo' for an instance of D`), passes with it.
-* `make test-all TESTS=ruby -j8`: 11762 tests, 1 failure; with `RUN_OPTS=--zjit-call-threshold=1`: 11762 tests,
+* `test_unused_refinement_for_module_method_in_superclass` fails on master (`NoMethodError: undefined method 'foo' for
+  an instance of D`) and with only the `resolve_refined_method` change (`Expected D.method_defined?(:foo) to return
+  true`). `test_undef_in_active_refinement_for_module_method_in_superclass` passes on master and fails on `d852ad111c`
+  (`NoMethodError expected but nothing was raised`). Both pass on the head.
+* `make test-all TESTS=ruby -j8`: 11763 tests, 1 failure; with `RUN_OPTS=--zjit-call-threshold=1`: 11763 tests,
   1 failure. Both are `TestThread#test_handle_interrupt_masks_sigint`, which fails the same way on unmodified master
   in this orb.
-* `test_refinement.rb test_method.rb test_module.rb test_object.rb test_yjit.rb` with `--yjit-call-threshold=1`: 733
-  tests, 0 failures.
+* `test_refinement.rb test_method.rb test_module.rb test_object.rb test_alias.rb test_yjit.rb` with
+  `--yjit-call-threshold=1`: 754 tests, 0 failures.
 * `make btest`: PASS all 2148; with `--zjit-call-threshold=2`: PASS all 2148.
-* ruby/spec core/refinement, module/refine, module/using, main/using, kernel, basicobject: 2529 examples, 0 failures;
-  with `-T --zjit-call-threshold=2 --repeat 2`: 4998 examples, 0 failures.
+* ruby/spec core/refinement, module, main/using, kernel, basicobject: 3577 examples, 0 failures; core/refinement,
+  module, kernel, basicobject with `-T --zjit-call-threshold=2 --repeat 2`: 7134 examples, 0 failures.
 * Not run: `make zjit-check` (the Rust unit tests); the change touches no ZJIT code.
 
 **Existing reports:** none for this. Searched bugs.ruby-lang.org (open issues titled "refinement", unused refinement
@@ -174,3 +194,13 @@ Closest: [Bug #14068](https://bugs.ruby-lang.org/issues/14068) (fixed the direct
 2c15e9fe33, b870c03951, 380fa6ff3f; these touch `UnboundMethod#bind`, not this lookup),
 [Bug #22071](https://bugs.ruby-lang.org/issues/22071) (super in a refined module method). Not fixed on master
 `0d399335b7` (master tip at 2026-11-27 evening).
+
+## Separate findings, not in this PR
+
+* **`[BUG]` crash with an undef in an active module refinement:**
+  [active_undef_send_crash.rb](../../bench/upstream/ruby-bugs-2026-11-27/active_undef_send_crash.rb) (a module that
+  defines `foo`, an active refinement that undefs it, one direct call, then `send(:foo)`) aborts with
+  `[BUG] vm_call_method: unsupported method type (7)` on 3.4.13, 4.0.10, master `0d399335b7` and this head. Not
+  investigated further; a new lead, not reported.
+* **Undef in an active refinement is ignored by `send`, `method` and `respond_to?`** in three of the four shapes
+  above, while a direct call honors it. Unchanged by this PR; not reported.

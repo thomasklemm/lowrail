@@ -5,7 +5,7 @@ super_class/module/unused method: nil
 super_class/module/unused call_method: :parent
 super_class/module/unused respond_to: true
 super_class/module/unused instance_method_owner: nil
-super_class/module/unused method_defined: false
+super_class/module/unused method_defined: true
 super_class/module/unused sym_proc: :parent
 super_class/module/unused try_convert: true
 super_class/module/false != : true
@@ -17,7 +17,7 @@ super_class/module/used method: "#<Module"
 super_class/module/used call_method: :refined
 super_class/module/used respond_to: true
 super_class/module/used instance_method_owner: "#<Module"
-super_class/module/used method_defined: false
+super_class/module/used method_defined: true
 super_class/module/used sym_proc: :refined
 super_class/module/used try_convert: true
 super_class/module/true != : true
@@ -51,7 +51,7 @@ super_class/prepended_module/unused method: nil
 super_class/prepended_module/unused call_method: :parent
 super_class/prepended_module/unused respond_to: true
 super_class/prepended_module/unused instance_method_owner: nil
-super_class/prepended_module/unused method_defined: false
+super_class/prepended_module/unused method_defined: true
 super_class/prepended_module/unused sym_proc: :parent
 super_class/prepended_module/unused try_convert: true
 super_class/prepended_module/false != : true
@@ -63,7 +63,7 @@ super_class/prepended_module/used method: "#<Module"
 super_class/prepended_module/used call_method: :refined
 super_class/prepended_module/used respond_to: true
 super_class/prepended_module/used instance_method_owner: "#<Module"
-super_class/prepended_module/used method_defined: false
+super_class/prepended_module/used method_defined: true
 super_class/prepended_module/used sym_proc: :refined
 super_class/prepended_module/used try_convert: true
 super_class/prepended_module/true != : true
@@ -74,7 +74,7 @@ later_module/module/unused method: "#<Module"
 later_module/module/unused call_method: :later
 later_module/module/unused respond_to: true
 later_module/module/unused instance_method_owner: "#<Module"
-later_module/module/unused method_defined: false
+later_module/module/unused method_defined: true
 later_module/module/unused sym_proc: :later
 later_module/module/unused try_convert: true
 later_module/module/false != : true
@@ -86,7 +86,7 @@ later_module/module/used method: "#<Module"
 later_module/module/used call_method: :refined
 later_module/module/used respond_to: true
 later_module/module/used instance_method_owner: "#<Module"
-later_module/module/used method_defined: false
+later_module/module/used method_defined: true
 later_module/module/used sym_proc: :refined
 later_module/module/used try_convert: true
 later_module/module/true != : true
@@ -120,7 +120,7 @@ later_module/prepended_module/unused method: "#<Module"
 later_module/prepended_module/unused call_method: :later
 later_module/prepended_module/unused respond_to: true
 later_module/prepended_module/unused instance_method_owner: "#<Module"
-later_module/prepended_module/unused method_defined: false
+later_module/prepended_module/unused method_defined: true
 later_module/prepended_module/unused sym_proc: :later
 later_module/prepended_module/unused try_convert: true
 later_module/prepended_module/false != : true
@@ -132,7 +132,7 @@ later_module/prepended_module/used method: "#<Module"
 later_module/prepended_module/used call_method: :refined
 later_module/prepended_module/used respond_to: true
 later_module/prepended_module/used instance_method_owner: "#<Module"
-later_module/prepended_module/used method_defined: false
+later_module/prepended_module/used method_defined: true
 later_module/prepended_module/used sym_proc: :refined
 later_module/prepended_module/used try_convert: true
 later_module/prepended_module/true != : true
@@ -189,7 +189,7 @@ class_itself/prepended_module/unused method: nil
 class_itself/prepended_module/unused call_method: :klass
 class_itself/prepended_module/unused respond_to: true
 class_itself/prepended_module/unused instance_method_owner: nil
-class_itself/prepended_module/unused method_defined: false
+class_itself/prepended_module/unused method_defined: true
 class_itself/prepended_module/unused sym_proc: :klass
 class_itself/prepended_module/unused try_convert: true
 class_itself/prepended_module/false != : true
@@ -201,7 +201,7 @@ class_itself/prepended_module/used method: "#<Module"
 class_itself/prepended_module/used call_method: :refined
 class_itself/prepended_module/used respond_to: true
 class_itself/prepended_module/used instance_method_owner: "#<Module"
-class_itself/prepended_module/used method_defined: false
+class_itself/prepended_module/used method_defined: true
 class_itself/prepended_module/used sym_proc: :refined
 class_itself/prepended_module/used try_convert: true
 class_itself/prepended_module/true != : true
@@ -345,5 +345,5 @@ none/prepended_module/used try_convert: true
 none/prepended_module/true != : true
 kernel ==: [true, true, true, BasicObject]
 comparable frozen?: true true
-alias: NameError
-undef: NameError
+alias: bar
+undef: false

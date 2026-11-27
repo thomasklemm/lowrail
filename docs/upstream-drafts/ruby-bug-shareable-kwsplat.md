@@ -43,7 +43,9 @@ In `pm_compile_hash_elements`, the shareable branch compiles each key and value 
 every chunk after the first the pairs end up below the receiver of `core#hash_merge_*`. This came with 391b6746cd for
 [Bug #20916](https://bugs.ruby-lang.org/issues/20916).
 
-Tested with prism and parse.y on 3.4.13, 4.0.10 and master (0d399335b7). Prism fails on all three; parse.y does not.
+Tested with prism and parse.y on 3.4.13, 4.0.10 and master (0d399335b7). In both experimental modes, prism raises
+NoMethodError on all three versions while parse.y returns the hash. In literal mode, parse.y raises
+Ractor::IsolationError instead.
 
 ## Pull request
 
@@ -53,8 +55,8 @@ Tested with prism and parse.y on 3.4.13, 4.0.10 and master (0d399335b7). Prism f
 
 [Bug #NNNNN](https://bugs.ruby-lang.org/issues/NNNNN)
 
-With prism, `X = { **h, a: 1 }` under `# shareable_constant_value: experimental_everything` (or `experimental_copy`
-or `literal`) raises NoMethodError for `core#hash_merge_bang_ptr`. For shareable constants, `pm_compile_hash_elements`
+With prism, `X = { **h, a: 1 }` under `# shareable_constant_value: experimental_everything` (or `experimental_copy`)
+raises NoMethodError for `core#hash_merge_bang_ptr`. For shareable constants, `pm_compile_hash_elements`
 compiled each key and value into `ret` instead of `anchor`, so every chunk after the first had its pairs below the
 receiver of the merge call. Hash literals with more than 128 pairs that are not all static literals failed the same
 way.

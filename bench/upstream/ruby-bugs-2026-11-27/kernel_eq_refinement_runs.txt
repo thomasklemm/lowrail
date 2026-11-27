@@ -18,7 +18,7 @@
 [--yjit] unused_module_refinement_send.rb: :C unused_module_refinement_send.rb:6:in '<main>': undefined method 'foo' for an instance of D (NoMethodError) 
 [--zjit] kernel_eq_refinement_min.rb: true
 [--zjit] unused_module_refinement_send.rb: :C unused_module_refinement_send.rb:6:in '<main>': undefined method 'foo' for an instance of D (NoMethodError) 
-# head 333ec5b187
+# head 07c745a4ab
 [] true / :C :C 
 [--yjit] true / :C :C 
 [--zjit] true / :C :C 

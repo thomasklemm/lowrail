@@ -1,0 +1,160 @@
+From 07c745a4ab0ccf857539de0f8ffe2f011ef767a8 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Fri, 27 Nov 2026 20:40:40 +0000
+Subject: [PATCH] Skip an unused module refinement from the include's
+ superclass
+
+When a refinement of a module M is not active, a lookup of a method that
+M itself does not define has to continue after M in the receiver's
+ancestors. resolve_refined_method continued from
+RCLASS_SUPER(me->owner), the superclass of the module M itself, which is
+usually empty, instead of from the iclass that includes M. Lookups that
+resolve refinements this way did not find the method, while a direct
+call did: send, public_send and calls from C via rb_funcall raised
+NoMethodError, Kernel#method, alias_method and undef_method raised
+NameError, and respond_to? and method_defined? returned false.
+
+For example, an unused refinement of Kernel#== made `obj != 1` raise,
+because BasicObject#!= calls #== with rb_funcall.
+
+Continue from the superclass of the class where the refined entry was
+found, as search_refined_method in vm_insnhelper.c already does for
+direct calls, and have every caller in vm_method.c pass that class.
+An undef in an active refinement keeps resolving from the owner as
+before.
+---
+ test/ruby/test_refinement.rb | 44 ++++++++++++++++++++++++++++++++++++
+ vm_method.c                  | 18 ++++++++++-----
+ 2 files changed, 56 insertions(+), 6 deletions(-)
+
+diff --git a/test/ruby/test_refinement.rb b/test/ruby/test_refinement.rb
+index 3f733989e9..f9c05b18b9 100644
+--- a/test/ruby/test_refinement.rb
++++ b/test/ruby/test_refinement.rb
+@@ -4398,6 +4398,50 @@ def foo
+     INPUT
+   end
+ 
++  def test_unused_refinement_for_module_method_in_superclass
++    assert_separately([], <<-"end;")
++      class C
++        def foo = :C
++      end
++      module M
++      end
++      class D < C
++        include M
++      end
++      Module.new { refine(M) { def foo = :M } }
++      d = D.new
++      assert_equal(:C, d.send(:foo))
++      assert_equal(:C, d.method(:foo).call)
++      assert_respond_to(d, :foo)
++      assert_send([D, :method_defined?, :foo])
++      D.alias_method(:bar, :foo)
++      assert_equal(:C, d.bar)
++      D.undef_method(:foo)
++      assert_not_respond_to(d, :foo)
++
++      Module.new { refine(Kernel) { def ==(other) = true } }
++      assert_equal(true, Object.new != 1)
++    end;
++  end
++
++  def test_undef_in_active_refinement_for_module_method_in_superclass
++    assert_separately([], <<-"end;")
++      class C
++        def foo = :C
++      end
++      module M
++      end
++      class D < C
++        include M
++      end
++      using Module.new { refine(M) { def foo = :M; undef_method :foo } }
++      d = D.new
++      assert_raise(NoMethodError) { d.foo }
++      assert_raise(NoMethodError) { d.send(:foo) }
++      assert_equal(false, d.respond_to?(:foo))
++    end;
++  end
++
+   def test_refining_module_repeatedly
+     bug14070 = '[ruby-core:83617] [Bug #14070]'
+     assert_in_out_err([], <<-INPUT, ["ok"], [], bug14070, timeout: 30)
+diff --git a/vm_method.c b/vm_method.c
+index 8377cc45aa..b32bbe3166 100644
+--- a/vm_method.c
++++ b/vm_method.c
+@@ -2234,6 +2234,8 @@ static const rb_method_entry_t *resolve_refined_method(VALUE refinements, const
+ static const rb_method_entry_t *
+ method_entry_resolve_refinement(VALUE klass, ID id, int with_refinement, VALUE *defined_class_ptr)
+ {
++    VALUE defined_class;
++    if (!defined_class_ptr) defined_class_ptr = &defined_class;
+     const rb_method_entry_t *me = search_method_protect(klass, id, defined_class_ptr);
+ 
+     if (me) {
+@@ -2314,16 +2316,19 @@ resolve_refined_method(VALUE refinements, const rb_method_entry_t *me, VALUE *de
+         VALUE refinement;
+         const rb_method_entry_t *tmp_me;
+         VALUE super;
++        VALUE defined_class = defined_class_ptr ? *defined_class_ptr : 0;
+ 
+         refinement = find_refinement(refinements, me->owner);
+         if (!NIL_P(refinement)) {
+             if (RB_TYPE_P(me->owner, T_MODULE) && defined_class_ptr && RB_TYPE_P(*defined_class_ptr, T_ICLASS)) {
+                 refinement = module_refinement_iclass(refinement, *defined_class_ptr);
+             }
+-            tmp_me = search_method_protect(refinement, me->called_id, defined_class_ptr);
++            tmp_me = search_method(refinement, me->called_id, defined_class_ptr);
+ 
+             if (tmp_me && tmp_me->def->type != VM_METHOD_TYPE_REFINED) {
+-                return tmp_me;
++                if (!UNDEFINED_METHOD_ENTRY_P(tmp_me)) return tmp_me;
++                // An undef in an active refinement keeps resolving from the owner.
++                defined_class = 0;
+             }
+         }
+ 
+@@ -2338,7 +2343,7 @@ resolve_refined_method(VALUE refinements, const rb_method_entry_t *me, VALUE *de
+             return tmp_me;
+         }
+ 
+-        super = RCLASS_SUPER(me->owner);
++        super = RCLASS_SUPER(defined_class ? defined_class : me->owner);
+         if (!super) {
+             return 0;
+         }
+@@ -2611,6 +2616,7 @@ void
+ rb_undef(VALUE klass, ID id)
+ {
+     const rb_method_entry_t *me;
++    VALUE defined_class;
+ 
+     if (NIL_P(klass)) {
+         rb_raise(rb_eTypeError, "no class to undef method");
+@@ -2620,9 +2626,9 @@ rb_undef(VALUE klass, ID id)
+         rb_warn("undefining '%s' may cause serious problems", rb_id2name(id));
+     }
+ 
+-    me = search_method(klass, id, 0);
++    me = search_method(klass, id, &defined_class);
+     if (me && me->def->type == VM_METHOD_TYPE_REFINED) {
+-        me = rb_resolve_refined_method(Qnil, me);
++        me = resolve_refined_method(Qnil, me, &defined_class);
+     }
+ 
+     if (UNDEFINED_METHOD_ENTRY_P(me) ||
+@@ -3023,7 +3029,7 @@ rb_add_alias(VALUE klass, ID alias_name, ID original_name, rb_method_visibility_
+     orig_me = search_method(klass, original_name, &defined_class);
+ 
+     if (orig_me && orig_me->def->type == VM_METHOD_TYPE_REFINED) {
+-        orig_me = rb_resolve_refined_method(Qnil, orig_me);
++        orig_me = resolve_refined_method(Qnil, orig_me, &defined_class);
+     }
+ 
+     if (UNDEFINED_METHOD_ENTRY_P(orig_me) ||
+-- 
+2.55.0
+
