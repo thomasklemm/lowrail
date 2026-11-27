@@ -336,3 +336,212 @@ to an unqualified long list; none of their older gem versions was substituted fo
   excludes zero on the slower side, the zero-argument reader's on the faster side. The simple two-key fixture's
   setter interval contains zero; this does not negate the older, different fixture's setter regression. Exact
   diagnostic estimates, intervals, windows and commands remain in `worst-confirm/results.json` and `table.md`.
+
+## thermos-sol: changes on 282ebcbb8248ae3ef379bc7254ad69fd0422d7b4
+
+2026-11-27, orb `T-01a21f08-d041-7016-b829-aa1e0ed68eaf`. Reviewed the single commit against
+`9e313f308f3270995c2c978e92f0f216b861861b`, including the exact HM3 title/body, commit message and CHANGELOG.
+Applied both Thermos correctness/security and maintainability rubrics directly in this thread, without delegating,
+as requested. **Changes required:** a demonstrated keyword-forwarding regression, overbroad allocation claims,
+and omitted master/ZJIT losses. No upstream writes or fork pushes.
+
+Scripts, raw outputs, source/API evidence and the validated rollback patch:
+[`thermos-sol-HM3-282ebcb.tar.gz`](thermos-sol-HM3-282ebcb.tar.gz). Paths below are inside that archive;
+`RUNS.md` gives commands and limitations. The reviewed branch still resolved to the full head above.
+
+### R1 — P2: the optional value lets a keyword-marked Hash escape as keywords
+
+`lib/hashie/mash.rb:500,506`: moving the first argument out of the named rest changes Ruby's handling of
+`ruby2_keywords` forwarding. This affects public dispatch and return values, not only reflection or a private hook.
+Minimal repro, run separately with `ruby -I BASE/lib repro.rb` and `ruby -I HEAD/lib repro.rb`:
+
+```ruby
+require 'hashie'
+require 'delegate'
+def receive(*positional, **keywords); [positional, keywords]; end
+value = SimpleDelegator.new(Hashie::Mash.new).public_send(:item=, a: 13)
+p receive(*[value])
+```
+
+Base: `[[{a: 13}], {}]`. Head: `[[], {a: 13}]`. The returned Hash has become keyword arguments when splatted.
+This introduced difference reproduces on Ruby 3.3.10, 3.4.7, 4.0.10, and pinned master, with every tested JIT mode.
+A public `assign_property(name, value)` override calling `receive(*[value])` sees the same difference before storing.
+No override is needed for the return-value repro above.
+
+A subclass with an ordinary legacy forwarding override also reproduces, starting on Ruby 3.2.10:
+
+```ruby
+class LegacyKeywordMash < Hashie::Mash
+  ruby2_keywords def method_missing(name, *args, &block)
+    super
+  end
+end
+value = LegacyKeywordMash.new.public_send(:item=, a: 13)
+p receive(*[value])
+```
+
+The same base/head outputs differ on 3.2.10–4.0.10 and master. On 3.0.7/3.1.7 the legacy example already returns
+keywords on base too, so that is not an introduced regression there. The SimpleDelegator example is unchanged
+through 3.2.10. Complete three-case/version/JIT outputs: `evidence/keyword-repro-all.txt`.
+
+Mechanism checked in master `0d399335b733776187e43a783e5f950c18ad881c`, `vm_args.c`: optional arguments are
+assigned before rest-argument cleanup; the latter removes `RHASH_PASS_AS_KEYWORDS` only from a final Hash still
+in the rest. The new optional slot has already consumed it (`evidence/ruby-vm-argument-path.txt`).
+
+**Smallest validated correction:** restore `(method_name, *args, &blk)` and `args.first`. The two-line
+`restore-named-rest.patch` is in the archive. It gives exactly base's entire `lib` tree, fixes the focused repro on
+3.2/3.3/4.0/master, and passes 1,077 specs and RuboCop (156 files) on 4.0.10. It sacrifices this optimization.
+No guard, keyword-copy workaround or alternative optimized signature is claimed safe. Do not apply only a
+keyword-flag test to Hashie: fixing Ruby's argument handling is a separate possible investigation, not a validated fix.
+
+### R2 — P2: narrow the allocation promise to the call shapes measured
+
+The title, commit subject/body and CHANGELOG suggest method reads generally lose the Array; HM3's impact explicitly
+says "Every method-style read on every Mash". `allocations.rb`, run base/head/base on each Ruby/JIT configuration,
+demonstrates these boundaries on 4.0.10 and master:
+
+| Public call shape | Base objects/call | Head objects/call |
+| --- | ---: | ---: |
+| ordinary `mash.name` | 1 | 0 |
+| `mash.name(*EMPTY)` with a frozen empty Array | 1 | 1 |
+| a subclass's `def method_missing(name, *args, &block); super; end`, then `mash.name` | 2 | 2 |
+| a subclass's `def method_missing(...); super; end`, then `mash.name` | 1 | 0 |
+| `mash.name(13)` | 1 | 1 |
+
+These are allocation counts, not timings. Direct-read output has an equal 0.0001/call instrumentation cost on both
+sides; the displayed integers remove that equal overhead. Base/head/base controls agree. Ruby 3.0–3.4 show no
+allocation change. `evidence/allocations-all.txt` retains every raw count. An empty argument list is not sufficient
+to promise no allocation when the call arrives as a splat. Narrow the prose to ordinary unsplatted reads and do not
+promise all subclass forwarding shapes. `mash.owner.login` also contains two affected reads, not one call.
+
+### R3 — P2: the body does not disclose the known larger master/ZJIT losses
+
+The last body sentence accurately describes Duel's 4.0.10 setter medians, but it is not a fair account of the known
+costs across pins. HM3's note says the local losses are "stated in the body"; they are not. Checked the existing
+`wall/HM3-setter-master-zjit/results.json` against all 90 archived process logs, including every case's windows,
+A/A and flat-JIT flags (`evidence/historical-wall-audit.txt`: 360 case/process arrays match):
+
+| Existing master/ZJIT cohort, 30 rounds | Change, 95% interval | A/A, 95% interval |
+| --- | --- | --- |
+| setter | +2.456% [+2.156, +2.687] | −0.441% [−0.832, +1.001] |
+| `mash.name(1)` | +6.724% [+6.462, +6.932] | +0.160% [−0.198, +0.382] |
+
+They meet the statistical claimed-loss gate, not the "noise" exception. The VM now fills an optional argument while
+these shapes retain their Array; that is a checked path difference, not an isolated attribution of all the CPU cost.
+An allocation win for plain reads can justify that tradeoff, but there is no measured application read/write or
+forwarding mix here proving a net time win. Require a concise disclosure and an explained/accepted tradeoff before
+approval, rather than clearing it with Duel's different pin or 5% limit. These losses do not alone prove that the
+optimization must be abandoned; R1 independently blocks the exact head. Cut the body rather than lengthening its
+roughly 200 words beyond the PR-description guidance.
+
+**Independent worst-input measurement:** `perf_body.rb`, `script/upstream-bench --wall 30 --wall-mode zjit
+--wall-windows 5 --wall-ms 10 --warmup 10000 --core 4 --modes ''`, same base/head, pinned master
+`0d399335b733776187e43a783e5f950c18ad881c`; 90 fresh processes, GC off, every measured window JIT-flat.
+Among the 14 tested call shapes the largest median relative loss is an **empty-splat read**, not a setter:
+
+| New diagnostic cohort | Change, 95% interval | A/A, 95% interval |
+| --- | --- | --- |
+| `mash.name(*empty)` | +5.9% [+5.6, +6.2] | +0.1% [−0.5, +0.5] |
+| `mash.name(1)` | +5.8% [+5.5, +6.2] | +0.1% [−0.2, +0.7] |
+| named-rest subclass, no-argument read | +2.7% [+2.3, +3.0] | +0.3% [−0.4, +1.2] |
+| setter, one value | +1.7% [+1.1, +2.0] | −0.0% [−0.3, +0.5] |
+| ordinary unsplatted read | −7.3% [−7.8, −7.1] | +0.0% [−0.4, +0.4] |
+
+The slowest absolute case was the two-argument setter (`public_send(:name=, 'Grace', 29)`), about 0.62 µs/call,
+versus 0.61 µs base; its relative loss is +2.0% [+1.5, +2.2], A/A +0.4% [−0.2, +2.0]. All 14 rows, individual
+windows, flags, generated commands and results are under `evidence/worst-master-zjit`. This is a measured sweep,
+not a universal worst-case bound. The preliminary screen is kept and not used for claims.
+
+**Host limitation:** this orb has 8 CPUs, not the mandated a1.xxlarge publication host. The existing local timing
+record also declares 8 CPUs. These are diagnostic/statistically resolving cohorts, not publication-approved timing
+numbers; do not move the new percentages into an upstream body. No timing was delegated to another orb because
+this review was expressly confined to this thread. Allocation and correctness conclusions do not depend on timing.
+
+### Independent exactness and validation coverage
+
+`public_diff.rb` is a new probe, not a rerun of `probes/mm_diff.rb`: 197,602 observable rows per side per configuration,
+19 classes including Mash, bare/explicit/keyword/legacy/`...`/optional `super`, prepends, assignment/read observers,
+nine Mash extensions and BlockAccess. It covers absent/present/exact-suffix keys, frozen receivers, default procs,
+nil/false/scalars, Hash/Array/String subclasses, public/private conversions, marked/mixed/empty keywords, splats,
+blocks, public dispatch/direct calls/Method objects/String names/SimpleDelegator; it records results, errors,
+mutation, identity and hook events. Two fiber cases suspend at lookup, mutate the receiver and optionally freeze it.
+
+Ran 3.0.7 interpreter; 3.1.7, 3.2.10, 3.3.10, 3.4.7 and 4.0.10 interpreter/YJIT; master interpreter/YJIT/ZJIT.
+Normalized only checkout paths and object addresses. No differences through 3.2 in the broad probe; 80 rows per
+configuration from 3.3 onward expose R1 through the assignment observer. The focused public return-value repro adds
+the 3.2 legacy-super boundary the broad snapshots missed. `edge_diff.rb` adds 54 cases per release and master/ZJIT
+for singleton methods, per-object prepends/extend, frozen conversion results, method-name conversion mutation/errors,
+and missing required arguments; no additional semantic differences. Fresh-process load-order checks agree.
+
+Checklist: (1) singleton/private/extend/prepend/dispatch checked; (2) container subclasses and overridden conversion/
+iteration hooks checked; (3) implicit conversions and hook counts checked; (4) no added call on a supplied value,
+`args.first` on the VM-created Array goes, but VM keyword processing changes (R1); (5) no new accumulator/adoption;
+(6) mutation and fiber boundary checked, no iteration changed; (7) frozen receivers/values and error class/message
+checked; (8) load order checked. Reflection changes as expected: arity stays −2, parameters change from required name,
+rest `args`, block `blk` to required name, optional `value`, anonymous rest, block `blk`. Accepted metadata difference,
+not a second correctness finding. No new shared state, configuration, dependencies or security boundary.
+
+On 4.0.10, independently ran base specs **1,076/0**, head specs **1,077/0**, head documentation examples **359/0**,
+and project RuboCop **156 files clean**. The two changed examples pass individually and both fail with a deliberately
+wrong fixed-arity control. The broader fixed-arity control has 41,568 differing rows among 197,600 completed rows,
+then raises at the first unrescued fiber: that negative-control run is not reported as a completed full probe.
+No claim of full gem-suite execution on every Ruby/JIT; compatibility conclusions are scoped to the probes run.
+
+### Maintainability, added comments and specifications
+
+Cold read of both versions: an exact key wins even when its spelling ends in a suffix, so it forwards the block to
+`[]`; otherwise split the suffix, assign the first value (nil if absent) for `=`, booleanize the read for `?`, create
+and store a nested Mash only when absent for `!`, return a temporary nested Mash when absent for `_`, and otherwise
+perform an ordinary read. Every dispatch branch is unchanged; the correctness difference is at argument binding.
+
+**L0 structurally:** one signature and one expression change, no helper, branch, wrapper or duplication. `mash.rb`
+stays 654 lines; no file crosses 1,000 lines because of this change. No unrelated restructuring would improve these
+two lines. Per-method measurements, flog 4.10.0 and RuboCop 1.91.0 with metric limits set to zero:
+
+| `method_missing` metric | Base | Head |
+| --- | ---: | ---: |
+| flog | 17.7 | 16.6 |
+| ABC | 12.25 | 11.36 |
+| cyclomatic | 6 | 6 |
+| perceived | 4 | 4 |
+| method length | 14 | 14 |
+| parameter count | 2 | 3 |
+
+The parameter metric rises because the optional value is now named; the control flow does not grow. Lower scores
+do not excuse R1. There are **zero added comment lines**, including specs; pre-existing comments shown in diff
+context are not additions. Both added expectations check public behavior with asymmetric values: extra arguments
+do not change an existing-key read, and a multi-argument setter uses 123 rather than 456. They fail the plausible
+mistake of removing the rest altogether; keep them. They do not cover keyword forwarding, so add a public R1
+regression test if an optimized replacement is attempted. No superfluous comments or implementation-only tests found.
+
+### Sentence-by-sentence claim audit
+
+| Posted text | Check performed and result |
+| --- | --- |
+| Title: "Read Mash keys as methods without allocating an arguments Array" | Diff and independent base/head/base allocation probe confirm ordinary unsplatted reads on 4.0+, not every call shape; R2. Title also omits the Ruby boundary present in the CHANGELOG. |
+| Body 1: `*args` collects an Array on every call; only the setter reads an argument | Opened both `method_missing` bodies, the callers/extensions and allocation outputs. True for the method's normal calls; there is no other `args` use. This does not mean its argument-array allocation is the only allocation of a setter or suffix call. |
+| Body 2: `mash.name`, `mash.owner.login`, `mash.private?` allocate an empty Array | Source and ordinary-read allocation probe plus Duel's read/suffix cases support an Array per dispatched read on base. The chained example contains two reads; simplify the sentence rather than imply one total Array for the chain. |
+| Body 3: names the setter value and leaves the rest anonymous, with the printed signature | Exact `git diff` confirms both changed lines. |
+| Body 4: since Ruby 4.0 anonymous rest allocates nothing for a no-argument call; older Rubies allocate as before | Opened Ruby optimization commit `43683e1e9d8f7f6ed3fb4a48598190a0993f8f66`, verified it is an ancestor of v4.0.0 (`553f1675f3a9cece340b90f374a4245dccac2272`), and ran allocation controls on all pins. True for ordinary calls, false for empty-splat/named-rest-super generalization; R2. |
+| Body 5: replaces the earlier reply on 659; optional plus anonymous rest still accepts setter and extra arguments | Fetched `issuecomment-7227673119`: point 4 did retain `*args` over fixed-arity rejection. Ran extra-argument public probes and both added specs. Acceptance is true, but preserved keyword behavior is not; R1. |
+| Body allocation-table introduction and all four rows | Opened the exact Duel benchmark source and extracted run 46067769275 logs: method reads 5→0, Symbol method reads 5→0, KeepOriginalKeys Symbol reads 5→0, suffixes 16→12 under both JITs. Raw Ruby description is 4.0.10, so "Ruby 4.0" is accurate. |
+| Body: Duel calls Symbol reads faster under both JITs, CPU 0.91 of master | Raw medians 0.914 [0.912, 0.917] YJIT and 0.912 [0.908, 0.921] ZJIT; both labeled faster. 0.91 is honest rounding. Allocation counts are not being mislabeled time. |
+| Body: setters retain the Array, Duel 1–2% slower, within limit | VM/signature allocation probe and raw two-setter medians: 1.018/1.012 YJIT, 1.022/1.008 ZJIT, all "same". Opened exact workflow/config and Duel limit implementation: actual CPU limit 1.05, despite the output's generic 1.02 header. Literally supported, but omits the different master losses; R3. |
+| Commit subject: "Stop allocating an arguments Array in Mash#method_missing" | Same boundary issue as title, and setters still allocate; scope it to ordinary reads on Ruby 4.0+ (R2). |
+| Commit sentence 1: named rest allocates on every call and only setter reads an argument | Source and base allocation probe support it, with the same scope as body 1. |
+| Commit sentence 2: optional value plus anonymous rest; since 4.0 empty rest avoids allocation, including `?`, `!`, `_` | Signature, Ruby source/ancestry, ordinary-read controls and actual Duel suffix benchmark support the ordinary calls; not splatted/forwarded calls (R2). |
+| Commit sentence 3: extra arguments remain accepted/ignored and older Rubies allocate as before | Public shape matrix and old-version allocation controls support argument acceptance and allocation. Ignoring extras does not establish keyword equivalence; R1. |
+| CHANGELOG: Ruby 4.0 method reads avoid an arguments Array, attribution and link 662 | Code/allocation audit gives the R2 boundary. Commit author and committer are Thomas Klemm, no trailers. GET of upstream PR 662 returned 404: it is a prospective number, not a verified reference. Recheck/replace on opening; do not treat it as an existing PR. |
+
+**Duel provenance:** run API and raw checkout logs identify workflow-carrying head
+`522b8997366f6b1304f38e6cb008bf945b9a17fd`, test merge `4b48c95270f0e242a21283e062fb2254c4b00ff5`,
+and base `f6545d1dd34c3905fb4c8fa25764f209cb65274f`. Compared `lib`, `spec`, `benchmarks`, `.duel.rb` tree/blob
+hashes, not just a branch name: head/merge match reviewed head for all four; workflow base matches reviewed master.
+The extra branch changes are workflow, spelling, CHANGELOG and CONTRIBUTING, not runtime/spec/benchmark changes.
+All 27 benchmarks report 0 regressed, 0 errors, 0 unsettled under each JIT. Opened calibration-8's kept A/A and
+planted-regression logs/config too; do not confuse its controls or the other candidates' logs with this run.
+
+After the independent audit, read fork PR 27's conversation, inline comments and reviews (empty), and searched for
+an upstream PR for this candidate (none found). No external reviewer finding was imported. No public claim remains
+silently unchecked: unsupported scope is R2, missing material context is R3, and the unassigned CHANGELOG number
+is an explicit pre-opening check. This pass does not authorize opening or bless a replacement head.

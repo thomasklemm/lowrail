@@ -23,6 +23,7 @@ note: "2026-11-27 built on master 9e313f3 as one commit 282ebcb (Thomas, no trai
 ownership: {date: 2026-11-27, checked: ["open PRs naming method_missing that change CHANGELOG.md, lib/hashie/mash.rb"], hits: []}
 passes:
   - {reviewer: astra, head: "282ebcbb8248ae3ef379bc7254ad69fd0422d7b4", date: 2026-11-27, orb: T-01a21f08-d80b-7106-a4dc-d66f07191d10, verdict: changes, open: "Ruby 3.2+ forwarded keyword hashes retain their flag instead of becoming positional (minimal repros and full matrix in round2 Astra section/archive). Body omits recorded master-ZJIT losses; impact overstates current eligibility and every-Mash coverage. Earlier-reply paraphrase is a wording nit. Restore exact keyword behavior and correct the text before opening."}
+  - {reviewer: thermos-sol, head: "282ebcbb8248ae3ef379bc7254ad69fd0422d7b4", date: 2026-11-27, orb: T-01a21f08-d041-7016-b829-aa1e0ed68eaf, verdict: changes, open: "R1 keyword forwarding changes a returned positional Hash into keywords (SimpleDelegator on Ruby 3.3+, ruby2_keywords super on 3.2+); R2 allocation promises exclude empty splats and named-rest super; R3 body omits claimed master/ZJIT losses. Restore named rest or supply an exact replacement, narrow claims and disclose/accept costs. CHANGELOG number remains prospective. Full audit and validated rollback patch in round2/thermos-sol-HM3-282ebcb.tar.gz and the appended README section."}
 ---
 
 # Read Mash keys as methods without allocating an arguments Array
