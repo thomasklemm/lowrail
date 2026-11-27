@@ -1,0 +1,18 @@
+== rails-main
+1 frozen tag(:br): "<br />"
+2 name mutated: "<br id=\"value\" />"
+3 encoding order: RuntimeError: later attribute
+4a tag.self_closing_tag_string: "<self-closing-tag-string id=\"a\">text</self-closing-tag-string>"
+4b tag.append_tag_options: "<append-tag-options id=\"a\">text</append-tag-options>"
+== rails-old
+1 frozen tag(:br): "<br />"
+2 name mutated: "<input id=\"value\" />"
+3 encoding order: Encoding::CompatibilityError: incompatible character encodings: UTF-8 and BINARY (ASCII-8BIT)
+4a tag.self_closing_tag_string: "<self-closing-tag-string id=\"a\">text</self-closing-tag-string>"
+4b tag.append_tag_options: ArgumentError: wrong number of arguments (given 2, expected 3)
+== rails
+1 frozen tag(:br): FrozenError: can't modify frozen Object: #<Object:0x>
+2 name mutated: "<input id=\"value\" />"
+3 encoding order: Encoding::CompatibilityError: incompatible character encodings: UTF-8 and BINARY (ASCII-8BIT)
+4a tag.self_closing_tag_string: "<text id=\"a\" />"
+4b tag.append_tag_options: ArgumentError: wrong number of arguments (given 2, expected 3)

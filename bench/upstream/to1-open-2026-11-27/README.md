@@ -79,3 +79,40 @@ Not reached: `content_tag`, `tag.div` and other elements with content, `label`, 
   before; exception classes and messages identical; (8) load order: same file, no new require.
 * Action View `rake test` on Ruby 4.0.10: main and head both 2,984 + 252 + 177 runs, 0 failures
   (`results/av_main.txt`, `results/av_head.txt`).
+
+## Astra: not exact (2026-11-27), stopped
+
+Astra (`openai/gpt-6-astra`, thread T-01a21f0d-5484-77aa-89c4-29131c0e3f58) on `be8139e150`: changes / not exact.
+Evidence bundle: `astra/review-evidence.tar.gz`. Its four public-API repros, rerun here on main, the old head
+`7f1f0dce45` and `be8139e150` (`astra_check.rb`, `results/astra_check.txt`):
+
+| Repro | main | old head | new head | Cause |
+| --- | --- | --- | --- | --- |
+| 1 `tag(:br)` on a frozen view, nil options | `<br />` | `<br />` | FrozenError (memoizes `@tag_builder`) | the simplification |
+| 2 an attribute's `to_s` mutates the tag name String | `<br id="value" />` | `<input …>` | `<input …>` | the approach: the name is copied before the attributes run |
+| 3 invalid-encoding attribute before one whose `to_s` raises | RuntimeError from the later `to_s` | Encoding::CompatibilityError | same | the approach: encodings meet the name during the loop |
+| 4a `tag.self_closing_tag_string(...)` custom element | custom element | custom element | `<text id="a" />` | the simplification (method made public) |
+| 4b `tag.append_tag_options(...)` custom element | custom element | ArgumentError | ArgumentError | the approach (public helper on TagBuilder) |
+
+1 and 4a could be undone by going back to the old shape. 2 and 3 can't without giving up the change: the tag's own
+String has to start with the name before the attributes are evaluated. Both need contrived inputs (aliasing the name
+from an attribute's `to_s`, a failing mixed-encoding tag), but they fall under exactness checklist items 6 and 7, and
+the brief said to stop on a "not exact" verdict. Astra also judged the change worth pursuing in principle and
+corrected the reach list: `select`'s hidden input needs `multiple` and `include_hidden`, `button_to`'s submit input
+depends on configuration, and `form_with`'s hidden inputs gain while its `<form>` doesn't.
+
+The a1.xxlarge timing run (T-01a21f0c-fbe0-77e6-9af2-3a4d79a2adde) was stopped before any per-call or page result,
+so there are no page-level numbers. The fork branch stays at `be8139e150`, and nothing was posted.
+
+thermos-sol (`openai/gpt-6.1-sol` xhigh, thread T-01a21f0d-28ca-7638-ad49-8af4c8d3f393) on the same head: not exact,
+hold. Its own 6,256-case probe reproduced repros 2 and 3 (also with a Fiber suspended in the name-mutating `to_s`),
+the frozen-view FrozenError and both custom-element collisions. The maintainability side approved the shape (L1, no
+duplicated serialization or one-tag fast path) and would make `append_tag_options` private. That fixes 4b but not 2
+or 3. Its objects check matched ours: one object fewer per tag with attributes, a cold `tag(:br)` on a fresh helper
+instance 3 → 4 (the memoized builder), warm `tag(:br)` unchanged. It also says the commit sentence "The returned
+buffer is unchanged" is too broad. Its correctness subreviewer was blocked by the provider, and it finished that
+rubric itself in the thread.
+
+Outcome: held. Both reviewers judged the reach big enough for a PR if the change were exact. An exact form would have
+to evaluate every attribute before the tag's String exists, which is what main already does, so there is no exact
+variant left with the saving. Opening it as is needs Thomas to accept repros 2 and 3 as outside the contract.
