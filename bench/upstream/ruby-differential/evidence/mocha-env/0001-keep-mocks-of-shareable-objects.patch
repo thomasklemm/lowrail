@@ -1,4 +1,4 @@
-From 3d3f63b4c136e807c6f532f97fc90794080ba364 Mon Sep 17 00:00:00 2001
+From 2db1c867821c6ea4af94348c772afacd62c6e519 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Fri, 27 Nov 2026 12:13:50 +0000
 Subject: [PATCH] Keep mocks of shareable objects such as ENV out of instance
@@ -11,8 +11,6 @@ Ractor::IsolationError when Mocha stored the object's mock in @mocha.
 The mock of such an object now lives in a Hash keyed by identity, with
 the same lifetime @mocha had. Classes and modules are shareable too,
 but still allow instance variables, so they keep using @mocha.
-
-Amp-Thread-ID: https://ampcode.com/threads/T-01a21ca4-eb07-7134-a138-0909fab59394
 ---
  lib/mocha/object_methods.rb      | 21 +++++++++++++++--
  test/acceptance/stub_env_test.rb | 40 ++++++++++++++++++++++++++++++++
