@@ -5,3 +5,13 @@ blog PATCH article (redirect) zjit ur1_cgi.rb Ir/op 2463384 objs/op 1329.1 jit 0
 blog PATCH article (redirect) zjit none.rb Ir/op 2602978 objs/op 1429.4 jit 0/0 settle 1
 blog POST comment (redirect) zjit none.rb Ir/op 4065330 objs/op 1864.2 jit 3/15 settle 6
 blog POST comment (redirect) zjit none.rb Ir/op 3978749 objs/op 1839.1 jit 1/5 settle 1
+blog POST comment (redirect) zjit none.rb Ir/op 3979709 objs/op 1825.6 jit 1/5 settle 1
+blog GET article zjit none.rb Ir/op 4733485 objs/op 1919.2 jit 0/0 settle 1
+blog GET article zjit none.rb Ir/op 4737441 objs/op 1922.4 jit 0/0 settle 1
+blog GET article zjit ur1_cgi.rb Ir/op 4700117 objs/op 1876.1 jit 0/0 settle 1
+blog GET article zjit none.rb Ir/op 4719696 objs/op 1919.2 jit 0/0 settle 1
+blog GET articles.json zjit none.rb Ir/op 2211555 objs/op 1130.6 jit 0/0 settle 1
+blog GET articles.json zjit none.rb Ir/op 2212250 objs/op 1130.6 jit 0/0 settle 1
+blog GET articles.json zjit ur1_cgi.rb Ir/op 2215526 objs/op 1130.6 jit 0/0 settle 1
+blog GET articles.json zjit none.rb Ir/op 2214075 objs/op 1130.6 jit 0/0 settle 1
+DONE

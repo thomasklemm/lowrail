@@ -10,3 +10,11 @@ blog POST comment (redirect) yjit ur1_cgi.rb Ir/op 4200612 objs/op 1776.2 jit 64
 blog POST comment (redirect) yjit none.rb Ir/op 4246899 objs/op 1841.9 jit 42/0 settle 2
 blog GET article yjit none.rb Ir/op 4660548 objs/op 1949.7 jit 0/0 settle 1
 blog GET article yjit none.rb Ir/op 4676262 objs/op 1950.6 jit 0/0 settle 1
+blog GET article yjit ur1_cgi.rb Ir/op 4625080 objs/op 1904.3 jit 0/0 settle 1
+blog GET article yjit none.rb Ir/op 4671968 objs/op 1950.2 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 3995499 objs/op 1821.2 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 4008721 objs/op 1824.2 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit ur1_copy.rb Ir/op 4017172 objs/op 1808.6 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit ur1_cgi.rb Ir/op 3925169 objs/op 1736.4 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 3989911 objs/op 1813.4 jit 0/0 settle 1
+codetriage GET repo yjit none.rb Ir/op 8618117 objs/op 3179.2 jit 5/0 settle 1

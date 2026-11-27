@@ -1,0 +1,41 @@
+5 runs, 5 apps, 42 workloads (yjit, owncallers)
+ 4.732%   603.4 us/op wl  14  std:uri <- app                                                                              campfire 17.38%, writebook 5.29%
+ 2.807%   268.2 us/op wl  39  gem:rack <- rails                                                                           blog 4.20%, campfire 1.68%, codetriage 2.03%, pingcrm 3.73%, writebook 2.09%
+ 2.806%   371.9 us/op wl  25  gem:sqlite3 <- rails                                                                        blog 4.07%, campfire 3.54%, writebook 5.65%
+ 1.607%   116.0 us/op wl  42  gem:i18n <- rails                                                                           blog 4.69%, campfire 0.28%, codetriage 1.05%, pingcrm 0.98%, writebook 0.36%
+ 1.551%   161.1 us/op wl  42  gem:concurrent-ruby <- rails                                                                blog 1.97%, campfire 0.88%, codetriage 1.93%, pingcrm 1.42%, writebook 1.58%
+ 1.406%   133.7 us/op wl  15  gem:pg <- rails                                                                             codetriage 3.99%, pingcrm 3.89%
+ 1.245%   325.3 us/op wl   6  gem:nokogiri <- rails                                                                       campfire 4.79%, writebook 1.15%
+ 1.204%    98.4 us/op wl  23  gem:useragent <- rails                                                                      blog 3.23%, campfire 1.16%, writebook 0.98%
+ 1.038%    75.3 us/op wl   7  gem:cancancan <- rails                                                                      pingcrm 5.45%
+ 1.011%    93.7 us/op wl  34  std:uri <- gem:rack                                                                         blog 1.33%, campfire 0.23%, codetriage 0.96%, pingcrm 1.95%, writebook 0.59%
+ 0.743%    69.2 us/op wl  37  gem:rack <- harness                                                                         blog 1.04%, campfire 0.43%, codetriage 0.61%, pingcrm 1.07%, writebook 0.51%
+ 0.559%    44.7 us/op wl   8  gem:inertia_rails <- rails                                                                  pingcrm 2.93%
+ 0.548%    51.8 us/op wl  42  std:monitor <- rails                                                                        blog 0.71%, campfire 0.42%, codetriage 0.41%, pingcrm 0.61%, writebook 0.53%
+ 0.504%    46.3 us/op wl  40  std:json <- rails                                                                           blog 0.57%, campfire 0.38%, codetriage 0.36%, pingcrm 0.83%, writebook 0.37%
+ 0.422%    59.9 us/op wl  12  std:time <- harness                                                                         campfire 1.13%, writebook 0.94%
+ 0.363%    44.4 us/op wl  11  gem:sentry-ruby <- gem:sentry-rails                                                         campfire 0.01%, codetriage 2.17%
+ 0.353%    26.8 us/op wl   8  std:socket <- gem:redis-client                                                              campfire 0.92%, writebook 0.82%
+ 0.328%    26.5 us/op wl  13  std:uri <- gem:globalid                                                                     blog 0.56%, campfire 0.46%, codetriage 0.15%, writebook 0.37%
+ 0.305%    16.5 us/op wl  12  gem:globalid <- rails                                                                       blog 0.41%, campfire 0.41%, codetriage 0.06%, writebook 0.57%
+ 0.257%    30.8 us/op wl   6  gem:rack-timeout <- rails                                                                   codetriage 1.54%
+ 0.235%    27.8 us/op wl   6  gem:hashie <- gem:omniauth                                                                  codetriage 1.41%
+ 0.232%    23.3 us/op wl  33  gem:base64 <- rails                                                                         blog 0.29%, campfire 0.06%, codetriage 0.21%, pingcrm 0.43%, writebook 0.18%
+ 0.230%    28.0 us/op wl  15  gem:rack <- app                                                                             campfire 0.87%, codetriage 0.00%, writebook 0.22%
+ 0.220%    27.4 us/op wl  12  gem:sentry-rails <- rails                                                                   campfire 0.01%, codetriage 1.31%
+ 0.206%    60.3 us/op wl   6  gem:nokogiri <- gem:loofah                                                                  campfire 0.46%, writebook 0.56%
+ 0.205%    20.2 us/op wl  14  gem:warden <- gem:devise                                                                    codetriage 0.53%, pingcrm 0.62%
+ 0.201%    19.6 us/op wl   8  gem:redis-client <- gem:connection_pool                                                     campfire 0.50%, writebook 0.50%
+ 0.199%    28.1 us/op wl  14  std:json <- app                                                                             campfire 0.64%, writebook 0.33%
+ 0.194%    22.6 us/op wl   7  gem:sqlite3 <- app                                                                          campfire 0.90%
+ 0.189%    10.8 us/op wl   9  gem:jbuilder <- app                                                                         blog 0.40%, campfire 0.07%, pingcrm 0.42%
+ 0.179%    24.0 us/op wl  14  std:digest <- app                                                                           campfire 0.60%, writebook 0.27%
+ 0.171%     8.0 us/op wl  24  gem:turbo-rails <- rails                                                                    blog 0.54%, campfire 0.03%, writebook 0.19%
+ 0.170%    17.8 us/op wl  27  std:openssl <- rails                                                                        blog 0.17%, campfire 0.01%, codetriage 0.23%, pingcrm 0.32%, writebook 0.15%
+ 0.170%    16.4 us/op wl  17  std:time <- rails                                                                           blog 0.15%, campfire 0.29%, codetriage 0.09%, writebook 0.30%
+ 0.169%    13.0 us/op wl   4  gem:pagy <- app                                                                             pingcrm 0.89%
+ 0.169%    19.2 us/op wl  29  std:ipaddr <- rails                                                                         blog 0.11%, campfire 0.15%, codetriage 0.22%, pingcrm 0.26%, writebook 0.12%
+ 0.168%    12.8 us/op wl   8  gem:lograge <- rails                                                                        pingcrm 0.88%
+ 0.167%    10.7 us/op wl  41  std:random <- rails                                                                         blog 0.43%, campfire 0.09%, codetriage 0.09%, pingcrm 0.11%, writebook 0.06%
+ 0.164%    14.8 us/op wl  42  gem:logger <- rails                                                                         blog 0.20%, campfire 0.13%, codetriage 0.25%, pingcrm 0.13%, writebook 0.12%
+ 0.163%    21.7 us/op wl   7  gem:rack-mini-profiler <- rails                                                             codetriage 0.98%
