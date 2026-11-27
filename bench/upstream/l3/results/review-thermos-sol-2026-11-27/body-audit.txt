@@ -1,0 +1,10 @@
+quoted line found in main: Marshal.dump 37.337k (± 4.3%) i/s (26.78 μs/i) - 188.500k in 5.048642s
+quoted line found in main: attributes_for_database 93.220k (± 2.0%) i/s (10.73 μs/i) - 467.064k in 5.010354s
+quoted line found in l3: Marshal.dump 42.863k (± 7.7%) i/s (23.33 μs/i) - 216.976k in 5.062101s
+quoted line found in l3: attributes_for_database 153.856k (±11.0%) i/s (6.50 μs/i) - 772.850k in 5.023190s
+body script equals l3_ips.rb; all four output lines match retained raw samples
+retained samples by round:
+main {1: 2, 2: 2, 3: 2, 4: 2}
+l3 {1: 2, 2: 2, 3: 2}
+main2 {1: 2, 2: 2, 3: 2}
+prose words excluding fences: 166

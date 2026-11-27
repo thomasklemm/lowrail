@@ -1,0 +1,2 @@
+before_type_cast={"id" => nil, "title" => "title", "author_name" => "Mary"}
+author_name_after="Mary"

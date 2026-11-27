@@ -1,0 +1,4 @@
+59958	Reset the dirty tracker before dup copies the record	2026-11-26T16:04:59Z
+59911	Treat a missing namespaced class as a MessagePack cache miss too	2026-11-26T17:25:54Z
+59800	Avoid rebuilding attribute names in `LazyIndexedAttributeSet#keys`	2026-11-26T21:53:09Z
+6f81bf3f080da8a8893eafaa0e6216b2776ebf46 Merge pull request #59800 from thomasklemm/thomasklemm/lazy-indexed-keys

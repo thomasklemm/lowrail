@@ -1,0 +1,10 @@
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: -n /attributes_for_database_serializes_the_attributes/ --seed 51626
+
+# Running:
+
+.
+
+Finished in 0.024831s, 40.2718 runs/s, 40.2718 assertions/s.
+1 runs, 1 assertions, 0 failures, 0 errors, 0 skips

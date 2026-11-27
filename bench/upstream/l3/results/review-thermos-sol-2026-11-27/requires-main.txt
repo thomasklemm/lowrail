@@ -1,0 +1,3 @@
+active_model/attribute_set: NoMethodError: undefined method 'delegate' for class ActiveModel::LazyAttributeHash
+active_model: ok
+active_record: ok

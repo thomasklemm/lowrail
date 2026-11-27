@@ -1,0 +1,6 @@
+/home/user/workspace/repo/bench/upstream/l3/concurrency_probe.rb:91: warning: Ractor API is experimental and may change in future versions of Ruby.
+threads: 200 records x 8 threads, mismatches 0, errors 0, slots built twice 0
+frozen: db true btc true frozen? true set frozen? true
+frozen dirty: db c3 "w" btc c3 "w"
+ractor (prepared): [22, 22]
+ractor (cold): "FrozenError: can't modify frozen ActiveModel::Attribute::FromDatabase: #<ActiveModel::Attribute::FromDatabase:0x00007f43a89681b8 @nam"

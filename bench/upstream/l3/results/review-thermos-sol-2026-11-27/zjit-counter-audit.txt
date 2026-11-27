@@ -1,0 +1,25 @@
+ir-zjit-1-Marshal_dump-base-n0.log jit Marshal.dump	compiled_iseq_count=575>575 failed_iseq_count=0>0 compiled_side_exit_count=10041>10041 invalidation_count=>
+ir-zjit-1-Marshal_dump-base-n500.log jit Marshal.dump	compiled_iseq_count=575>575 failed_iseq_count=0>0 compiled_side_exit_count=10039>10039 invalidation_count=>
+ir-zjit-1-Marshal_dump-base2-n0.log jit Marshal.dump	compiled_iseq_count=575>575 failed_iseq_count=0>0 compiled_side_exit_count=10039>10039 invalidation_count=>
+ir-zjit-1-Marshal_dump-base2-n500.log jit Marshal.dump	compiled_iseq_count=575>575 failed_iseq_count=0>0 compiled_side_exit_count=10039>10039 invalidation_count=>
+ir-zjit-1-Marshal_dump-candidate-n0.log jit Marshal.dump	compiled_iseq_count=569>569 failed_iseq_count=0>0 compiled_side_exit_count=9987>9987 invalidation_count=>
+ir-zjit-1-Marshal_dump-candidate-n500.log jit Marshal.dump	compiled_iseq_count=569>569 failed_iseq_count=0>0 compiled_side_exit_count=9987>9987 invalidation_count=>
+ir-zjit-2-attributes_for_database-base-n0.log jit attributes_for_database	compiled_iseq_count=567>567 failed_iseq_count=0>0 compiled_side_exit_count=9896>9896 invalidation_count=>
+ir-zjit-2-attributes_for_database-base-n500.log jit attributes_for_database	compiled_iseq_count=567>567 failed_iseq_count=0>0 compiled_side_exit_count=9896>9896 invalidation_count=>
+ir-zjit-2-attributes_for_database-base2-n0.log jit attributes_for_database	compiled_iseq_count=567>567 failed_iseq_count=0>0 compiled_side_exit_count=9896>9896 invalidation_count=>
+ir-zjit-2-attributes_for_database-base2-n500.log jit attributes_for_database	compiled_iseq_count=567>567 failed_iseq_count=0>0 compiled_side_exit_count=9896>9896 invalidation_count=>
+ir-zjit-2-attributes_for_database-candidate-n0.log jit attributes_for_database	compiled_iseq_count=561>561 failed_iseq_count=0>0 compiled_side_exit_count=9843>9843 invalidation_count=>
+ir-zjit-2-attributes_for_database-candidate-n500.log jit attributes_for_database	compiled_iseq_count=561>561 failed_iseq_count=0>0 compiled_side_exit_count=9843>9843 invalidation_count=>
+ir-zjit-3-attributes_before_type_cast-base-n0.log jit attributes_before_type_cast	compiled_iseq_count=559>559 failed_iseq_count=0>0 compiled_side_exit_count=9779>9779 invalidation_count=>
+ir-zjit-3-attributes_before_type_cast-base-n500.log jit attributes_before_type_cast	compiled_iseq_count=559>559 failed_iseq_count=0>0 compiled_side_exit_count=9779>9779 invalidation_count=>
+ir-zjit-3-attributes_before_type_cast-base2-n0.log jit attributes_before_type_cast	compiled_iseq_count=559>559 failed_iseq_count=0>0 compiled_side_exit_count=9779>9779 invalidation_count=>
+ir-zjit-3-attributes_before_type_cast-base2-n500.log jit attributes_before_type_cast	compiled_iseq_count=559>559 failed_iseq_count=0>0 compiled_side_exit_count=9779>9779 invalidation_count=>
+ir-zjit-3-attributes_before_type_cast-candidate-n0.log jit attributes_before_type_cast	compiled_iseq_count=554>554 failed_iseq_count=0>0 compiled_side_exit_count=9726>9726 invalidation_count=>
+ir-zjit-3-attributes_before_type_cast-candidate-n500.log jit attributes_before_type_cast	compiled_iseq_count=554>554 failed_iseq_count=0>0 compiled_side_exit_count=9726>9726 invalidation_count=>
+ir-zjit-4-MessagePack_dump-base-n0.log jit MessagePack dump	compiled_iseq_count=575>575 failed_iseq_count=0>0 compiled_side_exit_count=10026>10026 invalidation_count=>
+ir-zjit-4-MessagePack_dump-base-n500.log jit MessagePack dump	compiled_iseq_count=575>575 failed_iseq_count=0>0 compiled_side_exit_count=10026>10026 invalidation_count=>
+ir-zjit-4-MessagePack_dump-base2-n0.log jit MessagePack dump	compiled_iseq_count=575>575 failed_iseq_count=0>0 compiled_side_exit_count=10026>10026 invalidation_count=>
+ir-zjit-4-MessagePack_dump-base2-n500.log jit MessagePack dump	compiled_iseq_count=575>575 failed_iseq_count=0>0 compiled_side_exit_count=10026>10026 invalidation_count=>
+ir-zjit-4-MessagePack_dump-candidate-n0.log jit MessagePack dump	compiled_iseq_count=569>569 failed_iseq_count=0>0 compiled_side_exit_count=9973>9973 invalidation_count=>
+ir-zjit-4-MessagePack_dump-candidate-n500.log jit MessagePack dump	compiled_iseq_count=569>569 failed_iseq_count=0>0 compiled_side_exit_count=9973>9973 invalidation_count=>
+24 windows: available counters flat, invalidation_count absent; no certified JIT-flat claim

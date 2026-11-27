@@ -1,0 +1,9 @@
+head f70d3e091759d3f7acf5f5b46ba40537c7b6c6f5
+parents 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+author Thomas Klemm <github@tklemm.eu>
+committer Thomas Klemm <github@tklemm.eu>
+subject Build attribute Hashes without copying the lazy row
+trailers start
+
+trailers end
+diff-check exit: 0

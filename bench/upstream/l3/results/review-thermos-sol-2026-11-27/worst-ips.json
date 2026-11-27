@@ -1,0 +1,88 @@
+{
+  "best": {
+    "serialize 128MiB every call": {
+      "main": {
+        "tree": "main",
+        "round": 3,
+        "ips": 7.27,
+        "output": "serialize 128MiB every call      7.270 (±13.8%) i/s  (137.55 ms/i) -     12.000 in   1.650628s"
+      },
+      "head": {
+        "tree": "head",
+        "round": 2,
+        "ips": 7.32,
+        "output": "serialize 128MiB every call      7.320 (±13.7%) i/s  (136.61 ms/i) -     12.000 in   1.639314s"
+      },
+      "main2": {
+        "tree": "main2",
+        "round": 2,
+        "ips": 6.962,
+        "output": "serialize 128MiB every call      6.962 (±14.4%) i/s  (143.64 ms/i) -     11.000 in   1.580040s"
+      }
+    }
+  },
+  "samples": {
+    "serialize 128MiB every call": {
+      "main": [
+        {
+          "tree": "main",
+          "round": 1,
+          "ips": 6.651,
+          "output": "serialize 128MiB every call      6.651 (±15.0%) i/s  (150.35 ms/i) -     10.000 in   1.503464s"
+        },
+        {
+          "tree": "main",
+          "round": 2,
+          "ips": 6.93,
+          "output": "serialize 128MiB every call      6.930 (±14.4%) i/s  (144.30 ms/i) -     11.000 in   1.587263s"
+        },
+        {
+          "tree": "main",
+          "round": 3,
+          "ips": 7.27,
+          "output": "serialize 128MiB every call      7.270 (±13.8%) i/s  (137.55 ms/i) -     12.000 in   1.650628s"
+        }
+      ],
+      "head": [
+        {
+          "tree": "head",
+          "round": 1,
+          "ips": 6.907,
+          "output": "serialize 128MiB every call      6.907 (±14.5%) i/s  (144.79 ms/i) -     11.000 in   1.592643s"
+        },
+        {
+          "tree": "head",
+          "round": 2,
+          "ips": 7.32,
+          "output": "serialize 128MiB every call      7.320 (±13.7%) i/s  (136.61 ms/i) -     12.000 in   1.639314s"
+        },
+        {
+          "tree": "head",
+          "round": 3,
+          "ips": 7.124,
+          "output": "serialize 128MiB every call      7.124 (±14.0%) i/s  (140.37 ms/i) -     11.000 in   1.544067s"
+        }
+      ],
+      "main2": [
+        {
+          "tree": "main2",
+          "round": 1,
+          "ips": 6.845,
+          "output": "serialize 128MiB every call      6.845 (±14.6%) i/s  (146.08 ms/i) -     11.000 in   1.606931s"
+        },
+        {
+          "tree": "main2",
+          "round": 2,
+          "ips": 6.962,
+          "output": "serialize 128MiB every call      6.962 (±14.4%) i/s  (143.64 ms/i) -     11.000 in   1.580040s"
+        },
+        {
+          "tree": "main2",
+          "round": 3,
+          "ips": 6.592,
+          "output": "serialize 128MiB every call      6.592 (±15.2%) i/s  (151.69 ms/i) -     10.000 in   1.516932s"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,71 @@
+Root: /home/user/workspace/repo
+Ruby: mise exec ruby@4.0.9 -- ruby
+WORK=$ROOT/.amp/in/orb-backup/l3-review
+OUT=$ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-27
+
+For each tree main/head:
+  export RAILS=$WORK/$tree
+  export BUNDLE_GEMFILE=$WORK/b-$tree/Gemfile
+  export BUNDLE_PATH=$WORK/gems
+  mise exec ruby@4.0.9 -- bundle lock --local
+
+Differential probes and worst-input measurements:
+  bash $OUT/run-probes.sh
+  bash $OUT/run-benchmarks.sh
+
+Public callable-default counterexample, each tree (also repeated with --yjit):
+  mise exec ruby@4.0.9 -- ruby $OUT/callable_default_repro.rb
+
+Head, validation-only snapshot overlay:
+  mise exec ruby@4.0.9 -- ruby -r$OUT/proposed_snapshot.rb $OUT/callable_default_repro.rb
+  mise exec ruby@4.0.9 -- ruby -r$OUT/proposed_snapshot.rb $ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-25/exactness_extension.rb
+
+Allocation/encryption claims, each tree:
+  mise exec ruby@4.0.9 -- ruby -rbundler/setup $ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-25/body_claims.rb
+Head with each validation-only overlay, separately:
+  mise exec ruby@4.0.9 -- ruby -r$OUT/proposed_snapshot.rb $ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-25/body_claims.rb
+  mise exec ruby@4.0.9 -- ruby -r$ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-25/row_read_variant.rb $ROOT/bench/upstream/l3/results/review-thermos-sol-2026-11-25/body_claims.rb
+
+Concurrency, frozen records and Ractors, each tree:
+  mise exec ruby@4.0.9 -- ruby $ROOT/bench/upstream/l3/concurrency_probe.rb
+
+Head, from $RAILS/activemodel:
+  mise exec ruby@4.0.9 -- bundle exec ruby bin/test test/cases/attribute_set_test.rb test/cases/attributes_test.rb
+Head, from $RAILS/activerecord:
+  mise exec ruby@4.0.9 -- bundle exec ruby bin/test --adapter sqlite3 test/cases/attribute_methods_test.rb test/cases/marshal_serialization_test.rb test/cases/message_pack_test.rb test/cases/dirty_test.rb test/cases/serialized_attribute_test.rb test/cases/encryption/encryptable_record_test.rb
+
+Added serialization test, using the head's test/fixtures with each tree's framework:
+  ARCONN=sqlite3 RAILS_MINITEST_PLUGIN=true mise exec ruby@4.0.9 -- ruby -rbundler/setup -I$WORK/head/activerecord/test $WORK/head/activerecord/test/cases/attribute_methods_test.rb -n /attributes_for_database_serializes_the_attributes/
+
+Metrics, each tree:
+  mise exec ruby@4.0.9 -- bundle exec rubocop --config $OUT/metrics.yml --format json $RAILS/activemodel/lib/active_model/attribute_set.rb
+  mise exec ruby@4.0.9 -- bundle exec flog -a $RAILS/activemodel/lib/active_model/attribute_set.rb
+Project lint, head:
+  mise exec ruby@4.0.9 -- bundle exec rubocop --config $RAILS/.rubocop.yml $RAILS/activemodel/lib/active_model/attribute_set.rb $RAILS/activerecord/test/cases/attribute_methods_test.rb
+
+Body source/output audit:
+  python3 $OUT/audit_body.py
+
+Upstream overlap and identity:
+  git -C .corpus/rails fetch --quiet --unshallow origin main
+  git -C .corpus/rails ls-remote origin refs/heads/main
+  git -C .corpus/rails ls-remote https://github.com/thomasklemm/rails.git refs/heads/thomasklemm/attrs-for-database-row-2
+  git -C .corpus/rails show -s --format=raw f70d3e091759d3f7acf5f5b46ba40537c7b6c6f5
+  git -C .corpus/rails diff --check 088fc0cf61e4ba0c7987decafacc69adb3e22eec f70d3e091759d3f7acf5f5b46ba40537c7b6c6f5
+  git -C .corpus/rails diff f785381cca..088fc0cf61e4ba0c7987decafacc69adb3e22eec -- activemodel/lib/active_model/attribute_set.rb
+  git -C .corpus/rails log --format='%H %s' --since=2026-11-25 088fc0cf61e4ba0c7987decafacc69adb3e22eec -- activemodel/lib/active_model/attribute_set.rb activemodel/lib/active_model/indexed_row.rb activerecord/lib/active_record/marshalling.rb activerecord/lib/active_record/message_pack.rb
+  gh api -X GET search/issues -f q='repo:rails/rails is:pr is:merged merged:>=2026-11-25' -f per_page=100
+  gh api -X GET search/issues -f q='repo:rails/rails is:pr (values_for_database OR values_before_type_cast OR attributes_for_database OR attributes_before_type_cast)' -f per_page=100
+
+Live citation sources:
+  gh api repos/rails/rails
+  gh api repos/rails/rails/pulls/59141
+  gh api repos/rails/rails/pulls/59800
+  gh api repos/rails/rails/pulls/59800/files
+  gh api repos/msgpack/msgpack-ruby
+  gh api repos/evanphx/benchmark-ips
+  gh api repos/sparklemotion/sqlite3-ruby
+  curl -fsSL https://rubygems.org/api/v1/gems/activerecord.json
+  curl -fsSL https://rubygems.org/api/v1/gems/msgpack.json
+  curl -fsSL https://rubygems.org/api/v1/gems/sqlite3.json
+  curl -fsSL https://rubygems.org/api/v1/gems/benchmark-ips.json
