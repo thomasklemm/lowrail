@@ -18,22 +18,6 @@ macOS. Windows is refused with a message.
 gem "lowrail-profile", group: [:development, :test], require: false
 ```
 
-Until 0.1.2 is on rubygems.org, build it from a Lowrail checkout. The gemspec's file list is
-relative to `gem/`, so build it there:
-
-```sh
-cd lowrail/gem && gem build lowrail-profile.gemspec && gem install --local lowrail-profile-0.1.2.gem
-```
-
-Or let Bundler take it from GitHub:
-
-```ruby
-gem "lowrail-profile", github: "thomasklemm/lowrail", glob: "gem/lowrail-profile.gemspec", group: [:development, :test], require: false
-```
-
-That checks out the whole Lowrail repository for each revision, about 530 MB of files (700 MB on disk in one
-install, under Bundler's `bundler/gems`), plus about 250 MB of git cache, against 90 KB for the built gem.
-
 `require: false` matters: nothing of the gem loads in your app unless you run the command below. The first run
 compiles a small C extension (the counter) into `~/.cache/lowrail/profile/`, outside your app; it needs a C compiler
 and Ruby's headers, which `bundle install` of a Rails app already needs. A compile failure stops the profiler with

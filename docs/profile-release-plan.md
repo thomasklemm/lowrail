@@ -308,7 +308,7 @@ About three weeks of work before M6. M1 and M3 can run in parallel; M4 needs M1 
 6. **Proof apps.** Recommended: Campfire, Lobsters, CodeTriage, plus a floor-version app if CodeTriage cannot run
    there.
 
-## 8. Release checklist: 0.1.2 (prepared 2026-11-27, not published)
+## 8. Release checklist: 0.1.2 (published 2026-11-27)
 
 0.1.0 and 0.1.1 were never published; 0.1.2 is the first release and includes 0.1.1's changes. Every step up to
 publishing is done by an agent and recorded here; publishing and tagging need Thomas.
@@ -326,15 +326,17 @@ publishing is done by an agent and recorded here; publishing and tagging need Th
   parallel warning; compare of the two exits 0; compare with the base as its own A/A report exits 2.
 - [x] CI green on `95faabeb`: run 46042156810, all 13 jobs (Ruby 3.3/3.4/4.0 × Rails 7.2/8.0/8.1, macOS 3.3 and
   4.0, Ruby head, the `test` job). The release commit changes only Markdown after it, which CI does not run on.
-- [ ] Publishing runs in GitHub Actions through RubyGems trusted publishing (`.github/workflows/release-profile.yml`,
+- [x] Publishing runs in GitHub Actions through RubyGems trusted publishing (`.github/workflows/release-profile.yml`,
   environment `release`, which admits only `lowrail-profile-v*` tags): no API key is stored anywhere. Once, Thomas
   adds a pending trusted publisher on rubygems.org (gem `lowrail-profile`, repository `thomasklemm/lowrail`, workflow
   `release-profile.yml`, environment `release`; done 2026-11-27). The first push names the owning account with
   `owner: "61730"` (Thomas's rubygems.org account ID), which rubygems.org requires for a pending publisher. Then, with his OK, the tag `lowrail-profile-v0.1.2` is pushed on
   the commit that adds the `owner` input to the workflow (its `gem/` is identical to the release commit's); the workflow builds with Ruby 4.0.7 and RubyGems 4.0.20, checks the tag against the version,
   prints the SHA-256 (must be the one above) and pushes the gem.
-- [ ] After publishing: `gem install lowrail-profile -v 0.1.2` from rubygems.org in a new app, and the README's
-  "Until 0.1.2 is on rubygems.org" paragraph removed.
+- [x] After publishing: `gem install lowrail-profile -v 0.1.2` from rubygems.org in a new app, and the README's
+  "Until 0.1.2 is on rubygems.org" paragraph removed. Done: tag `lowrail-profile-v0.1.2` on `747cea08`, release run
+  46047920338 pushed the gem with SHA-256 `89162118…0ee3c2`, the same as rubygems.org reports;
+  `gem install lowrail-profile -v 0.1.2` from rubygems.org prints 0.1.2.
 
 ## 9. Release checklist: 0.1.1 (superseded by 0.1.2, never published)
 
