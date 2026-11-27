@@ -6,7 +6,7 @@ kind: perf
 area: URI.decode_www_form_component
 reviewer: hsbt
 branch: thomasklemm/decode-www-form-component-cgi
-head: "33c17e67fdbd274a255dcf61f5fb1d65a0b57634"
+head: "cecaed123f04e1704bccf4b1b3272c0b12e759c7"
 base: master
 built_on: "48cda77031"
 depends_on: []
@@ -58,7 +58,18 @@ note: >-
   is converted with String#b ("The bytes of the given string are decoded (as below), and the result is
   force-encoded to the given encoding +enc+."); commit amended to 33c17e6 (same message, code identical), fork
   branch moved with a lease from a3b201f05b. Suite 94 tests green on 4.0.10. Body: one sentence that singleton
-  methods on a plain string, such as its own `b`, are no longer called. Measurements on a3b201f05b apply (comment-only change). ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  methods on a plain string, such as its own `b`, are no longer called. Measurements on a3b201f05b apply (comment-only change).
+  2026-11-27 (thermos-sol, interim, on a3b201f05b): released TruffleRuby 40.0.0 crashes (internal
+  ArrayIndexOutOfBoundsException) on valid GB18030 input, because CGI's pure-Ruby unescape runs `tr` in the caller's
+  encoding before `b`; also, `gsub` reuses one MatchData, so the commit's per-escape MatchData claim was false.
+  Rebuilt as cecaed1: the method keeps the lone-% check and `str.b` and replaces only the gsub,
+  `CGI.unescape(str.b, Encoding::BINARY).force_encoding(enc)`, no guard; RDoc unchanged from base (String#b stays
+  true), so 33c17e6's doc edit is dropped; commit message rewritten; test adds a GB18030 string decoding to its
+  bytes. This also removes Astra's hook boundaries on `b`, `encoding` and `instance_of?`: diff.rb 300,000 + 142
+  cases, 0 differences on 4.0.10 and master, also with SINGLETON_B=1; 100,000 on 3.4.12 with pure_cgi.rb: 0. Suite
+  94 tests green on 4.0.10, master, 3.4.12 and 3.4.12 with the pure-Ruby CGI. Remaining boundary: a prepend on
+  `CGI.unescape` now sees these calls. Fork branch moved with a lease from 33c17e6. Body numbers rerun as
+  body/UR1-cecaed1-{4010,master}, requests as req-ur1b-*.txt (req/ur1_cgib.rb). ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes:
   - reviewer: astra
@@ -130,9 +141,9 @@ passes:
 
 # Decode www-form components with cgi/escape
 
-`URI.decode_www_form_component` copies the string with `b` and then runs `gsub` with a hash table, so every `+` and `%XX` builds a MatchData and looks up the hash. Rack decodes query strings and cookies with it ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes every query string and form body key and value with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
+`URI.decode_www_form_component` copies the string with `b` and then runs `gsub` with a regexp and a hash table, so every `+` and `%XX` is matched and looked up in Ruby. Rack decodes query strings and cookies with it ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes every query string and form body key and value with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
 
-This uses `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C, for plain ASCII-compatible strings. The check for an invalid `%` still runs first, and the result is still forced to the requested encoding, also when its bytes are invalid there. String subclasses and other objects keep the current path; singleton methods on a plain string, such as its own `b`, are no longer called.
+This replaces only the `gsub` with `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C. The check for an invalid `%`, the `b` copy and the final `force_encoding` stay, so the result has the same class, bytes and encoding as before.
 
 | Objects and instructions per call, Ruby 4.0.10 | Before | After |
 | --- | ---: | ---: |
