@@ -449,8 +449,9 @@ Beyond the floor:
   Thomas sees the drafts first (2026-11-18).
 * **Opus is the regular Claude reviewer; Fable is for special reviews** (Thomas, 2026-11-27; three Claude accounts):
   use Opus intensively for second opinions, claims-heavy bodies, measurements, exactness and hard design questions,
-  since it allows far more tokens. Fable only where a review needs it, such as a hard design or exactness question
-  Opus left open. Recorded as `opus` or `fable` with the orb's thread ID in `orb`; they add to the floor and don't
+  since it allows far more tokens. Fable has its own quota per Claude account (Thomas, 2026-11-27), so use it
+  alongside Opus to spread the load: for hard investigations, deep design or exactness questions and special
+  reviews. Recorded as `opus` or `fable` with the orb's thread ID in `orb`; they add to the floor and don't
   replace the Astra pass.
 * **Active Record adapter or schema changes run `script/min-versions` before review** (2026-11-25): their tests on the oldest supported SQLite (and a middle
   one), PostgreSQL, MySQL and Ruby, base versus head ([usage](upstream/ar-adapter-suite.md#oldest-supported-versions-2026-11-25)).
@@ -458,7 +459,7 @@ Beyond the floor:
 Models (Thomas, 2026-11-17 to 11-25): Sol is GPT-6.1 Sol, not 6.2, always `xhigh`; Astra is GPT-6 Astra. Build and
 review threads run as plain Opus 5.5 (`anthropic/claude-opus-5-5`), not Claude Code external agents (same model on the
 linked subscription), at `high` for reviews, exactness work and hard builds, `medium` for record updates, reruns and
-small follow-ups. Fable is `anthropic/claude-fable-5-2`, for special reviews only, not for build threads.
+small follow-ups. Fable is `anthropic/claude-fable-5-2`, with its own quota: hard investigations and special reviews.
 Sonnet trial (Thomas, 2026-11-27; a Claude account lasts about a day and a half): Sonnet 5.5
 (`anthropic/claude-sonnet-5-5`) runs mechanical threads: watchers, ledger and inventory updates, scripted reruns
 and measurement runs with a fixed recipe, CI follow-ups, rebases without conflicts in logic. Opus keeps builds,
