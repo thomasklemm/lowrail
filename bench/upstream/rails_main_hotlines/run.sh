@@ -20,6 +20,7 @@ case $tree in
 esac
 PREP() { :; }
 source "$hl/apps/$app.sh"
+~/.local/bin/mise install --quiet ruby@$RUBY >/dev/null 2>&1
 export PATH="$(~/.local/bin/mise where ruby@$RUBY)/bin:$HOME/.local/bin:$PATH"
 unset RUBYLIB RUBYOPT BUNDLE_GEMFILE
 export SEED=1234 DISABLE_SPRING=1 PARALLEL_WORKERS=${PARALLEL_WORKERS:-1}
