@@ -1,0 +1,5 @@
+1 frozen tag(:br): "<br />"
+2 name mutated: "<input id=\"value\" />"
+3 encoding order: Encoding::CompatibilityError: incompatible character encodings: UTF-8 and BINARY (ASCII-8BIT)
+4a tag.self_closing_tag_string: "<self-closing-tag-string id=\"a\">text</self-closing-tag-string>"
+4b tag.append_tag_options: "<append-tag-options id=\"a\">text</append-tag-options>"

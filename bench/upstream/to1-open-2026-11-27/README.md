@@ -116,3 +116,28 @@ rubric itself in the thread.
 Outcome: held. Both reviewers judged the reach big enough for a PR if the change were exact. An exact form would have
 to evaluate every attribute before the tag's String exists, which is what main already does, so there is no exact
 variant left with the saving. Opening it as is needs Thomas to accept repros 2 and 3 as outside the contract.
+
+## Thomas accepts 1 and 2; head 18fd3c4a07 (2026-11-27)
+
+Thomas (2026-11-27) accepts differences 2 and 3 of the Astra table above (an attribute's `to_s` that mutates the
+tag-name String; the earlier `Encoding::CompatibilityError` when the name and a value have incompatible encodings) as
+outside the contract. They stay out of the PR body and are recorded only here and in the item.
+
+The new head `18fd3c4a07` (lease-pushed over `be8139e150`) removes the frozen-view and custom-element differences by
+adding no public method to TagBuilder: `tag_options` takes an optional third argument, the String to append to, and
+`tag()` keeps main's `if options` guard. `self_closing_tag_string` stays private and writes into its own String the
+same way. Diff +11/−4.
+
+* `astra_check.rb` (`results/head-18fd3c4a07/astra.txt`): frozen `tag(:br)` renders `<br />`, and both custom elements
+  render as on main. Only the two accepted differences remain.
+* `to1_probe.rb` and `sweep_fuzz.rb` byte-identical to main (`equivalence_sha256.txt`); Action View 2,984 + 252 + 177
+  runs, 0 failures on Ruby 4.0.10.
+* Overrides: `tag_options` prepends that forward with `...` or `*` now see `tag()` and void elements again, with the
+  same output as main. That matters for turbo_boost-commands 0.3.2 (40k downloads), whose TagBuilder patch is
+  `tag_options(options, ...)`: under the earlier heads its attributes vanished from `tag()`, `tag.input`,
+  `text_field_tag` and `image_tag` (`turbo_boost_prepend.rb`, `results/head-18fd3c4a07/turbo_boost_prepend.txt`).
+  A prepend with exactly `(options, escape = true)` now raises ArgumentError on `tag()` and void tags
+  (`boundaries_diff.txt`). The only such override in a GitHub code search for `def tag_options` is green_monkey
+  (last push 2017, an `alias_method` on the Rails 3 API). Overrides of `:nodoc:` methods are an accepted boundary.
+* Objects per call (Ruby 4.0.10, interpreter): text_field_tag 8 → 7, submit_tag 14 → 13, tag.input 6 → 5,
+  image_tag 9 → 8, f.text_field 17 → 16, f.check_box 20 → 18; `tag(:br)` and `content_tag` unchanged.
