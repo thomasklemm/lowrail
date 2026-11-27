@@ -132,7 +132,7 @@ Orbs bill per running minute by size; a paused orb costs nothing.
 * **a1.medium minimum (the project default), a1.large is fine.** Pass `orb_size` on every create_thread: a1.medium for
   watchers, coordination, reviews, ledger and docs work and light suites; a1.large for Ruby builds, framework, app and
   gem suites, differential harnesses and benchmarks. Larger only for a short, focused burst (a full Rails matrix, a
-  parallel bisect): say why in the prompt and archive the thread when done.
+  parallel bisect, timing for a body on a1.xxlarge): say why in the prompt and archive the thread when done.
 * **One central watcher** (W1) checks every open upstream PR every 30 minutes and reports what matters; workers keep
   no PR watch schedules.
 * **Let orbs pause:** no sleep loops or long polling; stop services when done; batch messages, since each wakes the
@@ -378,6 +378,9 @@ benchmark-driver's table, and the older release in one sentence when it shows a 
 short benchmark-ips (or benchmark-driver) script with its before/after output. One pinned core, best of N; the record
 keeps raw output and an A/A. Callgrind finds and attributes; in a body it is one supporting line or a small table only
 when it shows what wall time can't (objects, a JIT-only path). Wall time is measured on orbs.
+Timing that goes into a body or a record runs on an a1.xxlarge orb (Thomas, 2026-11-27): on the 2-vCPU a1.large
+BT1's `make benchmark` A/A varied too much to show a result, on a1.xxlarge it stayed 1.00x–1.06x. Hand the
+measurement to such an orb when the working orb is smaller.
 
 ### Realistic sizes upstream (Thomas, 2026-11-14)
 
