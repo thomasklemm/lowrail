@@ -1,0 +1,714 @@
++ r=.amp/in/orb-backup/sq37-review/rails
++ out=bench/upstream/sq37/review-thermos-sol-2026-11-27/confirm
++ scratch=.amp/in/orb-backup/sq37-review/confirm
++ base=088fc0cf61e4ba0c7987decafacc69adb3e22eec
++ old=3e348f32bdc2b5b405d31f226e6de04aa3278dc9
++ head=e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
++ mkdir -p .amp/in/orb-backup/sq37-review/confirm
++ date -u --iso-8601=seconds
+2026-11-27T12:43:27+00:00
++ git rev-parse HEAD
+4a9a64695a98aa665cdef6c1005ff84ce504f4ab
++ git -C .amp/in/orb-backup/sq37-review/rails fetch --quiet https://github.com/thomasklemm/rails.git thomasklemm/sqlite-floor-3-37
+++ git -C .amp/in/orb-backup/sq37-review/rails rev-parse FETCH_HEAD
++ test e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2 = e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
++ git -C .amp/in/orb-backup/sq37-review/rails fetch --quiet origin main
++ git -C .amp/in/orb-backup/sq37-review/rails rev-parse FETCH_HEAD
+088fc0cf61e4ba0c7987decafacc69adb3e22eec
+++ git -C .amp/in/orb-backup/sq37-review/rails rev-parse FETCH_HEAD
++ test 088fc0cf61e4ba0c7987decafacc69adb3e22eec = 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+++ git -C .amp/in/orb-backup/sq37-review/rails show -s --format=%P e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
++ test 088fc0cf61e4ba0c7987decafacc69adb3e22eec = 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+++ git -C .amp/in/orb-backup/sq37-review/rails rev-list --count 088fc0cf61e4ba0c7987decafacc69adb3e22eec..e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
++ test 1 = 1
++ git -C .amp/in/orb-backup/sq37-review/rails show -s --format=fuller e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
+commit e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Fri Nov 27 10:59:15 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Fri Nov 27 12:40:02 2026 +0000
+
+    Bump the minimum supported SQLite version to 3.37.0
+    
+    SQLite 3.37.0 introduced the `pragma_table_list` table-valued function.
+    The SQLite3 adapter has read it in `data_source_sql` since #52354
+    (released in Rails 8.0), which backs `table_exists?`, `data_sources`,
+    `tables`, `views` and the schema cache.
+    
+    On SQLite 3.35.x and 3.36.x, which `check_version` still accepts,
+    uncached schema discovery fails with "no such table: pragma_table_list".
+    This breaks `db:prepare` and model operations that need that information.
+    
+    Make the requirement explicit by raising in `check_version` when the
+    server is older than 3.37.0. Raw SQL and model operations using a
+    preloaded schema cache can still work on those versions; this change
+    refuses those connections too.
++ git -C .amp/in/orb-backup/sq37-review/rails show -s '--format=TRAILERS_BEGIN%n%(trailers:only)TRAILERS_END' e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
+TRAILERS_BEGIN
+TRAILERS_END
+++ git -C .amp/in/orb-backup/sq37-review/rails show -s '--format=%(trailers:only)' e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
++ test -z ''
+++ git -C .amp/in/orb-backup/sq37-review/rails show -s '--format=%an <%ae>|%cn <%ce>' e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
++ test 'Thomas Klemm <github@tklemm.eu>|Thomas Klemm <github@tklemm.eu>' = 'Thomas Klemm <github@tklemm.eu>|Thomas Klemm <github@tklemm.eu>'
++ git -C .amp/in/orb-backup/sq37-review/rails cat-file commit e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
++ sed '/^$/q'
+tree fd6f13a7a50b983789d84cfc79ec203a9bf06b25
+parent 088fc0cf61e4ba0c7987decafacc69adb3e22eec
+author Thomas Klemm <github@tklemm.eu> 1795777155 +0000
+committer Thomas Klemm <github@tklemm.eu> 1795783202 +0000
+gpgsig -----BEGIN SSH SIGNATURE-----
+ U1NIU0lHAAAAAQAAADMAAAALc3NoLWVkMjU1MTkAAAAgnj59+AONTp7nKTKq9g73acun7O
+ bbrMVqT7PV17XNu14AAAADZ2l0AAAAAAAAAAZzaGE1MTIAAABTAAAAC3NzaC1lZDI1NTE5
+ AAAAQMINnKhPW91hHSC6rRW0b8igyc1JiqsS2DY/nXvTqCXuO/3FPxP1tA4P8EDJhpnWUH
+ xtahUk4YfW7py4oP/AdQE=
+ -----END SSH SIGNATURE-----
+
++ git -C .amp/in/orb-backup/sq37-review/rails diff --check 088fc0cf61e4ba0c7987decafacc69adb3e22eec e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
++ git -C .amp/in/orb-backup/sq37-review/rails diff --stat 3e348f32bdc2b5b405d31f226e6de04aa3278dc9 e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
+ activerecord/CHANGELOG.md | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
++ git -C .amp/in/orb-backup/sq37-review/rails diff 3e348f32bdc2b5b405d31f226e6de04aa3278dc9 e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index be317e9fb1..71cb523a2f 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,9 +1,9 @@
+ *   Bump the minimum supported SQLite version to 3.37.0.
+ 
+     SQLite 3.37.0 introduced `pragma_table_list`, which the SQLite3 adapter
+-    has used to list tables and views since Rails 8.0 (#52354). On older
+-    versions `table_exists?`, `tables`, migrations and the schema cache fail
+-    with "no such table: pragma_table_list"; make the requirement explicit.
++    has used to list tables and views since Rails 8.0 (#52354). On SQLite 3.35
++    and 3.36, table listing and uncached schema discovery fail with
++    "no such table: pragma_table_list"; make the requirement explicit.
+ 
+     *Thomas Klemm*
+ 
+++ git -C .amp/in/orb-backup/sq37-review/rails diff --name-only 3e348f32bdc2b5b405d31f226e6de04aa3278dc9 e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
++ test activerecord/CHANGELOG.md = activerecord/CHANGELOG.md
++ git -C .amp/in/orb-backup/sq37-review/rails diff --exit-code 3e348f32bdc2b5b405d31f226e6de04aa3278dc9 e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2 -- . ':!activerecord/CHANGELOG.md'
++ git -C .amp/in/orb-backup/sq37-review/rails range-diff 088fc0cf61e4ba0c7987decafacc69adb3e22eec..3e348f32bdc2b5b405d31f226e6de04aa3278dc9 088fc0cf61e4ba0c7987decafacc69adb3e22eec..e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2
+1:  3e348f32bd ! 1:  e7a17ff01b Bump the minimum supported SQLite version to 3.37.0
+    @@ Commit message
+         (released in Rails 8.0), which backs `table_exists?`, `data_sources`,
+         `tables`, `views` and the schema cache.
+     
+    -    On SQLite 3.35.x and 3.36.x, which `check_version` still accepts, these
+    -    fail with "no such table: pragma_table_list", so creating the
+    -    `schema_migrations` table, `db:prepare` and loading a model's primary
+    -    key all raise.
+    +    On SQLite 3.35.x and 3.36.x, which `check_version` still accepts,
+    +    uncached schema discovery fails with "no such table: pragma_table_list".
+    +    This breaks `db:prepare` and model operations that need that information.
+     
+         Make the requirement explicit by raising in `check_version` when the
+    -    server is older than 3.37.0.
+    +    server is older than 3.37.0. Raw SQL and model operations using a
+    +    preloaded schema cache can still work on those versions; this change
+    +    refuses those connections too.
+     
+      ## activerecord/CHANGELOG.md ##
+     @@
+     +*   Bump the minimum supported SQLite version to 3.37.0.
+     +
+     +    SQLite 3.37.0 introduced `pragma_table_list`, which the SQLite3 adapter
+    -+    has used to list tables and views since Rails 8.0 (#52354). On older
+    -+    versions `table_exists?`, `tables`, migrations and the schema cache fail
+    -+    with "no such table: pragma_table_list"; make the requirement explicit.
+    ++    has used to list tables and views since Rails 8.0 (#52354). On SQLite 3.35
+    ++    and 3.36, table listing and uncached schema discovery fail with
+    ++    "no such table: pragma_table_list"; make the requirement explicit.
+     +
+     +    *Thomas Klemm*
+     +
++ git -C .amp/in/orb-backup/sq37-review/rails diff 088fc0cf61e4ba0c7987decafacc69adb3e22eec e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2 -- activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+index 0da5ffeadb..c8d8bf505a 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+@@ -516,8 +516,8 @@ def get_database_version # :nodoc:
+       end
+ 
+       def check_version # :nodoc:
+-        if database_version < "3.35.0"
+-          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
++        if database_version < "3.37.0"
++          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.37.0."
+         end
+       end
+ 
+diff --git a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+index e13ab9431a..2e808fbded 100644
+--- a/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
++++ b/activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+@@ -170,6 +170,17 @@ def test_connect
+         assert @conn, "should have connection"
+       end
+ 
++      def test_check_version_requires_sqlite_3_37
++        @conn.stub(:database_version, SQLite3Adapter::Version.new("3.36.0")) do
++          error = assert_raises(RuntimeError) { @conn.check_version }
++          assert_equal "Your version of SQLite (3.36.0) is too old. Active Record supports SQLite >= 3.37.0.", error.message
++        end
++
++        @conn.stub(:database_version, SQLite3Adapter::Version.new("3.37.0")) do
++          assert_nil @conn.check_version
++        end
++      end
++
+       # sqlite3 defaults to UTF-8 encoding
+       def test_encoding
+         assert_equal "UTF-8", @conn.encoding
++ git patch-id --stable
++ git -C .amp/in/orb-backup/sq37-review/rails diff 088fc0cf61e4ba0c7987decafacc69adb3e22eec e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2 -- activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb activerecord/test/cases/adapters/sqlite3/sqlite3_adapter_test.rb
+4deab6000ad2799a470e1ba3f9fa39e1d4c2bc4f 0000000000000000000000000000000000000000
++ git -C .amp/in/orb-backup/sq37-review/rails show e7a17ff01bab93970dd7fe3fe1ef7b9075dd6af2:activerecord/CHANGELOG.md
++ sed -n 1,11p
+*   Bump the minimum supported SQLite version to 3.37.0.
+
+    SQLite 3.37.0 introduced `pragma_table_list`, which the SQLite3 adapter
+    has used to list tables and views since Rails 8.0 (#52354). On SQLite 3.35
+    and 3.36, table listing and uncached schema discovery fail with
+    "no such table: pragma_table_list"; make the requirement explicit.
+
+    *Thomas Klemm*
+
+*   Don't compare owner conditions when joining an association without a scope.
+
++ cp bench/upstream/pr-queue/items/SQ37.md bench/upstream/sq37/review-thermos-sol-2026-11-27/confirm/reviewed-item.md
++ cp bench/upstream/sq37/README.md bench/upstream/sq37/review-thermos-sol-2026-11-27/confirm/reviewed-record.md
++ python3 -
+BODY_VERBATIM_MATCH=true; title matches subject; two paragraphs; unreleased and compatibility disclosures present
+POSTED_TITLE_AND_BODY_BEGIN
+Bump the minimum supported SQLite version to 3.37.0
+
+Since #52354 (Rails 8.0), [`data_source_sql`](https://github.com/rails/rails/blob/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb#L218-L227) reads `pragma_table_list`, added in SQLite 3.37.0. On main, [`check_version`](https://github.com/rails/rails/blob/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb#L518-L522) accepts 3.35.0 after #58284 (unreleased), so SQLite 3.35 and 3.36 fail during uncached schema discovery with `no such table: pragma_table_list`, breaking `bin/rails db:prepare` and model operations that need it.
+
+Raise the connection-time check to 3.37.0 to report the missing requirement clearly. Raw SQL and model operations using a preloaded schema cache can still work on these versions; this change refuses those connections too. Only apps building the `sqlite3` gem against an older system SQLite are affected; the gem bundles a current SQLite.
+POSTED_TITLE_AND_BODY_END
+PERMALINKS=https://github.com/rails/rails/blob/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb#L218-L227
+https://github.com/rails/rails/blob/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb#L518-L522
++ for spec in 'sqlite3/schema_statements.rb 218 227 schema_statements.rb' 'sqlite3_adapter.rb 518 522 sqlite3_adapter.rb'
++ read -r path first last local_name
++ path=activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
++ gh api 'repos/rails/rails/contents/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb?ref=088fc0cf61e4ba0c7987decafacc69adb3e22eec' --jq .content
++ base64 -d
++ cmp .amp/in/orb-backup/sq37-review/confirm/schema_statements.rb /dev/fd/63
+++ git -C .amp/in/orb-backup/sq37-review/rails show 088fc0cf61e4ba0c7987decafacc69adb3e22eec:activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
++ nl -ba .amp/in/orb-backup/sq37-review/confirm/schema_statements.rb
++ sed -n 218,227p
+   218	          def data_source_sql(name = nil, type: nil)
+   219	            scope = quoted_scope(name, type: type)
+   220	            scope[:type] ||= "'table','view'"
+   221	
+   222	            sql = +"SELECT name FROM pragma_table_list WHERE schema <> 'temp'"
+   223	            sql << " AND name NOT IN ('sqlite_sequence', 'sqlite_schema')"
+   224	            sql << " AND name = #{scope[:name]}" if scope[:name]
+   225	            sql << " AND type IN (#{scope[:type]})"
+   226	            sql
+   227	          end
++ for spec in 'sqlite3/schema_statements.rb 218 227 schema_statements.rb' 'sqlite3_adapter.rb 518 522 sqlite3_adapter.rb'
++ read -r path first last local_name
++ path=activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++ gh api 'repos/rails/rails/contents/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb?ref=088fc0cf61e4ba0c7987decafacc69adb3e22eec' --jq .content
++ base64 -d
++ cmp .amp/in/orb-backup/sq37-review/confirm/sqlite3_adapter.rb /dev/fd/63
+++ git -C .amp/in/orb-backup/sq37-review/rails show 088fc0cf61e4ba0c7987decafacc69adb3e22eec:activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++ nl -ba .amp/in/orb-backup/sq37-review/confirm/sqlite3_adapter.rb
++ sed -n 518,522p
+   518	      def check_version # :nodoc:
+   519	        if database_version < "3.35.0"
+   520	          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
+   521	        end
+   522	      end
++ for n in 52354 58284
++ gh api repos/rails/rails/pulls/52354 --jq '{number,title,state,merged_at,merge_commit_sha,base:.base.ref}'
+{"base":"main","merge_commit_sha":"534b4ab2a65048c5eb558af2ef8ddcd93ff8d88d","merged_at":"2024-08-26T17:49:11Z","number":52354,"state":"closed","title":"Add support for SQLite3 full-text-search and other virtual tables"}
++ for n in 52354 58284
++ gh api repos/rails/rails/pulls/58284 --jq '{number,title,state,merged_at,merge_commit_sha,base:.base.ref}'
+{"base":"main","merge_commit_sha":"f652cc1648b954d546cfafb8ec4436ff9ff513ca","merged_at":"2026-07-29T02:19:08Z","number":58284,"state":"closed","title":"Bump the minimum supported SQLite version to 3.35.0"}
++ git -C .amp/in/orb-backup/sq37-review/rails merge-base --is-ancestor 534b4ab2a65048c5eb558af2ef8ddcd93ff8d88d v8.0.0
++ gh api repos/rails/rails/releases/latest --jq '{tag_name,published_at}'
+{"published_at":"2026-11-04T02:46:00Z","tag_name":"v8.1.4.1"}
++ git -C .amp/in/orb-backup/sq37-review/rails show v8.1.4.1:activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++ sed -n '/def check_version/,/^      end/p'
+      def check_version # :nodoc:
+        if database_version < "3.23.0"
+          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.23.0."
+        end
+      end
++ git -C .amp/in/orb-backup/sq37-review/rails merge-base --is-ancestor f652cc1648b954d546cfafb8ec4436ff9ff513ca v8.1.4.1
++ echo 'Prior floor bump is not in latest release v8.1.4.1'
+Prior floor bump is not in latest release v8.1.4.1
++ curl -fsSL --max-time 30 https://www.sqlite.org/releaselog/3_37_0.html
+<!DOCTYPE html>
+<html><head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link href="../sqlite.css" rel="stylesheet">
+<title>SQLite Release 3.37.0 On 2021-11-27</title>
+<!-- path=../ -->
+</head>
+<body>
+<div class=nosearch>
+<a href="../index.html">
+<img class="logo" src="../images/sqlite370_banner.svg" alt="SQLite" border="0">
+</a>
+<div><!-- IE hack to prevent disappearing logo --></div>
+<div class="tagline desktoponly">
+Small. Fast. Reliable.<br>Choose any three.
+</div>
+<div class="menu mainmenu">
+<ul>
+<li><a href="../index.html">Home</a>
+<li class='mobileonly'><a href="javascript:void(0)" onclick='toggle_div("submenu")'>Menu</a>
+<li class='wideonly'><a href='../about.html'>About</a>
+<li class='desktoponly'><a href="../docs.html">Documentation</a>
+<li class='desktoponly'><a href="../download.html">Download</a>
+<li class='wideonly'><a href='../copyright.html'>License</a>
+<li class='desktoponly'><a href="../support.html">Support</a>
+<li class='desktoponly'><a href="../prosupport.html">Purchase</a>
+<li class='search' id='search_menubutton'>
+<a href="javascript:void(0)" onclick='toggle_search()'>Search</a>
+</ul>
+</div>
+<div class="menu submenu" id="submenu">
+<ul>
+<li><a href='../about.html'>About</a>
+<li><a href='../docs.html'>Documentation</a>
+<li><a href='../download.html'>Download</a>
+<li><a href='../support.html'>Support</a>
+<li><a href='../prosupport.html'>Purchase</a>
+</ul>
+</div>
+<div class="searchmenu" id="searchmenu">
+<form method="GET" action="../search">
+<select name="s" id="searchtype">
+<option value="d">Search Documentation</option>
+<option value="c">Search Changelog</option>
+</select>
+<input type="text" name="q" id="searchbox" value="">
+<input type="submit" value="Go">
+</form>
+</div>
+</div>
+<script>
+function toggle_div(nm) {
+var w = document.getElementById(nm);
+if( w.style.display=="block" ){
+w.style.display = "none";
+}else{
+w.style.display = "block";
+}
+}
+function toggle_search() {
+var w = document.getElementById("searchmenu");
+if( w.style.display=="block" ){
+w.style.display = "none";
+} else {
+w.style.display = "block";
+setTimeout(function(){
+document.getElementById("searchbox").focus()
+}, 30);
+}
+}
+function div_off(nm){document.getElementById(nm).style.display="none";}
+window.onbeforeunload = function(e){div_off("submenu");}
+/* Disable the Search feature if we are not operating from CGI, since */
+/* Search is accomplished using CGI and will not work without it. */
+if( !location.origin || !location.origin.match || !location.origin.match(/http/) ){
+document.getElementById("search_menubutton").style.display = "none";
+}
+/* Used by the Hide/Show button beside syntax diagrams, to toggle the */
+function hideorshow(btn,obj){
+var x = document.getElementById(obj);
+var b = document.getElementById(btn);
+if( x.style.display!='none' ){
+x.style.display = 'none';
+b.innerHTML='show';
+}else{
+x.style.display = '';
+b.innerHTML='hide';
+}
+return false;
+}
+var antiRobot = 0;
+function antiRobotGo(){
+if( antiRobot!=3 ) return;
+antiRobot = 7;
+var j = document.getElementById("mtimelink");
+if(j && j.hasAttribute("data-href")) j.href=j.getAttribute("data-href");
+}
+function antiRobotDefense(){
+document.body.onmousedown=function(){
+antiRobot |= 2;
+antiRobotGo();
+document.body.onmousedown=null;
+}
+document.body.onmousemove=function(){
+antiRobot |= 2;
+antiRobotGo();
+document.body.onmousemove=null;
+}
+setTimeout(function(){
+antiRobot |= 1;
+antiRobotGo();
+}, 100)
+antiRobotGo();
+}
+antiRobotDefense();
+</script>
+<h2>SQLite Release 3.37.0 On 2021-11-27</h2><p><ol class='lessindent'>
+<li> <a href="../stricttables.html">STRICT tables</a> provide a prescriptive style of data type management,
+     for developers who prefer that kind of thing.
+<li> When adding columns that contain a
+     <a href="../lang_createtable.html#ckconst">CHECK constraint</a> or a <a href="../gencol.html">generated column</a> containing a <a href="../lang_createtable.html#notnullconst">NOT NULL constraint</a>,
+     the <a href="../lang_altertable.html#altertabaddcol">ALTER TABLE ADD COLUMN</a> now checks new constraints against
+     preexisting rows in the database and will only proceed if no constraints
+     are violated.
+<li> Added the <a href="../pragma.html#pragma_table_list">PRAGMA table_list</a> statement.
+<li> <a href="../cli.html">CLI</a> enhancements:
+     <ol type="a">
+     <li> Add the <a href="../cli.html#dotconn">.connection</a> command, allowing the CLI to keep multiple database
+          connections open at the same time.
+     <li> Add the <a href="../cli.html#safemode">--safe command-line option</a> that disables
+          <a href="../cli.html#dotcmd">dot-commands</a> and SQL statements that might cause side-effects that extend
+          beyond the single database file named on the command-line.
+     <li> Performance improvements when reading SQL statements
+          that span many lines.
+     </ol>
+<li> Added the <a href="../c3ref/autovacuum_pages.html">sqlite3_autovacuum_pages()</a> interface.
+<li> The <a href="../c3ref/deserialize.html">sqlite3_deserialize()</a> does not and has never worked for the TEMP
+     database.  That limitation is now noted in the documentation.
+<li> The query planner now omits ORDER BY clauses on subqueries and views
+     if removing those clauses does not change the semantics of the query.
+<li> The <a href="../series.html">generate_series</a> table-valued function extension is modified so that
+     the first parameter ("START") is now required.  This is done as a way to
+     demonstrate how to write table-valued functions with required parameters.
+     The legacy behavior is available using the -DZERO_ARGUMENT_GENERATE_SERIES
+     compile-time option.
+<li> Added new <a href="../c3ref/changes.html">sqlite3_changes64()</a> and <a href="../c3ref/total_changes.html">sqlite3_total_changes64()</a> interfaces.
+<li> Added the <a href="../c3ref/c_open_autoproxy.html">SQLITE_OPEN_EXRESCODE</a> flag option to <a href="../c3ref/open.html">sqlite3_open_v2()</a>.
+<li> Use less memory to hold the database schema.
+
+<p><b>Hashes:</b>
+<li>SQLITE_SOURCE_ID: 2021-11-27 14:13:22 bd41822c7424d393a30e92ff6cb254d25c26769889c1499a18a0b9339f5d6c8a
+<li>SHA3-256 for sqlite3.c: a202a950ab401cda052e81259e96d6e64ad91faaaaf5690d769f64c2ab962f27
+
+</ol></p>
+
+      <p>A <a href="../changes.html">complete list of SQLite releases</a>
+      in a single page and a <a href="../chronology.html">chronology</a> are both also available.
+      A detailed history of every
+      check-in is available at
+      <a href="https://sqlite.org/src/timeline">
+      SQLite version control site</a>.</p>
+    
+
++ curl -fsSL --max-time 30 https://rubygems.org/api/v1/gems/sqlite3.json
++ jq '{name,version,downloads,version_created_at,source_code_uri}'
+{
+  "name": "sqlite3",
+  "version": "2.10.2",
+  "downloads": 203666215,
+  "version_created_at": "2026-10-26T21:35:27.803Z",
+  "source_code_uri": "https://github.com/sparklemotion/sqlite3-ruby"
+}
++ base64 -d
++ gh api 'repos/sparklemotion/sqlite3-ruby/contents/dependencies.yml?ref=v2.10.2' --jq .content
+sqlite3:
+  # checksum verified by first checking the published sha3(256) checksum against https://sqlite.org/download.html:
+  # b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4
+  #
+  # $ openssl dgst -sha3-256 -r ports/archives/sqlite-autoconf-3540100.tar.gz
+  # b6ced585c750916b1052667239a12c25a7ff34e7f06e1e6e01ecb0427657d9c4 *ports/archives/sqlite-autoconf-3540100.tar.gz
+  #
+  # $ sha256sum ports/archives/sqlite-autoconf-3540100.tar.gz
+  # 926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e  ports/archives/sqlite-autoconf-3540100.tar.gz
+  version: "3.54.1"
+  files:
+    - url: "https://sqlite.org/2026/sqlite-autoconf-3540100.tar.gz"
+      sha256: "926ef8d3eab93fbf6e06011901273eec076b25594a4e1cdadd50c987f4f6d64e"
++ gh api 'repos/sparklemotion/sqlite3-ruby/contents/INSTALLATION.md?ref=v2.10.2' --jq .content
++ base64 -d
+
+# Installation and Using SQLite3 extensions
+
+This document will help you install the `sqlite3` ruby gem. It also contains instructions on loading database extensions and building against drop-in replacements for sqlite3.
+
+## Installation
+
+### Native Gems (recommended)
+
+In v2.5.0 and later, native (precompiled) gems are available for recent Ruby versions on these platforms:
+
+- `aarch64-linux-gnu` (requires: glibc >= 2.29)
+- `aarch64-linux-musl`
+- `arm-linux-gnu` (requires: glibc >= 2.29)
+- `arm-linux-musl`
+- `arm64-darwin`
+- `x64-mingw-ucrt`
+- `x86-linux-gnu` (requires: glibc >= 2.29)
+- `x86-linux-musl`
+- `x86_64-darwin`
+- `x86_64-linux-gnu` (requires: glibc >= 2.29)
+- `x86_64-linux-musl`
+
+⚠ Musl linux users should update to Bundler >= 2.5.6 to avoid https://github.com/rubygems/rubygems/issues/7432
+
+If you are using one of these Ruby versions on one of these platforms, the native gem is the recommended way to install sqlite3-ruby.
+
+For example, on a linux system running Ruby 3.4:
+
+``` text
+$ ruby -v
+ruby 3.4.7 (2025-10-08 revision 7a5688e2a2) +PRISM [x86_64-linux]
+
+$ time gem install sqlite3
+Fetching sqlite3-2.8.1-x86_64-linux-gnu.gem
+Successfully installed sqlite3-2.8.1-x86_64-linux-gnu
+1 gem installed
+
+real    0m1.273s
+user    0m0.496s
+sys     0m0.078s
+```
+
+#### Avoiding the precompiled native gem
+
+The maintainers strongly urge you to use a native gem if at all possible. It will be a better experience for you and allow us to focus our efforts on improving functionality rather than diagnosing installation issues.
+
+If you're on a platform that supports a native gem but you want to avoid using it in your project, do one of the following:
+
+- If you're not using Bundler, then run `gem install sqlite3 --platform=ruby`
+- If you are using Bundler
+  - version 2.3.18 or later, you can specify [`gem "sqlite3", force_ruby_platform: true`](https://bundler.io/v2.3/man/gemfile.5.html#FORCE_RUBY_PLATFORM)
+  - version 2.1 or later, then you'll need to run `bundle config set force_ruby_platform true`
+  - version 2.0 or earlier, then you'll need to run `bundle config force_ruby_platform true`
+
+
+### Compiling the source gem
+
+If you are on a platform or version of Ruby that is not covered by the Native Gems, then the vanilla "ruby platform" (non-native) gem will be installed by the `gem install` or `bundle` commands.
+
+
+#### Packaged libsqlite3
+
+By default, as of v1.5.0 of this library, the latest available version of libsqlite3 is packaged with the gem and will be compiled and used automatically. This takes a bit longer than the native gem, but will provide a modern, well-supported version of libsqlite3.
+
+⚠ A prerequisite to build the gem with the packaged sqlite3 is that you must have `pkgconf` installed.
+
+For example, on a linux system running Ruby 2.5:
+
+``` text
+$ ruby -v
+ruby 2.5.9p229 (2021-04-05 revision 67939) [x86_64-linux]
+
+$ time gem install sqlite3
+Building native extensions. This could take a while...
+Successfully installed sqlite3-1.5.0
+1 gem installed
+
+real    0m20.620s
+user    0m23.361s
+sys     0m5.839s
+```
+
+##### Controlling compilation flags for sqlite
+
+Upstream sqlite allows for the setting of some parameters at compile time. If you're an expert and would like to set these, you may do so at gem install time in two different ways ...
+
+**If you're installing the gem using `gem install`** then you can pass in these compile-time flags like this:
+
+``` sh
+gem install sqlite3 --platform=ruby -- \
+  --with-sqlite-cflags="-DSQLITE_DEFAULT_CACHE_SIZE=9999 -DSQLITE_DEFAULT_PAGE_SIZE=4444"
+```
+
+or the equivalent:
+
+``` sh
+CFLAGS="-DSQLITE_DEFAULT_CACHE_SIZE=9999 -DSQLITE_DEFAULT_PAGE_SIZE=4444" \
+  gem install sqlite3 --platform=ruby
+```
+
+**If you're installing the gem using `bundler`** then you should first pin the gem to the "ruby" platform gem, so that you are compiling from source:
+
+``` ruby
+# Gemfile
+gem "sqlite3", force_ruby_platform: true # requires bundler >= 2.3.18
+```
+
+and then set up a bundler config parameter for `build.sqlite3`:
+
+``` sh
+bundle config set build.sqlite3 \
+  "--with-sqlite-cflags='-DSQLITE_DEFAULT_CACHE_SIZE=9999 -DSQLITE_DEFAULT_PAGE_SIZE=4444'"
+```
+
+NOTE the use of single quotes within the double-quoted string to ensure the space between compiler flags is interpreted correctly. The contents of your `.bundle/config` file should look like:
+
+``` yaml
+---
+BUNDLE_BUILD__SQLITE3: "--with-sqlite-cflags='-DSQLITE_DEFAULT_CACHE_SIZE=9999 -DSQLITE_DEFAULT_PAGE_SIZE=4444'"
+```
+
+
+#### System libsqlite3
+
+If you would prefer to build the sqlite3-ruby gem against your system libsqlite3, which requires that you install libsqlite3 and its development files yourself, you may do so by using the `--enable-system-libraries` flag at gem install time.
+
+PLEASE NOTE:
+
+- you must avoid installing a precompiled native gem (see [previous section](#avoiding-the-precompiled-native-gem))
+- only versions of libsqlite3 `>= 3.5.0` are supported,
+- and some library features may depend on how your libsqlite3 was compiled.
+
+For example, on a linux system running Ruby 2.5:
+
+``` text
+$ time gem install sqlite3 -- --enable-system-libraries
+Building native extensions with: '--enable-system-libraries'
+This could take a while...
+Successfully installed sqlite3-1.5.0
+1 gem installed
+
+real    0m4.234s
+user    0m3.809s
+sys     0m0.912s
+```
+
+If you're using bundler, you can opt into system libraries like this:
+
+``` sh
+bundle config build.sqlite3 --enable-system-libraries
+```
+
+If you have sqlite3 installed in a non-standard location, you may need to specify the location of the include and lib files by using `--with-sqlite-include` and `--with-sqlite-lib` options (or a `--with-sqlite-dir` option, see [MakeMakefile#dir_config](https://ruby-doc.org/stdlib-3.1.1/libdoc/mkmf/rdoc/MakeMakefile.html#method-i-dir_config)). If you have pkg-config installed and configured properly, this may not be necessary.
+
+``` sh
+gem install sqlite3 -- \
+  --enable-system-libraries \
+  --with-sqlite3-include=/opt/local/include \
+  --with-sqlite3-lib=/opt/local/lib
+```
+
+
+#### System libsqlcipher
+
+If you'd like to link against a system-installed libsqlcipher, you may do so by using the `--with-sqlcipher` flag:
+
+``` text
+$ time gem install sqlite3 -- --with-sqlcipher
+Building native extensions with: '--with-sqlcipher'
+This could take a while...
+Successfully installed sqlite3-1.5.0
+1 gem installed
+
+real    0m4.772s
+user    0m3.906s
+sys     0m0.896s
+```
+
+If you have sqlcipher installed in a non-standard location, you may need to specify the location of the include and lib files by using `--with-sqlite-include` and `--with-sqlite-lib` options (or a `--with-sqlite-dir` option, see [MakeMakefile#dir_config](https://ruby-doc.org/stdlib-3.1.1/libdoc/mkmf/rdoc/MakeMakefile.html#method-i-dir_config)). If you have pkg-config installed and configured properly, this may not be necessary.
+
+
+## Using SQLite3 extensions
+
+### How do I load a sqlite extension?
+
+Some add-ons are available to sqlite as "extensions". The instructions that upstream sqlite provides at https://www.sqlite.org/loadext.html are the canonical source of advice, but here's a brief example showing how you can do this with the `sqlite3` ruby gem.
+
+In this example, I'll be loading the ["spellfix" extension](https://www.sqlite.org/spellfix1.html):
+
+``` text
+# download spellfix.c from somewherehttp://www.sqlite.org/src/finfo?name=ext/misc/spellfix.c
+$ wget https://raw.githubusercontent.com/sqlite/sqlite/master/ext/misc/spellfix.c
+spellfix.c                     100%[=================================================>] 100.89K  --.-KB/s    in 0.09s
+
+# follow instructions at https://www.sqlite.org/loadext.html
+# (you will need sqlite3 development packages for this)
+$ gcc -g -fPIC -shared spellfix.c -o spellfix.o
+
+$ ls -lt
+total 192
+-rwxrwxr-x 1 flavorjones flavorjones  87984 2023-05-24 10:44 spellfix.o
+-rw-rw-r-- 1 flavorjones flavorjones 103310 2023-05-24 10:43 spellfix.c
+```
+
+Then, in your application, use that `spellfix.o` file like this:
+
+``` ruby
+require "sqlite3"
+
+db = SQLite3::Database.new(':memory:')
+db.enable_load_extension(true)
+db.load_extension("/path/to/sqlite/spellfix.o")
+db.execute("CREATE VIRTUAL TABLE demo USING spellfix1;")
+```
+
+### How do I use my own sqlite3 shared library?
+
+Some folks have strong opinions about what features they want compiled into sqlite3; or may be using a package like SQLite Encryption Extension ("SEE"). This section will explain how to get your Ruby application to load that specific shared library.
+
+If you've installed your alternative as an autotools-style installation, the directory structure will look like this:
+
+```
+/opt/sqlite3
+├── bin
+│   └── sqlite3
+├── include
+│   ├── sqlite3.h
+│   └── sqlite3ext.h
+├── lib
+│   ├── libsqlite3.a
+│   ├── libsqlite3.la
+│   ├── libsqlite3.so -> libsqlite3.so.0.8.6
+│   ├── libsqlite3.so.0 -> libsqlite3.so.0.8.6
+│   ├── libsqlite3.so.0.8.6
+│   └── pkgconfig
+│       └── sqlite3.pc
+└── share
+    └── man
+        └── man1
+            └── sqlite3.1
+```
+
+You can build this gem against that library like this:
+
+```
+gem install sqlite3 --platform=ruby -- \
+  --enable-system-libraries \
+  --with-opt-dir=/opt/sqlite
+```
+
+Explanation:
+
+- use `--platform=ruby` to avoid the precompiled native gems (see the README)
+- the `--` separates arguments passed to "gem install" from arguments passed to the C extension builder
+- use `--enable-system-libraries` to avoid the vendored sqlite3 source
+- use `--with-opt-dir=/path/to/installation` to point the build process at the desired header files and shared object files
+
+Alternatively, if you've simply downloaded an "amalgamation" and so your compiled library and header files are in arbitrary locations, try this more detailed command:
+
+```
+gem install sqlite3 --platform=ruby -- \
+  --enable-system-libraries \
+  --with-opt-include=/path/to/include \
+  --with-opt-lib=/path/to/lib
+```
+
++ for repo in rails/rails sqlite/sqlite sparklemotion/sqlite3-ruby
++ gh api repos/rails/rails --jq '{full_name,stargazers_count,archived,pushed_at,default_branch}'
+{"archived":false,"default_branch":"main","full_name":"rails/rails","pushed_at":"2026-11-27T11:44:38Z","stargazers_count":59174}
++ for repo in rails/rails sqlite/sqlite sparklemotion/sqlite3-ruby
++ gh api repos/sqlite/sqlite --jq '{full_name,stargazers_count,archived,pushed_at,default_branch}'
+{"archived":false,"default_branch":"master","full_name":"sqlite/sqlite","pushed_at":"2026-11-27T12:42:20Z","stargazers_count":11155}
++ for repo in rails/rails sqlite/sqlite sparklemotion/sqlite3-ruby
++ gh api repos/sparklemotion/sqlite3-ruby --jq '{full_name,stargazers_count,archived,pushed_at,default_branch}'
+{"archived":false,"default_branch":"main","full_name":"sparklemotion/sqlite3-ruby","pushed_at":"2026-11-25T19:17:31Z","stargazers_count":848}
++ gh api --method GET search/issues -f 'q=repo:rails/rails is:pr is:merged merged:>=2026-11-25 sqlite' -f per_page=100 --jq '{total_count,incomplete_results,items:[.items[]|{number,title,html_url}]}'
+{"incomplete_results":false,"items":[{"html_url":"https://github.com/rails/rails/pull/59668","number":59668,"title":"Let a temporary SQLite table or view hide a permanent one in the schema readers"},{"html_url":"https://github.com/rails/rails/pull/59983","number":59983,"title":"Look up an existing connection lease without the registry mutex"},{"html_url":"https://github.com/rails/rails/pull/59955","number":59955,"title":"Limit the size of the quoted name caches"},{"html_url":"https://github.com/rails/rails/pull/59964","number":59964,"title":"Compare scalar ids without arrays in nested attributes"}],"total_count":4}
++ echo CONFIRMATION_CHECKS_COMPLETED
+CONFIRMATION_CHECKS_COMPLETED
