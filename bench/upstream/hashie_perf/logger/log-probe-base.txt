@@ -1,0 +1,15 @@
+../log_probe.rb:36:in 'block in <main>': uninitialized constant ActiveSupport::BroadcastLogger (NameError)
+
+  loggers['BroadcastLogger x2'] = -> { a = sio.(); b = sio.(); [ActiveSupport::BroadcastLogger.new(ActiveSupport::Logger.new(a), ActiveSupport::Logger.new(b)), -> { [a.string, b.string] }] }
+                                                                             ^^^^^^^^^^^^^^^^^
+	from ../log_probe.rb:40:in 'block in <main>'
+	from ../log_probe.rb:39:in 'Hash#each'
+	from ../log_probe.rb:39:in '<main>'
+Logger DEBUG | ok | "W,   WARN -- : You are setting a key that conflicts with a built-in method Hashie::Mash#key defined in Hash. This can cause unexpected behavior when accessing the key as a property. You can still access the key via the # method.\nW,   WARN -- : You are setting a key that conflicts with a built-in method Hashie::Mash#zip defined in Enumerable. This can cause unexpected behavior when accessing the 
+Logger ERROR | ok | ""
+Logger progname | ok | "WARN|app|You are setting a key that conflicts with a built-in method Hashie::Mash#key defined in Hash. This can cause unexpected behavior when accessing the key as a property. You can still access the key via the #[] method.\nWARN|app|You are setting a key that conflicts with a built-in method Hashie::Mash#zip defined in Enumerable. This can cause unexpected behavior when accessing the key as a p
+Logger nil | ok | ""
+warn(msg) only | ok | ["You are setting a key that conflicts with a built-in method Hashie::Mash#key defined in Hash. This can cause unexpected behavior when accessing the key as a property. You can still access the key via the #[] method.", "You are setting a key that conflicts with a built-in method Hashie::Mash#zip defined in Enumerable. This can cause unexpected behavior when accessing the key as a property. You ca
+warn(*args) | ok | [[["You are setting a key that conflicts with a built-in method Hashie::Mash#key defined in Hash. This can cause unexpected behavior when accessing the key as a property. You can still access the key via the #[] method."], nil], [["You are setting a key that conflicts with a built-in method Hashie::Mash#zip defined in Enumerable. This can cause unexpected behavior when accessing the key as a prope
+warn? false but warn writes | ok | [["You are setting a key that conflicts with a built-in method Hashie::Mash#key defined in Hash. This can cause unexpected behavior when accessing the key as a property. You can still access the key via the #[] method."], ["You are setting a key that conflicts with a built-in method Hashie::Mash#zip defined in Enumerable. This can cause unexpected behavior when accessing the key as a property. You
+ActiveSupport::Logger | ok | "You are setting a key that conflicts with a built-in method Hashie::Mash#key defined in Hash. This can cause unexpected behavior when accessing the key as a property. You can still access the key via the #[] method.\nYou are setting a key that conflicts with a built-in method Hashie::Mash#zip defined in Enumerable. This can cause unexpected behavior when accessing the key as a property. You can s

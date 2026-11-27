@@ -344,3 +344,39 @@ claim. Candidates 2–4 remain recorded and unopened. The exact current fenced t
 Astra's final-head approval landed during sync and names that identical reply hash; both text approvals are now
 recorded. The coordinator still must verify the actual PR number before posting. This thread pushed no Hashie
 branch, opened no PR and posted nothing upstream.
+
+## Follow-up: build the conflict warning only when it is logged (2026-11-27, not opened)
+
+The coordinator asked whether `_log_built_in_message` can skip building its message (8 Strings and 2 Method
+objects per conflicting key on the fixture) when the logger will drop it, without changing what any logger
+receives. `Hashie.logger` is any object; the README only says to assign your application's logger, and the Railtie
+assigns `Rails.logger`.
+
+`probes/log_probe.rb` builds a Mash with two conflicting keys (`key`, `zip`) on Ruby 4.0.9 and compares what each
+logger receives under master, the block form and a level check (`logger/log-probe-*.txt`):
+
+* **`Hashie.logger.warn { ... }`: not exact.** Stdlib Logger (DEBUG, ERROR, custom progname and formatter, nil device)
+  and ActiveSupport 5.2's Logger receive identical output. But with a custom logger whose method is `def warn(msg)`,
+  `Mash.new` raises ArgumentError (given 0, expected 1). A logger with `def warn(*args)` receives empty calls instead of
+  the message. Rails 7.1+'s BroadcastLogger was not available in this orb's bundle.
+* **`return if Hashie.logger.respond_to?(:warn?) && !Hashie.logger.warn?`** (`probes/logger-level-check.patch`):
+  identical for every logger above except one whose `warn?` is false while `warn` still writes. It adds a
+  `respond_to?` call and a `warn?` call on the user's logger per conflicting key. It saves work only when the level
+  is above WARN. `Logger.new(nil)` (what the Duel benchmarks use), the default `Logger.new($stdout)` and Rails' default
+  log levels all report `warn?` true, so they keep building and sending the message. Telling a nil device apart would
+  need Logger's private state.
+
+`script/upstream-bench --wall 20` (`logger_body.rb`, master `9e313f3` against the level check, A/A in each cohort;
+this 8-CPU orb, not a1.xxlarge):
+
+| Mash.new of the fixture | YJIT 4.0.10 | ZJIT master `0d399335b7` |
+|---|---|---|
+| `Logger.new(nil)`: objects | 25 → 25 | 19 → 19 |
+| `Logger.new(nil)`: time | +0.3% [−0.1, +0.7], no claim | −0.1% [−0.5, +1.3], no claim |
+| logger at `:error`: objects | 25 → 13 | 19 → 11 |
+| logger at `:error`: time | −7.1% [−7.3, −6.5], A/A −0.2% | −4.6% [−5.5, −3.3], A/A +0.0% |
+
+Not opened, so no Duel run and no reviews. The block form isn't exact. The level check is exact only for loggers whose
+`warn?` matches `warn`, and its win needs both a payload with method-name keys and a logger level above WARN, which
+neither Duel's benchmarks nor default Rails setups have. Duel's own setup, `Logger.new(nil)`, would show no change
+under YJIT or ZJIT.

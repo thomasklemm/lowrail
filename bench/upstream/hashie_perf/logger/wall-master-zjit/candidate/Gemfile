@@ -1,0 +1,2 @@
+source "https://rubygems.org"
+gem "hashie", path: "/home/user/workspace/repo/.amp/in/orb-backup/hashie-perf/hashie-lvl"
