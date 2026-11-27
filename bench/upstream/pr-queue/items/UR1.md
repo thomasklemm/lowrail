@@ -6,7 +6,7 @@ kind: perf
 area: URI.decode_www_form_component
 reviewer: hsbt
 branch: thomasklemm/decode-www-form-component-cgi
-head: "7da6979b27b2aba69c4076d8f01939e5a8c0f1f6"
+head: "545506abb5d4e12b5d148c3dd5e3814762120d2d"
 base: master
 built_on: "48cda77031"
 depends_on: []
@@ -76,7 +76,15 @@ note: >-
   Body says query parameters and URL-encoded form fields (Rails sends multipart pairs around QueryParser). Body
   table and impact from cecaed1's runs (body/UR1-cecaed1-4010, A/A <= 0.33%; master A/A <= 0.62%, ZJIT JIT-flat by
   upstream-bench's gate) and req-ur1b-*.txt; the earlier req-ur1-*.txt receipts price the guarded a3b201f05b
-  overlay and are historical. req.rb's ZJIT check reads compiled ISEQs and side exits only. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  overlay and are historical. req.rb's ZJIT check reads compiled ISEQs and side exits only.
+  2026-11-27 (thermos-sol on 7da6979: changes): on JRuby 9.4.16.0 (current 9.4 maintenance release, 11-23) String#b
+  keeps a subclass and CGI's no-escape branch dups it, so a subclass with nothing to decode returned the subclass
+  (1,905 of 42,264 cases); `gsub` had normalized it. Fix as the reviewer tested it: `CGI.unescape(str.b.to_s,
+  Encoding::BINARY)`, no new guard and no allocation for a String. Head 545506a (commit message adds one paragraph
+  on it), fork branch moved with a lease from 7da6979. diff.rb with SINGLETON_B=1: 0 differences on 4.0.10 and master
+  (300k), 3.4.12 pure CGI (100k); suite 94 green on 4.0.10. Not run here: JRuby 9.4 (reviewer's probe). Per-call
+  rerun on the exact tree: body/UR1-052cf07-{4010,master} (052cf07 = 545506a's tree). Astra's approval on 7da6979
+  predates this change. Reviewer's worst size-sweep row: 8 MiB plain, -13.6% instructions. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes:
   - reviewer: astra
