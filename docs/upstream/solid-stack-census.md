@@ -148,7 +148,10 @@ connection.\"
 benchmark-ips) and `body/SC1-zjit` (Ruby master `0d399335b7`, ZJIT). Idle poll with 20 streams: −14.5% instructions
 without a JIT, −23.2% YJIT, −23.7% ZJIT on master, 3 fewer objects; one new message −8.9% / −13.8% / −13.9%. Every
 base A/A ≤ 0.06%, every JIT window flat. benchmark-ips under YJIT on a1.large: idle +14.8% (A/A 0.5%); one message
-+3.2% (A/A 2.3%, no claim). Timing for the body: a1.xxlarge run `body/SC1-xxl`.
++3.2% (A/A 2.3%, no claim). On a1.xxlarge (`body/SC1-xxl`, YJIT): idle poll
+benchmark-ips +15.9%, wall cohort 204.7 → 174.2 µs, −14.8% [−15.3%, −14.3%], A/A −0.9% [−1.5%, +0.1%], 30 rounds,
+JIT-flat. The one-message case compiled a block in several processes at `--warmup 500`: not JIT-flat, no claim, and
+the body doesn't use it.
 
 ## Held and dropped
 

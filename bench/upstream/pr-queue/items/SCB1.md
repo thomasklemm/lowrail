@@ -12,8 +12,8 @@ built_on: "40dd29ffdc"
 depends_on: []
 stacked_on:
 alternative_of:
-impact: "Every process with Solid Cable (the Rails 8 default cable adapter, 24.7 M downloads) polls every 0.1 s by default, idle or not. With 20 subscribed streams an idle poll runs -14.5% instructions without a JIT and -23.2% under YJIT (A/A <= 0.03%), 3 fewer objects; benchmark-ips under YJIT +14.8% (A/A 0.5%, a1.large; a1.xxlarge timing pending). The saving grows with the number of streams (one bind per stream in the cache key). Path runs on Ruby master and Rails main; ZJIT on master 0d399335b7: idle poll -23.7% instructions, one message -13.9% (A/A <= 0.04%, JIT-flat)."
-evidence: [bench/upstream/solid_stack/body/SC1, bench/upstream/solid_stack/body/SC1-zjit, bench/upstream/solid_stack/raw/probes-p1-p2.tar.gz, bench/upstream/solid_stack/sc1_differential.rb]
+impact: "Every process with Solid Cable (the Rails 8 default cable adapter, 24.7 M downloads) polls every 0.1 s by default, idle or not. With 20 subscribed streams an idle poll runs -14.5% instructions without a JIT and -23.2% under YJIT (A/A <= 0.03%), 3 fewer objects; on a1.xxlarge under YJIT: benchmark-ips +15.9%, wall cohort 204.7 -> 174.2 us per poll, -14.8% [-15.3%, -14.3%] with A/A -0.9% [-1.5%, +0.1%], 30 rounds, JIT-flat (body/SC1-xxl). The one-message case is not JIT-flat at --warmup 500 and is not claimed. The saving grows with the number of streams (one bind per stream in the cache key). Path runs on Ruby master and Rails main; ZJIT on master 0d399335b7: idle poll -23.7% instructions, one message -13.9% (A/A <= 0.04%, JIT-flat)."
+evidence: [bench/upstream/solid_stack/body/SC1, bench/upstream/solid_stack/body/SC1-xxl, bench/upstream/solid_stack/body/SC1-zjit, bench/upstream/solid_stack/raw/probes-p1-p2.tar.gz, bench/upstream/solid_stack/sc1_differential.rb]
 rank: 1
 risky: true
 state: built
@@ -31,7 +31,7 @@ This polls under `uncached`, which turns the query cache off for Solid Cable's c
 
 | One idle listener poll with 20 subscribed channels | main | this branch |
 | --- | ---: | ---: |
-| benchmark-ips, Ruby 4.0.10 with YJIT | 4.6k i/s | 5.3k i/s (+15%) |
+| Time per poll, Ruby 4.0.10 with YJIT | 205 µs | 174 µs (−15%) |
 | Instructions, no JIT / YJIT | 1,698,352 / 930,367 | −14.5% / −23.2% |
 
 The saving grows with the number of subscribed channels.
