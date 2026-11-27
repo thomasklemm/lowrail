@@ -1,0 +1,14 @@
++ cc -shared -fPIC -O2 -I/home/user/.local/share/mise/installs/ruby/4.0.10/include/ruby-4.0.0 -I/home/user/.local/share/mise/installs/ruby/4.0.10/include/ruby-4.0.0/x86_64-linux /home/user/workspace/repo/bench/upstream/outside_leads/req/cg.c -o /tmp/reqcg-4.0.10/reqcg.so
+blog PATCH article (redirect) yjit none.rb Ir/op 2555722 objs/op 1422.0 jit 0/0 settle 1
+blog PATCH article (redirect) yjit ur1_cgib.rb Ir/op 2428935 objs/op 1339.7 jit 0/0 settle 1
+blog PATCH article (redirect) yjit ur1_cgic.rb Ir/op 2402462 objs/op 1333.8 jit 0/0 settle 1
+blog PATCH article (redirect) yjit none.rb Ir/op 2552984 objs/op 1424.4 jit 0/0 settle 1
+blog GET article yjit none.rb Ir/op 4662863 objs/op 1951.4 jit 0/0 settle 1
+blog GET article yjit ur1_cgib.rb Ir/op 4632140 objs/op 1913.0 jit 0/0 settle 1
+blog GET article yjit ur1_cgic.rb Ir/op 4626638 objs/op 1913.3 jit 0/0 settle 1
+blog GET article yjit none.rb Ir/op 4654033 objs/op 1949.2 jit 0/0 settle 1
+blog GET articles.json yjit none.rb Ir/op 2203682 objs/op 1134.6 jit 0/0 settle 1
+blog GET articles.json yjit ur1_cgib.rb Ir/op 2203883 objs/op 1134.6 jit 0/0 settle 1
+blog GET articles.json yjit ur1_cgic.rb Ir/op 2210582 objs/op 1134.6 jit 0/0 settle 1
+blog GET articles.json yjit none.rb Ir/op 2188943 objs/op 1134.6 jit 0/0 settle 1
+DONE

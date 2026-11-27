@@ -1,0 +1,14 @@
++ gcc -shared -fPIC -O2 -I/home/user/.rubies/master-zjit/include/ruby-4.1.0+7 -I/home/user/.rubies/master-zjit/include/ruby-4.1.0+7/x86_64-linux /home/user/workspace/repo/bench/upstream/outside_leads/req/cg.c -o /tmp/reqcg-master-zjit/reqcg.so
+blog PATCH article (redirect) zjit none.rb Ir/op 2598415 objs/op 1430.4 jit 0/0 settle 1
+blog PATCH article (redirect) zjit ur1_cgib.rb Ir/op 2475645 objs/op 1344.8 jit 0/0 settle 1
+blog PATCH article (redirect) zjit ur1_cgic.rb Ir/op 2466887 objs/op 1343.4 jit 0/0 settle 1
+blog PATCH article (redirect) zjit none.rb Ir/op 2603531 objs/op 1431.4 jit 0/0 settle 1
+blog GET article zjit none.rb Ir/op 4737114 objs/op 1921.6 jit 0/0 settle 1
+blog GET article zjit ur1_cgib.rb Ir/op 4671632 objs/op 1882.2 jit 0/0 settle 1
+blog GET article zjit ur1_cgic.rb Ir/op 4679664 objs/op 1882.7 jit 0/0 settle 1
+blog GET article zjit none.rb Ir/op 4743853 objs/op 1924.0 jit 0/0 settle 1
+blog GET articles.json zjit none.rb Ir/op 2207315 objs/op 1130.6 jit 0/0 settle 1
+blog GET articles.json zjit ur1_cgib.rb Ir/op 2208046 objs/op 1130.6 jit 0/0 settle 1
+blog GET articles.json zjit ur1_cgic.rb Ir/op 2209741 objs/op 1130.6 jit 0/0 settle 1
+blog GET articles.json zjit none.rb Ir/op 2208495 objs/op 1130.6 jit 0/0 settle 1
+DONE

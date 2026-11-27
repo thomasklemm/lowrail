@@ -1,0 +1,69 @@
+==72371== Callgrind, a call-graph generating cache profiler
+==72371== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==72371== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==72371== Command: /home/user/.rubies/master-zjit/bin/ruby -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/outside_leads/ur1/ur1_rework_body.rb uri\ hello 2000
+==72371== Parent PID: 58106
+==72371== 
+--72371-- 
+--72371-- Valgrind options:
+--72371--    --verbose
+--72371--    --tool=callgrind
+--72371--    --collect-atstart=no
+--72371--    --toggle-collect=rb_ary_cycle
+--72371--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/outside_leads/ur1/body/UR1-d09ffb7-master/raw/ir-interp-5-uri_hello-base-n2000.callgrind
+--72371--    --log-file=/home/user/workspace/repo/bench/upstream/outside_leads/ur1/body/UR1-d09ffb7-master/raw/ir-interp-5-uri_hello-base-n2000.valgrind.log
+--72371-- Contents of /proc/version:
+--72371--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--72371-- 
+--72371-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--72371-- Page sizes: currently 4096, max supported 4096
+--72371-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==72371== For interactive control, run 'callgrind_control -h'.
+--72371-- Reading syms from /home/user/.rubies/master-zjit/bin/ruby
+--72371-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--72371--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--72371--   .. build-id is valid
+--72371-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--72371--    object doesn't have a dynamic symbol table
+--72371-- Scheduler: using generic scheduler lock implementation.
+==72371== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-72371-by-user-on-???
+==72371== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-72371-by-user-on-???
+==72371== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-72371-by-user-on-???
+==72371== 
+==72371== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==72371== don't want to do, unless you know exactly what you're doing,
+==72371== or are doing some strange experiment):
+==72371==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=72371 ...command...
+==72371== 
+==72371== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==72371==   /path/to/gdb /home/user/.rubies/master-zjit/bin/ruby
+==72371== and then give GDB the following command
+==72371==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=72371
+==72371== --pid is optional if only one valgrind process is running
+==72371== 
+--72371-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--72371-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--72371--    object doesn't have a symbol table
+--72371-- Reading syms from /usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0
+--72371--    object doesn't have a symbol table
+--72371-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
+--72371--    object doesn't have a symbol table
+--72371-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--72371--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--72371--   .. build-id is valid
+--72371-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--72371--    object doesn't have a symbol table
+--72371-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--72371--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--72371--   .. build-id is valid
+--72371-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--72371-- Reading syms from /home/user/.rubies/master-zjit/lib/ruby/4.1.0+7/x86_64-linux/enc/encdb.so
+--72371-- Reading syms from /home/user/.rubies/master-zjit/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/transdb.so
+==72371== 
+--72371-- Start dumping at BB 125665580 (Prg.Term.)...
+--72371-- Dump to /home/user/workspace/repo/bench/upstream/outside_leads/ur1/body/UR1-d09ffb7-master/raw/ir-interp-5-uri_hello-base-n2000.callgrind
+--72371-- Dumping done.
+==72371== Events    : Ir
+==72371== Collected : 8731468
+==72371== 
+==72371== I   refs:      8,731,468
