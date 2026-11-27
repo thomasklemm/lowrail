@@ -1,0 +1,108 @@
+diff --git a/script/upstream-bench b/script/upstream-bench
+index 80cc6531..ef7ef7df 100755
+--- a/script/upstream-bench
++++ b/script/upstream-bench
+@@ -64,10 +64,13 @@ if ARGV.first == "--worker"
+     windows = mode == "wall" ? Integer(rest[1]) : 1
+     cpu = -> { Process.clock_gettime(Process::CLOCK_THREAD_CPUTIME_ID) }
+     mono = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) }
+-    # One GC-free window of n calls; JIT counters are read outside the timed part.
++    # One window of n calls, GC off unless --wall-gc; JIT counters are read outside the timed part.
++    gc_on = ENV["UPSTREAM_BENCH_WALL_GC"] == "1"
+     measure = lambda do |call, n|
+-      GC.start
+-      GC.disable
++      unless gc_on
++        GC.start
++        GC.disable
++      end
+       before = jit&.()
+       w0 = mono.()
+       c0 = cpu.()
+@@ -79,7 +82,7 @@ if ARGV.first == "--worker"
+       c1 = cpu.()
+       w1 = mono.()
+       after = jit&.()
+-      GC.enable
++      GC.enable unless gc_on
+       [c1 - c0, w1 - w0, before, after]
+     end
+     # The warm-up runs measure itself: 100 one-call windows compile every branch of its loop, then warm_calls calls.
+@@ -152,7 +155,7 @@ MODE_FLAGS = { "interp" => [], "yjit" => ["--yjit"], "zjit" => ["--zjit"] }.free
+ MODE_TITLES = { "interp" => "no JIT", "yjit" => "YJIT", "zjit" => "ZJIT" }.freeze
+ 
+ o = { gems: nil, with: [], n: 2000, warmup: 3000, ips: 0, ips_mode: "yjit", ips_time: 5, ips_warmup: 2, core: 1,
+-  wall: 0, wall_windows: 30, wall_ms: 50,
++  wall: 0, wall_windows: 30, wall_ms: 50, wall_gc: false,
+   names: %w[Before After], modes: nil }
+ parser = OptionParser.new do |p|
+   p.banner = "Usage: script/upstream-bench --out NEW_DIR [--base TREE --candidate TREE] [--ruby R | --base-ruby R --candidate-ruby R] BENCH.rb"
+@@ -177,6 +180,7 @@ parser = OptionParser.new do |p|
+   p.on("--wall-mode MODE", "interp, yjit or zjit (default zjit when both Rubies have it, else yjit)") { o[:wall_mode] = _1 }
+   p.on("--wall-windows N", Integer, "Timed windows per case and process (default 30)") { o[:wall_windows] = _1 }
+   p.on("--wall-ms MS", Float, "Target length of one window (default 50)") { o[:wall_ms] = _1 }
++  p.on("--wall-gc", "GC on in wall windows, default heap, mean window per process (allocation claims)") { o[:wall_gc] = true }
+   p.on("--core N", Integer, "CPU for benchmark-ips and --wall (default 1)") { o[:core] = _1 }
+   p.on("--names BEFORE,AFTER", Array, "Column names (default Before,After)") { o[:names] = _1 }
+ end
+@@ -338,7 +342,9 @@ wall = nil
+ if o[:wall] > 0
+   taskset = ["taskset", "-c", o[:core].to_s]
+   log = File.join(out, "raw", "wall-calibrate.log")
+-  text = run(sides["base"][:env], [*taskset, *worker["base", wall_mode, "wall-calibrate", script]], log: log)
++  # --wall-gc drops the heap floors, so GC runs at the default heap's rate.
++  wall_env = ->(side) { o[:wall_gc] ? sides[side][:env].merge(HEAP.transform_values { nil }, "UPSTREAM_BENCH_WALL_GC" => "1") : sides[side][:env] }
++  text = run(wall_env.("base"), [*taskset, *worker["base", wall_mode, "wall-calibrate", script]], log: log)
+   calls = text.scan(/^calibrate (.+)\t(\S+)$/).to_h { |name, s| [name, [1, (o[:wall_ms] / 1000.0 / Float(s)).round].max] }
+   wall = { calls: calls, rounds: Hash.new { |h, k| h[k] = [] } }
+   orders = runs.permutation.to_a
+@@ -346,7 +352,7 @@ if o[:wall] > 0
+     procs = orders[round % orders.size].to_h do |r|
+       side = side_of[r]
+       log = File.join(out, "raw", "wall-r#{round + 1}-#{r}.log")
+-      text = run(sides[side][:env], [*taskset, *worker[side, wall_mode, "wall", script, JSON.generate(calls), o[:wall_windows].to_s]], log: log)
++      text = run(wall_env.(side), [*taskset, *worker[side, wall_mode, "wall", script, JSON.generate(calls), o[:wall_windows].to_s]], log: log)
+       record_jit.("wall", wall_mode, text, log, cases, "r#{round + 1} #{r}")
+       [r, text.scan(/^wall (.+)\t(.*)$/).to_h { |name, json| [name, JSON.parse(json)] }]
+     end
+@@ -381,8 +387,10 @@ def bootstrap(rounds)
+   medians = Array.new(5000) { median(Array.new(rounds.size) { rounds[rng.rand(rounds.size)] }.flatten) }.sort
+   [medians[124], medians[4875]]
+ end
+-def wall_cell(rounds, calls)
+-  est = rounds.map { |r| r.transform_values { |w| Math.log(w["cpu"].sort[((w["cpu"].size - 1) * WALL_QUANTILE).round] / calls) } }
++# With GC on, a low quantile would pick the GC-free windows, so each process gives its mean window instead.
++def wall_cell(rounds, calls, gc: false)
++  per_process = ->(cpu) { gc ? cpu.sum / cpu.size : cpu.sort[((cpu.size - 1) * WALL_QUANTILE).round] }
++  est = rounds.map { |r| r.transform_values { |w| Math.log(per_process.(w["cpu"]) / calls) } }
+   change = est.map { [_1["candidate"] - _1["base"], _1["candidate"] - _1["base2"]] }
+   aa = est.map { [_1["base2"] - _1["base"]] }
+   ex = ->(x) { Math.exp(x) - 1 }
+@@ -456,13 +464,14 @@ if ips
+   md << ""
+ end
+ if wall
+-  md << "Time per call, #{ruby_label}, #{MODE_TITLES.fetch(wall_mode)}, #{o[:wall]} rounds of fresh processes on one core"
++  md << "Time per call, #{ruby_label}, #{MODE_TITLES.fetch(wall_mode)}#{", GC on" if o[:wall_gc]}, #{o[:wall]} rounds of fresh processes on one core"
+   md << ""
+   md << "| | #{before} | #{after} | Change |"
+   md << "| --- | ---: | ---: | ---: |"
+   wall[:rounds].each do |name, rounds|
+-    c = gate(wall_cell(rounds, wall[:calls].fetch(name)), windows.(wall_mode, "wall #{name}"))
+-    results[:wall][name] = c.merge(calls: wall[:calls].fetch(name), windows: o[:wall_windows], quantile: WALL_QUANTILE, rounds: rounds)
++    c = gate(wall_cell(rounds, wall[:calls].fetch(name), gc: o[:wall_gc]), windows.(wall_mode, "wall #{name}"))
++    results[:wall][name] = c.merge(calls: wall[:calls].fetch(name), windows: o[:wall_windows], gc: o[:wall_gc],
++      quantile: (WALL_QUANTILE unless o[:wall_gc]), rounds: rounds)
+     md << "| `#{name}` | #{dur(c[:base])} | #{dur(c[:candidate])} | #{change(c)} |"
+     notes << "wall #{name}: #{pct(c[:change])} #{ci(c[:change_ci])} with A/A #{pct(c[:aa])} #{ci(c[:aa_ci])} " \
+       "(#{wall[:calls].fetch(name)} calls × #{o[:wall_windows]} windows per process)" \
+@@ -476,7 +485,8 @@ unless jit.empty?
+     "(each Callgrind N and N = 0 run; each benchmark-ips report from `running` to its last timed interval; every timed wall window)"
+ end
+ if wall
+-  md << "- Wall: thread CPU time with GC off per window, the #{(WALL_QUANTILE * 100).round}th-percentile window per process; change = median " \
++  per_process = o[:wall_gc] ? "GC on and the default heap, the mean window" : "GC off per window, the #{(WALL_QUANTILE * 100).round}th-percentile window"
++  md << "- Wall: thread CPU time with #{per_process} per process; change = median " \
+     "of every round's candidate / base and candidate / base2, A/A = median of base2 / base, 95% bootstrap intervals resampling rounds"
+ end
+ sides.each do |side, s|

@@ -129,7 +129,10 @@ the rows it needs; a single cell that is "within noise" is not claimed in prose 
   [wall_noise](../../bench/upstream/wall_noise/README.md) 30 rounds gave A/A intervals of about ±1% and caught a
   planted ~1% regression under ZJIT (+1.3% [+0.7%, +2.2%]) and YJIT (+1.2% [+0.3%, +2.0%]). It costs about
   22 s per round for a 0.7 ms call, so 30 rounds take about 11 minutes. It measures time with GC off; a change
-  whose cost is mostly GC shows in the objects column, not here.
+  whose cost is mostly GC shows in the objects column, not here. The record estimates that GC share as Δobjects ×
+  about 60 ns per object (railsbench and lobsters heaps on an orb) and doesn't call it time; a GC-on cohort resolves
+  only about 3–4% ([gc_jit_windows](../../bench/upstream/gc_jit_windows/README.md)), so time with GC is claimed
+  only where the estimate is that large.
 * `commands.sh` has absolute paths; rerunning it elsewhere needs the same layout or a fresh run.
 * It does not run ruby-bench, the census or `make benchmark`; ruby/ruby bodies still use benchmark-driver
   ([DECISIONS](../DECISIONS.md#benchmark-tables-in-the-projects-own-format-thomas-2026-11-14)).
