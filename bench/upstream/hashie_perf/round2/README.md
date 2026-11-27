@@ -171,3 +171,168 @@ Out loud: for each key, pick the output key, read the value once, and convert it
 Array. `to_hash` metrics: ABC 20.15 → 18.84, cyclomatic 8 → 8, perceived 10 → 10. L0.
 
 Queued, not opened: at most two new hashie PRs at a time.
+
+## Astra: changes on 282ebcbb8248ae3ef379bc7254ad69fd0422d7b4
+
+2026-11-27, [review thread](https://ampcode.com/threads/T-01a21f08-d80b-7106-a4dc-d66f07191d10).
+Reviewed here without delegation. Verified the remote branch, clean checkout, exact parent
+`9e313f308f3270995c2c978e92f0f216b861861b` and one-commit range. The reviewed item text and complete commit diff,
+scripts, raw outputs, build logs, source/API responses and reproduction instructions are in
+[astra-HM3-282ebcb.tar.gz](astra-HM3-282ebcb.tar.gz). No fork push or upstream post was made.
+
+### Must fix: forwarded keyword hashes change meaning
+
+On Ruby 3.2.10, 3.3.10, 3.4.7, 4.0.10 (interpreter and YJIT), and Ruby master
+`0d399335b733776187e43a783e5f950c18ad881c` with ZJIT, a `ruby2_keywords` forwarding subclass exposes this difference:
+
+```ruby
+require 'hashie'
+class ForwardingMash < Hashie::Mash
+  ruby2_keywords def method_missing(*args, &block)
+    super
+  end
+end
+def consume(*args, **kwargs)
+  [args, kwargs]
+end
+value = ForwardingMash.new.public_send(:payload=, a: 1)
+p consume(*[value])
+```
+
+Base: `[[{a: 1}], {}]`. Head: `[[], {a: 1}]`. Ruby 3.0.7 and 3.1.7 give the same result on both
+trees (the keyword form), so this is not a claim of breakage on those versions. `forwarding_repro.rb` and its
+per-version outputs retain the exact runs. This is observable public return behavior, not just reflection or
+an override of a private helper. A caller forwarding the returned value to a method that distinguishes positional
+arguments from keywords can hit it; no specific dependent in the reach table is claimed to do so.
+
+There is also a plain-Mash version on 3.3.10 onward, including master/ZJIT (`keyword_repro.rb`):
+
+```ruby
+require 'hashie'
+require 'delegate'
+class Payload < Hash; end
+def consume(*args, **kwargs)
+  [args, kwargs]
+end
+mash = Hashie::Mash.new
+SimpleDelegator.new(mash).public_send(:payload=, **Payload[a: 1])
+p consume(*[mash.payload])
+```
+
+It produces the same base/head difference, without overriding Mash. Hashie explicitly preserves custom Hash
+subclasses. The archive also demonstrates the flag reaching the public `assign_property` override through
+`SimpleDelegator` with an ordinary Hash; forwarding that value changes positional/keyword dispatch too.
+This is a real supported delegation/subclass boundary, though the exact call shape is uncommon.
+
+The cause is visible in Ruby master's `vm_args.c`, lines 924–947: optional parameters are filled before the rest
+parameter, and the `ruby2_keywords` marker is cleared only on the rest Array's last Hash. Moving the first value
+out of that Array bypasses that clearing. The previous probe formats hashes as key/value pairs and does not
+observe the marker, so its identical output does not establish equivalence here.
+
+The smallest certainly safe correction is restoring `*args` and `args.first`; that loses this optimization.
+An optimization-preserving alternative needs a new exactness pass that preserves keyword declassification,
+identity and extra-argument behavior on all supported Rubies. Do not add an unconditional Hash copy or a
+keyword parameter as an untested fix: positional hashes and forwarded keyword hashes are not interchangeable.
+The candidate itself was not edited.
+
+### Text findings and claim audit
+
+* **Must fix the omission of the master/ZJIT tradeoff.** The body accurately attributes its final sentence to Duel,
+  but mentions only the 4.0 setter result. The note says the local losses are stated in the body; they are not.
+  The retained `wall/HM3-setter-master-zjit/results.json` and table report setter +2.456% [2.156%, 2.687%] and
+  argument-bearing read +6.7% [6.5%, 6.9%], with passing A/A intervals containing zero, 30 rounds and flat JIT
+  counters. These are different from a result inside noise. Add a short qualitative sentence about slower setters
+  and argument-bearing reads on Ruby master/ZJIT; do not turn the old 8-CPU measurements into newly approved
+  publication-quality numbers. The bounded setter tradeoff could be accepted for a read-oriented optimization
+  after disclosure; it is not an automatic rejection of the idea. The keyword behavior difference independently
+  blocks this exact head. No evidence here establishes the frequency of reads versus writes in all consumers.
+* **Must qualify `impact`.** Released snaky_hash 2.0.9 (and therefore current oauth2) and restforce 8.0.1 exclude
+  Hashie 6, so they are not current eligible beneficiaries of a new Hashie-6 change. snaky_hash's default branch
+  permits `< 7`, unreleased; restforce's still says `< 6.0`. Also, “every method-style read on every Mash” is false:
+  warmed DefineAccessors readers allocate zero on both trees and bypass this method. Say “reads dispatched through
+  `Mash#method_missing`,” and separate eligible consumers from those waiting for dependency updates.
+* **Optional wording correction for the earlier reply.** Opened
+  [the actual comment](https://github.com/hashie/hashie/pull/659#issuecomment-7227673119) through the GitHub API.
+  It says “I left `method_missing`'s `*args` too: the setter needs the argument, and a fixed arity would reject the
+  extra arguments it accepts today.” It does not say every alternative must retain `*args`. The body addresses
+  the right earlier decision, but “revisits the `*args` left unchanged in #659” is more exact and less defensive
+  than “replaces what I wrote … had to stay.”
+
+Sentence-by-sentence checks of the title, body, commit message and CHANGELOG:
+
+| Claim | Command/source checked and conclusion |
+| --- | --- |
+| Title and CHANGELOG: no arguments Array on method reads, Ruby 4.0 in the CHANGELOG | Exact diff and base/head/base `allocations.rb` runs support the saving on 4.0.10 and master. The body supplies the title's version boundary. The anticipated CHANGELOG link 662 returned 404; it is a reservation, not an existing PR, and must match the actual number before opening. |
+| Old `*args` allocates, only the setter consumes an argument | Read the complete method at base and head, and ran `allocations.rb`. No other branch reads `args`. A chained `owner.login` performs two missing-method calls, not one; “each dispatch” would avoid implying one Array for that whole expression. |
+| The new optional-value/anonymous-rest signature; older Rubies still allocate | `git show` and executions on 3.0.7, 3.1.7, 3.2.10, 3.3.10, 3.4.7, 4.0.10 and master. Read Ruby commit `43683e1e9d` via its API and the actual `v4.0.0/vm_args.c`, which contains the anonymous-empty-rest optimization. |
+| Setter takes the first value; extras accepted and ignored | Both existing and new differential probes, including multiple values, nil, false, keyword hashes, splats, blocks and frozen receivers. Ordinary values agree; this does not excuse the keyword-marker regression above. |
+| Four Duel allocation rows, 5 → 0 three times and 16 → 12 | Extracted and read both raw logs from run 46067769275, not just summaries. Repeated those four fixture shapes in `duel_objects.rb`, base/head/base, 4.0.10 interpreter/YJIT and master/ZJIT: deltas are exactly −5, −5, −5, −4 objects. The first raw slope has a shared −0.001 startup residual, documented in the archive. |
+| Duel Symbol-given reads “faster”, CPU 0.91 in both JITs | Raw logs report 0.914 [0.912, 0.917] YJIT and 0.912 [0.908, 0.921] ZJIT, both `faster`. Checked the wrapper commits: candidate 522b899 and base f6545d1 have byte-identical `lib`, `spec` and `benchmarks` trees to this head/base respectively. This verifies a report of Duel's result, not a newly measured speed claim. |
+| Setters keep the Array; Duel 1–2% slower within its limit | Allocation probes confirm the Array remains for calls with an argument. Raw Duel rows are 1.018/1.012 YJIT and 1.022/1.008 ZJIT, all `same`. Read `.duel.rb` and Duel 0.3.1's `Stats.decide`: the CPU-specific limit is 1.05; the log header's generic 1.02 is not that override. `same` means under the threshold, not equal speed. |
+| Commit message: reads and `?`, `!`, `_` stop allocating that arguments Array; older Rubies unchanged | Tested every shape in `allocations.rb` with repeated-base controls. One object saved per dispatch on 4.0/master, none on 3.0–3.4. Other suffix work still allocates, and missing-method dispatch with explicit arguments retains its rest Array. Also ran the supplied `mm_signatures.rb` across all release pins and master/ZJIT; direct calls can be optimized differently from missing-method dispatch. No added code-comment line needs removal. |
+
+No factual sentence in those four text surfaces was left unchecked. The missing tradeoff, overbroad impact and
+inexact earlier-reply paraphrase are recorded rather than silently corrected.
+
+### Reach and currency, checked on 2026-11-27
+
+Live RubyGems metadata and GitHub repository responses are in `sources/`; `reach.sh` reproduces the requests.
+Downloaded and inspected each latest released gem's actual Mash consumer. `current-sources.sh` also resolves the
+default branch to a full SHA and reads its gemspec. All repositories below are unarchived. Direct dependents are
+listed by total gem downloads, not stars; downloads are not unique installations or proof of this call frequency.
+
+| Project | Stars | Gem downloads | Latest release/date | Last push | Current eligibility |
+| --- | ---: | ---: | --- | --- | --- |
+| omniauth | 8,102 | 235,361,860 | 2.4.2 / 2026-11-18 | 2026-11-27 | KeyStore/AuthHash derive from Mash; allows Hashie 6 |
+| snaky_hash | 19 | 140,364,316 | 2.0.9 / 2026-10-25 | 2026-11-27 | StringKeyed/SymbolKeyed derive from Mash; release excludes 6, default-branch relaxation unreleased |
+| slack-ruby-client | 1,259 | 96,263,564 | 3.4.0 / 2026-11-24 | 2026-11-24 | Messages::Message derives from Mash; allows 6 |
+| elasticsearch-model (elasticsearch-rails repo) | 3,079 | 78,459,520 | 8.0.1 / 2025-09-01 | 2025-10-08 | HashWrapper derives from Mash; allows 6; older activity, not shown to be abandoned |
+| restforce | 822 | 60,005,180 | 8.0.1 / 2025-12-29 | 2026-07-27 | Mash subclass, but release and default branch exclude 6 |
+| zendesk_api | 410 | 47,179,059 | 3.1.2 / 2026-07-23 | 2026-11-17 | SilentMash derives from Mash; allows 6 |
+| faraday-mashify | 4 | 26,806,907 | 1.0.3 / 2026-08-23 | 2026-11-07 | Default response wrapper is Mash; allows 6; downloads support relevance despite few stars |
+
+Also checked every contextual project: oauth2 has 2,179 stars, 288,611,398 downloads, release 2.1.0 on 2026-10-25,
+last push 2026-11-27; it depends on snaky_hash, so its reach is indirect and not added to that gem's counts.
+Hashie has 3,035 stars and 507,055,651 downloads, release 6.0.0 on 2026-11-11, last push 2026-11-27.
+Duel has 21 stars and 8,745 downloads, release 0.3.1 on 2026-11-22, last push 2026-11-25; it remains relevant as
+Hashie's adopted benchmark tool, not as evidence of ecosystem reach. Ruby has 23,868 stars, last push
+2026-11-27; gem download counts do not apply to the language runtime. Of currently eligible direct consumers,
+the order is omniauth, slack-ruby-client, elasticsearch-model, zendesk_api, faraday-mashify. Prefer a few of these
+to an unqualified long list; none of their older gem versions was substituted for the latest release.
+
+### Executed coverage and limits
+
+* Reran `probes/mm_diff.rb` unchanged on all six release Rubies above, on 4.0.10/YJIT and master/ZJIT: every
+  base/head output pair is byte-identical. Older versions have different multiline error formatting; they were
+  compared only within the same pin. This successful control is retained alongside the failing new probe.
+* `adversarial.rb` runs 30,576 cases plus one reflection row per cell. It covers all seven requested extensions,
+  implicit and explicit `super`, `...`, `ruby2_keywords`, prepends, SimpleDelegator, Forwardable, dynamic Method
+  and Proc calls, UnboundMethod binding/bind_call, super_method, custom Hash/Array/String values, public/private
+  duck conversions and blocks, frozen receivers, and ordinary/empty/flagged/mixed keyword and positional inputs.
+  The existing probe adds singleton methods, default procs, warning capture and identity observations. Only the
+  demonstrated keyword-marker changes and the already-accepted `parameters` reflection change survived;
+  `arity` remains −2. Changed behavior rows: 0 on 3.0/3.1, 360 on 3.2, 525 on 3.3, 465 on 3.4, and 400 in each
+  4.0/master cell. Raw rows, not just normalized comparisons, are kept.
+* Exactness checklist: exercised 1–3 (overrides/subclasses/conversions), 4–5 (argument behavior, with the flag
+  regression explicitly blocking), 7 (frozen errors) and 8 (fresh processes plus standalone `require 'hashie/mash'`).
+  No iteration, cache, loading hook or new user callback is added, so checklist 6 introduces no new traversal or
+  suspension point; no concurrency or reloading stress test is claimed.
+* Ruby 4.0.10 official commands: `bundle exec rake spec` gives base 1,076/0 and head 1,077/0;
+  `bundle exec rake rubocop` inspects 156 files without offenses; `bundle exec rake docs:examples` gives 359/0.
+  Initial incomplete-bundle failures were reproduced on base and repaired by installing the full bundle, not
+  by changing tests. Other Ruby versions ran the differential probes, not the full suite. Release Ruby ZJIT was
+  not built; its Duel logs were inspected, while our ZJIT execution used the pinned master build.
+* Cold read: read an existing key, otherwise dispatch its suffix, and pass the first value only to assignment.
+  L0 structurally. Measured Flog 17.7 → 16.6, ABC 12.25 → 11.36, cyclomatic 6 → 6, perceived 4 → 4,
+  method length 14 → 14. The smaller metrics do not establish argument-binding equivalence.
+* Worst-input search: `worst.rb` includes zero/one/two/keyword/direct reads, a setter, and prepared splats of
+  0, 1, 2, 20, 1,000 and 131,072 arguments (1 MiB backing array). The largest relative slowdown in the five-round
+  screening was the ordinary existing-key read with one ignored argument, `mash.name(1)`, not the huge splat.
+  Screening alone claims nothing. A separate 30-round base/head/base confirmation, with 30 GC-off windows per
+  process, one pinned core and JIT-flat checks, is kept as `worst-confirm/` in the archive. This is a bounded
+  input search, not a universal worst-case proof. This orb has 8 CPUs, not the required a1.xxlarge, so none of
+  its new diagnostic timings is approved for a body or promoted to a publication-quality timing claim.
+  The confirmation passes A/A and all 90 processes' JIT-flat checks: the one-argument reader's change interval
+  excludes zero on the slower side, the zero-argument reader's on the faster side. The simple two-key fixture's
+  setter interval contains zero; this does not negate the older, different fixture's setter regression. Exact
+  diagnostic estimates, intervals, windows and commands remain in `worst-confirm/results.json` and `table.md`.
