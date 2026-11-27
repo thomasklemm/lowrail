@@ -21,6 +21,6 @@ for r in $(seq 1 "$rounds"); do
   one yjit-b master-0d399335b7 --yjit
 done
 for p in master-0d399335b7 h6-5c4239a16d; do
-  "$HOME/rubies/$p/bin/ruby" $Z --zjit-stats=quiet -e 'f = ARGV.shift; at_exit { s = RubyVM::ZJIT.stats; File.write(f, s.to_a.select { _2.is_a?(Integer) && _2 > 0 }.map { "#{_1}\t#{_2}" }.join("\n") + "\n") }; load ARGV.shift' \
+  "$HOME/rubies/$p/bin/ruby" $Z --zjit-stats-quiet -e 'f = ARGV.shift; at_exit { s = RubyVM::ZJIT.stats; File.write(f, s.to_a.select { _2.is_a?(Integer) && _2 > 0 }.map { "#{_1}\t#{_2}" }.join("\n") + "\n") }; load ARGV.shift' \
     "$out/$case-$p-stats.tsv" "$script" "$case" "${N:-200000}" ns > /dev/null
 done
