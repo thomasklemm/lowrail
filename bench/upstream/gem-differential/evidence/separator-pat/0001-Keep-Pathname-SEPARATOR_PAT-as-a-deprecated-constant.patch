@@ -1,0 +1,58 @@
+From 8961f4c5410f5459487af7fc110858100c0cf26d Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Fri, 27 Nov 2026 14:06:38 +0000
+Subject: [PATCH] Keep Pathname::SEPARATOR_PAT as a deprecated constant
+
+Bundler before 4.0.12 evaluates /\A#{Pathname::SEPARATOR_PAT}/o in
+Bundler::Source::Path#generate_bin, which runs for every gem installed
+from a path or git source, including the gem of a Gemfile that says
+`gemspec`.  Bundler switches to the version named in BUNDLED WITH, so
+`bundle install` with a lockfile written by Bundler 2.x or 4.0.0 to
+4.0.11 fails on master with "uninitialized constant
+Pathname::SEPARATOR_PAT" since 4e243c709e made the constant private and
+a5996718f3 removed it.  Bundler itself no longer uses it (ruby/rubygems
+PR 9529, released in 4.0.12).
+
+Define it again with the value it had in 4.0 and deprecate it, so such
+lockfiles keep installing and code that still reads it warns under
+-W:deprecated.
+---
+ pathname_builtin.rb            | 4 ++++
+ test/pathname/test_pathname.rb | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/pathname_builtin.rb b/pathname_builtin.rb
+index 4cabfb30c4..b397a0b313 100644
+--- a/pathname_builtin.rb
++++ b/pathname_builtin.rb
+@@ -363,6 +363,10 @@ class Pathname
+ 
+   # :stopdoc:
+ 
++  # Read by Bundler before 4.0.12, which older lockfiles still install.
++  SEPARATOR_PAT = File::ALT_SEPARATOR ? /[#{Regexp.quote(File::ALT_SEPARATOR + File::SEPARATOR)}]/ : /#{Regexp.quote(File::SEPARATOR)}/
++  deprecate_constant :SEPARATOR_PAT
++
+   attr_reader :path
+   protected :path
+ 
+diff --git a/test/pathname/test_pathname.rb b/test/pathname/test_pathname.rb
+index 2c7ec3f800..5ffdf69702 100644
+--- a/test/pathname/test_pathname.rb
++++ b/test/pathname/test_pathname.rb
+@@ -195,6 +195,12 @@ def del_trailing_separator(path)
+     defassert(:del_trailing_separator, "\225".dup.force_encoding("cp437"), "\225\\\\".dup.force_encoding("cp437"))
+   end
+ 
++  def test_separator_pat
++    assert_deprecated_warning(/SEPARATOR_PAT/) do
++      assert_match(/\A#{Pathname::SEPARATOR_PAT}/, "/usr")
++    end
++  end
++
+   def test_plus
+     assert_kind_of(Pathname, Pathname("a") + Pathname("b"))
+   end
+-- 
+2.55.0
+

@@ -1,0 +1,364 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Ruby 4.1 gem differential: each widely used gem's own test suite at its latest release tag, on two Ruby builds
+# with the same checkout, the same Gemfile.lock and the same environment (docs/upstream/ruby41-gem-differential.md).
+#
+#   script/gem-differential select  TOP.tsv                          # writes gems.json: ranked gems, skips with reasons
+#   script/gem-differential fetch   [GEMS]                           # shallow clone of each gem's repo at its release tag
+#   script/gem-differential run     --ruby DIR --label L [--base-label B] [--force] [GEMS]
+#   script/gem-differential compare --base-label B --label L         # per-test differences, writes compare-B-L.json
+#   script/gem-differential run     --ruby DIR --label L-r2 --base-label B GEM   # a rerun: same lock, new label
+#
+# The base label locks each gem's bundle once (committed lock if it installs, else a fresh `bundle lock`); every other
+# label installs that exact lock. TOP.tsv comes from packages.ecosyste.ms (rank, name, downloads, dependents, repo,
+# archived, pushed_at, stars, version, released_at). Outcomes go to bench/upstream/gem-differential/runs/L/GEM.json.gz,
+# logs and checkouts to $GEMDIFF_HOME (~/gemdiff).
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "time"
+require "zlib"
+
+module GemDifferential
+  ROOT = File.expand_path("..", __dir__)
+  DIR = File.join(ROOT, "bench/upstream/gem-differential")
+  RECORDER = File.join(DIR, "gemrec.rb")
+  HOME = ENV.fetch("GEMDIFF_HOME", File.expand_path("~/gemdiff"))
+  TARGET = 150
+  TIMEOUT = 1500
+  SEED = "41231"
+
+  RUBY_CI = "default or bundled gem: its own suite runs in ruby/ruby CI on master"
+  RAILS = "Rails component: covered by Rails CI on Ruby master and the app differential"
+  # Every skip and its reason; the report lists them.
+  SKIP = {
+    "bundler" => RUBY_CI, "rubygems-update" => RUBY_CI, "rake" => RUBY_CI, "json" => RUBY_CI, "minitest" => RUBY_CI,
+    "rexml" => RUBY_CI, "racc" => RUBY_CI, "base64" => RUBY_CI, "bigdecimal" => RUBY_CI, "logger" => RUBY_CI,
+    "net-imap" => RUBY_CI, "net-smtp" => RUBY_CI, "net-pop" => RUBY_CI, "net-protocol" => RUBY_CI, "timeout" => RUBY_CI,
+    "date" => RUBY_CI, "drb" => RUBY_CI, "uri" => RUBY_CI, "reline" => RUBY_CI, "irb" => RUBY_CI, "io-console" => RUBY_CI,
+    "securerandom" => RUBY_CI, "psych" => RUBY_CI, "benchmark" => RUBY_CI, "csv" => RUBY_CI, "mutex_m" => RUBY_CI,
+    "net-http" => RUBY_CI, "stringio" => RUBY_CI, "ostruct" => RUBY_CI, "prism" => RUBY_CI, "rdoc" => RUBY_CI,
+    "erb" => RUBY_CI, "pp" => RUBY_CI, "prettyprint" => RUBY_CI, "matrix" => RUBY_CI, "digest" => RUBY_CI,
+    "activesupport" => RAILS, "activemodel" => RAILS, "activerecord" => RAILS, "actionpack" => RAILS, "railties" => RAILS,
+    "rails" => RAILS, "actionview" => RAILS, "actionmailer" => RAILS, "activejob" => RAILS, "actioncable" => RAILS,
+    "activestorage" => RAILS, "actiontext" => RAILS, "actionmailbox" => RAILS,
+    "arel" => "merged into Rails in 2018, repo unmaintained",
+    "rspec" => "meta gem without code; rspec-core, -expectations, -mocks, -support run instead",
+    "aws-sdk" => "meta gem without code", "aws-sdk-resources" => "meta gem without code",
+    "kaminari" => "meta gem; kaminari-core runs instead",
+    "aws-partitions" => "generated data gem; aws-sdk-core's suite covers it",
+    "mime-types-data" => "data gem; mime-types' suite covers it",
+    "erubis" => "no source repository (last release 2011)", "coffee-script-source" => "no source repository (generated)",
+    "trailblazer-option" => "no source repository listed", "shellany" => "no source repository listed",
+    "rb-fsevent" => "macOS only (FSEvents)", "terminal-notifier" => "macOS only", "simctl" => "needs Xcode",
+    "security" => "macOS keychain only", "fastlane" => "suite needs macOS and Xcode tooling",
+    "cocoapods" => "suite needs macOS and Xcode tooling", "cocoapods-core" => "suite needs macOS and Xcode tooling",
+    "xcodeproj" => "suite needs macOS and Xcode tooling",
+    "mysql2" => "needs a MySQL server (not in the orb)", "elasticsearch" => "needs an Elasticsearch server",
+    "elasticsearch-api" => "needs an Elasticsearch server", "elasticsearch-transport" => "needs an Elasticsearch server",
+    "selenium-webdriver" => "Bazel monorepo; suite needs browsers and drivers",
+    "grpc" => "C++ core build (Bazel/make, about an hour on 2 cores) per Ruby",
+    "google-protobuf" => "built from the protobuf monorepo with Bazel",
+    "faraday-em_synchrony" => "EventMachine adapter dropped from Faraday 2; no release since 2021",
+    "faraday-em_http" => "EventMachine adapter dropped from Faraday 2; no release since 2021",
+    "orm_adapter" => "last release 2013", "sass-rails" => "last release 2019; built on the archived sassc",
+    "faraday-patron" => "needs libcurl-based patron, deprecated adapter",
+  }.freeze
+
+  # Overrides: cmd (argv run with bundle exec), dir (subdirectory holding the Gemfile), env.
+  RSPEC = { root_gemfile: true } # the monorepo's dev Gemfile at its root points every rspec gem at its sibling path
+  GEMS = {
+    "rspec-core" => RSPEC, "rspec-expectations" => RSPEC, "rspec-mocks" => RSPEC, "rspec-support" => RSPEC,
+    # Its Rakefile evals the gemspec, whose require_relative fails inside eval (4.0.10 too); these are its test task.
+    "parser" => { gemfile_add: 'gem "ostruct"' }, # its Rakefile requires ostruct, a bundled gem since 4.0
+    "tzinfo" => { cmd: ["sh", "-c", "for t in ruby_format1 ruby_format2 zoneinfo; do ruby -w -Ilib test/ts_all_$t.rb; done"] },
+  }.merge(%w[aws-sdk-core aws-sigv4 aws-eventstream aws-sdk-s3 aws-sdk-kms aws-sdk-sqs].to_h do |n|
+    # The repo's specs run from its root Gemfile; it has no per-gem tags, and v1.x tags belong to the old v1 SDK.
+    [n, { dir: "", cmd: %W[rake test:spec:#{n}], head: true }]
+  end).freeze
+
+  module_function
+
+  def sh(env, *cmd, chdir: nil, log: nil, timeout: nil, allow: false)
+    opts = { chdir: chdir || Dir.pwd, pgroup: true }
+    if log
+      FileUtils.mkdir_p(File.dirname(log))
+      opts[:out] = opts[:err] = [log, "a"]
+      File.open(log, "a") { _1.puts "+ #{cmd.join(" ")} (in #{opts[:chdir]})" }
+    end
+    pid = Process.spawn(env, *cmd, **opts)
+    status = nil
+    if timeout
+      deadline = Time.now + timeout
+      until (status = Process.wait2(pid, Process::WNOHANG)&.last)
+        if Time.now > deadline
+          Process.kill("-KILL", pid) rescue nil
+          status = Process.wait2(pid).last
+          File.open(log, "a") { _1.puts "!! timeout after #{timeout}s" } if log
+          break
+        end
+        sleep 1
+      end
+    else
+      status = Process.wait2(pid).last
+    end
+    raise "failed: #{cmd.join(" ")}" unless allow || status.success?
+    status
+  end
+
+  def capture(*cmd, chdir: nil)
+    out, st = Open3.capture2e(*cmd, chdir: chdir || Dir.pwd)
+    [out, st]
+  end
+
+  def gems_file = File.join(DIR, "gems.json")
+  def gems = JSON.parse(File.read(gems_file))
+  def runnable = gems.select { _1["status"] == "run" }
+  def out_dir(label) = File.join(DIR, "runs", label)
+  def read_gz(path) = JSON.parse(Zlib::GzipReader.open(path, &:read))
+  def write_gz(path, data)
+    FileUtils.mkdir_p(File.dirname(path))
+    Zlib::GzipWriter.open(path) { _1.write(JSON.generate(data)) }
+  end
+
+  def select(tsv)
+    seen_repo = Hash.new(0)
+    rows = File.readlines(tsv, chomp: true).map { _1.split("\t") }
+    count = 0
+    list = rows.map do |rank, name, downloads, dependents, repo, archived, pushed, stars, version, released|
+      g = { "rank" => rank.to_i, "name" => name, "downloads" => downloads.to_i, "dependents" => dependents.to_i,
+        "repo" => repo, "archived" => archived == "true", "pushed_at" => pushed, "stars" => stars.to_i,
+        "version" => version, "released_at" => released }
+      reason = SKIP[name]
+      reason ||= "archived repository" if g["archived"]
+      reason ||= "no source repository listed" if repo == "-"
+      reason ||= "repository not on GitHub" unless repo.start_with?("https://github.com/")
+      if reason then g.merge("status" => "skip", "reason" => reason)
+      elsif count >= TARGET then g.merge("status" => "beyond")
+      else
+        count += 1
+        seen_repo[repo.downcase] += 1
+        g.merge("status" => "run")
+      end
+    end
+    File.write(gems_file, JSON.pretty_generate(list) + "\n")
+    puts "#{count} to run, #{list.count { _1["status"] == "skip" }} skipped before reaching #{TARGET}"
+  end
+
+  def slug(repo) = repo.sub(%r{\Ahttps://github.com/}, "").downcase.tr("/", "__")
+  def src(g) = File.join(HOME, "src", slug(g["repo"]))
+
+  def tag_for(g, tags)
+    v, n = g["version"], g["name"]
+    cands = ["v#{v}", v, "#{n}-#{v}", "#{n}-v#{v}", "#{n}/v#{v}", "#{n}/#{v}", "v#{v.tr(".", "_")}", "release-#{v}",
+      "#{n}_#{v}", "#{n}@#{v}", "#{n.tr("-", "_")}-#{v}", "#{n}-#{v}-ruby", "ruby-#{v}"]
+    cands.find { tags.include?(_1) }
+  end
+
+  def fetch(names)
+    list = gems
+    targets = list.select { names.empty? ? _1["status"] == "run" : names.include?(_1["name"]) }
+    targets.each do |g|
+      tags = capture("git", "ls-remote", "--tags", "--refs", g["repo"]).first.lines.map { _1.split("refs/tags/").last.to_s.strip }
+      tag = g["tag_mismatch"] || GEMS.dig(g["name"], :head) ? nil : tag_for(g, tags)
+      dir = File.join(HOME, "src", "#{slug(g["repo"])}@#{tag || "HEAD"}")
+      unless File.exist?(File.join(dir, ".git"))
+        FileUtils.rm_rf(dir)
+        args = ["git", "clone", "--quiet", "--depth", "1"]
+        args += ["--branch", tag] if tag
+        _, st = capture(*args, "--recurse-submodules", "--shallow-submodules", g["repo"], dir)
+        unless st.success?
+          g["fetch_error"] = "clone failed"
+          puts "#{g["name"]}: clone failed"
+          next
+        end
+      end
+      g["tag"] = tag
+      g["sha"] = capture("git", "-C", dir, "rev-parse", "HEAD").first.strip
+      g["checkout"] = dir
+      gemspec = Dir.glob(File.join(dir, "**", "#{g["name"]}.gemspec")).min_by(&:length)
+      g["dir"] = gemspec ? File.dirname(gemspec).delete_prefix(dir).delete_prefix("/") : ""
+      if tag && !version_at?(gemspec, g["version"])
+        # A monorepo can carry an unrelated release under the same tag name (aws-sdk-ruby's v1 SDK).
+        puts "#{g["name"]}: #{tag} does not contain #{g["version"]}, using HEAD"
+        g["tag_mismatch"] = tag
+        FileUtils.rm_rf(dir)
+        redo
+      end
+      puts "#{g["name"]} #{g["version"]}: #{tag || "no release tag, HEAD"} #{g["sha"][0, 10]} dir=#{g["dir"].empty? ? "." : g["dir"]}"
+    end
+    File.write(gems_file, JSON.pretty_generate(list) + "\n")
+  end
+
+  def version_at?(gemspec, version)
+    return true unless gemspec
+    out, st = capture(RbConfig.ruby, "-e", "puts Gem::Specification.load(ARGV[0]).version", gemspec, chdir: File.dirname(gemspec))
+    !st.success? || out.strip.empty? || out.lines.last.strip.start_with?(version) # mail's 2.9.1 tag says 2.9.1.edge
+  end
+
+  def ruby_env(ruby, label, extra = {})
+    bin = File.join(ruby, "bin")
+    { "PATH" => "#{bin}:#{File.expand_path("~/.cargo/bin")}:/usr/local/bin:/usr/bin:/bin",
+      "GEM_HOME" => nil, "GEM_PATH" => nil,
+      "BUNDLE_PATH" => File.join(HOME, "bundle", File.basename(ruby)), "BUNDLE_JOBS" => "2", "BUNDLE_RETRY" => "2",
+      "BUNDLE_SILENCE_ROOT_WARNING" => "1", "BUNDLE_FROZEN" => nil, "BUNDLE_DEPLOYMENT" => nil, "BUNDLE_WITHOUT" => nil,
+      "BUNDLE_GEMFILE" => nil, "RUBYOPT" => nil, "RUBYLIB" => nil, "RAILS_ENV" => nil, "RACK_ENV" => nil, "CI" => nil,
+      "LANG" => "C.UTF-8", "LC_ALL" => "C.UTF-8", "TZ" => "UTC", "SEED" => SEED, "TESTOPTS" => "--seed=#{SEED}",
+      "MT_NO_PLUGINS" => nil, "REDIS_URL" => "redis://localhost:6379/15", "MEMCACHE_SERVERS" => "localhost:11211",
+      "PGHOST" => "/var/run/postgresql", "NO_COLOR" => "1" }.merge(extra)
+  end
+
+  def lock_path(g) = File.join(HOME, "locks", "#{g["name"]}.lock")
+
+  def work(g, label)
+    dir = File.join(HOME, "work", label, g["name"])
+    unless File.exist?(dir)
+      FileUtils.mkdir_p(File.dirname(dir))
+      sh({}, "git", "-C", g["checkout"], "worktree", "add", "--quiet", "--detach", "--force", dir, "HEAD")
+      sh({}, "git", "-C", dir, "submodule", "update", "--quiet", "--init", "--depth", "1", allow: true)
+    end
+    File.join(dir, GEMS.dig(g["name"], :dir) || g["dir"])
+  end
+
+  def test_cmd(g, dir, env, log)
+    return GEMS.dig(g["name"], :cmd) if GEMS.dig(g["name"], :cmd)
+    tasks, = capture(env, "bundle", "exec", "rake", "-AT", chdir: dir)
+    names = tasks.lines.map { _1[/\Arake (\S+)/, 1] }.compact
+    File.open(log, "a") { _1.puts "rake tasks: #{names.first(40).join(" ")}" }
+    specs = Dir.glob(File.join(dir, "spec/**/*_spec.rb")).any?
+    tests = Dir.glob(File.join(dir, "test/**/*.rb")).any?
+    if specs && names.include?("spec") then %w[rake spec]
+    elsif tests && names.include?("test") then %w[rake test]
+    elsif specs then %w[rspec]
+    else %w[rake]
+    end
+  end
+
+  def run(opts, names)
+    ruby, label = opts.fetch(:ruby), opts.fetch(:label)
+    base = opts[:base_label] || label
+    list = runnable.select { _1["checkout"] && (names.empty? || names.include?(_1["name"])) }
+    list.each do |g|
+      out = File.join(out_dir(label), "#{g["name"]}.json.gz")
+      next if File.exist?(out) && !opts[:force]
+      t0 = Time.now
+      log = File.join(HOME, "logs", label, "#{g["name"]}.log")
+      FileUtils.rm_f(log)
+      dir = work(g, label)
+      env = ruby_env(ruby, label, GEMS.dig(g["name"], :env) || {})
+      rec = File.join(HOME, "rec", label, g["name"])
+      FileUtils.rm_rf(rec)
+      FileUtils.mkdir_p(rec)
+      result = { "gem" => g["name"], "version" => g["version"], "tag" => g["tag"], "sha" => g["sha"], "label" => label,
+        "ruby" => capture(File.join(ruby, "bin/ruby"), "-v").first.strip }
+      gemfile = %w[Gemfile gems.rb].map { File.join(dir, _1) }.find { File.exist?(_1) }
+      if GEMS.dig(g["name"], :root_gemfile)
+        gemfile = File.join(HOME, "work", label, g["name"], "Gemfile")
+        env["BUNDLE_GEMFILE"] = gemfile
+      end
+      unless gemfile
+        gemfile = File.join(dir, "Gemfile")
+        File.write(gemfile, "source \"https://rubygems.org\"\ngemspec\n")
+        result["gemfile"] = "generated (gemspec only)"
+      end
+      if (add = GEMS.dig(g["name"], :gemfile_add)) && !File.read(gemfile).include?(add)
+        File.write(gemfile, "#{File.read(gemfile)}\n#{add} # gem-differential overlay, on both Rubies\n")
+        result["overlay"] = add
+      end
+      lockfile = gemfile.end_with?("gems.rb") ? File.join(dir, "gems.locked") : "#{gemfile}.lock"
+      if label == base
+        installed = File.exist?(lockfile) && sh(env, "bundle", "install", chdir: dir, log: log, allow: true, timeout: TIMEOUT).success?
+        unless installed
+          FileUtils.rm_f(lockfile)
+          installed = sh(env, "bundle", "install", chdir: dir, log: log, allow: true, timeout: TIMEOUT).success?
+        end
+        FileUtils.mkdir_p(File.dirname(lock_path(g)))
+        FileUtils.cp(lockfile, lock_path(g)) if File.exist?(lockfile)
+      else
+        FileUtils.cp(lock_path(g), lockfile) if File.exist?(lock_path(g))
+        installed = sh(env, "bundle", "install", chdir: dir, log: log, allow: true, timeout: TIMEOUT).success?
+        result["lock_identical"] = File.exist?(lock_path(g)) && File.read(lock_path(g)) == File.read(lockfile)
+      end
+      result["install"] = installed ? "ok" : "failed"
+      if installed
+        tasks_env = env
+        cmd = test_cmd(g, dir, tasks_env, log)
+        if GEMS.dig(g["name"], :compile) != false && File.read(log).match?(/rake tasks: .*\bcompile\b/)
+          st = sh(env, "bundle", "exec", "rake", "compile", chdir: dir, log: log, allow: true, timeout: TIMEOUT)
+          result["compile"] = st.success? ? "ok" : "failed"
+        end
+        result["cmd"] = cmd.join(" ")
+        st = sh(env.merge("GEMREC_DIR" => rec, "RUBYOPT" => "-r#{RECORDER}"), "bundle", "exec", *cmd,
+          chdir: dir, log: log, allow: true, timeout: TIMEOUT)
+        result["exit"] = st.exitstatus || "signal #{st.termsig}"
+      end
+      tests = {}
+      Dir[File.join(rec, "*.tsv")].sort.each do |f|
+        File.foreach(f) do |line|
+          raw, r, e, m = line.chomp.split("\t", -1).map { [_1].pack("H*").force_encoding("UTF-8").scrub }
+          next unless r
+          id = tests.key?(raw) ? "#{raw} ##{(2..).find { !tests.key?("#{raw} ##{_1}") }}" : raw
+          tests[id] = [r, e, m].reject(&:empty?)
+        end
+      end
+      result["tests"] = tests
+      result["tally"] = tests.values.map(&:first).tally
+      result["seconds"] = (Time.now - t0).round
+      write_gz(out, result)
+      puts "#{label} #{g["name"]}: install=#{result["install"]} exit=#{result["exit"].inspect} #{result["tally"]} #{result["seconds"]}s"
+    end
+  end
+
+  # RSpec ids are "./spec/x_spec.rb[1:2:3] full description"; descriptions can hold object addresses and paths.
+  def keyed(tests)
+    tests.transform_keys do |id|
+      id = id.gsub(%r{/work/[^/]+/}, "/work/LABEL/") # test names that embed the checkout path (sprockets)
+      id[/\A(\S+\[[\d:]+\])(?: | #\d+\z)/, 1] ? "#{$1}#{id[/ #\d+\z/]}" : id
+    end
+  end
+
+  def compare(base, head)
+    out = {}
+    Dir[File.join(out_dir(head), "*.json.gz")].sort.each do |hf|
+      name = File.basename(hf, ".json.gz")
+      bf = File.join(out_dir(base), "#{name}.json.gz")
+      next unless File.exist?(bf)
+      b, h = read_gz(bf), read_gz(hf)
+      bt, ht = keyed(b["tests"]), keyed(h["tests"])
+      newly = (bt.keys | ht.keys).select { bt[_1]&.first == "pass" && ht[_1] && %w[fail error].include?(ht[_1].first) }
+      missing = bt.keys.select { bt[_1].first == "pass" && !ht.key?(_1) }
+      fixed = (bt.keys & ht.keys).select { %w[fail error].include?(bt[_1].first) && ht[_1].first == "pass" }
+      line = "#{name}: base #{b["install"]}/#{b["exit"].inspect} #{b["tally"]} | head #{h["install"]}/#{h["exit"].inspect} " \
+        "#{h["tally"]} lock_identical=#{h["lock_identical"]} | newly failing #{newly.size}, missing #{missing.size}, fixed #{fixed.size}"
+      puts line
+      newly.first(10).each { puts "    #{_1[0, 160]}\n      base=#{bt[_1].inspect[0, 160]}\n      head=#{ht[_1].inspect[0, 240]}" }
+      out[name] = { "base" => b.slice("install", "exit", "tally", "cmd"), "head" => h.slice("install", "exit", "tally", "lock_identical"),
+        "newly_failing" => newly.map { { "id" => _1, "base" => bt[_1], "head" => ht[_1] } }, "missing" => missing.size,
+        "missing_sample" => missing.first(20), "fixed" => fixed }
+    end
+    path = File.join(DIR, "runs", "compare-#{base}-#{head}.json")
+    File.write(path, JSON.pretty_generate(out) + "\n")
+    puts "wrote #{path}"
+  end
+end
+
+if $PROGRAM_NAME == __FILE__
+  GD = GemDifferential
+  opts = {}
+  cmd = ARGV.shift
+  OptionParser.new do |o|
+    o.on("--ruby DIR") { opts[:ruby] = File.expand_path(_1) }
+    o.on("--label L") { opts[:label] = _1 }
+    o.on("--base-label B") { opts[:base_label] = _1 }
+    o.on("--force") { opts[:force] = true }
+  end.parse!(ARGV)
+  case cmd
+  when "select" then GD.select(ARGV.fetch(0))
+  when "fetch" then GD.fetch(ARGV)
+  when "run" then GD.run(opts, ARGV)
+  when "compare" then GD.compare(opts.fetch(:base_label), opts.fetch(:label))
+  else abort File.read(__FILE__)[/^# Ruby 4.1.*?\n\n/m]
+  end
+end

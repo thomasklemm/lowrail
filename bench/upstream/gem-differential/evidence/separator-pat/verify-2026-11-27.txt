@@ -1,0 +1,15 @@
+v4.0.10 gemspec ruby=4.0.10 bundled_with=2.4.2 exit=0 Bundle complete!
+v4.0.10 gemspec ruby=4.0.10 bundled_with=4.0.7 exit=0 Bundle complete!
+v4.0.10 gemspec ruby=4.0.10 bundled_with=4.0.11 exit=0 Bundle complete!
+v4.0.10 gemspec ruby=4.0.10 bundled_with=4.0.12 exit=0 Bundle complete!
+v4.0.10 git source: ruby=4.0.10 bundled_with=2.6.9 exit=0 Bundle complete!
+master-a1a9f45587 gemspec ruby=4.1.0 bundled_with=2.4.2 exit=1 NameError: u
+master-a1a9f45587 gemspec ruby=4.1.0 bundled_with=4.0.7 exit=1 NameError: u
+master-a1a9f45587 gemspec ruby=4.1.0 bundled_with=4.0.11 exit=1 NameError: u
+master-a1a9f45587 gemspec ruby=4.1.0 bundled_with=4.0.12 exit=0 Bundle complete!
+master-a1a9f45587 git source: ruby=4.1.0 bundled_with=2.6.9 exit=1 NameError: uninitialized constant Pathname::SEPARATOR_PAT
+sep-fix gemspec ruby=4.1.0 bundled_with=2.4.2 exit=0 Bundle complete!
+sep-fix gemspec ruby=4.1.0 bundled_with=4.0.7 exit=0 Bundle complete!
+sep-fix gemspec ruby=4.1.0 bundled_with=4.0.11 exit=0 Bundle complete!
+sep-fix gemspec ruby=4.1.0 bundled_with=4.0.12 exit=0 Bundle complete!
+sep-fix git source: ruby=4.1.0 bundled_with=2.6.9 exit=0 Bundle complete!

@@ -1,0 +1,1954 @@
+{
+  "addressable": {
+    "base": {
+      "install": "failed",
+      "tally": {}
+    },
+    "head": {
+      "install": "failed",
+      "tally": {},
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "ast": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 28
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 28
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "aws-eventstream": {
+    "base": {
+      "install": "failed",
+      "tally": {}
+    },
+    "head": {
+      "install": "failed",
+      "tally": {},
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "aws-sdk-core": {
+    "base": {
+      "install": "ok",
+      "exit": 127,
+      "tally": {},
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 127,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "aws-sdk-kms": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 68
+      },
+      "cmd": "rake test:spec:aws-sdk-kms"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 68
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "aws-sdk-s3": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1721,
+        "skip": 3
+      },
+      "cmd": "rake test:spec:aws-sdk-s3"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1721,
+        "skip": 3
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "aws-sigv4": {
+    "base": {
+      "install": "ok",
+      "exit": 127,
+      "tally": {},
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 127,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "builder": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 96
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 96
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "coderay": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 3
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 3
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "concurrent-ruby": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 2783,
+        "skip": 13
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 2783,
+        "skip": 13
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "connection_pool": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 87
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 87
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "crass": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 236
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 236
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "diff-lcs": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 173,
+        "error": 2
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 173,
+        "error": 2
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "domain_name": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "dotenv": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 172,
+        "error": 23
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 172,
+        "error": 23
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "erubi": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "excon": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 1315,
+        "fail": 76,
+        "error": 6
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 473
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 842,
+    "missing_sample": [
+      "BasicReusableLocalPortTest#test_local_port_can_be_bound_again_while_the_connection_is_open",
+      "BasicReusableLocalPortTest#test_response_has_a_local_port",
+      "BadServerTest#test_body_without_content_length_or_chunking_is_read_until_eof",
+      "BadServerTest#test_rejects_header_value_with_crlf",
+      "BadServerTest#test_response_block_without_content_length_or_chunking_is_read_until_eof",
+      "BadServerTest#test_rejects_header_key_with_crlf",
+      "SOCKS5Test#test_socks5_proxy_is_a_valid_connection_key",
+      "SOCKS5Test#test_password_may_contain_colons",
+      "SOCKS5Test#test_parses_socks5_scheme_with_credentials",
+      "SOCKS5Test#test_parses_credentials",
+      "SOCKS5Test#test_parses_host_and_port",
+      "SOCKS5Test#test_parses_socks5_scheme",
+      "SOCKS5Test#test_socks5_socket_is_a_socket",
+      "SOCKS5Test#test_socks5_ssl_socket_is_an_ssl_socket",
+      "SOCKS5Test#test_port_defaults_to_socks_port",
+      "SocketTest#test_blocking_read_reraises_ssl_errors",
+      "SocketTest#test_read_without_max_length_reuses_a_binary_append_buffer",
+      "SocketTest#test_read_with_max_length_reuses_a_binary_append_buffer",
+      "DnsTimeoutTest#test_passes_dns_timeouts_to_resolver",
+      "DnsTimeoutTest#test_warns_that_dns_timeouts_is_deprecated"
+    ],
+    "fixed": []
+  },
+  "faraday-net_http": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 407
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 407
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "faraday": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 742
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 742
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "ffi": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 5063
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "globalid": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 159,
+        "error": 7
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 125,
+        "error": 41
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [
+      {
+        "id": "GlobalLocatorTest#test_by_invalid_purpose_returns_nil",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID_of_a_composite_primary_key_model",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID_with_only:_restriction_with_match_subclass",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID_with_only:_restriction_by_module_no_match",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_many_SGIDs_of_the_same_composite_primary_key_class",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID_with_only:_restriction_with_match",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_many_SGIDs_of_one_class",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID_with_only:_restriction_with_no_match",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID_string",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID_with_only:_restriction_by_module",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_many_SGIDs_of_mixed_classes",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_many_SGIDs_with_only:_restriction_to_match_subclass",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_valid_purpose_with_SGID_returns_right_model",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_many_SGIDs_of_composite_primary_key_model_mixed_with_other_models",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_many_SGID_strings_with_for:_restriction_to_match_purpose",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID_with_only:_restriction_by_multiple_types_w/module",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_invalid_purpose_with_SGID_returns_nil",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_SGID_with_only:_restriction_by_multiple_types",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalLocatorTest#test_by_valid_purpose_returns_right_model",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDTest#test_to_param",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDTest#test_as_string",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDExpirationTest#test_passing_expires_at_sets_expiration_date",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDExpirationTest#test_passing_expires_in_less_than_a_second_is_not_expired",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDExpirationTest#test_expires_in_defaults_to_class_level_expiration",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDExpirationTest#test_favor_expires_at_over_expires_in",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDExpirationTest#test_passing_expires_at_overrides_class_level_expires_in",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDExpirationTest#test_passing_in_expires_in_overrides_class_level_expiration",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDExpirationTest#test_passing_nil_expires_at_turns_off_expiration_checking",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDExpirationTest#test_passing_expires_in_nil_turns_off_expiration_checking",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "GlobalIDCreationTest#test_as_JSON",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDPurposeTest#test_parse_returns_nil_when_purpose_mismatch",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDPurposeTest#test_sign_with_purpose_when_:for_is_provided",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      },
+      {
+        "id": "SignedGlobalIDPurposeTest#test_sign_with_default_purpose_when_no_:for_is_provided",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "error",
+          "ArgumentError",
+          "ArgumentError: unknown keyword: quirks_mode"
+        ]
+      }
+    ],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "http-cookie": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "httpclient": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "i18n": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1607
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1607
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "jmespath": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1790
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1790
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "jwt": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 725,
+        "skip": 12
+      },
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 725,
+        "skip": 12
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "loofah": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1563
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1563
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "mail": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1833,
+        "skip": 4
+      },
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1833,
+        "skip": 4
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "method_source": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 34,
+        "error": 1,
+        "fail": 1
+      },
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 34,
+        "error": 1,
+        "fail": 1
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "mime-types": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 154
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 154
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "mini_mime": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 8,
+        "error": 1
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 8,
+        "error": 1
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "mini_portile2": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 56,
+        "error": 2
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 56,
+        "error": 2
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "msgpack": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 461,
+        "skip": 1
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 461,
+        "skip": 1
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "multi_json": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 921,
+        "skip": 4
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 921,
+        "skip": 4
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "multi_xml": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 589,
+        "error": 374,
+        "fail": 1
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 589,
+        "error": 374,
+        "fail": 1
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "multipart-post": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 56
+      },
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 56
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "netrc": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "nio4r": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 111,
+        "skip": 1
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 110,
+        "skip": 2
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "parallel": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 180,
+        "fail": 2,
+        "skip": 10
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "failed",
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 180,
+    "missing_sample": [
+      "./spec/parallel/serializer_spec.rb[1:1:1]",
+      "./spec/parallel/serializer_spec.rb[1:1:2]",
+      "./spec/parallel/serializer_spec.rb[1:1:3]",
+      "./spec/parallel/serializer_spec.rb[1:1:4]",
+      "./spec/parallel/serializer_spec.rb[1:1:5]",
+      "./spec/parallel/serializer_spec.rb[1:1:6]",
+      "./spec/parallel/serializer_spec.rb[1:1:7]",
+      "./spec/parallel/serializer_spec.rb[1:1:8]",
+      "./spec/parallel/serializer_spec.rb[1:1:9]",
+      "./spec/parallel/serializer_spec.rb[1:1:10]",
+      "./spec/parallel/serializer_spec.rb[1:1:11]",
+      "./spec/parallel_spec.rb[1:16]",
+      "./spec/parallel_spec.rb[1:18]",
+      "./spec/parallel_spec.rb[1:19]",
+      "./spec/parallel_spec.rb[1:20]",
+      "./spec/parallel_spec.rb[1:21]",
+      "./spec/parallel_spec.rb[1:22]",
+      "./spec/parallel_spec.rb[1:23]",
+      "./spec/parallel_spec.rb[1:24]",
+      "./spec/parallel_spec.rb[1:1:1]"
+    ],
+    "fixed": []
+  },
+  "parser": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "pry": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 1446,
+        "skip": 6
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 1445,
+        "skip": 6,
+        "fail": 1
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [
+      {
+        "id": "./spec/syntax_checking_spec.rb[1:15]",
+        "base": [
+          "pass"
+        ],
+        "head": [
+          "fail",
+          "RSpec::Expectations::ExpectationNotMetError"
+        ]
+      }
+    ],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "public_suffix": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 92
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 92
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "puma": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 1061,
+        "skip": 6,
+        "fail": 1,
+        "error": 4
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 1063,
+        "skip": 6,
+        "fail": 1,
+        "error": 2
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": [
+      "TestIntegrationCluster#test_fork_worker_replaces_worker_zero_without_losing_pending_forks",
+      "TestIntegrationCluster#test_queue_requests_disabled_does_not_pin_new_requests_to_busy_worker"
+    ]
+  },
+  "rack-protection": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 304
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 304
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rack-test": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 301
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 301
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rack": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {},
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rails-dom-testing": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 65,
+        "error": 1,
+        "fail": 3
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "failed",
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 65,
+    "missing_sample": [
+      "DomAssertionsTest#test_dom_not_equal_with_interior_whitespace",
+      "DomAssertionsTest#test_dom_equal_with_indentation",
+      "DomAssertionsTest#test_dom_equal_with_whitespace_strict",
+      "DomAssertionsTest#test_responds_to_assert_dom_equal",
+      "DomAssertionsTest#test_unequal_dom_attributes_in_children",
+      "DomAssertionsTest#test_dom_equal",
+      "DomAssertionsTest#test_dom_not_equal",
+      "DomAssertionsTest#test_custom_message_is_used_in_failures",
+      "DomAssertionsTest#test_dom_equal_with_surrounding_whitespace",
+      "DomAssertionsTest#test_equal_doms_with_different_order_attributes",
+      "DomAssertionsTest#test_dom_equal_with_attribute_whitespace",
+      "DomAssertionsTest#test_unequal_doms_attributes_with_different_order_and_values",
+      "DomAssertionsTest#test_dom_equal_with_whitespace",
+      "DomAssertionsHtmlParserSelectionTest#test_default_value_is_html4",
+      "DomAssertionsHtmlParserSelectionTest#test_default_set_to_invalid",
+      "DomAssertionsHtmlParserSelectionTest#test_invalid_version_specified",
+      "DomAssertionsHtmlParserSelectionTest#test_default_html5,_html4_specified",
+      "DomAssertionsHtmlParserSelectionTest#test_default_html4,_html4_specified",
+      "DomAssertionsHtmlParserSelectionTest#test_default_html5,_html5_specified",
+      "DomAssertionsHtmlParserSelectionTest#test_default_html4,_html5_specified"
+    ],
+    "fixed": []
+  },
+  "rails-html-sanitizer": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 456
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 456
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rainbow": {
+    "base": {
+      "install": "failed",
+      "tally": {}
+    },
+    "head": {
+      "install": "failed",
+      "tally": {},
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "redis": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "regexp_parser": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rspec-core": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rspec-expectations": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rspec-mocks": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rspec-support": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rubocop-ast": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 2913,
+        "skip": 1
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 2913,
+        "skip": 1
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "rubocop": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 36044,
+        "skip": 3
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 36044,
+        "skip": 3
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "ruby-progressbar": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 244
+      },
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "failed",
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 244,
+    "missing_sample": [
+      "./spec/lib/ruby-progressbar/projector_spec.rb[1:1:2]",
+      "./spec/lib/ruby-progressbar/projector_spec.rb[1:1:1]",
+      "./spec/lib/ruby-progressbar/components/title_spec.rb[1:1]",
+      "./spec/lib/ruby-progressbar/calculators/length_spec.rb[1:9]",
+      "./spec/lib/ruby-progressbar/calculators/length_spec.rb[1:8]",
+      "./spec/lib/ruby-progressbar/calculators/length_spec.rb[1:7]",
+      "./spec/lib/ruby-progressbar/calculators/length_spec.rb[1:6]",
+      "./spec/lib/ruby-progressbar/calculators/length_spec.rb[1:2]",
+      "./spec/lib/ruby-progressbar/calculators/length_spec.rb[1:5]",
+      "./spec/lib/ruby-progressbar/calculators/length_spec.rb[1:3]",
+      "./spec/lib/ruby-progressbar/calculators/length_spec.rb[1:4]",
+      "./spec/lib/ruby-progressbar/calculators/length_spec.rb[1:1:1]",
+      "./spec/lib/ruby-progressbar/output_spec.rb[1:3]",
+      "./spec/lib/ruby-progressbar/output_spec.rb[1:2]",
+      "./spec/lib/ruby-progressbar/output_spec.rb[1:1]",
+      "./spec/lib/ruby-progressbar/base_spec.rb[1:15]",
+      "./spec/lib/ruby-progressbar/base_spec.rb[1:14:1]",
+      "./spec/lib/ruby-progressbar/base_spec.rb[1:14:2:1]",
+      "./spec/lib/ruby-progressbar/base_spec.rb[1:8:9]",
+      "./spec/lib/ruby-progressbar/base_spec.rb[1:8:3]"
+    ],
+    "fixed": []
+  },
+  "rubyzip": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "sprockets-rails": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 118,
+        "error": 33
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {
+        "pass": 118,
+        "error": 33
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "sprockets": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 906,
+        "skip": 7
+      },
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 906,
+        "skip": 7
+      },
+      "lock_identical": false
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "thor": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 910
+      },
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 910
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "tilt": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "tzinfo": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "unf_ext": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake test"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "unicode-display_width": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 67
+      },
+      "cmd": "rake spec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 67
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "websocket-driver": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 205
+      },
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "failed",
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 205,
+    "missing_sample": [
+      "./spec/websocket/driver/client_spec.rb[1:1:1]",
+      "./spec/websocket/driver/client_spec.rb[1:1:2:1]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:1]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:2]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:10]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:3:1]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:4:1]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:5:1]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:6:1]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:7:1]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:8:1]",
+      "./spec/websocket/driver/client_spec.rb[1:1:3:9:1]",
+      "./spec/websocket/driver/client_spec.rb[1:2:1]",
+      "./spec/websocket/driver/client_spec.rb[1:2:2]",
+      "./spec/websocket/driver/client_spec.rb[1:2:3]",
+      "./spec/websocket/driver/client_spec.rb[1:2:4:1]",
+      "./spec/websocket/driver/client_spec.rb[1:2:4:2]",
+      "./spec/websocket/driver/client_spec.rb[1:3:1:1]",
+      "./spec/websocket/driver/client_spec.rb[1:3:1:2]",
+      "./spec/websocket/driver/client_spec.rb[1:3:1:3]"
+    ],
+    "fixed": []
+  },
+  "websocket-extensions": {
+    "base": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 67
+      },
+      "cmd": "rspec"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 0,
+      "tally": {
+        "pass": 67
+      },
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  },
+  "zeitwerk": {
+    "base": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "cmd": "rake"
+    },
+    "head": {
+      "install": "ok",
+      "exit": 1,
+      "tally": {},
+      "lock_identical": true
+    },
+    "newly_failing": [],
+    "missing": 0,
+    "missing_sample": [],
+    "fixed": []
+  }
+}
