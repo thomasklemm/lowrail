@@ -88,9 +88,9 @@ when the two sides resolve different third-party gems.
 
 Every cell has base, candidate and base again. In Callgrind and benchmark-ips cells the A/A is
 |base₁ − base₂| / mean(base), and a change counts only when it is larger (wall cells use the rule above).
-Otherwise the cell says "within noise" and the notes say "inside the A/A, no claim". A JIT cell where any window compiled, invalidated or lacked a counter says "not JIT-flat, no claim", whatever its
-A/A, and the notes name the windows and counters that moved. Ruby master no longer has ZJIT's `invalidation_count`;
-there the gate reads `invalidation_time_ns`, which rises whenever an invalidation runs.
+Otherwise the cell says "within noise" and the notes say "inside the A/A, no claim". A JIT cell where any
+window compiled, invalidated or lacked a counter says "not JIT-flat, no claim", whatever its A/A, and the notes
+name the windows and counters that moved. Ruby master no longer has ZJIT's `invalidation_count`; there the gate reads `invalidation_time_ns`, which rises whenever an invalidation runs.
 Objects that differ between the two base runs are shown as "–".
 
 ## Output
