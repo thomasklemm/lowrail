@@ -4,6 +4,7 @@
 #           newcont  = the same for a model with a JSON-serialized text default and a json default;
 #           newnested = the same for a model with a nested JSON-serialized default (the case the fix changes);
 #           newnull = the same for a model with a NULL-default json column next to integer and string defaults;
+#           newjson = the same for a model with a json default {} next to integer and string defaults (no serialized column);
 #           rbar = ruby-bench activerecord's run (100 posts with their comments, attribute reads).
 require "bundler/setup"
 require "active_record"
@@ -27,6 +28,9 @@ ActiveRecord::Schema.define do
   create_table :profiles, force: true do |t|
     t.json :data; t.string :name, default: "x"; t.integer :n, default: 0
   end
+  create_table :configs, force: true do |t|
+    t.json :meta, default: {}; t.string :name, default: "x"; t.integer :n, default: 0
+  end
   create_table :documents, force: true do |t|
     t.text :prefs, default: "{}"; t.json :meta, default: {}
   end
@@ -37,6 +41,7 @@ class Setting < ActiveRecord::Base; end
 class Document < ActiveRecord::Base; serialize :prefs, coder: JSON; end
 class Nested < ActiveRecord::Base; serialize :cfg, coder: JSON; end
 class Profile < ActiveRecord::Base; end
+class Config < ActiveRecord::Base; end
 srand(1)
 Post.transaction do
   100.times do |i|
@@ -54,6 +59,8 @@ when "newcont"
   -> { d = Document.new; d.prefs; d.meta }
 when "newnull"
   -> { p = Profile.new; p.data; p.name; p.n }
+when "newjson"
+  -> { c = Config.new; c.meta; c.name; c.n }
 when "newnested"
   -> { n = Nested.new; n.cfg }
 when "rbar"
