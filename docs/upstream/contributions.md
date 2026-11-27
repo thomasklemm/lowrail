@@ -806,7 +806,7 @@ Every open PR by thomasklemm outside `thomasklemm/*`, from `gh search prs --auth
 "Awaiting approval" means the fork's workflow runs wait for a maintainer to approve them (`action_required`); we
 don't ask. Not Lowrail and not listed here: argos-ri, roundhouse-rb and once-campfire; rubycdp/cuprite#360, its
 issue #359 and rubycdp/ferrum#695 (from Argos); and older personal PRs and issues (kane50613/takumi#1973 and #1974,
-aws/aws-sdk-ruby#3041, croaky/recipient_interceptor#8, isaacs/github#1952). The 06:20 UTC table is in git history.
+isaacs/github#1952). The 06:20 UTC table is in git history.
 
 Since 06:20 UTC: rails/rails#59596, #59597 and #59598 merged (amatsuda, 07:33–07:43 UTC); ruby/ruby#19680 (06:52)
 and #19661 (08:47, in favor of byroot's #19703, merged 09:03 UTC) closed by us; ruby/ruby-bench#564 opened (07:01,
