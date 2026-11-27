@@ -16,7 +16,9 @@ if ARGV.first == "--worker"
   load File.expand_path(script)
   # docs/bench.md's JIT-flat counters, read before and after each measured window; a missing one fails the gate.
   keys, stats = if defined?(RubyVM::ZJIT) && RubyVM::ZJIT.enabled?
-    [%i[compiled_iseq_count failed_iseq_count compiled_side_exit_count invalidation_count], -> { RubyVM::ZJIT.stats || {} }]
+    # Ruby master from about 2026-11 reports invalidation_time_ns but no invalidation_count; any rise means one ran.
+    invalidation = (RubyVM::ZJIT.stats || {}).key?(:invalidation_count) ? :invalidation_count : :invalidation_time_ns
+    [[:compiled_iseq_count, :failed_iseq_count, :compiled_side_exit_count, invalidation], -> { RubyVM::ZJIT.stats || {} }]
   elsif defined?(RubyVM::YJIT) && RubyVM::YJIT.enabled?
     [%i[compiled_iseq_count compiled_block_count invalidation_count], -> { RubyVM::YJIT.runtime_stats }]
   end
@@ -55,6 +57,53 @@ if ARGV.first == "--worker"
       GC.start
       GC.disable
       [call].cycle(Integer(n)) { |c| c.call }
+    end
+  when "wall-calibrate", "wall"
+    require "json"
+    calls = mode == "wall" ? JSON.parse(rest[0]) : Hash.new(1)
+    windows = mode == "wall" ? Integer(rest[1]) : 1
+    cpu = -> { Process.clock_gettime(Process::CLOCK_THREAD_CPUTIME_ID) }
+    mono = -> { Process.clock_gettime(Process::CLOCK_MONOTONIC) }
+    # One GC-free window of n calls; JIT counters are read outside the timed part.
+    measure = lambda do |call, n|
+      GC.start
+      GC.disable
+      before = jit&.()
+      w0 = mono.()
+      c0 = cpu.()
+      k = 0
+      while k < n
+        call.call
+        k += 1
+      end
+      c1 = cpu.()
+      w1 = mono.()
+      after = jit&.()
+      GC.enable
+      [c1 - c0, w1 - w0, before, after]
+    end
+    # The warm-up runs measure itself: 100 one-call windows compile every branch of its loop, then warm_calls calls.
+    UpstreamBench::CASES.each_value { |call| 100.times { measure.(call, 1) } }
+    UpstreamBench::CASES.each_value { |call| measure.(call, warm_calls) }
+    if mode == "wall-calibrate"
+      UpstreamBench::CASES.each { |name, call| puts "calibrate #{name}\t#{measure.(call, warm_calls)[0] / warm_calls}" }
+      exit
+    end
+    samples = UpstreamBench::CASES.to_h { |name, _| [name, { cpu: [], wall: [], moved: Array.new(keys&.size || 0, 0) }] }
+    # Cases alternate window by window, so a slow stretch of the host spreads over all of them.
+    windows.times do
+      UpstreamBench::CASES.each do |name, call|
+        c, w, before, after = measure.(call, calls.fetch(name))
+        s = samples[name]
+        s[:cpu] << c
+        s[:wall] << w
+        # Absolute deltas, so a counter that rises in one window and is reset in another can't cancel out.
+        s[:moved] = s[:moved].zip(before.zip(after)).map { |m, (b, a)| m && b && a ? m + (a - b).abs : nil } if jit
+      end
+    end
+    samples.each do |name, s|
+      puts "wall #{name}\t#{JSON.generate(cpu: s[:cpu], wall: s[:wall])}"
+      puts "jit #{name}\t#{keys.zip(s[:moved]).map { |k, m| "#{k}=#{m && 0}>#{m}" }.join(" ")}" if jit
     end
   when "ips"
     require "benchmark/ips"
@@ -103,6 +152,7 @@ MODE_FLAGS = { "interp" => [], "yjit" => ["--yjit"], "zjit" => ["--zjit"] }.free
 MODE_TITLES = { "interp" => "no JIT", "yjit" => "YJIT", "zjit" => "ZJIT" }.freeze
 
 o = { gems: nil, with: [], n: 2000, warmup: 3000, ips: 0, ips_mode: "yjit", ips_time: 5, ips_warmup: 2, core: 1,
+  wall: 0, wall_windows: 30, wall_ms: 50,
   names: %w[Before After], modes: nil }
 parser = OptionParser.new do |p|
   p.banner = "Usage: script/upstream-bench --out NEW_DIR [--base TREE --candidate TREE] [--ruby R | --base-ruby R --candidate-ruby R] BENCH.rb"
@@ -123,7 +173,11 @@ parser = OptionParser.new do |p|
   p.on("--ips ROUNDS", Integer, "benchmark-ips rounds of base/candidate/base (default 0: none)") { o[:ips] = _1 }
   p.on("--ips-mode MODE", "interp, yjit or zjit (default yjit)") { o[:ips_mode] = _1 }
   p.on("--ips-time S", Float) { o[:ips_time] = _1 }
-  p.on("--core N", Integer, "CPU for benchmark-ips (default 1)") { o[:core] = _1 }
+  p.on("--wall ROUNDS", Integer, "Wall-time cohort: rounds of fresh base/candidate/base processes (default 0: none)") { o[:wall] = _1 }
+  p.on("--wall-mode MODE", "interp, yjit or zjit (default zjit when both Rubies have it, else yjit)") { o[:wall_mode] = _1 }
+  p.on("--wall-windows N", Integer, "Timed windows per case and process (default 30)") { o[:wall_windows] = _1 }
+  p.on("--wall-ms MS", Float, "Target length of one window (default 50)") { o[:wall_ms] = _1 }
+  p.on("--core N", Integer, "CPU for benchmark-ips and --wall (default 1)") { o[:core] = _1 }
   p.on("--names BEFORE,AFTER", Array, "Column names (default Before,After)") { o[:names] = _1 }
 end
 parser.parse!
@@ -200,11 +254,14 @@ same_ruby = sides["base"][:description] == sides["candidate"][:description]
 abort "base and candidate are identical: same tree and same Ruby" if sides.values.map { _1[:ruby] }.uniq.size == 1 && o[:base] == o[:candidate]
 
 modes = o[:modes] || ["interp", "yjit", *("zjit" if sides.values.all? { _1[:zjit] })]
-prefix = File.expand_path(o[:valgrind] || ENV["LOWRAIL_VALGRIND"] || abort("pass --valgrind PREFIX (build it with script/bench-valgrind)"))
-manifest = File.join(prefix, "share/lowrail/valgrind.json")
-abort "#{prefix} is not a script/bench-valgrind prefix" unless File.file?(manifest)
-FileUtils.cp(manifest, File.join(out, "valgrind.json"))
-valgrind = File.join(prefix, "bin/valgrind")
+wall_mode = o[:wall_mode] || (sides.values.all? { _1[:zjit] } ? "zjit" : "yjit")
+unless modes.empty?
+  prefix = File.expand_path(o[:valgrind] || ENV["LOWRAIL_VALGRIND"] || abort("pass --valgrind PREFIX (build it with script/bench-valgrind)"))
+  manifest = File.join(prefix, "share/lowrail/valgrind.json")
+  abort "#{prefix} is not a script/bench-valgrind prefix" unless File.file?(manifest)
+  FileUtils.cp(manifest, File.join(out, "valgrind.json"))
+  valgrind = File.join(prefix, "bin/valgrind")
+end
 
 worker = ->(side, mode, *args) do
   s = sides.fetch(side)
@@ -215,8 +272,8 @@ runs = %w[base candidate base2]
 side_of = ->(run) { run.delete_suffix("2") }
 
 # Objects: deterministic, but still run base twice so a nondeterministic case shows.
-# With --modes "" (ips only), the objects pass still runs in the ips mode: it names the cases and needs no Valgrind.
-objects = (modes.empty? && o[:ips] > 0 ? [o[:ips_mode]] : modes).to_h do |mode|
+# With --modes "" (ips or wall only), the objects pass still runs in that mode: it names the cases and needs no Valgrind.
+objects = (modes.empty? ? [*(o[:ips_mode] if o[:ips] > 0), *(wall_mode if o[:wall] > 0)].uniq : modes).to_h do |mode|
   [mode, runs.to_h do |r|
     text = run(sides[side_of[r]][:env], worker[side_of[r], mode, "objects", script], log: File.join(out, "raw", "objects-#{mode}-#{r}.log"))
     [r, text.scan(/^objects (.+)\t(\S+)$/).to_h { [_1, Float(_2)] }]
@@ -275,6 +332,28 @@ if o[:ips] > 0
   end
 end
 
+# Wall-time cohort (docs/upstream/body-numbers.md): one calibration process, then ROUNDS rounds of fresh
+# base, candidate and base processes on one core, in the six orders in turn.
+wall = nil
+if o[:wall] > 0
+  taskset = ["taskset", "-c", o[:core].to_s]
+  log = File.join(out, "raw", "wall-calibrate.log")
+  text = run(sides["base"][:env], [*taskset, *worker["base", wall_mode, "wall-calibrate", script]], log: log)
+  calls = text.scan(/^calibrate (.+)\t(\S+)$/).to_h { |name, s| [name, [1, (o[:wall_ms] / 1000.0 / Float(s)).round].max] }
+  wall = { calls: calls, rounds: Hash.new { |h, k| h[k] = [] } }
+  orders = runs.permutation.to_a
+  o[:wall].times do |round|
+    procs = orders[round % orders.size].to_h do |r|
+      side = side_of[r]
+      log = File.join(out, "raw", "wall-r#{round + 1}-#{r}.log")
+      text = run(sides[side][:env], [*taskset, *worker[side, wall_mode, "wall", script, JSON.generate(calls), o[:wall_windows].to_s]], log: log)
+      record_jit.("wall", wall_mode, text, log, cases, "r#{round + 1} #{r}")
+      [r, text.scan(/^wall (.+)\t(.*)$/).to_h { |name, json| [name, JSON.parse(json)] }]
+    end
+    cases.each { |name| wall[:rounds][name] << runs.to_h { |r| [r, procs[r].fetch(name)] } }
+  end
+end
+
 # A change counts only when it is larger than the spread between the two base runs.
 def compare(b1, cand, b2)
   base = (b1 + b2) / 2.0
@@ -288,6 +367,41 @@ def int(x) = x.round.to_s.reverse.scan(/\d{1,3}/).join(",").reverse
 def num(x) = (x - x.round).abs < 0.05 ? int(x) : format("%.1f", x)
 def pct(x) = format("%+.1f%%", x * 100).sub("-", "−")
 def rate(x) = x >= 1e6 ? format("%.2fM", x / 1e6) : x >= 1e3 ? format("%.1fk", x / 1e3) : format("%.0f", x)
+def dur(s) = s >= 1e-3 ? format("%.3f ms", s * 1e3) : format("%.2f µs", s * 1e6)
+
+# Wall cohort: each process gives the WALL_QUANTILE of its windows' thread CPU time per call. The change is the median
+# of every round's two log ratios candidate/base and candidate/base2: a difference of two iid process values is
+# symmetric, so this median centres on zero under the null even when process noise is skewed (candidate minus the
+# mean of both bases doesn't). The A/A is base2/base. Seeded percentile-bootstrap 95% CIs resample whole rounds.
+WALL_QUANTILE = 0.1
+def median(xs) = (s = xs.sort; n = s.size; n.odd? ? s[n / 2] : (s[n / 2 - 1] + s[n / 2]) / 2.0)
+# rounds: one Array of values per round; each resample draws whole rounds and takes the median of their values.
+def bootstrap(rounds)
+  rng = Random.new(1)
+  medians = Array.new(5000) { median(Array.new(rounds.size) { rounds[rng.rand(rounds.size)] }.flatten) }.sort
+  [medians[124], medians[4875]]
+end
+def wall_cell(rounds, calls)
+  est = rounds.map { |r| r.transform_values { |w| Math.log(w["cpu"].sort[((w["cpu"].size - 1) * WALL_QUANTILE).round] / calls) } }
+  change = est.map { [_1["candidate"] - _1["base"], _1["candidate"] - _1["base2"]] }
+  aa = est.map { [_1["base2"] - _1["base"]] }
+  ex = ->(x) { Math.exp(x) - 1 }
+  c = { base: Math.exp(median(est.map { (_1["base"] + _1["base2"]) / 2 })), candidate: Math.exp(median(est.map { _1["candidate"] })),
+    change: ex.(median(change.flatten)), change_ci: bootstrap(change).map(&ex), aa: ex.(median(aa.flatten)), aa_ci: bootstrap(aa).map(&ex) }
+  c[:aa_pass] = c[:aa_ci][0] <= 0 && c[:aa_ci][1] >= 0
+  # A bootstrap over fewer than 10 rounds is too coarse to claim anything.
+  c.merge(claim: rounds.size >= 10 && c[:aa_pass] && (c[:change_ci][0] > 0 || c[:change_ci][1] < 0))
+end
+def ci(c) = "[#{pct(c[0])}, #{pct(c[1])}]"
+def wall_verdict(c, rounds)
+  return verdict(c) if c[:jit] && !c[:jit][:flat]
+  flat = c[:jit] ? ", JIT-flat in #{c[:jit][:windows].size} processes" : ""
+  if !c[:aa_pass] then "#{flat}: A/A interval excludes 0, no claim"
+  elsif c[:claim] then flat
+  elsif rounds < 10 then "#{flat}: fewer than 10 rounds, no claim"
+  else "#{flat}: interval includes 0, no claim"
+  end
+end
 
 # JIT-flat (docs/bench.md): a JIT cell counts only when no window compiled or invalidated, whatever its A/A.
 def gate(cell, windows)
@@ -306,7 +420,7 @@ end
 before, after = o[:names]
 ruby_label = same_ruby ? "Ruby #{sides["base"][:description][/\Aruby (\S+)/, 1]}" : "base and candidate Ruby"
 results = { script: script, at: Time.now.utc.iso8601, n: o[:n], warmup: o[:warmup], preload: o[:preload], heap: HEAP, sides: sides.transform_values { _1.except(:env) },
-  objects: {}, instructions: {}, ips: {} }
+  objects: {}, instructions: {}, ips: {}, wall: {} }
 md = []
 notes = []
 modes.each do |mode|
@@ -341,10 +455,29 @@ if ips
   end
   md << ""
 end
-md << "Record (not for the body): base = mean of two base runs; A/A = their spread. Raw output and commands in #{out}."
+if wall
+  md << "Time per call, #{ruby_label}, #{MODE_TITLES.fetch(wall_mode)}, #{o[:wall]} rounds of fresh processes on one core"
+  md << ""
+  md << "| | #{before} | #{after} | Change |"
+  md << "| --- | ---: | ---: | ---: |"
+  wall[:rounds].each do |name, rounds|
+    c = gate(wall_cell(rounds, wall[:calls].fetch(name)), windows.(wall_mode, "wall #{name}"))
+    results[:wall][name] = c.merge(calls: wall[:calls].fetch(name), windows: o[:wall_windows], quantile: WALL_QUANTILE, rounds: rounds)
+    md << "| `#{name}` | #{dur(c[:base])} | #{dur(c[:candidate])} | #{change(c)} |"
+    notes << "wall #{name}: #{pct(c[:change])} #{ci(c[:change_ci])} with A/A #{pct(c[:aa])} #{ci(c[:aa_ci])} " \
+      "(#{wall[:calls].fetch(name)} calls × #{o[:wall_windows]} windows per process)" \
+      "#{wall_verdict(c, rounds.size)}"
+  end
+  md << ""
+end
+md << "Record (not for the body): Callgrind and benchmark-ips cells take base = mean of two base runs, A/A = their spread. Raw output and commands in #{out}."
 unless jit.empty?
   md << "- JIT-flat: #{jit.values.map { _1.first[:counters].keys.join(", ") }.uniq.join("; ")} unchanged in every measured window " \
-    "(each Callgrind N and N = 0 run; each benchmark-ips report from `running` to its last timed interval)"
+    "(each Callgrind N and N = 0 run; each benchmark-ips report from `running` to its last timed interval; every timed wall window)"
+end
+if wall
+  md << "- Wall: thread CPU time with GC off per window, the #{(WALL_QUANTILE * 100).round}th-percentile window per process; change = median " \
+    "of every round's candidate / base and candidate / base2, A/A = median of base2 / base, 95% bootstrap intervals resampling rounds"
 end
 sides.each do |side, s|
   md << "- #{side}: #{s[:description]}#{s[:tree] && ", #{s[:tree]} at #{s[:head][0, 10]}#{" (dirty)" if s[:dirty]}"}"

@@ -1939,6 +1939,48 @@ have stale source certificates and silently declined. It is omitted here,
 not reported as active AR performance; the primary counter uses fresh builds
 and verifies their installation.
 
+## Wall time under a JIT: noise sources (2026-11-27)
+
+E2's scalar `foreign_keys` cohorts under ZJIT gave a process-level A/A of about ±4% around a real cost of about 1%.
+The study behind `script/upstream-bench --wall` reran that workload as an A/A (main against main) in fresh
+processes, ABBA order, 16 pairs per configuration, one variable changed at a time, every window kept
+([wall_noise](../bench/upstream/wall_noise/README.md), raw data in its `study-2026-11-27.tar.gz`). Ruby master
+`42a644f6e0` for ZJIT, 4.0.10 for YJIT, on a 2-vCPU orb and on a1.large (8 vCPUs).
+
+* **Each process has its own speed.** The standard deviation of process means is 2.4–5.4% where window noise
+  alone would give 0.8–2%, in every configuration: ZJIT, YJIT and the interpreter, both orb sizes. So the spread
+  isn't JIT-specific and a bigger orb doesn't remove it.
+* **Part of it is the host, over time.** In a 300-window process even the fastest window of a 20-window block
+  rose 11% for about 20 s and then came back; in another, the last block was 9% slower and a float sort timed
+  next to each window 6% slower, while a register-only integer loop didn't move. Across 32 processes the sort's
+  per-process median correlates 0.87 with the workload's. That points to contention on the shared cache and
+  memory, not CPU frequency (no cpufreq, the integer loop flat) or steal (ticks in under 1% of windows).
+  Dividing by the sort cut the A/A pair sd from 5.1% to 3.2% (median) and 3.6% to 3.0% (10th percentile):
+  real, but too little to build on.
+* **Part of it is the layout.** ASLR off (`setarch -R`) took the 10th-percentile A/A pair sd from 2.9% to 1.6%
+  on the small orb and from 3.0% to 1.5% on a1.large; a fixed hash seed (`fixrand.so`) gave 1.1%. Both fix one
+  layout per tree, which an A/A can't see, so the tool keeps them random and averages over processes.
+* **GC, and for YJIT the compiles it triggers.** GC off per window with the fixed heap took the within-process
+  window IQR from 5.4% to 2.4% under ZJIT. YJIT 4.0.10 with GC on compiled blocks in 57 of 640 timed windows (45
+  of them with a GC; 67 on a1.large) and had the widest spread (5.2%); with GC off per window it compiled in none
+  and fell to 2.4%. ZJIT compiled in no timed window once the timing loop was a `while` loop warmed up first (an
+  `Integer#times` loop compiled in window 14).
+* **The SMT sibling.** The orb's two vCPUs are one core's hyperthreads; windows in which the other vCPU was busy
+  had a 2.7% slower median. Pinning still helps on a1.large (unpinned: 5.2% median pair sd against 4.2%).
+* **Not causes:** JIT code placement (`--zjit-exec-mem-size=512` was no tighter, 6.2%), the timer (1 ns
+  resolution, 80 ns per read against 30–150 ms windows), wall against CPU time (equal to 0.1%), core 0 against
+  core 1, and window length (80 × 50 calls no tighter than 20 × 200).
+
+The estimator matters as much as the setup: per-process medians have an A/A pair sd of 2.2–7%, the 10th
+percentile 1.1–3.7%, the minimum 0.9–3.5% but with occasional single-window outliers. E2's paired check took
+medians of 6 rounds with GC on, so its +5.5% was within about 2.5 of its own standard deviations.
+
+The resulting design is in [body-numbers](upstream/body-numbers.md) (`--wall`): GC off per window, the
+10th-percentile window per fresh process, base/candidate/base rounds in all six orders, and intervals over
+rounds, so a slow phase or a layout costs one round, not the result. PMU counters aren't there to replace it:
+`perf_event_open` for hardware instructions and cycles fails with ENOENT in this orb (software clocks work), so
+instruction counts under a JIT still come from Callgrind.
+
 ## GC and retained-memory diagnosis
 
 ```sh

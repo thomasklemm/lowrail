@@ -25,7 +25,8 @@ worker then gets its side's checkout in `UPSTREAM_BENCH_TREE` and the script boo
 Callgrind only. `--modes interp,yjit` limits the modes, and `--modes ""` with `--ips` runs benchmark-ips alone (plus the objects pass
 in the ips mode, which names the cases); by default it runs the interpreter, YJIT, and ZJIT when both
 Rubies have it. `-n` sets the calls per Callgrind window (default 2000), `--core` the CPU for
-benchmark-ips (default 1), `--with GEM` adds a third-party gem to both Gemfiles.
+benchmark-ips (default 1), `--with GEM` adds a third-party gem to both Gemfiles. `--wall ROUNDS` adds the wall-time
+cohort below (`--modes "" --wall 30` runs it alone, without Valgrind).
 
 ## The benchmark script
 
@@ -63,6 +64,20 @@ when the two sides resolve different third-party gems.
   ([bench.md](../bench.md)). A brk overflow in any Valgrind log stops the run.
 * **benchmark-ips** (`--ips ROUNDS`): base, candidate, base again per round, each pinned with `taskset -c CORE`,
   5 s per report; the table takes the best round of each.
+* **Wall-time cohort** (`--wall ROUNDS`, for ~1% differences under a JIT; [why](../bench.md#wall-time-under-a-jit-noise-sources-2026-11-27)):
+  one process on base times `--warmup` calls and sets each case's calls per window to about `--wall-ms` (default
+  50 ms). Then each round runs fresh base, candidate and base processes, in the six orders in turn, pinned with
+  `taskset -c CORE`, in `--wall-mode` (default ZJIT when both Rubies have it, else YJIT). Each process warms up
+  through the timing loop itself (100 one-call windows, then `--warmup` calls per case) and times `--wall-windows`
+  windows per case (default 30), the cases taking turns window by window. Each window runs `GC.start`, then GC
+  off, and reads the thread's CPU time (wall time is recorded next to it). A process's value is its
+  10th-percentile window. The change is the median of every round's two ratios candidate / base and
+  candidate / base₂ (a difference of two like process values is symmetric, so under skewed process noise its
+  null median stays at zero; candidate over the mean of both bases doesn't), the A/A the median of base₂ / base.
+  Seeded 95% percentile-bootstrap intervals resample whole rounds. A change counts only with at least 10 rounds, an A/A
+  interval that contains 0 and a change interval that doesn't. JIT counters are read before and after every
+  timed window; the sum of their absolute deltas goes through the JIT-flat gate, per process, so a counter reset
+  can't hide a compile.
 * **JIT-flat gate** (YJIT and ZJIT cells, [bench.md](../bench.md)): each measured window records
   `compiled_iseq_count`, `compiled_block_count` and `invalidation_count` from `RubyVM::YJIT.runtime_stats` (ZJIT:
   `compiled_iseq_count`, `failed_iseq_count`, `compiled_side_exit_count`, `invalidation_count` from
@@ -71,10 +86,11 @@ when the two sides resolve different third-party gems.
   through the measured block itself: 3,000 calls of the `cycle` block (yielded from C by `reverse_each`), and
   3,000 `call_times(1)` per report before benchmark-ips' own warm-up. Interpreter cells are unchanged.
 
-Every cell has base, candidate and base again. The A/A is |base₁ − base₂| / mean(base), and a change counts only
-when it is larger. Otherwise the cell says "within noise" and the notes say "inside the A/A, no claim". A JIT
-cell where any window compiled, invalidated or lacked a counter says "not JIT-flat, no claim", whatever its
-A/A, and the notes name the windows and counters that moved (ZJIT without `invalidation_count` never passes).
+Every cell has base, candidate and base again. In Callgrind and benchmark-ips cells the A/A is
+|base₁ − base₂| / mean(base), and a change counts only when it is larger (wall cells use the rule above).
+Otherwise the cell says "within noise" and the notes say "inside the A/A, no claim". A JIT cell where any window compiled, invalidated or lacked a counter says "not JIT-flat, no claim", whatever its
+A/A, and the notes name the windows and counters that moved. Ruby master no longer has ZJIT's `invalidation_count`;
+there the gate reads `invalidation_time_ns`, which rises whenever an invalidation runs.
 Objects that differ between the two base runs are shown as "–".
 
 ## Output
@@ -109,6 +125,11 @@ the rows it needs; a single cell that is "within noise" is not claimed in prose 
   `text_field` −0.9% (A/A 3.1%, no claim) and then +7.9% (A/A 4.7%, printed), and interpreter Callgrind −2.3% and
   −2.8%. A change just above its A/A is no evidence; claim wall time only when it is several times the A/A
   (AM1's `errors[:title]`, +326% with A/A 0.5%), and round Callgrind figures to what a rerun reproduces.
+* The wall cohort resolves about 1% on this workload, not less: in
+  [wall_noise](../../bench/upstream/wall_noise/README.md) 30 rounds gave A/A intervals of about ±1% and caught a
+  planted ~1% regression under ZJIT (+1.3% [+0.7%, +2.2%]) and YJIT (+1.2% [+0.3%, +2.0%]). It costs about
+  22 s per round for a 0.7 ms call, so 30 rounds take about 11 minutes. It measures time with GC off; a change
+  whose cost is mostly GC shows in the objects column, not here.
 * `commands.sh` has absolute paths; rerunning it elsewhere needs the same layout or a fresh run.
 * It does not run ruby-bench, the census or `make benchmark`; ruby/ruby bodies still use benchmark-driver
   ([DECISIONS](../DECISIONS.md#benchmark-tables-in-the-projects-own-format-thomas-2026-11-14)).

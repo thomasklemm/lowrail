@@ -1,0 +1,12 @@
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+index 0da5ffeadb..ec57fb7f29 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+@@ -484,6 +484,7 @@ def add_reference(table_name, ref_name, **options) # :nodoc:
+       FK_REGEX = /.*FOREIGN KEY\s+\("([^"]+)"\)\s+REFERENCES\s+"(\w+)"\s+\("(\w+)"\)/
+       DEFERRABLE_REGEX = /DEFERRABLE INITIALLY (\w+)/
+       def foreign_keys(table_name)
++        150.times { |j| j.to_s }
+         result = fetch_foreign_keys(Array(table_name).map(&:to_s))
+         table_name.is_a?(Array) ? result : result[table_name.to_s]
+       end
