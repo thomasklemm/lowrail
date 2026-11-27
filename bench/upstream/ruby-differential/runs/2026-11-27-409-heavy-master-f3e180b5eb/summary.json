@@ -1,0 +1,567 @@
+[
+  {
+    "app": "casa",
+    "mode": "interp",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 2992,
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 158,
+    "differ": 1,
+    "top": {
+      "RSpec::Expectations::MultipleExpectationsNotMetError": 1
+    }
+  },
+  {
+    "app": "casa",
+    "mode": "interpW",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interpW",
+    "base_tests": 2992,
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 165,
+    "differ": 1,
+    "top": {
+      "RSpec::Expectations::MultipleExpectationsNotMetError": 1
+    }
+  },
+  {
+    "app": "casa",
+    "mode": "yjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc yjit",
+    "base_tests": 2992,
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 138,
+    "differ": 1,
+    "top": {
+      "RSpec::Expectations::MultipleExpectationsNotMetError": 1
+    }
+  },
+  {
+    "app": "casa",
+    "mode": "zjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 2992,
+    "tests": 2992,
+    "results": {
+      "skip": 21,
+      "pass": 2747,
+      "fail": 224
+    },
+    "exit": 1,
+    "secs": 179,
+    "differ": 1,
+    "top": {
+      "RSpec::Expectations::MultipleExpectationsNotMetError": 1
+    }
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 22128,
+    "tests": 22128,
+    "results": {
+      "pass": 21878,
+      "fail": 242,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 5239,
+    "differ": 24,
+    "top": {
+      "FrozenError": 17,
+      "Redis::CannotConnectError": 2,
+      "SpecTimeoutError": 2
+    }
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interpW",
+    "base_tests": 22128,
+    "tests": 22128,
+    "results": {
+      "pass": 21876,
+      "fail": 244,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 5244,
+    "differ": 26,
+    "top": {
+      "FrozenError": 17,
+      "RSpec::Core::MultipleExceptionError": 3,
+      "Redis::CannotConnectError": 2
+    }
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc yjit",
+    "base_tests": 22128,
+    "tests": 22128,
+    "results": {
+      "pass": 21878,
+      "fail": 242,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 5055,
+    "differ": 25,
+    "top": {
+      "FrozenError": 17,
+      "Redis::CannotConnectError": 1,
+      "SpecTimeoutError": 1
+    }
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 22128,
+    "tests": 22128,
+    "results": {
+      "pass": 21879,
+      "fail": 241,
+      "skip": 8
+    },
+    "exit": 1,
+    "secs": 5244,
+    "differ": 23,
+    "top": {
+      "FrozenError": 17,
+      "SpecTimeoutError": 3
+    }
+  },
+  {
+    "app": "docuseal",
+    "mode": "interp",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 107,
+    "tests": 107,
+    "results": {
+      "pass": 107
+    },
+    "exit": 0,
+    "secs": 93,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "docuseal",
+    "mode": "interpW",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interpW",
+    "base_tests": 107,
+    "tests": 107,
+    "results": {
+      "pass": 107
+    },
+    "exit": 0,
+    "secs": 65,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "docuseal",
+    "mode": "yjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc yjit",
+    "base_tests": 107,
+    "tests": 107,
+    "results": {
+      "pass": 107
+    },
+    "exit": 0,
+    "secs": 92,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "docuseal",
+    "mode": "zjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 107,
+    "tests": 107,
+    "results": {
+      "pass": 107
+    },
+    "exit": 0,
+    "secs": 99,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "flow",
+    "mode": "interp",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 9714,
+    "tests": 9714,
+    "results": {
+      "pass": 9712,
+      "fail": 2
+    },
+    "exit": 1,
+    "secs": 1495,
+    "differ": 1,
+    "top": {
+      "Minitest::Assertion": 1
+    }
+  },
+  {
+    "app": "flow",
+    "mode": "interpW",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interpW",
+    "base_tests": 9714,
+    "tests": 9714,
+    "results": {
+      "pass": 9712,
+      "fail": 2
+    },
+    "exit": 1,
+    "secs": 1298,
+    "differ": 2,
+    "top": {
+      "Minitest::Assertion": 1
+    }
+  },
+  {
+    "app": "flow",
+    "mode": "yjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc yjit",
+    "base_tests": 9714,
+    "tests": 9714,
+    "results": {
+      "pass": 9712,
+      "fail": 2
+    },
+    "exit": 1,
+    "secs": 1557,
+    "differ": 1,
+    "top": {
+      "Minitest::Assertion": 1
+    }
+  },
+  {
+    "app": "flow",
+    "mode": "zjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 9714,
+    "tests": 9714,
+    "results": {
+      "pass": 9712,
+      "fail": 2
+    },
+    "exit": 1,
+    "secs": 1403,
+    "differ": 1,
+    "top": {
+      "Minitest::Assertion": 1
+    }
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 20484,
+    "tests": 32509,
+    "results": {
+      "pass": 32372,
+      "fail": 136,
+      "skip": 1
+    },
+    "exit": 124,
+    "secs": 16495,
+    "differ": 12026,
+    "top": {
+      "Faker::UniqueGenerator::RetryLimitExceeded": 107,
+      "Errno::ENOENT": 1,
+      "RSpec::Expectations::ExpectationNotMetError": 1
+    }
+  },
+  {
+    "app": "lobsters",
+    "mode": "interp",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 927,
+    "tests": 927,
+    "results": {
+      "pass": 924,
+      "fail": 3
+    },
+    "exit": 1,
+    "secs": 59,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "lobsters",
+    "mode": "interpW",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interpW",
+    "base_tests": 927,
+    "tests": 927,
+    "results": {
+      "pass": 924,
+      "fail": 3
+    },
+    "exit": 1,
+    "secs": 67,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "lobsters",
+    "mode": "yjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc yjit",
+    "base_tests": 927,
+    "tests": 927,
+    "results": {
+      "pass": 924,
+      "fail": 3
+    },
+    "exit": 1,
+    "secs": 49,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "lobsters",
+    "mode": "zjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 927,
+    "tests": 927,
+    "results": {
+      "pass": 924,
+      "fail": 3
+    },
+    "exit": 1,
+    "secs": 82,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "loomio",
+    "mode": "interp",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 3660,
+    "tests": 3660,
+    "results": {
+      "pass": 3655,
+      "skip": 2,
+      "error": 2,
+      "fail": 1
+    },
+    "exit": 1,
+    "secs": 777,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "loomio",
+    "mode": "interpW",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interpW",
+    "base_tests": 3660,
+    "tests": 3660,
+    "results": {
+      "pass": 3655,
+      "skip": 2,
+      "error": 2,
+      "fail": 1
+    },
+    "exit": 1,
+    "secs": 653,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "loomio",
+    "mode": "yjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc yjit",
+    "base_tests": 3660,
+    "tests": 3660,
+    "results": {
+      "pass": 3655,
+      "skip": 2,
+      "error": 2,
+      "fail": 1
+    },
+    "exit": 1,
+    "secs": 640,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "loomio",
+    "mode": "zjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 3660,
+    "tests": 3660,
+    "results": {
+      "pass": 3655,
+      "skip": 2,
+      "error": 2,
+      "fail": 1
+    },
+    "exit": 1,
+    "secs": 681,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "mastodon",
+    "mode": "interp",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 7748,
+    "tests": 7748,
+    "results": {
+      "pass": 7453,
+      "fail": 290,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 1230,
+    "differ": 2,
+    "top": {
+      "Redis::CannotConnectError": 2
+    }
+  },
+  {
+    "app": "mastodon",
+    "mode": "interpW",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interpW",
+    "base_tests": 7748,
+    "tests": 7748,
+    "results": {
+      "pass": 7455,
+      "fail": 288,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 824,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "mastodon",
+    "mode": "yjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc yjit",
+    "base_tests": 7748,
+    "tests": 7748,
+    "results": {
+      "pass": 7455,
+      "fail": 288,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 1131,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "mastodon",
+    "mode": "zjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 7748,
+    "tests": 7748,
+    "results": {
+      "pass": 7455,
+      "fail": 288,
+      "skip": 5
+    },
+    "exit": 1,
+    "secs": 1237,
+    "differ": 0,
+    "top": {}
+  },
+  {
+    "app": "sure",
+    "mode": "interp",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 14236,
+    "tests": 14236,
+    "results": {
+      "pass": 14160,
+      "skip": 37,
+      "fail": 15,
+      "error": 24
+    },
+    "exit": 1,
+    "secs": 1813,
+    "differ": 2,
+    "top": {
+      "Ractor::IsolationError": 2
+    }
+  },
+  {
+    "app": "sure",
+    "mode": "interpW",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interpW",
+    "base_tests": 14236,
+    "tests": 14236,
+    "results": {
+      "pass": 14160,
+      "skip": 37,
+      "fail": 15,
+      "error": 24
+    },
+    "exit": 1,
+    "secs": 1796,
+    "differ": 2,
+    "top": {
+      "Ractor::IsolationError": 2
+    }
+  },
+  {
+    "app": "sure",
+    "mode": "yjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc yjit",
+    "base_tests": 14236,
+    "tests": 14236,
+    "results": {
+      "pass": 14160,
+      "skip": 37,
+      "fail": 15,
+      "error": 24
+    },
+    "exit": 1,
+    "secs": 1627,
+    "differ": 2,
+    "top": {
+      "Ractor::IsolationError": 2
+    }
+  },
+  {
+    "app": "sure",
+    "mode": "zjit",
+    "base": "2026-11-27-409-heavy-v4.0.9-3e93b23afc interp",
+    "base_tests": 14236,
+    "tests": 14236,
+    "results": {
+      "pass": 14160,
+      "skip": 37,
+      "fail": 15,
+      "error": 24
+    },
+    "exit": 1,
+    "secs": 1734,
+    "differ": 2,
+    "top": {
+      "Ractor::IsolationError": 2
+    }
+  }
+]

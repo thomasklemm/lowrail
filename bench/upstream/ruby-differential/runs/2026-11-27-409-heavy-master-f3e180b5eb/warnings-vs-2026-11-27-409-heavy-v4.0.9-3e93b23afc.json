@@ -1,0 +1,172 @@
+{
+  "casa interp vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "casa interpW vs interpW": {
+    "new": {},
+    "gone": []
+  },
+  "casa yjit vs yjit": {
+    "new": {},
+    "gone": []
+  },
+  "casa zjit vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "discourse interp vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "discourse interpW vs interpW": {
+    "new": {
+      "APP/lib/freedom_patches/safe_buffer.rb:39):N: warning: aliasing ActiveSupport::SafeBuffer#concat defined in a prepended module FreedomPatches::SafeBuffer is deprecated and will be removed in Ruby 4.3": 1,
+      "GEMS/mini_sql-1.6.0/lib/mini_sql/result.rb:N: warning: the fallback to Object for alias of 'send' in module 'MiniSql::Result' is deprecated and will be removed in Ruby 4.3": 1,
+      "GEMS/active_model_serializers-0.8.4/lib/active_model_serializers.rb:N: warning: the fallback to Object for alias of 'send' in module 'ActiveModel::SerializerSupport' is deprecated and will be removed in Ruby 4.3": 1,
+      "GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:N: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": [
+      "APP/app/models/post_mover.rb:N: warning: string returned by :existing_topic.to_s will be frozen in the future",
+      "APP/app/models/post_mover.rb:N: warning: string returned by :new_topic.to_s will be frozen in the future"
+    ]
+  },
+  "discourse yjit vs yjit": {
+    "new": {},
+    "gone": []
+  },
+  "discourse zjit vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "docuseal interp vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "docuseal interpW vs interpW": {
+    "new": {},
+    "gone": []
+  },
+  "docuseal yjit vs yjit": {
+    "new": {},
+    "gone": []
+  },
+  "docuseal zjit vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "flow interp vs interp": {
+    "new": {
+      "GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:N: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "flow interpW vs interpW": {
+    "new": {
+      "GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:N: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "flow yjit vs yjit": {
+    "new": {
+      "GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:N: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "flow zjit vs interp": {
+    "new": {
+      "GEMS/mocha-3.1.0/lib/mocha/object_methods.rb:N: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "lago interp vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "lobsters interp vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "lobsters interpW vs interpW": {
+    "new": {},
+    "gone": []
+  },
+  "lobsters yjit vs yjit": {
+    "new": {},
+    "gone": []
+  },
+  "lobsters zjit vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "loomio interp vs interp": {
+    "new": {
+      "APP/app/models/concerns/null/group.rb:N: warning: the fallback to Object for alias of 'send' in module 'Null::Group' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "loomio interpW vs interpW": {
+    "new": {
+      "GEMS/active_model_serializers-d8bb60a57dba/lib/active_model_serializers.rb:N: warning: the fallback to Object for alias of 'send' in module 'ActiveModel::SerializerSupport' is deprecated and will be removed in Ruby 4.3": 1,
+      "APP/app/models/concerns/null/group.rb:N: warning: the fallback to Object for alias of 'send' in module 'Null::Group' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "loomio yjit vs yjit": {
+    "new": {
+      "APP/app/models/concerns/null/group.rb:N: warning: the fallback to Object for alias of 'send' in module 'Null::Group' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "loomio zjit vs interp": {
+    "new": {
+      "APP/app/models/concerns/null/group.rb:N: warning: the fallback to Object for alias of 'send' in module 'Null::Group' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "mastodon interp vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "mastodon interpW vs interpW": {
+    "new": {
+      "GEMS/irb-1.18.0/lib/irb/ext/loader.rb:N: warning: the fallback to Object for alias of 'require' in module 'IRB::IrbLoader' is deprecated and will be removed in Ruby 4.3": 1,
+      "GEMS/irb-1.18.0/lib/irb/ext/loader.rb:N: warning: the fallback to Object for alias of 'load' in module 'IRB::IrbLoader' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": [
+      "GEMS/rdf-3.3.4/lib/rdf/util/cache.rb:N: warning: ObjectSpace._id2ref is deprecated"
+    ]
+  },
+  "mastodon yjit vs yjit": {
+    "new": {},
+    "gone": []
+  },
+  "mastodon zjit vs interp": {
+    "new": {},
+    "gone": []
+  },
+  "sure interp vs interp": {
+    "new": {
+      "GEMS/mocha-2.7.1/lib/mocha/object_methods.rb:N: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "sure interpW vs interpW": {
+    "new": {
+      "GEMS/mocha-2.7.1/lib/mocha/object_methods.rb:N: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "sure yjit vs yjit": {
+    "new": {
+      "GEMS/mocha-2.7.1/lib/mocha/object_methods.rb:N: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  },
+  "sure zjit vs interp": {
+    "new": {
+      "GEMS/mocha-2.7.1/lib/mocha/object_methods.rb:N: warning: the fallback to Object for alias of 'method' in module 'Mocha::ObjectMethods' is deprecated and will be removed in Ruby 4.3": 1
+    },
+    "gone": []
+  }
+}

@@ -1,0 +1,3078 @@
+[
+  {
+    "app": "casa",
+    "mode": "interp",
+    "id": "./spec/config/parallel_coverage_spec.rb[1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "RSpec::Expectations::MultipleExpectationsNotMetError",
+      "Got 6 failures from failure aggregation block:"
+    ],
+    "loc": "./spec/config/parallel_coverage_spec.rb"
+  },
+  {
+    "app": "casa",
+    "mode": "interpW",
+    "id": "./spec/config/parallel_coverage_spec.rb[1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "RSpec::Expectations::MultipleExpectationsNotMetError",
+      "Got 6 failures from failure aggregation block:"
+    ],
+    "loc": "./spec/config/parallel_coverage_spec.rb"
+  },
+  {
+    "app": "casa",
+    "mode": "yjit",
+    "id": "./spec/config/parallel_coverage_spec.rb[1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "RSpec::Expectations::MultipleExpectationsNotMetError",
+      "Got 6 failures from failure aggregation block:"
+    ],
+    "loc": "./spec/config/parallel_coverage_spec.rb"
+  },
+  {
+    "app": "casa",
+    "mode": "zjit",
+    "id": "./spec/config/parallel_coverage_spec.rb[1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "RSpec::Expectations::MultipleExpectationsNotMetError",
+      "Got 6 failures from failure aggregation block:"
+    ],
+    "loc": "./spec/config/parallel_coverage_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:1:3:5:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:3]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:5]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:5]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:11]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:12]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:13]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:15:3]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:15:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/user_option_spec.rb[1:6:2:2:2:1:1]",
+    "base": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/models/user_option_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/user_option_spec.rb[1:6:2:2:2:1:2]",
+    "base": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/models/user_option_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/user_option_spec.rb[1:6:2:2:2:2:1]",
+    "base": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/models/user_option_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/user_spec.rb[1:43:1:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/user_spec.rb[1:43:1:3:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/user_spec.rb[1:44:1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "Redis::CannotConnectError",
+      "Waited 1.0 seconds (redis://localhost:7003/1)"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interp",
+    "id": "./spec/models/user_spec.rb[1:44:2:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "Redis::CannotConnectError",
+      "Waited 1.0 seconds (redis://localhost:7003/1)"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:1:3:5:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:3]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:5]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:5]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:11]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:12]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:13]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:15:3]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:15:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/user_history_spec.rb[1:2:1:6]",
+    "base": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/models/user_history_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/user_history_spec.rb[1:3:1]",
+    "base": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/models/user_history_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/user_history_spec.rb[1:3:2]",
+    "base": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/models/user_history_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/user_spec.rb[1:43:1:3:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Waited 1.0 seconds (redis://localhost:7002/1)"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/user_spec.rb[1:44:1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "Redis::CannotConnectError",
+      "Waited 1.0 seconds (redis://localhost:7002/1)"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/user_spec.rb[1:44:2:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "Redis::CannotConnectError",
+      "Waited 1.0 seconds (redis://localhost:7002/1)"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/user_spec.rb[1:45:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Waited 1.0 seconds (redis://localhost:7002/1)"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/user_spec.rb[1:46:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "interpW",
+    "id": "./spec/models/user_spec.rb[1:47:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Spec timed out after 45 seconds"
+    ],
+    "loc": "./spec/models/user_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:1:3:5:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:3]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:5]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:5]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:11]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:12]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:13]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:15:3]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:15:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/lib/auth/discourse_id_authenticator_spec.rb[1:2:1]",
+    "base": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/lib/auth/discourse_id_authenticator_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/lib/auth/discourse_id_authenticator_spec.rb[1:2:2]",
+    "base": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/lib/auth/discourse_id_authenticator_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/lib/auth/discourse_id_authenticator_spec.rb[1:2:3]",
+    "base": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/lib/auth/discourse_id_authenticator_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/lib/backup_restore/uploads_restorer_spec.rb[1:1:1:4:3:1:1:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "Redis::CannotConnectError",
+      "user specified timeout for localhost:7001 (redis://localhost:7001/1)"
+    ],
+    "loc": "./spec/lib/backup_restore/uploads_restorer_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/lib/backup_restore/uploads_restorer_spec.rb[1:1:1:4:3:1:1:5]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "loc": "./spec/lib/backup_restore/uploads_restorer_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/lib/backup_restore/uploads_restorer_spec.rb[1:1:1:4:3:1:1:6]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Spec timed out after 45 seconds"
+    ],
+    "loc": "./spec/lib/backup_restore/uploads_restorer_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/lib/pretty_text_spec.rb[1:33:1]",
+    "base": [
+      "fail",
+      "RSpec::Expectations::ExpectationNotMetError",
+      "expected no Exception, got #<Timeout::Error: execution expired> with backtrace:"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/lib/pretty_text_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "yjit",
+    "id": "./spec/lib/stylesheet/manager_spec.rb[1:9:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "AssetProcessor::TimeoutError",
+      "Script terminated: timeout after 15s"
+    ],
+    "loc": "./spec/lib/stylesheet/manager_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:1:3:5:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:3]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:5]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:2]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:3:5]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:11]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:12]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:13]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:15:3]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"new_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/post_mover_spec.rb[1:4:6:15:4]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "FrozenError",
+      "can't modify frozen String: \"existing_topic\""
+    ],
+    "loc": "./spec/models/post_mover_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/user_option_spec.rb[1:6:2:2:2:1:1]",
+    "base": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/models/user_option_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/user_option_spec.rb[1:6:2:2:2:1:2]",
+    "base": [
+      "fail",
+      "RSpec::Core::MultipleExceptionError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/models/user_option_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/user_option_spec.rb[1:6:2:2:2:2:1]",
+    "base": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/models/user_option_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/web_hook_spec.rb[1:8:10]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "loc": "./spec/models/web_hook_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/web_hook_spec.rb[1:8:11]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "loc": "./spec/models/web_hook_spec.rb"
+  },
+  {
+    "app": "discourse",
+    "mode": "zjit",
+    "id": "./spec/models/web_hook_spec.rb[1:8:12]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "SpecTimeoutError",
+      "Spec timed out after 45 seconds"
+    ],
+    "loc": "./spec/models/web_hook_spec.rb"
+  },
+  {
+    "app": "flow",
+    "mode": "interp",
+    "id": "RunnerProtocolConformanceTest#test_the_timestamp_matcher_takes_only_the_canonical_UTC_form_of_a_real_instant",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "fail",
+      "Minitest::Assertion",
+      "\"2026-02-30T00:00:00Z\" must not match $type: timestamp"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/flow-interp/test/integration/runner_protocol_conformance_test.rb:84"
+  },
+  {
+    "app": "flow",
+    "mode": "interpW",
+    "id": "WorkspaceSignupTicketTest#test_what_it_carries_cannot_be_read_from_the_link",
+    "base": [
+      "error",
+      "ArgumentError",
+      "ArgumentError: invalid base64"
+    ],
+    "got": [
+      "pass",
+      null,
+      null
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/flow-interpW/test/services/workspace_signup_ticket_test.rb:48"
+  },
+  {
+    "app": "flow",
+    "mode": "interpW",
+    "id": "RunnerProtocolConformanceTest#test_the_timestamp_matcher_takes_only_the_canonical_UTC_form_of_a_real_instant",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "fail",
+      "Minitest::Assertion",
+      "\"2026-02-30T00:00:00Z\" must not match $type: timestamp"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/flow-interpW/test/integration/runner_protocol_conformance_test.rb:84"
+  },
+  {
+    "app": "flow",
+    "mode": "yjit",
+    "id": "RunnerProtocolConformanceTest#test_the_timestamp_matcher_takes_only_the_canonical_UTC_form_of_a_real_instant",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "fail",
+      "Minitest::Assertion",
+      "\"2026-02-30T00:00:00Z\" must not match $type: timestamp"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/flow-yjit/test/integration/runner_protocol_conformance_test.rb:84"
+  },
+  {
+    "app": "flow",
+    "mode": "zjit",
+    "id": "RunnerProtocolConformanceTest#test_the_timestamp_matcher_takes_only_the_canonical_UTC_form_of_a_real_instant",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "fail",
+      "Minitest::Assertion",
+      "\"2026-02-30T00:00:00Z\" must not match $type: timestamp"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/flow-zjit/test/integration/runner_protocol_conformance_test.rb:84"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_coupons_service_spec.rb[1:1:9:1]",
+    "base": [
+      "",
+      null,
+      ""
+    ],
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_coupons_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:3]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:4]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:5]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:6]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:7]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:2:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:8:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:8:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:8:3]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:9:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:10:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:10:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:10:3:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:10:3:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:11:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:11:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:11:3:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:11:4:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:11:4:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:12:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:13:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:13:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:13:3]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:13:4]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:13:5:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:13:6:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:14:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:14:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:15:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:16:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:16:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:16:3]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:17:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:18:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:19:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:20:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:20:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:21:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:21:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:22:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/applied_prepaid_credits_service_spec.rb[1:1:22:2:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/applied_prepaid_credits_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:3:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:4:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:5:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:6:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:6:2:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:6:2:2:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:6:2:3:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:6:3:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:6:4:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/credit_note_service_spec.rb[1:2:7:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/credit_note_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:1:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:2:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:2:1:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:2:1:3:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:2:1:4:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:2:1:5:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:3:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:4:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:5:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:5:1:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:6:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:7:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:8:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:9:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/credits/progressive_billing_service_spec.rb[1:10:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/credits/progressive_billing_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:3:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:4:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:5:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:6:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:7:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:8:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:9:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:10:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:11:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:12:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:13:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:13:2:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:13:3:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:14:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:14:2]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:14:3:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:14:4:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:14:5:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:14:6:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:14:7:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:15:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:16:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:17:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/customer_update_service_spec.rb[1:18:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/customer_update_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/generate_url_service_spec.rb[1:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/generate_url_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customer_portal/generate_url_service_spec.rb[1:1:2:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customer_portal/generate_url_service_spec.rb"
+  },
+  {
+    "app": "lago",
+    "mode": "interp",
+    "id": "./spec/services/customers/apply_taxes_service_spec.rb[1:1:1]",
+    "base": null,
+    "got": [
+      "pass",
+      null,
+      ""
+    ],
+    "loc": "./spec/services/customers/apply_taxes_service_spec.rb"
+  },
+  {
+    "app": "mastodon",
+    "mode": "interp",
+    "id": "./spec/models/featured_tag_spec.rb[1:4:2:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "Redis::CannotConnectError",
+      "Unknown Error (hiredis_read) (redis://localhost:7015/1) (redis://localhost:7015/1)"
+    ],
+    "loc": "./spec/models/featured_tag_spec.rb"
+  },
+  {
+    "app": "mastodon",
+    "mode": "interp",
+    "id": "./spec/models/featured_tag_spec.rb[1:6:2:1]",
+    "base": [
+      "pass",
+      null,
+      ""
+    ],
+    "got": [
+      "fail",
+      "Redis::CannotConnectError",
+      "Unknown Error (hiredis_read) (redis://localhost:7015/1) (redis://localhost:7015/1)"
+    ],
+    "loc": "./spec/models/featured_tag_spec.rb"
+  },
+  {
+    "app": "sure",
+    "mode": "interp",
+    "id": "Provider::JevTest#test_uses_the_Jev_key_when_one_is_explicitly_set",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "error",
+      "Ractor::IsolationError",
+      "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/sure-interp/test/models/provider/jev_test.rb:370"
+  },
+  {
+    "app": "sure",
+    "mode": "interp",
+    "id": "Provider::JevTest#test_requires_an_explicit_Jev_key_rather_than_borrowing_an_OpenRouter_one",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "error",
+      "Ractor::IsolationError",
+      "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/sure-interp/test/models/provider/jev_test.rb:358"
+  },
+  {
+    "app": "sure",
+    "mode": "interpW",
+    "id": "Provider::JevTest#test_uses_the_Jev_key_when_one_is_explicitly_set",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "error",
+      "Ractor::IsolationError",
+      "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/sure-interpW/test/models/provider/jev_test.rb:370"
+  },
+  {
+    "app": "sure",
+    "mode": "interpW",
+    "id": "Provider::JevTest#test_requires_an_explicit_Jev_key_rather_than_borrowing_an_OpenRouter_one",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "error",
+      "Ractor::IsolationError",
+      "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/sure-interpW/test/models/provider/jev_test.rb:358"
+  },
+  {
+    "app": "sure",
+    "mode": "yjit",
+    "id": "Provider::JevTest#test_uses_the_Jev_key_when_one_is_explicitly_set",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "error",
+      "Ractor::IsolationError",
+      "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/sure-yjit/test/models/provider/jev_test.rb:370"
+  },
+  {
+    "app": "sure",
+    "mode": "yjit",
+    "id": "Provider::JevTest#test_requires_an_explicit_Jev_key_rather_than_borrowing_an_OpenRouter_one",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "error",
+      "Ractor::IsolationError",
+      "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/sure-yjit/test/models/provider/jev_test.rb:358"
+  },
+  {
+    "app": "sure",
+    "mode": "zjit",
+    "id": "Provider::JevTest#test_uses_the_Jev_key_when_one_is_explicitly_set",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "error",
+      "Ractor::IsolationError",
+      "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/sure-zjit/test/models/provider/jev_test.rb:370"
+  },
+  {
+    "app": "sure",
+    "mode": "zjit",
+    "id": "Provider::JevTest#test_requires_an_explicit_Jev_key_rather_than_borrowing_an_OpenRouter_one",
+    "base": [
+      "pass",
+      null,
+      null
+    ],
+    "got": [
+      "error",
+      "Ractor::IsolationError",
+      "Ractor::IsolationError: can't modify instance variables of a shareable Object"
+    ],
+    "loc": "/home/user/rdiff/work/2026-11-27-409-heavy-master-f3e180b5eb/sure-zjit/test/models/provider/jev_test.rb:358"
+  }
+]

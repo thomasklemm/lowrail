@@ -1,0 +1,4 @@
+master 32509 v409 20484 common 20484
+differ 1
+['', None] -> ['pass', None] ./spec/services/credits/applied_coupons_service_spec.rb[1:1:9:1] | 
+master-only failures by class [('Faker::UniqueGenerator::RetryLimitExceeded', 107), ('RSpec::Expectations::ExpectationNotMetError', 1), ('Errno::ENOENT', 1)]

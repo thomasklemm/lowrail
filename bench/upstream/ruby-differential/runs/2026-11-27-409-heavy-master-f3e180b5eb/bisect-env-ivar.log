@@ -1,0 +1,124 @@
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+b8eb3496ca: true
+Bisecting: 2085 revisions left to test after this (roughly 11 steps)
+[3b8479580399341b79b91b1953f66dab339c92a6] Bump taiki-e/install-action
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+3b84795803: true
+Bisecting: 1041 revisions left to test after this (roughly 10 steps)
+[0ad59eb0588e2b510d90d93e5035b28e06cda98f] [ruby/rubygems] security.rb: Reorder case branches in create_key to match help text
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+0ad59eb058: true
+Bisecting: 520 revisions left to test after this (roughly 9 steps)
+[dd70e80806fa9d513cc0625fe2992265597d7a92] [ruby/io-console] Detect the old style `ttyname_r` return type
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+dd70e80806: true
+Bisecting: 260 revisions left to test after this (roughly 8 steps)
+[e1f6ba50da4ee4b39f6882ee205cb08999476715] Do not report an interrupted M:N io wait as a timeout
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+e1f6ba50da: true
+Bisecting: 130 revisions left to test after this (roughly 7 steps)
+[308677c7032a5cf76b7a053011534360eda43e64] Ractor#monitor: name the ractor in the exit token
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+308677c703: true
+Bisecting: 65 revisions left to test after this (roughly 6 steps)
+[0b8e0b1c28bc839095e2c0e884313f0f5ef1fc53] [ruby/rubygems] Stop vendoring resolv for two regexps
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+0b8e0b1c28: true
+Bisecting: 32 revisions left to test after this (roughly 5 steps)
+[6bae4d8e5f7601935f2ae47568b677a3fc9e1062] Forbid Procs with ivars from being isolated
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+6bae4d8e5f: true
+Bisecting: 16 revisions left to test after this (roughly 4 steps)
+[fe24147a6224399a611826ad5beedf34e48cc18c] [ruby/resolv] Do not register on-demand classes for unknown DNS types and SvcParamKeys
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+fe24147a62: true
+Bisecting: 8 revisions left to test after this (roughly 3 steps)
+[caa446249020d0ed3f8cbc1ecde68818bf0de595] Update default gems list at 30ded5b167fbba0713339a6f3bae03 [ci skip]
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+caa4462490: true
+Bisecting: 4 revisions left to test after this (roughly 2 steps)
+[c402c18fe5eb5f33c7e9495f40e0235664815c37] [ruby/json] Add error position and json_path to the JRuby extension
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+c402c18fe5: true
+Bisecting: 2 revisions left to test after this (roughly 1 step)
+[f2f53ccbe318e6da29c5a1ad515410e4c12e3e12] Update default gems list at 793888fe2250e237776350ad5600c5 [ci skip]
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+f2f53ccbe3: true
+Bisecting: 0 revisions left to test after this (roughly 1 step)
+[73055acd572a458d0a2e90edeedc3027c86cc917] Forbid setting ivars on Ractor shareable objects
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+73055acd57: true
+Bisecting: 0 revisions left to test after this (roughly 0 steps)
+[55562be3de92cc8a8713b15c6dc6baa0d7662ae5] ZJIT: Check interrupts as late as possible (#18774)
+running '/home/user/workspace/repo/bench/upstream/ruby-differential/bisect-test.sh' '/home/user/workspace/repo/bench/upstream/ruby-differential/repros/env_ivar_shareable.rb'
+55562be3de: true
+73055acd572a458d0a2e90edeedc3027c86cc917 is the first 'bad' commit
+commit 73055acd572a458d0a2e90edeedc3027c86cc917
+Author: John Hawthorn <john@hawthorn.email>
+Date:   Thu Sep 3 10:14:59 2026 -0700
+
+    Forbid setting ivars on Ractor shareable objects
+    
+    Previously we had a check that objects which were shareable, but not
+    frozen on a non-main Ractor would raise an exception if instance
+    variables were read. This prevented a non-main Ractor reading
+    non-shareable objects.
+    
+    This changes the behaviour to forbid all writes to shareable objects
+    (even when unfrozen). This is done by re-purposing the frozen flag on
+    the object shape to reflect (FL_FROZEN || FL_SHAREABLE).
+    
+    With IV writes forbidden on all shareable objects whether or not they
+    are frozen (with the exception of classes and modules), we can also
+    remove the check against reading instance variables, since no unsafe
+    instance variables can be set.
+    
+    [Bug #22291]
+
+ bootstraptest/test_ractor.rb | 47 ++++++++++++++++++++----------------------
+ eval.c                       |  1 +
+ hash.c                       |  1 +
+ inits.c                      |  1 -
+ internal/inits.h             |  3 +++
+ internal/variable.h          |  1 +
+ ractor.c                     | 23 ++++++++++++++++-----
+ ractor_sync.c                |  3 +--
+ shape.h                      |  3 ++-
+ test/ruby/test_env.rb        | 31 ++++++++++++----------------
+ variable.c                   | 49 +++++++++++++++++++++++++++++---------------
+ vm_insnhelper.c              |  2 +-
+ 12 files changed, 96 insertions(+), 69 deletions(-)
+bisect found first 'bad' commit
+# bad: [f3e180b5ebc835f87c2ff7ccb8474a1bf18b0115] [Bug #22643] Prevent crashes compiling super in keyword defaults
+# good: [d375bcc965d4a0c661785fa94150f6202e99c1ce] [DOC] Escape capitalized word "data" not to be linked unexpectedly
+git bisect start 'f3e180b5ebc835f87c2ff7ccb8474a1bf18b0115' 'd375bcc965d4a0c661785fa94150f6202e99c1ce'
+# good: [b8eb3496ca2c2ab5ca77ef93f28cf7dc96573ce7] Automatically sync tests from ruby/mmtk
+git bisect good b8eb3496ca2c2ab5ca77ef93f28cf7dc96573ce7
+# bad: [3b8479580399341b79b91b1953f66dab339c92a6] Bump taiki-e/install-action
+git bisect bad 3b8479580399341b79b91b1953f66dab339c92a6
+# good: [0ad59eb0588e2b510d90d93e5035b28e06cda98f] [ruby/rubygems] security.rb: Reorder case branches in create_key to match help text
+git bisect good 0ad59eb0588e2b510d90d93e5035b28e06cda98f
+# bad: [dd70e80806fa9d513cc0625fe2992265597d7a92] [ruby/io-console] Detect the old style `ttyname_r` return type
+git bisect bad dd70e80806fa9d513cc0625fe2992265597d7a92
+# good: [e1f6ba50da4ee4b39f6882ee205cb08999476715] Do not report an interrupted M:N io wait as a timeout
+git bisect good e1f6ba50da4ee4b39f6882ee205cb08999476715
+# good: [308677c7032a5cf76b7a053011534360eda43e64] Ractor#monitor: name the ractor in the exit token
+git bisect good 308677c7032a5cf76b7a053011534360eda43e64
+# good: [0b8e0b1c28bc839095e2c0e884313f0f5ef1fc53] [ruby/rubygems] Stop vendoring resolv for two regexps
+git bisect good 0b8e0b1c28bc839095e2c0e884313f0f5ef1fc53
+# bad: [6bae4d8e5f7601935f2ae47568b677a3fc9e1062] Forbid Procs with ivars from being isolated
+git bisect bad 6bae4d8e5f7601935f2ae47568b677a3fc9e1062
+# good: [fe24147a6224399a611826ad5beedf34e48cc18c] [ruby/resolv] Do not register on-demand classes for unknown DNS types and SvcParamKeys
+git bisect good fe24147a6224399a611826ad5beedf34e48cc18c
+# good: [caa446249020d0ed3f8cbc1ecde68818bf0de595] Update default gems list at 30ded5b167fbba0713339a6f3bae03 [ci skip]
+git bisect good caa446249020d0ed3f8cbc1ecde68818bf0de595
+# good: [c402c18fe5eb5f33c7e9495f40e0235664815c37] [ruby/json] Add error position and json_path to the JRuby extension
+git bisect good c402c18fe5eb5f33c7e9495f40e0235664815c37
+# good: [f2f53ccbe318e6da29c5a1ad515410e4c12e3e12] Update default gems list at 793888fe2250e237776350ad5600c5 [ci skip]
+git bisect good f2f53ccbe318e6da29c5a1ad515410e4c12e3e12
+# bad: [73055acd572a458d0a2e90edeedc3027c86cc917] Forbid setting ivars on Ractor shareable objects
+git bisect bad 73055acd572a458d0a2e90edeedc3027c86cc917
+# good: [55562be3de92cc8a8713b15c6dc6baa0d7662ae5] ZJIT: Check interrupts as late as possible (#18774)
+git bisect good 55562be3de92cc8a8713b15c6dc6baa0d7662ae5
+# first 'bad' commit: [73055acd572a458d0a2e90edeedc3027c86cc917] Forbid setting ivars on Ractor shareable objects
+done

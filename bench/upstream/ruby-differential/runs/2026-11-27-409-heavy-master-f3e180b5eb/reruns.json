@@ -1,0 +1,874 @@
+[
+  {
+    "app": "casa",
+    "id": "./spec/config/parallel_coverage_spec.rb[1:1]",
+    "modes": [
+      "interp",
+      "interpW",
+      "yjit",
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "fail:RSpec::Expectations::ExpectationNotMetError",
+        "fail:RSpec::Expectations::ExpectationNotMetError",
+        "fail:RSpec::Expectations::ExpectationNotMetError"
+      ],
+      "yjit": [
+        "fail:RSpec::Expectations::ExpectationNotMetError",
+        "fail:RSpec::Expectations::ExpectationNotMetError",
+        "fail:RSpec::Expectations::ExpectationNotMetError"
+      ],
+      "zjit": [
+        "fail:RSpec::Expectations::ExpectationNotMetError",
+        "fail:RSpec::Expectations::ExpectationNotMetError",
+        "fail:RSpec::Expectations::ExpectationNotMetError"
+      ]
+    },
+    "log": "124a78d6b9"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/lib/auth/discourse_id_authenticator_spec.rb[1:2:1]",
+    "modes": [
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "596bb51607"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/lib/auth/discourse_id_authenticator_spec.rb[1:2:2]",
+    "modes": [
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "5942500cce"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/lib/auth/discourse_id_authenticator_spec.rb[1:2:3]",
+    "modes": [
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "d6a757bf31"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/lib/backup_restore/uploads_restorer_spec.rb[1:1:1:4:3:1:1:4]",
+    "modes": [
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "062dd95e20"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/lib/backup_restore/uploads_restorer_spec.rb[1:1:1:4:3:1:1:5]",
+    "modes": [
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "abe289c9a1"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/lib/backup_restore/uploads_restorer_spec.rb[1:1:1:4:3:1:1:6]",
+    "modes": [
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "1a5a006550"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/lib/pretty_text_spec.rb[1:33:1]",
+    "modes": [
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "4b1767607e"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/lib/stylesheet/manager_spec.rb[1:9:4]",
+    "modes": [
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "52d293d37b"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:1:1]",
+    "modes": [
+      "interp",
+      "interpW",
+      "yjit",
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "fail:FrozenError",
+        "fail:FrozenError",
+        "fail:FrozenError"
+      ],
+      "yjit": [
+        "fail:FrozenError",
+        "fail:FrozenError",
+        "fail:FrozenError"
+      ],
+      "zjit": [
+        "fail:FrozenError",
+        "fail:FrozenError",
+        "fail:FrozenError"
+      ]
+    },
+    "log": "f883d53831"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/post_mover_spec.rb[1:4:2:2:1]",
+    "modes": [
+      "interp",
+      "interpW",
+      "yjit",
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "fail:FrozenError",
+        "fail:FrozenError",
+        "fail:FrozenError"
+      ],
+      "yjit": [
+        "fail:FrozenError",
+        "fail:FrozenError",
+        "fail:FrozenError"
+      ],
+      "zjit": [
+        "fail:FrozenError",
+        "fail:FrozenError",
+        "fail:FrozenError"
+      ]
+    },
+    "log": "68bb1600c6"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_history_spec.rb[1:2:1:6]",
+    "modes": [
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "d9943b5324"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_history_spec.rb[1:3:1]",
+    "modes": [
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "e63f95eb4b"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_history_spec.rb[1:3:2]",
+    "modes": [
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "de1bd2c1a2"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_option_spec.rb[1:6:2:2:2:1:1]",
+    "modes": [
+      "interp",
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "4a01506041"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_option_spec.rb[1:6:2:2:2:1:2]",
+    "modes": [
+      "interp",
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "01a38a19ab"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_option_spec.rb[1:6:2:2:2:2:1]",
+    "modes": [
+      "interp",
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "8d02c10f55"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_spec.rb[1:43:1:2]",
+    "modes": [
+      "interp"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "9417b69e2c"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_spec.rb[1:43:1:3:1]",
+    "modes": [
+      "interp",
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "118c32d9f8"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_spec.rb[1:44:1:1]",
+    "modes": [
+      "interp",
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "20982588d7"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_spec.rb[1:44:2:1]",
+    "modes": [
+      "interp",
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "08e9b2fd31"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_spec.rb[1:45:1]",
+    "modes": [
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "d0720bbae8"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_spec.rb[1:46:1]",
+    "modes": [
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "a97ae48f55"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/user_spec.rb[1:47:1]",
+    "modes": [
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "0606838732"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/web_hook_spec.rb[1:8:10]",
+    "modes": [
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "262f65f198"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/web_hook_spec.rb[1:8:11]",
+    "modes": [
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "46ef4f5a20"
+  },
+  {
+    "app": "discourse",
+    "id": "./spec/models/web_hook_spec.rb[1:8:12]",
+    "modes": [
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "3aa5233879"
+  },
+  {
+    "app": "flow",
+    "id": "RunnerProtocolConformanceTest#test_the_timestamp_matcher_takes_only_the_canonical_UTC_form_of_a_real_instant",
+    "modes": [
+      "interp",
+      "yjit"
+    ],
+    "alone": {
+      "interp": [
+        "fail:Minitest::Assertion",
+        "fail:Minitest::Assertion",
+        "fail:Minitest::Assertion"
+      ],
+      "yjit": [
+        "fail:Minitest::Assertion",
+        "fail:Minitest::Assertion",
+        "fail:Minitest::Assertion"
+      ],
+      "zjit": [
+        "fail:Minitest::Assertion",
+        "fail:Minitest::Assertion",
+        "fail:Minitest::Assertion"
+      ]
+    },
+    "log": "f3eba99490"
+  },
+  {
+    "app": "flow",
+    "id": "WorkspaceSignupTicketTest#test_what_it_carries_cannot_be_read_from_the_link",
+    "modes": [
+      "interpW"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "aed6f900d6"
+  },
+  {
+    "app": "lago",
+    "id": "./spec/lib/tasks/recipes/clickhouse_rake_spec.rb[1:7:2:1:1]",
+    "modes": [
+      "interp"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "a0a837a19a"
+  },
+  {
+    "app": "mastodon",
+    "id": "./spec/models/featured_tag_spec.rb[1:4:2:1]",
+    "modes": [
+      "interp"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "3b1c9c9d1d"
+  },
+  {
+    "app": "mastodon",
+    "id": "./spec/models/featured_tag_spec.rb[1:6:2:1]",
+    "modes": [
+      "interp"
+    ],
+    "alone": {
+      "interp": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "yjit": [
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "zjit": [
+        "pass",
+        "pass",
+        "pass"
+      ]
+    },
+    "log": "f7dd4743d8"
+  },
+  {
+    "app": "sure",
+    "id": "Provider::JevTest#test_requires_an_explicit_Jev_key_rather_than_borrowing_an_OpenRouter_one",
+    "modes": [
+      "interp",
+      "interpW",
+      "yjit",
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError"
+      ],
+      "yjit": [
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError"
+      ],
+      "zjit": [
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError"
+      ]
+    },
+    "log": "7ec2a95c89"
+  },
+  {
+    "app": "sure",
+    "id": "Provider::JevTest#test_uses_the_Jev_key_when_one_is_explicitly_set",
+    "modes": [
+      "interp",
+      "interpW",
+      "yjit",
+      "zjit"
+    ],
+    "alone": {
+      "interp": [
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError"
+      ],
+      "yjit": [
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError"
+      ],
+      "zjit": [
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError",
+        "error:Ractor::IsolationError"
+      ]
+    },
+    "log": "7bc433cbcc"
+  }
+]

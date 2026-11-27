@@ -12,6 +12,9 @@
 #   script/ruby-differential run     --ruby DIR --label L [--modes LIST] [--apps LIST] [--jobs N] [--force]   # resumes a label
 #   script/ruby-differential compare --label L [--label L2 ...] [--base-label B] # per-test differences against interp (of B)
 #   script/ruby-differential rerun   --ruby DIR --label L [--reps 3] [--jobs N]   # each difference alone, see MODES_RERUN
+#   script/ruby-differential compare --label L --base-label B --same-mode        # two Rubies: each mode against B's same mode
+#   script/ruby-differential rerun   --ruby DIR --label L --diffs-from L2 --rerun-modes LIST  # L2's differences on another Ruby
+#   script/ruby-differential warndiff --label L --base-label B                    # Ruby warnings L prints and B does not
 #
 # weekly = build + (setup) + bundle + run + compare, then rerun and report only differences that are new against the
 # previous run of the same series (master, zjit-headline*) and known.json; writes runs/LABEL/report.md, exits 1 if any.
@@ -96,6 +99,32 @@ module RubyDifferential
       prep: ["sh", "-c", "bin/vite build --mode test && bin/rails db:test:prepare"] },
     "react-starter-kit" => { source: "census", kind: "rspec", cmd: RSPEC + NO_SYSTEM, prep: %w[bin/rails db:prepare assets:precompile] },
     "redprints-cfp" => { source: "census", kind: "rspec", cmd: RSPEC + NO_SYSTEM, prep: %w[bin/rails db:prepare assets:precompile] },
+    # Lago: a ClickHouse server on localhost:8123 (default user, no password) and one ClickHouse database per run,
+    # created and migrated by run_prep; spec/integration needs live services, as in Lago's CI.
+    "lago" => { source: "census", kind: "rspec", cmd: RSPEC + %w[--exclude-pattern spec/integration/**/*_integration_spec.rb],
+      prep: %w[bin/rails db:create db:schema:load:primary], db: ->(t) { "rd_lago_#{t}" },
+      run_prep: %w[bin/rails db:create:clickhouse db:migrate:clickhouse], clickhouse: ->(t) { "rd_lago_#{t}" },
+      env: ->(t, r) { ENCRYPTION.transform_keys { _1.sub("ACTIVE_RECORD", "LAGO") }.merge("DATABASE_URL" => "postgres:///rd_lago_#{t}",
+        "LAGO_REDIS_CACHE_URL" => "redis://localhost:#{r}/1", "REDIS_URL" => "redis://localhost:#{r}/2", "LAGO_REDIS_STORE_URL" => "localhost:#{r}",
+        "SECRET_KEY_BASE" => "census" * 16, "LAGO_API_URL" => "https://api.lago.dev", "LAGO_PDF_URL" => "https://pdf.lago.dev",
+        "LAGO_DATA_API_URL" => "http://data_api", "LAGO_FROM_EMAIL" => "noreply@getlago.com", "LAGO_DISABLE_SEGMENT" => "true",
+        "LAGO_CLICKHOUSE_ENABLED" => "true", "LAGO_CLICKHOUSE_MIGRATIONS_ENABLED" => "true", "LAGO_CLICKHOUSE_HOST" => "localhost",
+        "LAGO_CLICKHOUSE_DATABASE" => "rd_lago_#{t}", "LAGO_CLICKHOUSE_USERNAME" => "default", "LAGO_CLICKHOUSE_PASSWORD" => "",
+        "LAGO_KAFKA_BOOTSTRAP_SERVERS" => "localhost:9092", "LAGO_KAFKA_ACTIVITY_LOGS_TOPIC" => "activity_logs",
+        "LAGO_KAFKA_API_LOGS_TOPIC" => "api_logs", "LAGO_KAFKA_EVENTS_CHARGED_IN_ADVANCE_TOPIC" => "events_charged_in_advance",
+        "LAGO_KAFKA_REALTIME_USAGE_TRIGGERS_TOPIC" => "realtime_usage_triggers", "LAGO_REALTIME_USAGE_ALERTS_ENABLED" => "true",
+        "LAGO_KAFKA_SECURITY_LOGS_TOPIC" => "security_logs") } },
+    # Docuseal: libpdfium.so with its fork's nine extra symbols over bblanchon's build (docs/upstream/ruby41-differential-409-heavy.md).
+    "docuseal" => { source: "census", kind: "rspec", cmd: RSPEC + NO_SYSTEM, prep: %w[bin/rails db:create db:schema:load],
+      db: ->(t) { "rd_docuseal_#{t}" },
+      env: ->(t, r) { { "DATABASE_URL" => "postgres:///rd_docuseal_#{t}", "SECRET_KEY_BASE" => "census" * 16,
+        "REDIS_URL" => "redis://localhost:#{r}/3", "RUN_MIGRATIONS" => "false" } } },
+    # Flow: temporalio 1.10.0 as a path gem built from source for each Ruby (docs/upstream/ruby41-differential-409-heavy.md).
+    "flow" => { source: "census", kind: "minitest", cmd: MINITEST, prep: %w[bin/rails db:create db:schema:load], db: ->(t) { "rd_flow_#{t}" },
+      env: ->(t, r) { { "DATABASE_URL" => "postgres:///rd_flow_#{t}", "DB_HOST" => "/var/run/postgresql", "DB_USERNAME" => ENV.fetch("USER"),
+        "DB_PASSWORD" => "", "REDIS_URL" => "redis://localhost:#{r}/1", "SECRET_KEY_BASE" => "census" * 16,
+        "CREDENTIALS_SECRET_KEY" => "census-credentials-key-0123456789ab", "CONFIG_ITEMS_SECRET_KEY" => "census-config-items-key-0123456789",
+        "INTEGRATIONS_SECRET_KEY" => "census-integrations-key-012345678", "OAUTH_SECRET_KEY" => "census-oauth-secret-key-0123456789ab" } } },
   }.freeze
 
   module_function
@@ -242,7 +271,7 @@ module RubyDifferential
 
   # A fresh copy of the app (node_modules linked, not copied) and, for server databases, a fresh database
   # cloned from the template the setup step loaded, so every run starts from the same rows and sequences.
-  def fresh_copy(app, work, token)
+  def fresh_copy(app, work, token, bin = nil)
     FileUtils.rm_rf(work)
     FileUtils.mkdir_p(File.dirname(work))
     src = base(app)
@@ -252,6 +281,12 @@ module RubyDifferential
       FileUtils.mkdir_p(File.dirname(File.join(work, rel)))
       File.symlink(File.join(src, rel), File.join(work, rel))
     end
+    # A vendored path gem's extension (vendor/f1, built by the overlay with the setup Ruby) has a build per Ruby
+    # next to it as SO.ruby-REVISION, so two Rubies share one Gemfile.lock but not one binary.
+    Dir[File.join(work, "vendor/f1/*/lib/**/*.so")].each do |so|
+      own = "#{so}.ruby-#{revision(bin)}"
+      FileUtils.cp(own, so) if bin && File.exist?(own)
+    end
     return unless (db = APPS.fetch(app)[:db])
     system("dropdb", "--if-exists", db.call(token), exception: true)
     system("createdb", "-T", db.call("tpl"), db.call(token), exception: true)
@@ -260,6 +295,16 @@ module RubyDifferential
   def drop(app, token)
     db = APPS.fetch(app)[:db]
     system("dropdb", "--if-exists", db.call(token), out: File::NULL, err: File::NULL) if db
+    ch = APPS.fetch(app)[:clickhouse]
+    system("curl", "-fsS", "http://127.0.0.1:8123/", "--data-binary", "DROP DATABASE IF EXISTS #{ch.call(token)}", out: File::NULL, err: File::NULL) if ch
+  end
+
+  # Per-run preparation that a template database cannot carry (Lago's ClickHouse database), in the run copy.
+  def run_prep(app, bin, work, token, redis, log)
+    return unless (cmd = APPS.fetch(app)[:run_prep])
+    ch = APPS.fetch(app)[:clickhouse]
+    system("curl", "-fsS", "http://127.0.0.1:8123/", "--data-binary", "DROP DATABASE IF EXISTS #{ch.call(token)}", out: File::NULL, err: File::NULL) if ch
+    sh(env(app, bin, token, redis).merge("RUBYOPT" => nil), *cmd, chdir: work, log: log)
   end
 
   def token(*parts) = Digest::SHA256.hexdigest(parts.join("/"))[0, 10]
@@ -296,7 +341,47 @@ module RubyDifferential
     Process.wait(pid)
     jitstate = File.exist?("#{raw}.jit") ? File.read("#{raw}.jit").lines.to_h { _1.chomp.split("=", 2) } : {}
     { "exit" => $?.exitstatus || -$?.termsig.to_i, "secs" => (Time.now - start).round, "jit" => jitstate,
-      "tests" => outcomes(conf[:kind], raw) }
+      "warnings" => warnings(log, work), "tests" => outcomes(conf[:kind], raw) }
+  end
+
+  # Ruby warnings ("FILE:LINE: warning: ...") and Rails deprecations in a run's log, as { line => count }, with the run
+  # copy, gem directories and object addresses masked, so two Rubies' runs of one app compare line by line. Read from
+  # the log rather than hooked in Warning.warn, which apps capture with Warning.method(:warn) (Loomio, Mocha).
+  def warnings(log, work)
+    return {} unless File.exist?(log)
+    File.foreach(log, chomp: true).filter_map do |line|
+      line = line.scrub[/\S+:\d+: warning: .*|DEPRECATION WARNING: .*?(?= \(called from |\z)/]
+      line && norm_warning(line.sub(/\A[.F*]+(?=\/)/, "").gsub(work, "APP"))
+    end.tally.sort_by { -_2 }.first(500).to_h
+  end
+
+  def norm_warning(line) = line.gsub(%r{/\S*?/lib/ruby/gems/\d+\.\d+\.\d+(\+\d+)?/(bundler/)?gems/}, "GEMS/")
+    .gsub(%r{/\S*?/lib/ruby/\d+\.\d+\.\d+(\+\d+)?/}, "RUBYLIB/").gsub(/0x\h+/, "0x")
+
+  # Warning lines that a run of LABEL has and the same app and mode of --base-label B (or its interp run) does not.
+  def warndiff(opts)
+    label, base_label = opts.fetch(:label), opts.fetch(:base_label)
+    out = {}
+    Dir[File.join(out_dir(label), "*", "*.json.gz")].sort.each do |f|
+      r = read_gz(f)
+      bf = [r["mode"], "interp"].map { File.join(out_dir(base_label), r["app"], "#{_1}.json.gz") }.find { File.exist?(_1) }
+      next unless bf
+      b = read_gz(bf)
+      # The orb keeps the logs (RDIFF_HOME/logs/LABEL/APP-MODE.log): read warnings from them when present.
+      from_log = ->(lab, run) do
+        log = File.join(HOME, "logs", lab, "#{run["app"]}-#{run["mode"]}.log")
+        File.exist?(log) ? warnings(log, File.join(HOME, "work", lab, "#{run["app"]}-#{run["mode"]}")) : run["warnings"]
+      end
+      r["warnings"], b["warnings"] = from_log.(label, r), from_log.(base_label, b)
+      strip = ->(w) { w.to_h.each_with_object(Hash.new(0)) { |(k, n), h| h[norm_warning(k).gsub(/:\d+:/, ":N:")] += n } }
+      bw = strip.(b["warnings"])
+      fresh = strip.(r["warnings"]).reject { |k, _| bw.key?(k) }
+      gone = bw.keys - strip.(r["warnings"]).keys
+      out["#{r["app"]} #{r["mode"]} vs #{File.basename(bf, ".json.gz")}"] = { "new" => fresh, "gone" => gone }
+      puts "#{r["app"]} #{r["mode"]}: #{fresh.size} new, #{gone.size} gone"
+      fresh.first(15).each { |k, n| puts "  +#{n} #{k[0, 240]}" }
+    end
+    File.write(File.join(out_dir(label), "warnings-vs-#{base_label}.json"), JSON.pretty_generate(out) + "\n")
   end
 
   def write_gz(path, obj)
@@ -346,10 +431,11 @@ module RubyDifferential
   end
 
   # Longest suites first, so the pool's tail is short.
-  # Lobsters' suite stops in before(:suite) on Rails main (activerecord-typedstore); --apps lobsters still runs it.
-  DEFAULT_APPS = (APPS.keys - %w[lobsters]).freeze
+  # Lobsters' suite stops in before(:suite) on Rails main (activerecord-typedstore), and Lago needs ClickHouse;
+  # --apps lobsters,lago still runs them.
+  DEFAULT_APPS = (APPS.keys - %w[lobsters lago docuseal flow]).freeze
 
-  ORDER = %w[discourse sure mastodon loomio casa fizzy lobsters hackatime campfire writebook codetriage].freeze
+  ORDER = %w[discourse lago sure flow docuseal mastodon loomio casa fizzy lobsters hackatime campfire writebook codetriage].freeze
 
   def run(opts)
     bin = ruby_bin(opts.fetch(:ruby))
@@ -364,7 +450,8 @@ module RubyDifferential
       work = File.join(HOME, "work", label, "#{app}-#{mode}")
       logdir = File.join(HOME, "logs", label)
       FileUtils.mkdir_p(logdir)
-      fresh_copy(app, work, tok)
+      fresh_copy(app, work, tok, bin)
+      run_prep(app, bin, work, tok, slot, File.join(logdir, "#{app}-#{mode}.prep.log"))
       res = run_one(app, bin, mode, ms[mode], work, File.join(logdir, "#{app}-#{mode}.raw.json"), File.join(logdir, "#{app}-#{mode}.log"),
         redis: slot, token: tok)
       write_gz(File.join(out_dir(label), app, "#{mode}.json.gz"), { "ruby" => ruby, "app" => app, "mode" => mode, "flags" => ms[mode] }.merge(res))
@@ -394,8 +481,14 @@ module RubyDifferential
         base_file = opts[:base_label] && File.join(out_dir(opts[:base_label]), app, "interp.json.gz")
         base = base_file ? (read_gz(base_file) if File.exist?(base_file)) : rs.find { _1["mode"] == "interp" }
         next puts("#{label} #{app}: no interp run") unless base&.dig("tests")
-        bt = keyed(base["tests"])
+        interp_base = base
         rs.sort_by { _1["mode"] }.each do |r|
+          # --same-mode: each mode against the same mode of --base-label (another Ruby), else its interp run.
+          if opts[:same_mode] && opts[:base_label]
+            f = File.join(out_dir(opts[:base_label]), app, "#{r["mode"]}.json.gz")
+            base = File.exist?(f) && read_gz(f)&.dig("tests") ? read_gz(f) : interp_base
+          end
+          bt = keyed(base["tests"])
           tally = r["tests"]&.values&.map(&:first)&.tally
           unless r["tests"]
             # A crash, hang or boot failure: the whole run differs.
@@ -413,12 +506,13 @@ module RubyDifferential
           t = keyed(r["tests"])
           diffs = (bt.keys | t.keys).select { differs?(bt[_1], t[_1]) }
           puts "#{label} #{app} #{r["mode"]}: #{t.size} tests #{tally} exit=#{r["exit"]} jit=#{r["jit"].slice("yjit", "zjit")}: #{diffs.size} differ"
-          (summary[label] ||= []) << { "app" => app, "mode" => r["mode"], "tests" => t.size, "results" => tally, "exit" => r["exit"],
+          (summary[label] ||= []) << { "app" => app, "mode" => r["mode"], "base" => "#{opts[:same_mode] ? opts[:base_label] : label} #{base["mode"]}",
+            "base_tests" => base["tests"].size, "tests" => t.size, "results" => tally, "exit" => r["exit"],
             "secs" => r["secs"], "differ" => diffs.size,
             "top" => diffs.filter_map { t[_1]&.[](1) }.tally.max_by(3) { _2 }.to_h }
           (all[label] ||= {})["#{app} #{r["mode"]}"] = diffs
           # Keep the first 100 of a run: one that differs in thousands failed as a whole.
-          diffs.first(100).each_with_index do |k, i|
+          diffs.first(opts[:keep] || 100).each_with_index do |k, i|
             a, b = bt[k], t[k]
             puts "  #{a&.first || "MISSING"}#{"(#{a[1]})" if a&.[](1)} -> #{b&.first || "MISSING"}#{"(#{b[1]})" if b&.[](1)}  #{k}\n      #{(b || a)[2]}" if i < 20
             (report[label] ||= []) << { "app" => app, "mode" => r["mode"], "id" => (b || a).last, "base" => a&.take(3), "got" => b&.take(3),
@@ -448,24 +542,25 @@ module RubyDifferential
   def rerun(opts)
     bin = ruby_bin(opts.fetch(:ruby))
     label = opts.fetch(:label)
-    path = File.join(out_dir(label), "diffs.json")
+    path = File.join(out_dir(opts[:diffs_from] || label), "diffs.json")
     diffs = File.exist?(path) ? JSON.parse(File.read(path)) : []
     ms = MODES.merge(modes(opts[:modes]))
     # A run with hundreds of differences failed as a whole (a crash, or one bug in a shared path);
     # rerunning SAMPLE of them alone says the same as rerunning all.
     diffs = diffs.select { opts[:apps].include?(_1["app"]) }
     diffs = diffs.select { |d| opts[:only].include?([d["app"], norm(d["id"])]) } if opts[:only]
-      .group_by { [_1["app"], _1["mode"]] }
+    diffs = diffs.group_by { [_1["app"], _1["mode"]] }
       .flat_map { |_, ds| ds.size > 50 ? ds.select { _1.dig("base", 0) == "pass" }.sample(SAMPLE, random: Random.new(41231)) : ds }
     by_test = diffs.group_by { [_1["app"], _1["id"]] }
     results = []
     pool(opts[:jobs], by_test.to_a) do |((app, id), ds), slot|
-      rerun_modes = (MODES_RERUN + ds.map { _1["mode"] }).uniq
+      rerun_modes = opts[:rerun_modes] || (MODES_RERUN + ds.map { _1["mode"] }).uniq
       tok = token(label, "rerun", app, id)
       work = File.join(HOME, "work", label, "rerun-#{tok}")
       logdir = File.join(HOME, "logs", label, "rerun")
       FileUtils.mkdir_p(logdir)
-      fresh_copy(app, work, tok)
+      fresh_copy(app, work, tok, bin)
+      run_prep(app, bin, work, tok, slot, File.join(logdir, "#{tok}.prep.log"))
       outcome = rerun_modes.to_h do |m|
         [m, Array.new(opts[:reps]) do |i|
           res = run_one(app, bin, m, ms.fetch(m), work, File.join(logdir, "#{tok}-#{m}-#{i}.raw.json"), File.join(logdir, "#{tok}-#{m}-#{i}.log"),
@@ -611,6 +706,10 @@ module RubyDifferential
       o.on("--jobs N", Integer) { opts[:jobs] = _1 }
       o.on("--reps N", Integer) { opts[:reps] = _1 }
       o.on("--base-label L") { opts[:base_label] = _1 }
+      o.on("--same-mode") { opts[:same_mode] = true }
+      o.on("--keep N", Integer) { opts[:keep] = _1 }
+      o.on("--diffs-from L") { opts[:diffs_from] = _1 }
+      o.on("--rerun-modes LIST") { opts[:rerun_modes] = _1.split(",") }
     end.parse!(argv)
     case command
     when "build" then puts build(opts)
@@ -619,9 +718,10 @@ module RubyDifferential
     when "run" then run(opts)
     when "compare" then compare(opts)
     when "rerun" then rerun(opts)
+    when "warndiff" then warndiff(opts)
     when "weekly" then weekly(opts)
     when "services" then services(opts)
-    else abort File.read(__FILE__).lines[5..21].map { _1.delete_prefix("# ") }.join
+    else abort File.read(__FILE__).lines[5..24].map { _1.delete_prefix("# ") }.join
     end
   end
 end
