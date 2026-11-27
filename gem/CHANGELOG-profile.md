@@ -10,7 +10,7 @@ From a field test of 0.1.0.rc1 with parallel workers:
 * An action with fewer than 2 warm requests in a run (`warm_samples` per run in report.json, `thin`) comes last in
   Actions, ranked by all objects. An action requested 3 times read warm "– / 338390.0" against 115,023 all and
   ranked first.
-* Ledger: a line that opens a block matches a pull request that removed or added the same call as a one-line block.
+* Ledger: a line that opens a brace block matches a pull request that removed or added the same call as a one-line block.
   Rails 8.1.4.1 writes `get_oid_type`'s `type_map.fetch(oid, fmod, sql_type) {` over several lines and main on one,
   so `postgresql_adapter.rb:880` showed no ledger entry for a merged pull request that changes exactly that call.
   Matching was already by file, method and the line's code, not by line number.

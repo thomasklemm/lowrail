@@ -107,7 +107,7 @@ Line keys are `RAILS/<component>/path:line`, `GEM/<name>/path:line`, `RUBY/path:
 
 **Ledger.** A dated snapshot of upstream pull requests that reduce allocations ships with the gem. A line matches
 when a pull request changes that very line (same repository, file and method, and the line's code is among the
-lines it removes or adds; a line that opens a block, as `fetch(oid) {` in one version, also matches the same call
+lines it removes or adds; a line that opens a brace block, as `fetch(oid) {` in one version, also matches the same call
 written as a one-line block in another). The cell says what that means for the version your lockfile runs: *open upstream work*,
 *fixed in 8.2.0* (upgrade), *merged, not released yet*, or *merged, in 7.2.3, which this app runs*. The ledger covers
 the pull requests its authors track, not every upstream fix, and a snapshot goes stale: the header gives its date.

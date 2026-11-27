@@ -127,19 +127,25 @@ class ProfileReportTest < Minitest::Test
     realpath_tmpdir do |dir|
       gem = File.join(dir, "gems/foo-1.0/lib/foo.rb")
       FileUtils.mkdir_p(File.dirname(gem))
-      File.write(gem, "def get(oid)\n  map.fetch(oid) {\n    miss(oid)\n  }\nend\n")
+      File.write(gem, "def get(oid)\n  map.fetch(oid) {\n    miss(oid)\n  }\n  worker.do\n  list.collect do\n  end\n  benchmark do\n  end\n  String :do\nend\n")
       ledger = File.join(dir, "index.json")
       File.write(ledger, JSON.generate(generated: "2026-11-25T00:00:00Z", pulls: [
         { ref: "x/foo#1", repo: "x/foo", state: "merged", allocation_work: true, merged_at: "2026-11-03T00:00:00Z",
           released_in: nil, files: [{ path: "lib/foo.rb", methods: { "get" => { removed: ["map.fetch(oid) { miss(oid) }"], added: [] } } }] },
         { ref: "x/foo#2", repo: "x/foo", state: "open", allocation_work: true,
-          files: [{ path: "lib/foo.rb", methods: { "get" => { removed: ["map.fetch(oid, 1) { miss(oid) }"], added: [] } } }] }]))
+          files: [{ path: "lib/foo.rb", methods: { "get" => { removed: ["map.fetch(oid, 1) { miss(oid) }"], added: [] } } }] },
+        # A byte prefix is not the same call: `worker.do` is not `worker.download`, `collect do` not `collect double`.
+        { ref: "x/foo#3", repo: "x/foo", state: "open", allocation_work: true,
+          files: [{ path: "lib/foo.rb", methods: { "get" => { removed: ["worker.download", "list.collect double", "benchmark download", "String :download"],
+            added: ["benchmark upload", "String :upload"] } } }] }]))
       runs = File.join(dir, "capture")
       write_runs(runs, lambda do |run, pid|
         # Thin#x: 3 requests, one warm in run1 (1 + 2 windows over 2 processes).
         thin = run == "run1" ? (pid == 0 ? [1, 5000, 5000] : [2, 900_000, 1000]) : [2, 900_000, 1000]
         ["# lowrail-profile 4\trequests=7\tobjects=1000\tdropped=0\twindows=7,0,0,0\tpid=#{pid}\troot=/app\tapp_root=/app",
-          "P\t0\t#{gem}", "0\t2\tString\t40\t4\t10\t0\trequest",
+          "P\t0\t#{gem}", "0\t2\tString\t40\t4\t10\t0\trequest", "0\t5\tString\t30\t4\t10\t0\trequest",
+          "0\t6\tString\t20\t4\t10\t0\trequest",
+          "0\t8\tString\t20\t4\t10\t0\trequest", "0\t10\tString\t20\t4\t10\t0\trequest",
           "A\trequest\tBig#y\t#{run == "run1" && pid == 0 ? 4 : 5}\t5000\t100\t0", "A\trequest\tThin#x\t#{thin.join("\t")}\t0"]
       end)
       report = Lowrail::ProfileReport.new(runs, ledger: ledger)
@@ -148,15 +154,18 @@ class ProfileReportTest < Minitest::Test
       assert_equal [[7, 8], [1, 2]], actions.map { _1[:warm_samples] }
       md = report.markdown
       assert_includes md, "fewer than 2 warm requests in a run comes last"
-      assert_includes md, "* **Not comparable: run 1 ran in 2 processes."
+      assert_includes md, "* **Not comparable: run1 ran in 2 processes, run2 ran in 2 processes."
       row = md.lines.find { _1.include?("`GEM/foo/lib/foo.rb:2`") }
       assert_includes row, "x/foo#1 merged 2026-11-03, after this app's version, not released yet"
       refute_includes row, "x/foo#2"
+      %w[5 6 8 10].each { |line| refute_includes md.lines.find { _1.include?("`GEM/foo/lib/foo.rb:#{line}`") }, "x/foo#3" }
       _, err, status = Open3.capture3(RUBY, File.join(GEM_ROOT, "exe/lowrail-profile"), "report", runs, "--no-ledger")
       assert status.success?, err
-      assert_includes err, "lowrail-profile: Not comparable: run 1 ran in 2 processes"
+      assert_includes err, "lowrail-profile: Not comparable: run1 ran in 2 processes"
 
+      # Only the run that had more than one process is named.
       FileUtils.rm_rf(File.join(runs, "run1/1.tsv"))
+      assert_match(/\ANot comparable: run2 ran in 2 processes\./, Lowrail::ProfileReport.new(runs).parallel_warning)
       FileUtils.rm_rf(File.join(runs, "run2/1.tsv"))
       assert_nil Lowrail::ProfileReport.new(runs).parallel_warning
     end

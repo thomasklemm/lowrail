@@ -280,8 +280,9 @@ module Lowrail
     # The same line, or the first line of a block the other version writes on
     # one line: Rails 8.1's `type_map.fetch(oid, fmod, sql_type) {` is main's
     # `type_map.fetch(oid, fmod, sql_type) { register_unknown_oid_type(...) }`.
+    # Braces only: a byte prefix ending in `do` also matches `download`.
     def same_code?(text, change)
-      text == change || (text.match?(/(?:\{|\bdo)(?:\s*\|[^|]*\|)?\z/) && change.start_with?(text))
+      text == change || (text.end_with?("{") && change.start_with?(text) && change[text.size].match?(/[\s|}]/))
     end
 
     def ledger_index
@@ -294,9 +295,9 @@ module Lowrail
     # compare refuses a capture of more than one process (ProfileCompare): said
     # when profiling, not only when comparing.
     def parallel_warning
-      processes = @runs.map { _1[:processes] }.max
-      return if processes <= 1
-      "Not comparable: run 1 ran in #{processes} processes. Parallel test workers split the tests differently in every " \
+      parallel = @runs.select { _1[:processes] > 1 }
+      return if parallel.empty?
+      "Not comparable: #{parallel.map { "#{_1[:name]} ran in #{_1[:processes]} processes" }.join(", ")}. Parallel test workers split the tests differently in every " \
         "capture, which changes what warm leaves out, so compare refuses it (exit 2); profile with PARALLEL_WORKERS=1 to compare"
     end
 
