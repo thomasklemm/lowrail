@@ -1,0 +1,52 @@
+CGI_picks_the_result_encoding | 4.0.10 | www_form_component:214 www_form_component:215 uri_component:268 uri_component:270 uri_component:272 uri_component:273 uri_component:274
+CGI_picks_the_result_encoding | 4.0.10 no-C | www_form_component:214 www_form_component:215 uri_component:268 uri_component:270 uri_component:272 uri_component:273 uri_component:274
+CGI_picks_the_result_encoding | 2.5.9 | www_form_component:214 www_form_component:215 uri_component:268 uri_component:270 uri_component:272 uri_component:273 uri_component:274
+CGI_picks_the_result_encoding | truffleruby-40.0.0 | www_form_component:214 www_form_component:215 uri_component:268 uri_component:270 uri_component:272 uri_component:273 uri_component:274
+base_48cda77_lib_new_tests_ | 4.0.10 | 
+base_48cda77_lib_new_tests_ | 4.0.10 no-C | 
+base_48cda77_lib_new_tests_ | 2.5.9 | 
+base_48cda77_lib_new_tests_ | truffleruby-40.0.0 | 
+fallback_decodes_ | 4.0.10 | 
+fallback_decodes_ | 4.0.10 no-C | uri_component:264 uri_component:268 uri_component:270 uri_component:272 uri_component:273
+fallback_decodes_ | 2.5.9 | uri_component:264 uri_component:268 uri_component:270 uri_component:272 uri_component:273
+fallback_decodes_ | truffleruby-40.0.0 | uri_component:264 uri_component:268 uri_component:270 uri_component:272 uri_component:273
+fallback_gsub_nil_when_nothing_to_decode_ | 4.0.10 | 
+fallback_gsub_nil_when_nothing_to_decode_ | 4.0.10 no-C | uri_component:274 uri_component:276 uri_component:277 uri_component:283
+fallback_gsub_nil_when_nothing_to_decode_ | 2.5.9 | uri_component:274 uri_component:276 uri_component:277 uri_component:283
+fallback_gsub_nil_when_nothing_to_decode_ | truffleruby-40.0.0 | uri_component:274 uri_component:276 uri_component:277 uri_component:283
+fallback_upper_case_hex_only | 4.0.10 | 
+fallback_upper_case_hex_only | 4.0.10 no-C | uri_component:272
+fallback_upper_case_hex_only | 2.5.9 | uri_component:272
+fallback_upper_case_hex_only | truffleruby-40.0.0 | uri_component:272
+lone_accepted | 4.0.10 | www_form_component:220 www_form_component:221 www_form_component:222 www_form_component:223 uri_component:279 uri_component:280 uri_component:281 uri_component:282
+lone_accepted | 4.0.10 no-C | www_form_component:220 www_form_component:221 www_form_component:222 www_form_component:223 uri_component:279 uri_component:280 uri_component:281 uri_component:282
+lone_accepted | 2.5.9 | www_form_component:220 www_form_component:221 www_form_component:222 www_form_component:223 uri_component:279 uri_component:280 uri_component:281 uri_component:282
+lone_accepted | truffleruby-40.0.0 | www_form_component:220 www_form_component:221 www_form_component:222 www_form_component:223 uri_component:279 uri_component:280 uri_component:281 uri_component:282
+lone_check_misses_zz | 4.0.10 | www_form_component:221 www_form_component:222 uri_component:280 uri_component:281
+lone_check_misses_zz | 4.0.10 no-C | www_form_component:221 www_form_component:222 uri_component:280 uri_component:281
+lone_check_misses_zz | 2.5.9 | www_form_component:221 www_form_component:222 uri_component:280 uri_component:281
+lone_check_misses_zz | truffleruby-40.0.0 | www_form_component:221 www_form_component:222 uri_component:280 uri_component:281
+lone_check_takes_w_for_hex | 4.0.10 | www_form_component:222 www_form_component:223 uri_component:281 uri_component:282
+lone_check_takes_w_for_hex | 4.0.10 no-C | www_form_component:222 www_form_component:223 uri_component:281 uri_component:282
+lone_check_takes_w_for_hex | 2.5.9 | www_form_component:222 www_form_component:223 uri_component:281 uri_component:282
+lone_check_takes_w_for_hex | truffleruby-40.0.0 | www_form_component:222 www_form_component:223 uri_component:281 uri_component:282
+native_check_dropped_Ruby_decoder_used_ | 4.0.10 | 
+native_check_dropped_Ruby_decoder_used_ | 4.0.10 no-C | 
+native_check_dropped_Ruby_decoder_used_ | 2.5.9 | 
+native_check_dropped_Ruby_decoder_used_ | truffleruby-40.0.0 | uri_component:277
+no_b_copy | 4.0.10 | www_form_component:218 uri_component:277
+no_b_copy | 4.0.10 no-C | www_form_component:218 uri_component:270
+no_b_copy | 2.5.9 | www_form_component:218 uri_component:270 uri_component:277
+no_b_copy | truffleruby-40.0.0 | process died: java.lang.ArrayIndexOutOfBoundsException
+no_force_encoding | 4.0.10 | www_form_component:209 www_form_component:211 www_form_component:213 www_form_component:214 www_form_component:215 uri_component:268 uri_component:270 uri_component:272 uri_component:273 uri_component:274
+no_force_encoding | 4.0.10 no-C | www_form_component:209 www_form_component:211 www_form_component:213 www_form_component:214 www_form_component:215 uri_component:268 uri_component:270 uri_component:272 uri_component:273 uri_component:274
+no_force_encoding | 2.5.9 | www_form_component:209 www_form_component:211 www_form_component:213 www_form_component:214 www_form_component:215 uri_component:268 uri_component:270 uri_component:272 uri_component:273 uri_component:274
+no_force_encoding | truffleruby-40.0.0 | www_form_component:209 www_form_component:211 www_form_component:213 www_form_component:214 www_form_component:215 uri_component:268 uri_component:270 uri_component:272 uri_component:273 uri_component:274
+uri_component_decodes_ | 4.0.10 | uri_component:264 uri_component:274
+uri_component_decodes_ | 4.0.10 no-C | 
+uri_component_decodes_ | 2.5.9 | 
+uri_component_decodes_ | truffleruby-40.0.0 | 
+www_form_keeps_ | 4.0.10 | www_form_component:205 www_form_component:215
+www_form_keeps_ | 4.0.10 no-C | www_form_component:205 www_form_component:209 www_form_component:211 www_form_component:213 www_form_component:214 www_form_component:215 www_form_component:217 www_form_component:218 www_form_component:224
+www_form_keeps_ | 2.5.9 | www_form_component:205 www_form_component:209 www_form_component:211 www_form_component:213 www_form_component:214 www_form_component:215 www_form_component:217 www_form_component:218 www_form_component:224
+www_form_keeps_ | truffleruby-40.0.0 | www_form_component:205 www_form_component:215 www_form_component:218

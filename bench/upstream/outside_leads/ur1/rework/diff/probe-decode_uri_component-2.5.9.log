@@ -1,0 +1,2 @@
+ruby 2.5.9p229 (2021-04-05 revision 67939) [x86_64-linux] decode_uri_component
+41832 independent differential cases; 0 differences; 0 unconstructible inputs skipped; fiber mutation equal [:encoding_conversion, "A", "%42"]

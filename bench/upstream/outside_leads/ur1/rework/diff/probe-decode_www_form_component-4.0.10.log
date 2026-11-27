@@ -1,0 +1,2 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux] decode_www_form_component
+42264 independent differential cases; 0 differences; 0 unconstructible inputs skipped; fiber mutation equal [:encoding_conversion, "A", "%42"]

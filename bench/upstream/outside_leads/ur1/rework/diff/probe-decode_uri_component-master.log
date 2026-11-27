@@ -1,0 +1,2 @@
+ruby 4.1.0dev (2026-11-28) +PRISM [x86_64-linux] decode_uri_component
+42264 independent differential cases; 0 differences; 0 unconstructible inputs skipped; fiber mutation equal [:encoding_conversion, "A", "%42"]

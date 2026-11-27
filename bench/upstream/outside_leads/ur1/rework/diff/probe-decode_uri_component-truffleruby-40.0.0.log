@@ -1,0 +1,2 @@
+truffleruby 40.0.0 (2026-09-17), like ruby 4.0.2, Oracle GraalVM Native [x86_64-linux] decode_uri_component
+41349 independent differential cases; 0 differences; 915 unconstructible inputs skipped; fiber mutation equal [:encoding_conversion, "A", "%42"]

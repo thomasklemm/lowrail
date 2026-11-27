@@ -52,7 +52,11 @@ def make(rng)
   s = String.new
   rng.rand(0..8).times { s << PIECES.sample(random: rng).b }
   # TruffleRuby refuses some byte/encoding pairs (odd-length UTF-16); draw again there.
-  s = begin s.dup.force_encoding(ENCS.sample(random: rng)) rescue ArgumentError; retry end
+  s = begin
+    s.dup.force_encoding(ENCS.sample(random: rng))
+  rescue ArgumentError
+    retry
+  end
   s = Sub.new(s) if rng.rand < 0.1
   s.instance_variable_set(:@tag, 1) if rng.rand < 0.1
   s.define_singleton_method(:b) { "singleton" } if ENV["SINGLETON_B"] && rng.rand < 0.05
@@ -81,7 +85,7 @@ rng = Random.new(42)
 diffs = []
 n.times { compare(make(rng), TARGETS.sample(random: rng), diffs) }
 fixed = [nil, :sym, :"a%41", 1, 1.5, StrDuck.new("a%41+b"), "", "".encode("UTF-16LE"), "a".encode("UTF-16LE"),
-  "%".encode("UTF-16LE"), "a+b".force_encoding("UTF-16LE"), "x" * (1024 * 1024), "%41" * 100_000]
+  "%".encode("UTF-16LE"), ("a+b".force_encoding("UTF-16LE") rescue "a+"), "x" * (1024 * 1024), "%41" * 100_000]
 fixed.each { |f| TARGETS.each { |t| compare(f, t, diffs) } }
 bo = BasicObject.new
 TARGETS.each { |t| compare(bo, t, diffs, "BasicObject") }
