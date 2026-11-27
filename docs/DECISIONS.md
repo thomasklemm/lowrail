@@ -459,8 +459,8 @@ and measurement runs with a fixed recipe, CI follow-ups, rebases without conflic
 exactness work, upstream text, design questions and reviews. A Sonnet thread whose task turns into one of these
 hands it to Opus. Whatever a Sonnet thread produces for upstream or for a decision (code, records with claims,
 measurements) gets an `opus` review as well, besides the usual passes. Record in the thread's report whether Sonnet's
-result needed corrections; decide after a week. Lead models stay Claude (Thomas, 2026-11-27): the OpenAI quota is
-nearly used up until it resets on Tuesday, so OpenAI models only review.
+result needed corrections; decide after a week. Lead models stay Claude (Thomas, 2026-11-27); OpenAI models review,
+with every thermos-sol and Astra pass as before: there is quota for them, so never skip or thin out a review to save it.
 
 ### Exactness checklist
 
