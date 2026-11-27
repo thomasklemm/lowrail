@@ -379,3 +379,25 @@ gate. The current DECISIONS rule allows a one-sentence JIT result showing that t
 Evidence: `jit-wall-2026-11-27/{zjit,yjit}/{results.json,commands.sh,raw/}`. This was an audit/recalculation
 of retained measurements, not a fresh JIT build or benchmark run. Prior exact-head correctness validation
 remains applicable. No code change requested, no upstream post and no Ruby-fork push.
+
+## JIT spread and A/A text confirm, 2026-11-27
+
+Verdict: **approve**, no open findings. Verified exact outgoing body SHA-256
+`67ceebdfb89bff59f67180cc481466f6824ebcd46d5959a60e711358ef58e3e8`, introduced at Lowrail `d4337183`
+and unchanged at inspected main `514f733e`, equals `body-proposed.md`. Only the JIT sentence differs from
+the preceding reviewed body; Ruby head remains `5fc1871eec45270a068d2ecba6654eef979c5f6e`.
+
+My preceding approval accepted the timing evidence but missed the explicit requirement to include its
+spread and A/A alongside the numerical JIT claim. The general permission for a one-sentence JIT result
+does not waive that requirement. This revision supplies both and resolves the text omission.
+
+Recomputed extrema from the six previously raw-verified results: reductions 17.831902%–19.337104%; change
+interval endpoints −19.782831% to −17.365084%; A/A estimates −1.090636% to +0.472239%; A/A interval endpoints
+−8.717567% to +3.633162%. Every body figure rounds correctly to one decimal place and matches the two
+tables. Each case has 30 rounds. The descending change endpoints in the sentence give the same envelope;
+the plural "intervals" describes extrema across six intervals, not a newly computed pooled 95% interval.
+The actual intervals, noisy ZJIT control and JIT-flat verification remain documented in the previous pass.
+
+No further text or code change is required. This was a text/summary arithmetic confirm, not a new build,
+test run or measurement. Prior 180-process raw audit and exact-head correctness evidence still apply.
+No upstream post or Ruby-fork push.

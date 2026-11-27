@@ -310,6 +310,22 @@ passes:
       remains unchanged; no new build, measurements or test rerun for this body-only confirm. Evidence and
       detailed interval audit: evidence/backtrace-format/thermos-sol/results.txt. Probe script and output stay
       in this orb backup. No upstream post or Ruby fork push.
+  - reviewer: astra
+    orb: T-01a21dcc-1fab-7104-9ca4-c62537a6cf82
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None. Exact outgoing/copied body SHA-256 67ceebdfb89bff59f67180cc481466f6824ebcd46d5959a60e711358ef58e3e8,
+      introduced at Lowrail d4337183, verified unchanged at 514f733e. Only the JIT sentence changed.
+      My preceding approval missed the requirement to include spread and A/A with the numerical JIT claim;
+      the revised sentence now meets it. Recomputed all extrema: reductions 17.831902-19.337104%; change
+      CI endpoints -19.782831 to -17.365084%; A/A estimates -1.090636 to +0.472239%; A/A CI endpoints
+      -8.717567 to +3.633162%. All supplied figures round correctly, and all six cases have 30 rounds.
+      Plural intervals describe their endpoint envelope, not a pooled 95% interval. Prior 180-process
+      raw-data/JIT-flat audit and unchanged-head correctness evidence apply. No new build, test or benchmark
+      run. Details: evidence/backtrace-format/astra/review.md, JIT spread and A/A text confirm.
+      No upstream action or Ruby-fork push.
 ---
 
 # Append backtrace location strings by length
