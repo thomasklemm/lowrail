@@ -77,6 +77,28 @@ passes:
       Rack query_parser.rb:268 is the direct query caller in addition to the cited utils.rb:59.
       Body counts checked against retained raw logs/A/A, not remeasured. Details and limitations in
       bench/upstream/outside_leads/ur1/astra-2026-11-27.md. No new benchmark or Ruby master/ZJIT/JRuby/TruffleRuby run.
+  - reviewer: astra
+    head: "a3b201f05b2efd737af193bc45ebd0534b3b6a5c"
+    orb: T-01a21e96-8207-76d7-8f64-404eb741d298
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      Short confirm of Lowrail 7214d649; fork head and local reviewed checkout still match a3b201f05b.
+      Rack-first order and the added query_parser.rb:268 permalink pass (fetched the exact file again).
+      No new guard requested: the hook-only differences do not demonstrate a request-bytes-only failure, and
+      the prior native/fallback evidence still applies. The escaping exception removes the automatic exemption
+      for core/private overrides; the explicit, evidence-based boundary assessment is appropriate instead.
+      Two text issues remain. The guard rule also requires one body sentence for an accepted outside-contract
+      difference. The note's claim that users cannot hit these through any caller is too broad: direct public
+      calls with hooked Strings are the retained repros. Replace the body's blanket statement that subclasses
+      and other objects keep the current path with a scoped statement that custom String hooks are not preserved
+      on the optimized path and ordinary subclasses retain the Ruby path; no private-helper detail is needed.
+      Also update lib/uri/common.rb:404-405: its public documentation still explicitly says conversion uses
+      String#b, which the native fast path skips. Describe decoding bytes and tagging the result instead.
+      Existing guards protect invalid-percent errors, ordinary subclass result class, and ASCII compatibility;
+      no additional defensive machinery is justified by this confirm. No new runtime or performance runs.
+      Reviewed body SHA256 including title and boundary whitespace:
+      eb6acef7c20379247214908e6b6c861512b30a731cc6edadee39ca460fab680c.
 ---
 
 # Decode www-form components with cgi/escape
