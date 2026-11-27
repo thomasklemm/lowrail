@@ -1,0 +1,4 @@
+source "https://rubygems.org"
+gem "activesupport", path: "/home/user/w/rails-to1/activesupport"
+gem "activemodel", path: "/home/user/w/rails-to1/activemodel"
+gem "actionview", path: "/home/user/w/rails-to1/actionview"

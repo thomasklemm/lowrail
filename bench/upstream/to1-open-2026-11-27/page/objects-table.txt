@@ -1,0 +1,9 @@
+blog | GET article | 4.0.10:interpreter | main 1941.6 / 1940.75 | to1 1920.05 | Δ -21.1 | traced 1942.8 / 1941.4 → 1916.2 | ms 3.426
+blog | GET article | 4.0.10:yjit | main 1947.8 / 1950.8 | to1 1927.55 | Δ -21.8 | traced 1948.3 / 1953.7 → 1928.0 | ms 2.188
+blog | GET article | master:zjit | main 1922.55 / 1924.55 | to1 1899.0 | Δ -24.5 | traced 1921.3 / 1918.1 → 1902.8 | ms 1.665
+writebook | GET books | 4.0.10:interpreter | main 4355.1 / 4354.45 | to1 4286.1 | Δ -68.7 | traced 4358.0 / 4357.1 → 4288.0 | ms 5.882
+writebook | GET books | 4.0.10:yjit | main 4369.1 / 4369.15 | to1 4300.9 | Δ -68.2 | traced 4368.0 / 4370.4 → 4301.5 | ms 4.266
+writebook | GET books | master:zjit | main 4363.8 / 4365.9 | to1 4294.15 | Δ -70.7 | traced 4365.4 / 4363.0 → 4290.1 | ms 3.365
+casa | GET casa case edit | 4.0.10:interpreter | main 22566.2 / 22565.7 | to1 22512.8 | Δ -53.2 | traced 22564.2 / 22575.5 → 22513.1 | ms 54.034
+casa | GET casa case edit | 4.0.10:yjit | main 22779.35 / 22781.5 | to1 22726.65 | Δ -53.8 | traced 22783.1 / 22784.1 → 22732.6 | ms 32.159
+casa | GET casa case edit | master:zjit | main 22382.05 / 22386.1 | to1 22333.2 | Δ -50.9 | traced 22383.3 / 22388.1 → 22334.8 | ms 31.619

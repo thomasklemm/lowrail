@@ -141,3 +141,83 @@ same way. Diff +11/−4.
   (last push 2017, an `alias_method` on the Rails 3 API). Overrides of `:nodoc:` methods are an accepted boundary.
 * Objects per call (Ruby 4.0.10, interpreter): text_field_tag 8 → 7, submit_tag 14 → 13, tag.input 6 → 5,
   image_tag 9 → 8, f.text_field 17 → 16, f.check_box 20 → 18; `tag(:br)` and `content_tag` unchanged.
+
+## Timing on head 18fd3c4a07 (2026-11-27, a1.xxlarge)
+
+Base Rails main `2e299253f9`, head `18fd3c4a07`. Ruby 4.0.10 (mise) for the interpreter and YJIT; Ruby master
+`0d399335b7` (`--enable-zjit --enable-yjit optflags=-O3`, `zjit_gap_bet/setup.sh ruby`) for ZJIT.
+
+### Per call (`script/upstream-bench`, script [`to1_body.rb`](to1_body.rb))
+
+[`body/TO1`](body/TO1): objects and Callgrind interp/YJIT plus `--ips 3` (YJIT), all on 4.0.10.
+[`body/TO1-wall-yjit`](body/TO1-wall-yjit) and [`body/TO1-wall-zjit`](body/TO1-wall-zjit): `--modes "" --wall 30`.
+Raw output in each `raw.tar.gz`. Every JIT window was flat (6 Callgrind windows, 9 ips reports, 90 wall processes per
+case). Callgrind A/A in brackets; wall cells are change [95%] with the A/A [95%] below.
+
+| | Objects interp | Objects YJIT | Ir interp | Ir YJIT | ips YJIT (A/A) | Wall YJIT 4.0.10 | Wall ZJIT master |
+| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
+| `text_field_tag` | 7 → 6 | 7 → 6 | −0.7% (0.07%) | −1.7% (0.41%) | +6.2% (2.5%) | −2.5% [−3.3, −2.0]; A/A +0.4% [−0.7, +1.0] | −2.4% [−2.7, −2.1]; A/A +0.2% [−0.4, +0.5] |
+| `hidden_field_tag` | 9 → 8 | 9 → 8 | −0.6% (0.05%) | −1.1% (0.14%) | +2.5% (0.4%) | −2.2% [−2.6, −1.5]; A/A +0.3% [−0.3, +0.8] | −0.6% [−1.7, −0.2]; A/A +0.0% [−0.3, +0.5] |
+| `submit_tag` | 13 → 12 | 13 → 12 | −0.6% (0.04%) | −1.8% (0.09%) | +4.8% (0.3%) | −2.2% [−2.7, −1.6]; A/A +0.4% [−0.2, +1.1] | −1.5% [−2.1, −1.1]; A/A −0.2% [−1.0, +0.4] |
+| `tag.input` | 4 → 3 | 4 → 3 | −1.5% (0.06%) | −4.1% (0.44%) | +5.7% (0.1%) | −5.7% [−6.3, −4.8]; A/A +0.2% [−0.2, +1.1] | −4.1% [−4.3, −3.5]; A/A −0.2% [−1.1, +0.6] |
+| `image_tag` | 8 → 7 | 8 → 7 | −0.7% (0.01%) | −1.4% (0.60%) | +2.6% (1.8%) | −1.5% [−2.0, −0.7]; A/A +0.5% [−0.4, +1.0] | −2.1% [−2.8, −1.6]; A/A −0.1% [−1.1, +0.6] |
+| `f.text_field` | 17 → 16 | 18 → 17 | **+0.6%** (0.03%) | within noise (−0.5%, A/A 0.69%) | **−1.5%** (0.2%) | −0.2% [−1.0, +0.7], no claim; A/A +0.3% [−0.5, +0.9] | +0.4% [−0.4, +0.9], no claim; A/A +0.5% [−0.2, +0.9] |
+| `f.check_box` | 20 → 18 | 22 → 20 | −0.6% (0.12%) | −1.1% (0.01%) | +1.9% (1.7%) | −1.7% [−2.2, −0.6]; A/A +0.0% [−0.9, +1.0] | −1.5% [−1.9, −0.8]; A/A −0.0% [−0.8, +0.5] |
+
+`f.text_field` saves its object but costs 640 interpreter instructions more per call (+0.6%, 20× its A/A), and
+benchmark-ips under YJIT has it −1.5% slower (A/A 0.2%); both wall cohorts put it inside noise. Not explained here.
+`image_tag` and `f.check_box` ips gains are about their A/A; the wall cohorts are the time numbers to use.
+
+### Page level (`script/census`, corpus `censusto1`)
+
+Apps set up with `script/census setup --corpus censusto1 --rails rails/rails@2e299253f942… --ruby 4.0.10
+--ruby-overlays fixtures/corpus/frontier-master`; CASA set up without trouble (PostgreSQL 17 local), so no pingcrm.
+Head as `--rails thomasklemm/rails@18fd3c4a07`; dependencies outside Rails matched the base lock in every run.
+
+**Objects per request** ([`page/objects.sh`](page/objects.sh), `run --aa --only`, `page/objects-raw.tar.gz`,
+[`objects-table.txt`](page/objects-table.txt)): median GC-enabled objects per request, main / main again → TO1.
+
+| page | mode | main (A/A) | TO1 | Δ per request |
+| --- | --- | ---: | ---: | ---: |
+| blog `GET article` | interp 4.0.10 | 1,941.6 / 1,940.8 | 1,920.1 | −21.1 (−1.1%) |
+| | YJIT 4.0.10 | 1,947.8 / 1,950.8 | 1,927.6 | −21.8 (−1.1%) |
+| | ZJIT master | 1,922.6 / 1,924.6 | 1,899.0 | −24.5 (−1.3%) |
+| writebook `GET books` | interp 4.0.10 | 4,355.1 / 4,354.5 | 4,286.1 | −68.7 (−1.6%) |
+| | YJIT 4.0.10 | 4,369.1 / 4,369.2 | 4,300.9 | −68.2 (−1.6%) |
+| | ZJIT master | 4,363.8 / 4,365.9 | 4,294.2 | −70.7 (−1.6%) |
+| casa `GET casa case edit` | interp 4.0.10 | 22,566.2 / 22,565.7 | 22,512.8 | −53.2 (−0.2%) |
+| | YJIT 4.0.10 | 22,779.4 / 22,781.5 | 22,726.7 | −53.8 (−0.2%) |
+| | ZJIT master | 22,382.1 / 22,386.1 | 22,333.2 | −50.9 (−0.2%) |
+
+**Wall time per request** ([`page/wall_lane.sh`](page/wall_lane.sh), [`page/wall_table.rb`](page/wall_table.rb),
+`page/wall-raw.tar.gz`, [`wall-table.md`](page/wall-table.md)): census-3's method. 30 rounds per page and mode, a
+round being three fresh `script/census run --wall --only PAGE` processes (main a, TO1 h, main b) in the six orders in
+turn, one lane per page and mode, each pinned to its own physical core. GC on, `RUBY_GC_HEAP_INIT_BYTES=32 MiB`;
+windows of 25 (blog), 15 (writebook) or 3 (casa) requests, 80/80/150 warm windows, 20 timed. Per process the mean of
+its JIT-flat timed windows; change = TO1 / mean(main a, b), A/A = a / b, geometric means with 95% bootstrap intervals
+over rounds. Counts only with an A/A interval containing 0 and a change interval excluding 0.
+
+| page | mode | main ms | TO1 ms | change [95%] | A/A [95%] | flat windows main, TO1 | verdict |
+| --- | --- | ---: | ---: | --- | --- | --- | --- |
+| blog `GET article` | YJIT 4.0.10 | 1.753 | 1.746 | −0.4% [−1.8, +0.9] | −1.2% [−3.6, +0.7] | 1200/1200, 600/600 | inside noise |
+| | ZJIT master | 1.850 | 1.857 | +0.4% [−1.1, +1.8] | +1.2% [+0.2, +2.3] | 1200/1200, 600/600 | A/A excludes 0, no claim |
+| writebook `GET books` | YJIT 4.0.10 | 4.073 | 3.976 | −2.4% [−4.3, −0.4] | −2.6% [−5.7, +0.1] | 1125/1200, 568/600 | passes the rule, but see below |
+| | ZJIT master | 3.533 | 3.525 | −0.2% [−1.2, +0.7] | −0.4% [−1.7, +0.6] | 1180/1200, 593/600 | inside noise |
+| casa `GET casa case edit` | YJIT 4.0.10 | – | – | – | – | – | not run: never JIT-flat |
+| | ZJIT master | 33.746 | 33.893 | +0.4% [−1.5, +2.2] | +0.2% [−1.9, +2.3] | 1154/1200, 576/600 | inside noise |
+
+* Writebook under YJIT technically passes (A/A upper bound +0.1%, change upper bound −0.4%), but the A/A point
+  (−2.6%) is as large as the change (−2.4%) and the object saving is 1.6% of the request at an 18.6% GC share. Treat
+  it as noise, not a page-level win.
+* CASA under YJIT 4.0.10 invalidates about one block per request forever: a probe with 500 warm windows
+  (`page/wall/casa-yjit-counters-probe.json.gz`, inside the archive) shows `compiled_iseq_count` settled at 4,540 by
+  window ~100 while `invalidation_count` and `compiled_block_count` rise by 3 every 3-request window to the end. No
+  window passes the gate, so the cohort was stopped after its first round and is not reported.
+* Three Writebook processes (yjit r01-a and r27-h, zjit r23-a) crashed at workload setup
+  (`census_4_workloads.rb:107`, a leaf without its leafable left by a concurrent process) and were rerun alone; their
+  logs are kept as `*.crashed.log`.
+* Under the size of these pages the saving (21–71 objects per request, ≤ 1.6%) is below what the wall cohort resolves
+  (about ±1–2% here). No page shows a time change.
+
+Harness fix (separate commit): `wall()` ignored `CENSUS_ONLY`, so `--wall --only` timed every workload, and it called
+`RubyVM::ZJIT.enabled?`, which raises on 4.0.10; both fixed before these runs.
