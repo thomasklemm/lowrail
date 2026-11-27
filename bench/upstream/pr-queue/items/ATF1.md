@@ -16,7 +16,7 @@ impact: "Since #58173 (merged 2026-11-25, unreleased) Content#attachment_for_nod
 evidence: [bench/upstream/rails_main_hotlines/atf1]
 rank: 5
 risky: false
-state: built
+state: in-review
 note: "2026-11-27 (Rails 8.2 pre-beta round): found in Campfire's suite on main 088fc0cf61 (its own pin e3d5c569d2 passes); bisect.log in evidence. Classification: an unreleased behaviour change to a public extension point, and Rails' own two call sites disagree (gallery already passes only the located record), so the fix is in Rails rather than a compatibility shim; reviewers asked to judge that. Actiontext suite: 385 runs, one error (JavascriptPackageTest needs yarn, environment). Test fails without the fix. Only #58173 cross-reference is lylo/pagecord#1491 (adopting it). No open PR or issue names attachment_for_node, attachables_by_sgid or #58173."
 ownership: {date: 2026-11-27, checked: ["open PRs cross-referencing #58173","open PRs naming attachment_for_node that change actiontext/lib/action_text/content.rb"], hits: []}
 passes: []
