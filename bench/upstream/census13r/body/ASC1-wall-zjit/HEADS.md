@@ -1,0 +1,1 @@
+Measured on candidate 2b46f50bda46b9d84c3c86ac2f90bec4b7df6db. ASC1 head is now ed1b28c5b94530e1c8b06d14dfca0ee93d5c07ba; it changes only activerecord/test/cases/association_route_test.rb (`git diff 2b46f50bda ed1b28c5b9` has no lib change), so this run stands for it.

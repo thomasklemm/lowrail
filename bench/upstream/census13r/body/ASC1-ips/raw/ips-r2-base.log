@@ -1,0 +1,12 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+     belongs_to load     3.093k i/100ms
+        has_one load     2.800k i/100ms
+       has_many load     2.500k i/100ms
+Calculating -------------------------------------
+     belongs_to load     30.875k (± 7.0%) i/s   (32.39 μs/i) -    154.650k in   5.008932s
+jit belongs_to load	compiled_iseq_count=1151>1151 compiled_block_count=16986>16986 invalidation_count=299>299
+        has_one load     28.489k (± 8.4%) i/s   (35.10 μs/i) -    142.800k in   5.012388s
+jit has_one load	compiled_iseq_count=1155>1155 compiled_block_count=17011>17011 invalidation_count=299>299
+       has_many load     23.370k (±10.1%) i/s   (42.79 μs/i) -    117.500k in   5.027789s
+jit has_many load	compiled_iseq_count=1155>1155 compiled_block_count=17013>17026 invalidation_count=299>299

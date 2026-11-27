@@ -1,0 +1,605 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/census13r/asc1_body.rb",
+  "at": "2026-11-27T20:31:38Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/rails-main",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "2e299253f942ab94041cc6f210ac9d33884c210d",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/rails-asc1",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "2b46f50bda446b9d84c3c86ac2f90bec4b7df6db",
+      "dirty": false
+    }
+  },
+  "objects": {},
+  "instructions": {},
+  "ips": {
+    "belongs_to load": {
+      "base": 30891.0,
+      "base1": 31946.0,
+      "base2": 29836.0,
+      "candidate": 31519.0,
+      "change": 0.020329545822407757,
+      "aa": 0.0683046842122301,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "r1 base",
+            "counters": {
+              "compiled_iseq_count": [
+                1151,
+                1151
+              ],
+              "compiled_block_count": [
+                16986,
+                16986
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r1 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                1150,
+                1150
+              ],
+              "compiled_block_count": [
+                16985,
+                16985
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r1 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                1151,
+                1151
+              ],
+              "compiled_block_count": [
+                16986,
+                16986
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r2 base",
+            "counters": {
+              "compiled_iseq_count": [
+                1151,
+                1151
+              ],
+              "compiled_block_count": [
+                16986,
+                16986
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r2 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                1150,
+                1150
+              ],
+              "compiled_block_count": [
+                16985,
+                16985
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r2 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                1151,
+                1151
+              ],
+              "compiled_block_count": [
+                16986,
+                16986
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r3 base",
+            "counters": {
+              "compiled_iseq_count": [
+                1151,
+                1151
+              ],
+              "compiled_block_count": [
+                16986,
+                16986
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r3 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                1150,
+                1150
+              ],
+              "compiled_block_count": [
+                16985,
+                16985
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r3 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                1151,
+                1151
+              ],
+              "compiled_block_count": [
+                16986,
+                16986
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          }
+        ]
+      },
+      "rounds": {
+        "base": [
+          31946.0,
+          30875.0,
+          28804.0
+        ],
+        "candidate": [
+          31405.0,
+          31519.0,
+          30278.0
+        ],
+        "base2": [
+          29836.0,
+          29138.0,
+          29338.0
+        ]
+      }
+    },
+    "has_one load": {
+      "base": 28674.5,
+      "base1": 29047.0,
+      "base2": 28302.0,
+      "candidate": 29042.0,
+      "change": 0.012816265322847853,
+      "aa": 0.025981272559242534,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "r1 base",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17011,
+                17011
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r1 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                1154,
+                1154
+              ],
+              "compiled_block_count": [
+                17010,
+                17010
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r1 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17011,
+                17011
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r2 base",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17011,
+                17011
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r2 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                1154,
+                1154
+              ],
+              "compiled_block_count": [
+                17010,
+                17010
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r2 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17011,
+                17011
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r3 base",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17011,
+                17011
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r3 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                1154,
+                1154
+              ],
+              "compiled_block_count": [
+                17010,
+                17010
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r3 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17011,
+                17011
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          }
+        ]
+      },
+      "rounds": {
+        "base": [
+          29047.0,
+          28489.0,
+          27434.0
+        ],
+        "candidate": [
+          28580.0,
+          29042.0,
+          27443.0
+        ],
+        "base2": [
+          28302.0,
+          26455.0,
+          26831.0
+        ]
+      }
+    },
+    "has_many load": {
+      "base": 23926.0,
+      "base1": 25052.0,
+      "base2": 22800.0,
+      "candidate": 24989.0,
+      "change": 0.04442865501964399,
+      "aa": 0.09412354760511578,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "r1 base compiled_iseq_count +1",
+          "r1 base compiled_block_count +14",
+          "r1 candidate compiled_block_count +30",
+          "r1 base2 compiled_block_count +12",
+          "r2 base compiled_block_count +13",
+          "r2 candidate compiled_block_count +35",
+          "r2 base2 compiled_block_count +32",
+          "r3 base compiled_block_count +43",
+          "r3 candidate compiled_iseq_count +1",
+          "r3 candidate compiled_block_count +15",
+          "r3 base2 compiled_iseq_count +1",
+          "r3 base2 compiled_block_count +41"
+        ],
+        "windows": [
+          {
+            "window": "r1 base",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1156
+              ],
+              "compiled_block_count": [
+                17013,
+                17027
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r1 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                1154,
+                1154
+              ],
+              "compiled_block_count": [
+                17012,
+                17042
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r1 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17013,
+                17025
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r2 base",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17013,
+                17026
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r2 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                1154,
+                1154
+              ],
+              "compiled_block_count": [
+                17012,
+                17047
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r2 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17013,
+                17045
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r3 base",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1155
+              ],
+              "compiled_block_count": [
+                17013,
+                17056
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r3 candidate",
+            "counters": {
+              "compiled_iseq_count": [
+                1154,
+                1155
+              ],
+              "compiled_block_count": [
+                17012,
+                17027
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          },
+          {
+            "window": "r3 base2",
+            "counters": {
+              "compiled_iseq_count": [
+                1155,
+                1156
+              ],
+              "compiled_block_count": [
+                17013,
+                17054
+              ],
+              "invalidation_count": [
+                299,
+                299
+              ]
+            }
+          }
+        ]
+      },
+      "rounds": {
+        "base": [
+          25052.0,
+          23370.0,
+          23356.0
+        ],
+        "candidate": [
+          24989.0,
+          22392.0,
+          22470.0
+        ],
+        "base2": [
+          22800.0,
+          22238.0,
+          22741.0
+        ]
+      }
+    }
+  },
+  "wall": {}
+}
