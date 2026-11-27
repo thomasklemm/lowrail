@@ -153,7 +153,7 @@ stats run gives the exit counts (two processes each, GC off then GC on):
 
 So in this sample GC adds about 50 interrupt exits and 1–2 first compiles of rare methods per 6,840 requests, and no
 GC-dependent repeat compile or invalidation was found under ZJIT. The count doesn't price the exits: what each one
-costs (materializing frames, finishing in the interpreter) was not measured. YJIT is not steady at 13,680 requests
+costs (materializing frames, finishing in the interpreter) is priced in part 4. YJIT is not steady at 13,680 requests
 either way (55 blocks per 1,000 requests in the last 10 iterations even with GC off), and part of the GC-on excess
 there is the harness's own blocks (60 in iteration 119 of each GC-on process, from `rb_harness.rb`'s sampling); GC
 on adds 0.3–1.3 ISEQ entries per 1,000 requests over GC off.
@@ -222,5 +222,33 @@ every workload.
 4. Timed windows never read files, open IO or create finalizable objects (part 1's trigger). `upstream-bench`'s
    worker doesn't; any hand-written harness checks this.
 5. The JIT-flat gate stays as it is. With GC off it hides GC-triggered interrupt exits and YJIT's entry compiles;
-   part 2 found no GC-dependent repeat compiles under ZJIT, but the exits' cost is unmeasured, so this is not a claim
-   that GC off hides nothing.
+   part 2 found no GC-dependent repeat compiles under ZJIT, and part 4 prices the exits it hides at under 0.01% of
+   lobsters' time.
+
+## 4. GCI1 priced: what one ZJIT interrupt exit costs (2026-11-27)
+
+[gci1/](gci1/) prices one ZJIT `exit_interrupt` and what follows it, on current master `0d399335b7`, timed on this
+orb, GC off per window and the two arms alternating window by window in each process.
+[trig.c](gci1/trig.c) sets the interrupt flag the way GC's deferred finalization does: through a postponed job
+(`rb_postponed_job_trigger`). It does so either synchronously (`Trig.set`) or from a background thread every N µs,
+so exits land wherever the work is, as a GC's would. A same-process signal doesn't work for this: its trap runs
+inside `Process.kill` and leaves no flag set. A stats run counts the exits per window, and the timed processes run
+without stats. Per process: the median of paired window differences, divided by the exits per window
+([man.txt](gci1/man.txt)).
+
+| micro | exits per window | cost per exit, 4 processes (lobsters 3) | A/A per exit |
+| --- | ---: | --- | --- |
+| exit at a method's return (`late`): materialize and exit only | 1 | 1.06–1.33 µs | −16 to +17 ns |
+| exit before a 2,000-iteration loop (`early`): the loop finishes in the interpreter | 1 | 63–66 µs | −3 to +17 ns |
+| E2 `foreign_keys`, 70 calls, thread every 20 µs | 284 | 5.5–8.0 µs | −0.4 to +1.4 µs |
+| ruby-bench lobsters, 114 requests, thread every 200 µs | 3,865 | 2.3–7.3 µs | −1.6 to +0.4 µs |
+
+The two thread-driven rows also include the postponed-job flush for triggers that landed in the interpreter (about
+1.6 triggers per exit on lobsters), so they overstate the exit. A real exit costs what the rest of its frame costs
+in the interpreter: 1 µs at a return, unbounded in a long loop.
+
+**Share of request time:** at most 7.8 exits per 1,000 lobsters requests × 7.3 µs = 57 µs per 1,000 requests of
+about 7.5 s, or 0.0008%. Even at the tight-loop price of 64 µs per exit it is 0.007%. Railsbench has no exits.
+That is far below 0.1%, so GCI1 is priced and parked: handling the interrupt in JIT code without exiting would save
+nothing measurable on these apps, and no fix was sketched or built.
+

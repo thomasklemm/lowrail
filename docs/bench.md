@@ -1996,16 +1996,17 @@ ZJIT, master and 4.0.10 for YJIT).
   GC on or off, on every Ruby measured.
 * **Production.** In railsbench and lobsters (ruby-bench) no GC-dependent repeat compile or invalidation was
   found under ZJIT; GC adds at most 7.8 interrupt exits per 1,000 requests (lobsters; railsbench 0) and, in a late
-  lobsters sample of 6,840 requests, 1–2 first compiles of rare methods. What those exits cost was not measured.
+  lobsters sample of 6,840 requests, 1–2 first compiles of rare methods. One exit costs 1–8 µs in Rails code
+  (64 µs before a long interpreted loop), so the exits are under 0.01% of lobsters' time.
   YJIT 4.0.10 adds 2.8–9.5 interpreter-entry compiles per 1,000 lobsters requests with GC on early and 0.3–1.3
-  later; a rough price mixing runs is 0.02–0.1% of its time. Recorded as lead GCI1, unpriced.
+  later; a rough price mixing runs is 0.02–0.1% of its time. Recorded as lead GCI1, priced and parked.
 * **What GC off leaves out.** Average GC time per allocated object: about 32 ns in E2's micro (small heap,
   master), 53–58 ns on railsbench's and lobsters' heaps on master and 66–68 ns on 4.0.10 (`GC.stat[:time]` over
   `total_allocated_objects`, later iterations, concurrent processes on this orb; an average, not a marginal cost). `--wall` doesn't see that share, so an allocation-reducing
   change's time there is its work only. E2's 7 objects per call are about 0.4 µs of GC, 0.06% of the 0.69 ms call:
   far below what any cohort resolves. At the average, 2 objects would be about 6% of a 2 µs call.
 * **The JIT-flat gate with GC off** hides GC-triggered interrupt exits and, under YJIT, the entry compiles they
-  cause. Under ZJIT no GC-dependent repeat compile was found; the exits' cost is unmeasured.
+  cause. Under ZJIT no GC-dependent repeat compile was found, and the exits cost under 0.01% of lobsters' time.
 * **A GC-on `--wall` resolves about 3–4%, not 1%.** A trial `--wall-gc` (GC on, no heap floors, the mean window
   per process; [wall-gc.diff](../bench/upstream/gc_jit_windows/wall-gc.diff)) passed its A/A and claimed the
   150-string plant at +3.9% [+1.6%, +7.2%] (GC off: +1.5% [+1.0%, +2.0%]) under ZJIT, but missed a plant of about

@@ -1,0 +1,12 @@
+early  exits per window: on 1.0, off 0.00; median window off 11.6 µs
+   timed Δ per window µs +64.29 +63.19 +65.33 +65.67 => per exit +64289 +63188 +65328 +65666 ns
+   aa    Δ per window µs -0.00 +0.01 +0.02 +0.01 => per exit -3 +8 +17 +14 ns
+late   exits per window: on 1.0, off 0.00; median window off 11.9 µs
+   timed Δ per window µs +1.10 +1.06 +1.18 +1.33 => per exit +1099 +1057 +1184 +1332 ns
+   aa    Δ per window µs -0.00 -0.00 +0.01 -0.02 => per exit -2 -3 +10 -16 ns
+fk     exits per window: on 283.7, off 0.00; median window off 63661.2 µs
+   timed Δ per window µs +2262.54 +2075.19 +2179.22 +1553.70 => per exit +7975 +7315 +7681 +5477 ns
+   aa    Δ per window µs -107.64 -95.27 -124.12 +392.48 => per exit -379 -336 -438 +1383 ns
+lobsters exits per window: on 3864.7, off 0.04; median window off 856070.5 µs
+   timed Δ per window µs +28193.45 +19443.58 +9006.15 => per exit +7295 +5031 +2330 ns
+   aa    Δ per window µs -6151.18 +1018.35 +1363.28 => per exit -1592 +264 +353 ns
