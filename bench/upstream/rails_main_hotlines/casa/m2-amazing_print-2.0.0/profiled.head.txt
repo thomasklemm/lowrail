@@ -1,0 +1,30 @@
+lowrail-profile: run 1 of 2: bundle exec rspec spec/requests --seed 1234 --format documentation
+
+An error occurred while loading ./spec/requests/additional_expenses_spec.rb.
+Failure/Error: require_relative "../config/environment"
+
+Bundler::GemRequireError:
+  There was an error while trying to load the gem 'amazing_print'.
+  Gem Load Error is: undefined method 'colorize_logging' for class ActiveSupport::LogSubscriber
+  Backtrace for gem load error is:
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/amazing_print-2.0.0/lib/amazing_print/ext/active_support.rb:45:in '<top (required)>'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/amazing_print-2.0.0/lib/amazing_print.rb:27:in 'Kernel#require_relative'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/amazing_print-2.0.0/lib/amazing_print.rb:27:in '<top (required)>'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel#require'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel.replace_require'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel.require'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:63:in 'block (2 levels) in Bundler::Runtime#require'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:58:in 'Array#each'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:58:in 'block in Bundler::Runtime#require'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:52:in 'Array#each'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:52:in 'Bundler::Runtime#require'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler.rb:214:in 'Bundler.require'
+  /home/user/workspace/repo/.corpus/hl-casa/config/application.rb:7:in '<top (required)>'
+  /home/user/workspace/repo/.corpus/hl-casa/config/environment.rb:2:in 'Kernel#require_relative'
+  /home/user/workspace/repo/.corpus/hl-casa/config/environment.rb:2:in '<top (required)>'
+  /home/user/workspace/repo/.corpus/hl-casa/spec/rails_helper.rb:4:in 'Kernel#require_relative'
+  /home/user/workspace/repo/.corpus/hl-casa/spec/rails_helper.rb:4:in '<top (required)>'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
+  /home/user/workspace/repo/.corpus/hl-casa/spec/requests/additional_expenses_spec.rb:1:in '<top (required)>'
+  /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rspec-core-3.13.6/lib/rspec/core/configuration.rb:2144:in 'Kernel#load'

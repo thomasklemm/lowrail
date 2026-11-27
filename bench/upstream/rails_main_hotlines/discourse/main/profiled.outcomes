@@ -1,0 +1,10 @@
+2	Guard the call with a version check just in case the parent application is using
+2	Same recommendations as for applications, since the classic autoloader is no longer
+2	approaches.
+2	available starting with Rails N.N.
+2	cannot load such file -- active_job
+2	certain constant is loaded for constant lookup to work as expected, you can simply
+2	remove it.
+2	require_dependency "some_file" if Rails::VERSION::MAJOR < N
+2	the classic autoloader:
+2	things like STIs or Kafka consumers, please check the autoloading guide for modern

@@ -1,0 +1,40 @@
+| gem: pagy | 0.6 | 0.6 | `shared_methods.rb:12` 0.2, `backend.rb:16` 0.1, `shared_methods.rb:23` 0.0 |
+| gem: marcel | 0.3 | 0.3 | `magic.rb:18` 0.1, `mime_type.rb:136` 0.0, `magic.rb:146` 0.0 |
+| gem: faraday | 0.2 | 0.2 | `rack_builder.rb:119` 0.0, `options.rb:9` 0.0, `options.rb:33` 0.0 |
+| gem: redis-client | 0.2 | 0.2 | `resp3.rb:54` 0.0, `resp3.rb:99` 0.0, `resp3.rb:69` 0.0 |
+| gem: addressable | 0.2 | 0.3 | `uri.rb:1417` 0.0, `uri.rb:2272` 0.0, `uri.rb:1858` 0.0 |
+| gem: sidekiq-unique-jobs | 0.1 | 0.1 | `core_ext.rb:101` 0.1, `core_ext.rb:105` 0.0 |
+| ruby default gem: net-http | 0.1 | 0.1 | `header.rb:205` 0.0, `header.rb:468` 0.0, `header.rb:195` 0.0 |
+| gem: httparty | 0.1 | 0.1 | `headers_processor.rb:22` 0.0, `module_inheritable_attributes.rb:32` 0.0, `request.rb:293` 0.0 |
+| gem: csv | 0.1 | 0.1 | `parser.rb:683` 0.0, `parser.rb:656` 0.0, `parser.rb:623` 0.0 |
+| gem: plaid | 0.1 | 1.3 | `api_client.rb:46` 0.0, `configuration.rb:271` 0.0, `api_client.rb:45` 0.0 |
+| gem: ruby-vips | 0.1 | 0.1 | `object.rb:201` 0.0, `object.rb:200` 0.0, `object.rb:202` 0.0 |
+| ruby default gem: cgi | 0.1 | 0.1 | `escape.rb:133` 0.0, `escape.rb:134` 0.0, `escape.rb:135` 0.0 |
+| gem: ffi | 0.0 | 0.1 | `managedstruct.rb:80` 0.0, `autopointer.rb:88` 0.0, `autopointer.rb:79` 0.0 |
+| gem: hashery | 0.0 | 0.1 | `lru_hash.rb:107` 0.0, `lru_hash.rb:210` 0.0, `lru_hash.rb:36` 0.0 |
+| rails: actioncable | 0.0 | 0.4 | `broadcasting.rb:55` 0.0, `broadcasting.rb:43` 0.0, `broadcasting.rb:57` 0.0 |
+| ruby default gem: psych | 0.0 | 4.5 | `parser.rb:62` 0.0, `node.rb:33` 0.0, `tree_builder.rb:97` 0.0 |
+| gem: redis | 0.0 | 0.0 | `redis.rb:142` 0.0, `redis.rb:64` 0.0, `connection.rb:21` 0.0 |
+| ruby default gem: prettyprint | 0.0 | 0.0 | `prettyprint.rb:403` 0.0, `prettyprint.rb:263` 0.0, `prettyprint.rb:458` 0.0 |
+| ruby default gem: pp | 0.0 | 0.0 | `pp.rb:542` 0.0, `pp.rb:268` 0.0, `pp.rb:271` 0.0 |
+| gem: lookbook | 0.0 | 2.4 | `application_controller.rb:25` 0.0, `targetable_concern.rb:6` 0.0, `targetable_concern.rb:8` 0.0 |
+| rails: actionmailer | 0.0 | 0.0 | `base.rb:642` 0.0, `message_delivery.rb:175` 0.0, `message_delivery.rb:124` 0.0 |
+| gem: loofah | 0.0 | 0.0 | `concerns.rb:172` 0.0, `concerns.rb:43` 0.0, `concerns.rb:177` 0.0 |
+| gem: rails-html-sanitizer | 0.0 | 0.0 | `sanitizer.rb:165` 0.0, `sanitizer.rb:33` 0.0, `sanitizer.rb:56` 0.0 |
+| test harness: minitest | 0.0 | 0.0 | `assertions.rb:633` 0.0 |
+| gem: rails-i18n | 0.0 | 0.0 | `fr.rb:14` 0.0, `fr.rb:9` 0.0 |
+| gem: doorkeeper | 0.0 | 0.2 | `tokens_controller.rb:0` 0.0, `errors.rb:5` 0.0, `errors.rb:66` 0.0 |
+| rails: actiontext | 0.0 | 0.1 | `rendering.rb:0` 0.0, `content.rb:0` 0.0, `rendering.rb:6` 0.0 |
+| gem: sentry-rails | 0.0 | 0.0 | `action_cable.rb:6` 0.0, `action_cable.rb:10` 0.0, `action_cable.rb:5` 0.0 |
+| gem: mail | 0.0 | 0.0 | `address_lists_parser.rb:31971` 0.0, `address_lists_parser.rb:31959` 0.0, `encodings.rb:124` 0.0 |
+| ruby default gem: bundler | 0.0 | 0.0 | `rubygems_integration.rb:192` 0.0 |
+| gem: jbuilder | 0.0 | 0.2 | `jbuilder_template.rb:123` 0.0, `jbuilder.rb:16` 0.0, `jbuilder_template.rb:133` 0.0 |
+| gem: connection_pool | 0.0 | 0.0 | `connection_pool.rb:100` 0.0, `connection_pool.rb:110` 0.0, `timed_stack.rb:31` 0.0 |
+| gem: yard | 0.0 | 0.5 | `docstring.rb:383` 0.0, `docstring.rb:356` 0.0, `docstring.rb:284` 0.0 |
+| gem: pundit | 0.0 | 0.0 | `authorization.rb:17` 0.0, `authorization.rb:21` 0.0, `authorization.rb:19` 0.0 |
+| gem: sidekiq | 0.0 | 0.0 | `logger.rb:17` 0.0, `redis_connection.rb:72` 0.0, `api.rb:988` 0.0 |
+| gem: racc | 0.0 | 0.0 | `parser.rb:263` 0.0 |
+| gem: msgpack | 0.0 | 0.0 | `factory.rb:9` 0.0, `factory.rb:37` 0.0, `bigint.rb:4` 0.0 |
+| rails: actionmailbox | 0.0 | 0.3 | `inbound_emails_controller.rb:65` 0.0, `inbound_emails_controller.rb:0` 0.0, `inbound_emails_controller.rb:0` 0.0 |
+lowrail-profile: report in /home/user/rmh-out/sure/m2/profiled/report.md
+lowrail-profile: the command exited 1, 1

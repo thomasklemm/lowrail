@@ -1,0 +1,2 @@
+profiled exit 0 wall 624.943283686 at 11:32:21 rails 8.1.4.1 3f290b759c8e2ffe7c257951b1255740751355e4
+profiled.log: 1491 distinct outcomes, 2982 lines; 1491 runs, 7094 assertions, 0 failures, 0 errors, 1 skips | 1491 runs, 7094 assertions, 0 failures, 0 errors, 1 skips

@@ -1,0 +1,40 @@
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/css_parser/lib/css_parser/rule_set.rb:229` | 3352.9 / 3352.9 | 14% | `app/services/notification_email_delivery.rb:18` 84%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 15% | `property = property.to_s.downcase` |
+| 2 | `GEM/css_parser/lib/css_parser/parser.rb:407` | 1727.15 / 1727.15 | 14% | `app/services/notification_email_delivery.rb:18` 81%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 19% | `token = scanner.scan(RULESET_TOKENIZER_RX)` |
+| 3 | `GEM/css_parser/lib/css_parser/rule_set.rb:587` | 752.99 / 752.99 | 14% | `app/services/notification_email_delivery.rb:18` 80%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 20% | `values = DIMENSION_DIRECTIONS.each_with_index.with_object({}) do \|(sid` |
+| 4 | `GEM/css_parser/lib/css_parser/rule_set.rb:101` | 689.29 / 689.29 | 14% | `app/services/notification_email_delivery.rb:18` 84%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 15% | `elsif value.to_s.strip.empty?` |
+| 5 | `GEM/css_parser/lib/css_parser/rule_set.rb:48` | 685.44 / 685.44 | 14% | `app/services/notification_email_delivery.rb:18` 84%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 13% | `value = value.to_s.sub(/\s*;\s*\Z/, '')` |
+| 6 | `GEM/premailer/lib/premailer/adapter/nokogiri.rb:29` | 680.16 / 680.16 | 14% | `app/services/notification_email_delivery.rb:18` 81%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 19% | `selector.gsub!(/([\s]\|^)([\w]+)/) { \|m\| $1.to_s + $2.to_s.downcase }` |
+| 7 | `GEM/css_parser/lib/css_parser/rule_set.rb:673` | 660.57 / 660.57 | 14% | `app/services/notification_email_delivery.rb:18` 83%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 17% | `value = decs[(colon + 1)..]` |
+| 8 | `GEM/css_parser/lib/css_parser/rule_set.rb:104` | 654.58 / 654.58 | 14% | `app/services/notification_email_delivery.rb:18` 84%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 15% | `value = Value.new(value)` |
+| 9 | `GEM/css_parser/lib/css_parser/rule_set.rb:676` | 633.78 / 633.78 | 14% | `app/services/notification_email_delivery.rb:18` 83%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 17% | `next if property.empty? \|\| value.empty? \|\| value.casecmp?(IMPORTANT)` |
+| 10 | `GEM/css_parser/lib/css_parser/rule_set.rb:200` | 628.93 / 628.93 | 14% | `app/services/notification_email_delivery.rb:18` 88%, `app/workers/publish_subscriber_emails_topic_item_worker.rb:17` 12% | `self.declarations = replacement_keys.zip(replacement_values).to_h` |
+
+### Mails
+
+| # | Mailer action | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | DigestMailer#digest | 3 / 3 | 23420.5 / 23407.5 | -13.0 | 21093.3 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:256` 995.0, `RAILS/activerecord/lib/active_record/relation/where_clause.rb:22` 426.0, `RAILS/activemodel/lib/active_model/type/string.rb:40` 272.0 | `app/views/digest_mailer/digest/topic.rb:80` 925.5, `app/models/concerns/has_topic_items.rb:17` 658.5, `app/mailers/application_mailer.rb:39` 496.0 |
+| 2 | NotificationMailer#notification | 3 / 3 | 21897.5 / 21891.0 | -6.5 | 18724.0 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:256` 821.5, `RAILS/activerecord/lib/active_record/relation/where_clause.rb:22` 274.0, `RAILS/actionview/lib/action_view/template/renderable.rb:21` 268.0 | `app/models/concerns/has_topic_items.rb:17` 2411.0, `app/models/stance.rb:95` 753.5, `app/views/notification_mailer/poll/results/simple.rb:99` 732.0 |
+| 3 | UserMailer#login | 18 / 18 | 3728.2 / 3728.4 | 0.2 | 3736.8 | `RAILS/actionview/lib/action_view/template/renderable.rb:21` 267.2, `RAILS/activesupport/lib/active_support/deprecation/reporting.rb:23` 117.9, `GEM/mail/lib/mail/parsers/address_lists_parser.rb:32009` 53.9 | `app/mailers/user_mailer.rb:58` 497.6, `app/mailers/user_mailer.rb:57` 383.5, `app/extras/app_config.rb:162` 144.2 |
+| 4 | GroupMailer.deliver_mail | 2 / 2 | 2584.0 / 2584.0 | 0.0 | 2574.5 | `GEM/mail/lib/mail/encodings/8bit.rb:14` 432.0, `GEM/mail/lib/mail/utilities.rb:215` 316.0, `GEM/mail/lib/mail/field_list.rb:71` 157.0 | `app/controllers/dev/scenarios/group.rb:207` 2567.0, `app/controllers/dev/scenarios/group.rb:214` 0.0 |
+| 5 | NotificationMailer.deliver_mail | 2 / 2 | 2292.0 / 2292.0 | 0.0 | 2265.0 | `GEM/mail/lib/mail/utilities.rb:215` 315.0, `GEM/mail/lib/mail/field_list.rb:71` 157.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 138.0 | `app/services/notification_email_delivery.rb:18` 2275.0 |
+| 6 | UserMailer.deliver_mail | 19 / 19 | 2290.7 / 2290.9 | 0.2 | 2291.1 | `GEM/mail/lib/mail/utilities.rb:215` 316.0, `GEM/mail/lib/mail/encodings/8bit.rb:14` 304.0, `GEM/mail/lib/mail/field_list.rb:71` 157.0 | `app/services/login_token_service.rb:7` 2139.3, `app/services/merge_users_service.rb:8` 134.6 |
+| 7 | DigestMailer.deliver_mail | 3 / 3 | 2072.0 / 2072.0 | 0.0 | 2081.7 | `GEM/mail/lib/mail/utilities.rb:215` 316.0, `GEM/mail/lib/mail/field_list.rb:71` 157.0, `GEM/mail/lib/mail/fields/parameter_hash.rb:22` 137.0 | `app/controllers/dev/scenarios/discussion.rb:123` 1028.0, `app/controllers/dev/scenarios/discussion.rb:142` 1027.0, `app/controllers/dev/scenarios/oatmilk_cooperative.rb:284` 0.0 |
+| 8 | GroupMailer#admin_deletion_warning | 1 / 1 | – / – |  | 4824.0 |  |  |
+| 9 | GroupMailer#expired_trial_deletion_warning | 1 / 1 | – / – |  | 4791.0 |  |  |
+| 10 | UserMailer#merge_verification | 1 / 1 | – / – |  | 3569.0 |  |  |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/mail/lib/mail/utilities.rb:215` | 172.74 / 172.74 | 100% | `app/services/login_token_service.rb:7` 62%, `app/mailers/user_mailer.rb:57` 7% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 2 | `RAILS/actionview/lib/action_view/template/renderable.rb:21` | 129.13 / 129.13 | 51% | `app/mailers/user_mailer.rb:58` 68%, `app/mailers/application_mailer.rb:39` 23% | `@renderable.render_in(context, locals: locals, &@block)` |
+| 3 | `GEM/mail/lib/mail/encodings/8bit.rb:14` | 119.21 / 119.21 | 38% | `app/services/login_token_service.rb:7` 81%, `app/controllers/dev/scenarios/group.rb:207` 7% | `!str.lines.find { \|line\| line.bytesize > 998 }` |
+| 4 | `RAILS/activerecord/lib/active_record/connection_adapters/postgresql/database_statements.rb:256` | 96.09 / 96.09 | 51% | `app/models/concerns/has_topic_items.rb:17` 14%, `app/views/digest_mailer/digest/topic.rb:80` 9% | `ActiveRecord::Result.new(fields, result.values, types.freeze, affected` |
+| 5 | `GEM/mail/lib/mail/field_list.rb:71` | 84.38 / 84.38 | 100% | `app/services/login_token_service.rb:7` 63%, `app/services/notification_email_delivery.rb:18` 7% | `fields = select { \|f\| f.responsible_for? field_name }` |
+| 6 | `GEM/mail/lib/mail/fields/parameter_hash.rb:22` | 64.53 / 64.55 | 49% | `app/services/login_token_service.rb:7` 69%, `app/services/notification_email_delivery.rb:18` 8% | `if k =~ /^#{key_pattern}(\*\|$)/i` |
+| 7 | `RAILS/activesupport/lib/active_support/deprecation/reporting.rb:23` | 56.92 / 56.92 | 51% | `app/mailers/user_mailer.rb:58` 68%, `app/mailers/application_mailer.rb:39` 22% | `callstack \|\|= caller_locations(2)` |
+| 8 | `RAILS/activerecord/lib/active_record/log_subscriber.rb:40` (debug logging) | 55.11 / 55.11 | 51% | `app/models/concerns/has_topic_items.rb:17` 10%, `app/helpers/email_helper.rb:54` 10% | `binds = binds.inspect` |
+| 9 | `GEM/mail/lib/mail/utilities.rb:291` | 48.47 / 48.47 | 100% | `app/services/login_token_service.rb:7` 49%, `app/mailers/user_mailer.rb:57` 17% | `value !~ /\S/` |
+| 10 | `RAILS/activesupport/lib/active_support/colorize_logging.rb:63` (debug logging) | 41.55 / 41.55 | 51% | `app/models/concerns/has_topic_items.rb:17` 11%, `app/helpers/email_helper.rb:54` 7% | `"\e[#{modes.join(";")}m" if modes.any?` |
+lowrail-profile: report in /home/user/rmh-out/loomio/main/profiled/report.md

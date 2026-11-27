@@ -1,0 +1,40 @@
+| Group | Warm/req | All/req | Top lines (warm) |
+| --- | ---: | ---: | --- |
+| rails: railties | 243.0 | 243.2 | `logger.rb:52` 235.0, `bootstrap.rb:74` 2.0, `logger.rb:65` 1.0 |
+| gem: rack | 22.7 | 22.8 | `utils.rb:693` 10.5, `query_parser.rb:245` 2.0, `request.rb:607` 2.0 |
+| rails: actionpack | 17.8 | 17.8 | `remote_ip.rb:183` 3.0, `exception_wrapper.rb:317` 2.0, `executor.rb:15` 1.0 |
+| rails: activesupport | 15.0 | 15.1 | `callbacks.rb:105` 2.0, `broadcast_logger.rb:299` 2.0, `execution_wrapper.rb:83` 1.0 |
+| app | 8.0 | 8.0 | `remote_ip_extensions.rb:64` 6.0, `remote_ip_extensions.rb:59` 1.0, `remote_ip_extensions.rb:24` 1.0 |
+| ruby stdlib | 7.1 | 7.2 | `formatter.rb:174` 7.0, `tempfile.rb:227` 0.0, `tmpdir.rb:176` 0.0 |
+| ruby default gem: ipaddr | 7.0 | 7.0 | `ipaddr.rb:769` 5.0, `ipaddr.rb:716` 2.0 |
+| ruby default gem: uri | 6.0 | 6.0 | `common.rb:465` 4.9, `rfc2396_parser.rb:320` 1.1 |
+| gem: propshaft | 3.4 | 3.4 | `server.rb:16` 1.4, `server.rb:13` 1.0, `server.rb:14` 1.0 |
+| rails: activerecord | 3.0 | 3.0 | `connection_pool.rb:237` 1.0, `query_cache.rb:63` 1.0, `connection_pool.rb:168` 1.0 |
+| gem: rack-cors | 2.4 | 2.4 | `resource.rb:40` 1.4, `result.rb:38` 1.0 |
+| ruby default gem: securerandom | 1.0 | 1.0 | `securerandom.rb:71` 1.0 |
+| lowrail-profile | 0.0 | 0.0 | `profile.rb:56` 0.0 |
+
+## Outside requests
+
+Jobs (`perform_now`), mails (each build and each delivery) and Action Cable channel actions run outside a request, counted the same way and per window. A job, mail or broadcast inside a request counts as part of that request.
+
+### Jobs
+
+| # | Job | Count | Warm/window | Δ | All/window | Top lines outside the app (warm) | Top app lines (warm) |
+| ---: | --- | ---: | ---: | ---: | ---: | --- | --- |
+| 1 | ActionMailer::MailDeliveryJob#perform | 6 / 6 | 30274.8 / 30302.4 | 27.6 | 38403.8 | `GEM/css_parser/lib/css_parser/rule_set.rb:116` 1387.4, `GEM/css_parser/lib/css_parser/parser.rb:407` 1119.0, `GEM/css_parser/lib/css_parser.rb:112` 1063.0 | `app/services/notify_service.rb:302` 12073.6, `app/controllers/auth/sessions_controller.rb:167` 3888.0, `app/controllers/auth/sessions_controller.rb:186` 3875.0 |
+
+| # | Line | Warm/window | Reach | From the app | Source |
+| ---: | --- | ---: | ---: | --- | --- |
+| 1 | `GEM/css_parser/lib/css_parser/rule_set.rb:116` | 1156.17 / 1156.17 | 100% | `app/services/notify_service.rb:302` 53%, `no app frame` 23% | `value = Value.new(value)` |
+| 2 | `GEM/css_parser/lib/css_parser/parser.rb:407` | 932.5 / 932.5 | 100% | `app/services/notify_service.rb:302` 67%, `app/controllers/auth/sessions_controller.rb:167` 17% | `token = scanner.scan(RULESET_TOKENIZER_RX)` |
+| 3 | `GEM/css_parser/lib/css_parser.rb:112` | 885.83 / 885.83 | 100% | `app/services/notify_service.rb:302` 67%, `app/controllers/auth/sessions_controller.rb:167` 17% | `c = selector.scan(NON_ID_ATTRIBUTES_AND_PSEUDO_CLASSES_RX_NC).length` |
+| 4 | `GEM/premailer/lib/premailer/adapter/nokogiri.rb:228` | 883.33 / 883.33 | 100% | `app/services/notify_service.rb:302` 67%, `app/controllers/auth/sessions_controller.rb:167` 17% | `selector.scan(CLASS_IN_SELECTOR).any? { \|(name)\| !classes_in_doc.inclu` |
+| 5 | `GEM/css_parser/lib/css_parser/rule_set.rb:671` | 774.5 / 774.5 | 100% | `app/services/notify_service.rb:302` 55%, `no app frame` 18% | `block.split(SEMICOLON) do \|decs\|` |
+| 6 | `GEM/css_parser/lib/css_parser/rule_set.rb:683` | 719.17 / 719.17 | 100% | `app/services/notify_service.rb:302` 49%, `no app frame` 25% | `value = decs[colon + 1, decs.length]` |
+| 7 | `GEM/css_parser/lib/css_parser/rule_set.rb:682` | 678.67 / 678.67 | 100% | `app/services/notify_service.rb:302` 50%, `no app frame` 24% | `property = decs[0, colon]` |
+| 8 | `GEM/premailer/lib/premailer/adapter/nokogiri.rb:49` | 546.67 / 546.67 | 100% | `app/services/notify_service.rb:302` 67%, `app/controllers/auth/sessions_controller.rb:186` 17% | `selector.gsub!(/([\s]\|^)([\w]+)/) { \|_m\| $1.to_s + $2.to_s.downcase }` |
+| 9 | `GEM/mail/lib/mail/utilities.rb:215` | 518.5 / 518.5 | 100% | `app/services/notify_service.rb:302` 49%, `app/mailers/notification_mailer.rb:27` 18% | `str.to_s.tr(Constants::UNDERSCORE, Constants::HYPHEN)` |
+| 10 | `GEM/css_parser/lib/css_parser/rule_set.rb:702` | 489.17 / 489.17 | 100% | `app/services/notify_service.rb:302` 67%, `app/controllers/auth/sessions_controller.rb:167` 17% | `@selectors = selectors.split(',').map! do \|s\|` |
+lowrail-profile: report in /home/user/rmh-out/mastodon/main/profiled/report.md
+lowrail-profile: the command exited 1, 1

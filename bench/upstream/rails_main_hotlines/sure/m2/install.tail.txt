@@ -1,0 +1,8 @@
+Waiting for another process to let go of lock: /home/user/.local/share/mise/installs/ruby/3.4.9/lib/ruby/gems/3.4.0/bundler.lock
+WARN: Unresolved or ambiguous specs during Gem::Specification.reset:
+      psych (>= 4.0.0)
+      Available/installed versions of this gem:
+      - 5.4.0
+      - 5.2.2
+WARN: Clearing out unresolved specs. Try 'gem cleanup <gem>'
+Please report a bug if this causes problems.

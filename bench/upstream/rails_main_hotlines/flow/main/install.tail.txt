@@ -1,0 +1,9 @@
+Waiting for another process to let go of lock: /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler.lock
+Could not find compatible versions
+
+Because every version of rails depends on activestorage = 8.2.0.alpha
+  and every version of activestorage depends on marcel ~> 2.0,
+  every version of rails requires marcel ~> 2.0.
+So, because Gemfile.main depends on rails >= 0
+  and Gemfile.main depends on marcel ~> 1.0,
+  version solving has failed.

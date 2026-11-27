@@ -1,0 +1,11 @@
+bundle failed
+Could not find compatible versions
+
+Because caxlsx >= 3.1.0 depends on marcel ~> 1.0
+  and every version of activestorage depends on marcel ~> 2.0,
+  caxlsx >= 3.1.0 is incompatible with activestorage >= 0.
+And because every version of rails depends on activestorage = 8.2.0.alpha,
+  caxlsx >= 3.1.0 is incompatible with rails >= 0.
+So, because Gemfile.main depends on rails >= 0
+  and Gemfile.main depends on caxlsx ~> 4.5,
+  version solving has failed.

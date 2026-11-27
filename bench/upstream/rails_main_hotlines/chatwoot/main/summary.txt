@@ -1,0 +1,11 @@
+bundle failed
+Your bundle is locked to rails (7.2.3.1) from https://github.com/rails/rails.git
+(at 088fc0c@088fc0c), but that version can no longer be found in that source.
+That means the author of rails (7.2.3.1) has removed it. You'll need to update
+your bundle to a version other than rails (7.2.3.1) that hasn't been removed in
+order to install.
+Chatwoot locks Rails 7.2.3.1; the copied lock cannot move to 8.1.4.1 or main. Re-resolving with
+`bundle lock --update rails railties action* active*` on Gemfile.r81 (Ruby 3.4.4):
+  Because administrate-field-belongs_to_search >= 0.10.0 depends on rails >= 4.2, < 8.0
+  ... version solving has failed.
+Same on both trees: not a main-only failure.

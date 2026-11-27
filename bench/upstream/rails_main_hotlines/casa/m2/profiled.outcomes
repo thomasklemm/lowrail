@@ -1,0 +1,938 @@
+2	(email only)
+2	(phone_number only)
+2	Creates a new CasaCase, but no CaseCourtOrder
+2	Creates a new CaseCourtOrder
+2	DELETE /custom_org_links/:id
+18	DELETE /destroy
+2	DELETE /remove_language
+2	DELETE /soft_delete
+4	DELETE destroy
+2	GET #export_emails
+4	GET #index
+2	GET /
+2	GET /.well-known/assetlinks.json
+2	GET /all_casa_admins/metrics
+2	GET /analytics
+2	GET /casa_admins
+2	GET /casa_admins/:id/edit
+2	GET /casa_cases/:casa_id/fund_request/new
+2	GET /case_contact_reports
+2	GET /case_court_reports
+2	GET /case_court_reports/:id
+2	GET /contact_type_groups/:id/edit
+2	GET /contact_type_groups/new
+2	GET /contact_types/:id/edit
+2	GET /contact_types/new
+2	GET /custom_org_links/:id/edit
+2	GET /custom_org_links/new
+2	GET /destroy
+2	GET /drafts
+38	GET /edit
+2	GET /error
+2	GET /health
+2	GET /health.json
+2	GET /hearing_types/:id/edit
+2	GET /hearing_types/new
+2	GET /impersonate
+52	GET /index
+2	GET /index filtering (server-side)
+2	GET /judges/:id/edit
+2	GET /judges/new
+2	GET /leave
+42	GET /new
+2	GET /preference_sets/table_state/volunteers_table
+2	GET /restore
+26	GET /show
+2	GET /users/invitation/accept
+4	GET edit
+2	GET new
+8	PATCH /activate
+2	PATCH /add_language
+2	PATCH /casa_admins/:id/deactivate
+6	PATCH /casa_cases/:id/deactivate
+6	PATCH /casa_cases/:id/reactivate
+2	PATCH /change_to_admin
+2	PATCH /change_to_supervisor
+6	PATCH /deactivate
+2	PATCH /mark_as_complete
+2	PATCH /mark_as_needs_review
+2	PATCH /reimbursement
+4	PATCH /reminder
+6	PATCH /resend_invitation
+2	PATCH /resolve
+2	PATCH /show_hide_contacts
+4	PATCH /unassign
+44	PATCH /update
+2	PATCH /update_email
+4	PATCH /update_password
+2	PATCH update
+2	POST #mark_as_read
+2	POST /bulk_assignment
+2	POST /casa_admins
+2	POST /casa_cases/:casa_id/fund_request
+2	POST /case_court_reports
+2	POST /contact_type_groups
+2	POST /contact_types
+56	POST /create
+2	POST /custom_org_links
+2	POST /error
+2	POST /hearing_types
+2	POST /judges
+2	POST /preference_sets/table_state_update/volunteers_table
+2	POST /save
+2	POST /send_reactivation_alert
+2	POST create
+2	PUT /casa_admins/:id
+2	PUT /contact_type_groups/:id
+2	PUT /contact_types/:id
+2	PUT /custom_org_links/:id
+2	PUT /hearing_types/:id
+2	PUT /judges/:id
+2	PUT /update
+2	PUT /users/invitation
+2	accepts a range preset
+2	accepts the invitation
+2	activated volunteer with cases
+2	activated volunteer without cases
+2	activates an inactive casa_admin
+2	activates an inactive supervisor
+2	activates an inactive volunteer
+2	adds language to current user
+2	adds the category
+6	adds the correct headers to the csv
+2	adds the court date to each group case
+2	adds the court orders to each group case
+2	adds the option
+2	admin can view the edit supervisor page
+2	admin can view the new supervisor page
+2	admin cannot view the edit supervisor page
+2	admin updates the supervisor
+2	aggregates case contacts across every chapter
+2	allows access to hearing type create page
+2	allows access to hearing type edit page
+2	allows access to the edit admin page
+2	allows access to the new admin page
+2	allows admin to view the form
+2	allows current user to begin to update other casa admin's email and send a confirmation email
+2	allows for the creation of checklist items
+2	allows for the deletion of checklist items
+2	allows re-assigning the same contact type without uniqueness validation error
+2	allows volunteer's supervisor to view the form
+12	also respond as json
+4	also respond to json
+34	also responds as json
+2	also responds to json
+4	and html format
+4	and json format
+2	as a casa_admin
+10	as a supervisor
+2	as a supervisor user
+6	as a volunteer
+2	as a volunteer user
+2	as admin
+8	as an admin
+4	as an admin user
+4	as casa_admin
+4	as supervisor
+4	as volunteer
+4	authenticates the user
+14	authorizes action
+2	authorizes casa case
+2	authorizes save_emancipation?
+4	behaves like can view reports
+4	behaves like create
+4	behaves like delete
+4	behaves like edit
+2	behaves like successful deletion
+4	behaves like unsuccessful deletion
+4	behaves like update
+8	bypasses sign in if the current user is the true user
+2	call UserMailer.password_chaned_reminder
+4	calls DeviseMailer to remind the user that email has changed along with a confirmation link
+2	calls FailedImportCsvService#store when there are failed rows from the import
+2	calls ReimbursementPolicy::Scope to filter reimbursements
+6	calls UserMailer to reminder the user that password has changed
+4	calls for CasaAdminMailer
+2	can change exclude_from_court_report
+4	can create a note for volunteer
+4	can delete notes about a volunteer
+2	can impersonate a volunteer as a supervisor
+2	can impersonate a volunteer as an admin
+2	can not impersonate as a volunteer
+2	can see own active volunteer's other duties from own organization
+2	can see volunteer's other duties from own organization
+2	can set exclude_from_court_report attribute
+2	can set the supervisor to be inactive
+2	can successfully access a casa admin edit page
+2	can successfully access a contact type create page
+4	can successfully access a contact type edit page
+2	can successfully access a contact type group create page
+2	can successfully access a contact type group edit page
+2	can successfully access a custom org link create page
+2	can successfully access a judge create page
+2	can successfully access a judge edit page
+2	can successfully create a contact type
+2	can successfully create a contact type group
+2	can successfully create a custom org link
+2	can successfully create a judge
+2	can successfully deactivate a casa admin user
+2	can successfully delete a custom org link
+2	can successfully update a casa admin user
+2	can successfully update a contact type
+2	can successfully update a contact type group
+2	can successfully update a custom org link
+2	can successfully update a judge
+2	can update a casa admin user's email and send them a confirmation email
+2	can view 'Generate Court Report page
+2	can view 'Generate Court Report' page
+2	can view the 'Generate Court Report' page
+6	cannot access a casa admin edit page
+4	cannot access a contact type create page
+10	cannot access a contact type edit page
+4	cannot access a contact type group create page
+4	cannot access a contact type group edit page
+4	cannot access a custom org link create page
+4	cannot access a judge create page
+4	cannot access a judge edit page
+2	cannot access another organization's contact type group edit page
+2	cannot change its own type
+2	cannot change the active state
+4	cannot create a contact type
+4	cannot create a contact type group
+4	cannot create a custom org link
+4	cannot create a judge
+2	cannot create a note
+4	cannot create a note for volunteer
+6	cannot delete a custom org link
+2	cannot delete notes
+4	cannot delete notes about a volunteer
+2	cannot set itself to be inactive
+8	cannot update a casa admin user
+6	cannot update a custom org link
+4	cannot update a judge
+4	cannot update a update a contact type
+4	cannot update a update a contact type group
+2	cannot update another organization's contact type group
+2	cannot update the casa admin
+2	cannot view reports
+4	casa_case_ids filter
+2	cc's their supervisor and admin when the 'with_cc` param is present
+2	cc's their supervisor when the 'with_cc` param is present
+2	ccs the volunteer's supervisor and the admin when CC is checked
+2	ccs the volunteer's supervisor when CC is checked
+2	changes nothing and says so
+2	changes reimbursement status to complete
+2	changes reimbursement status to needs review
+2	changes status to 'active' if it was 'started'
+2	changes the admin to a supervisor
+2	changes the supervisor to an admin
+2	changes the volunteer address, not the admin's
+2	changes the volunteer address, not the supervisor's
+2	changes to contact types in params
+2	computes the month-over-month contact delta
+2	contains a empty link
+2	contains a link ending with .DOCX extension
+2	copies contact_topic answers for the cases
+2	copies the contact attributes for each contact
+4	court orders
+2	creates a case assignment
+2	creates a followup
+2	creates a new All CASA admin
+2	creates a new CASA admin for the organization
+2	creates a new CASA org
+2	creates a new CasaCase
+2	creates a new ContactTopic
+4	creates a new CourtDate
+2	creates a new PatchNote
+2	creates a new casa_admin
+2	creates a new case assignment for the casa_case
+2	creates a new case assignment for the volunteer
+4	creates a new language
+2	creates a new mileage rate
+2	creates a new supervisor_volunteers association
+2	creates a new volunteer and sends account_setup email
+6	creates a record and responds created
+2	creates additional expenses for the case contact
+2	creates an association for each volunteer
+2	creates case in cases CSV imports and adds next court date
+6	creates fund request, calls mailer, and redirects to casa case
+2	creates new record
+2	creates one new Duty and returns to other duties page
+2	creates supervisors and adds volunteers in supervisor CSV imports
+2	creates supervisors and assigns the volunteer if not already assigned
+2	creates the learning hour topic successfully and redirects to the organization's edit page
+2	creates the learning hour type successfully and redirects to the organization's edit page
+2	creates the placement successfully and redirects to the placement
+2	creates volunteers in volunteer CSV imports
+2	deactivates an active supervisor
+2	deactivates an active volunteer
+2	deactivates the case assignment
+2	deactivates the requested casa_case
+2	dedupes and updates the contact type ids
+2	defaults to the N-month range and accepts a preset
+2	delete
+2	deletes the court order
+2	deletes the placement successfully
+4	denies access
+2	denies access and redirects elsewhere
+2	destroys the case assignment from the casa_case
+2	destroys the case assignment from the volunteer
+4	destroys the record and responds no content
+2	destroys the requested patch_note
+2	destroys the requested record
+4	different org
+2	displays an error message when the Language id is empty
+2	displays banner
+2	displays changed attributes
+2	displays information of the records
+2	displays the Learning topic column if learning_topic_active is true
+2	displays the banner
+2	displays the court date
+2	displays the placement details
+2	displays the placement information
+4	displays the time completed column, naming the period it covers
+8	does not accept the invitation
+2	does not activate the casa admin's profile
+2	does not add the category
+2	does not add the language again
+2	does not add the option
+4	does not allow access to hearing type create page
+4	does not allow access to hearing type edit page
+2	does not allow access to the edit page
+2	does not allow access to the new checklist item page
+2	does not allow current user to successfully update other casa admin's email
+2	does not allow for the creation of checklist items
+2	does not allow for the deletion of checklist items
+2	does not allow updates
+8	does not bypass sign in when the current user is not the true user
+12	does not call UserMailer to reminder the user that password has changed
+2	does not call UserMailer.password_changed_reminder
+4	does not change status
+2	does not change status from 'started'
+2	does not change the admin to a supervisor
+2	does not change the contact status from 'started'
+2	does not change the status
+2	does not changes the supervisor to an admin
+6	does not create a case assignment
+4	does not create a hearing type
+2	does not create a mileage rate
+2	does not create a new CASA org
+2	does not create a new CasaCase
+2	does not create a new ContactTopic
+2	does not create a new CourtDate
+2	does not create a new Duty and renders new page
+2	does not create a new PatchNote
+2	does not create a new casa_admin
+2	does not create a new record
+2	does not create a new volunteer
+2	does not create contact topic answers
+4	does not create fund request or call mailer
+2	does not create new associations
+4	does not create record and redirects to root
+2	does not deactivate the casa admin's profile
+2	does not deactivate the case assignment
+10	does not deactivate the requested casa_case
+2	does not destroy the case assignment
+2	does not destroy the requested contact_topic
+2	does not display banner on page reloads
+2	does not display the Learning topic column if learning_topic_active is false
+2	does not display the banner
+2	does not expose another org's mileage rate
+2	does not include contacts outside the date range in the generated report
+2	does not include court orders section
+2	does not leak the exception to the user
+2	does not mark the notification as read
+2	does not mark the notification as read if it is already read
+2	does not reactivate the requested casa_case
+4	does not remove anything
+2	does not remove association
+2	does not remove associations
+4	does not remove court date record
+2	does not render for volunteers
+4	does not return casa case
+2	does not revert logo to default
+2	does not send SMS when Twilio has an error
+2	does not send SMS when Twilio is not enabled
+2	does not send SMS when phone number not given
+2	does not send a Followup Notifier
+2	does not send a SMS if Twilio has an error
+2	does not send a SMS if phone number not given
+4	does not send a SMS if the casa_org does not have Twilio enabled
+2	does not send a SMS when Twilio API has an error
+2	does not send a SMS when phone number is not provided
+2	does not send a notification
+2	does not send a reactivation SMS when Casa Org has Twilio disabled
+2	does not send an sms, only an email
+2	does not send any data
+2	does not send email with reset password
+2	does not send reimbursement email for non-reimbursement case contacts
+2	does not send sms with reset password
+2	does not set the is_active flag on the association to false
+2	does not show
+2	does not show patch notes made after the deploy date
+2	does not show the no notification message
+4	does not show the patch notes section
+2	does not toggle contacts visibility
+4	does not update a mileage rate
+8	does not update across organizations
+2	does not update and re-renders edit page
+4	does not update hearing type
+2	does not update it
+6	does not update note and redirects to root path
+2	does not update the all_casa_admin
+2	does not update the all_casa_admin password
+6	does not update the duty and redirects to root path
+2	does not update the first court order
+2	does not update the requested casa_org
+4	does not update the requested case_contact
+2	does not update the second court order
+2	does not update the second order
+4	does not update the user email
+8	does not update the user password
+2	does not update the volunteer
+4	does not update the volunteer's address
+2	doesn't send a deactivation email
+2	doesn't send an deactivation email
+6	doesn't show other organizations' cases
+2	doesn't show other volunteers' cases
+2	each check_item_action
+2	emails only the volunteer when CC is not checked
+6	emails the volunteer
+2	emails the volunteer without a supervisor
+2	expands contact types from single to multiple without errors
+2	exposes no cross-org activity charts (those moved to the authenticated Metrics/Analytics pages)
+4	fails
+18	fails across organizations
+4	fails and responds unprocessable_content
+2	filters by casa_case_ids
+2	filters by contact_medium
+2	filters by contact_type_ids without duplicating a multi-type row
+2	filters the list to the searched case number
+4	flashes success message
+2	followup doesn't exists
+2	followup exists
+2	for a future court date
+2	generates a csv
+2	generates a xlsx file
+2	generates correct defaults during creation
+2	gracefully fails
+2	handles multiple consecutive updates without uniqueness errors
+2	handles overlapping contact types (mix of existing and new)
+2	has key latest_deploy_time
+2	has keys ['link', 'status'] in JSON string
+2	has keys ['link','status','error_messages'] in JSON string
+2	hides drafts with no_drafts
+8	html request
+2	ignores an out-of-range value
+2	includes None for the hearing type in the document
+2	includes None for the judge's name in the document
+2	includes contacts within the date range in the generated report
+2	includes court order info
+2	includes the hearing type in the document
+2	includes the judge's name in the document
+2	invalid credentials
+4	invalid request
+2	is allowed
+2	is different than server
+16	is expected not to be successful
+2	is expected to be not found
+40	is expected to be successful
+2	is expected to redirect to "/all_casa_admins/casa_orgs/N"
+6	is expected to redirect to "/all_casa_admins/casa_orgs/N/casa_admins/N/edit"
+2	is expected to redirect to "/casa_cases/cina-N"
+4	is expected to redirect to "/casa_cases/cina-N/court_dates/N"
+18	is expected to redirect to "/casa_cases/cina-N/edit"
+4	is expected to redirect to "/case_contacts"
+10	is expected to redirect to "/volunteers/N/edit"
+2	is expected to redirect to "http://www.example.com/casa_org/N/edit"
+2	is expected to redirect to "http://www.example.com/users/sign_in"
+2	is expected to respond with a not_found status code (N)
+6	is expected to respond with a redirect status code (Nxx)
+14	is expected to respond with a success status code (Nxx)
+2	is expected to respond with status code :ok (N)
+6	is expected to respond with status code :unprocessable_content (N)
+2	is not authorized
+12	is successful
+4	is successful if note belongs to volunteer
+2	lets admin users update checklist items
+2	lists exactly two active contacts and one draft
+2	load metrics correctly
+30	logged in as a non-admin user
+4	logged in as admin from a different organization
+30	logged in as admin user
+2	marks it as :resolved
+2	marks the notification as read
+2	more than one active case
+2	must not create a new mileage rate
+2	nils out session variable
+2	notifies the user that the language has been added
+2	notifies the user that the language is already in their list
+2	on logo update
+4	only allows all_casa_admin users
+2	only creates cases within user's organizations
+2	orders contact topics alphabetically
+2	orders contacts by occurred_at desc
+2	other supervisor can view the edit supervisor page
+2	passes in casa_org_id to CaseContractReport
+2	passes the empty-topic option to the report context
+2	populates and sends correct emancipation template
+2	post
+2	pre-selects the case it was opened from, without persisting it
+2	produces an error when a deactivated case already exists in cases CSV imports
+2	raises Wicked::Wizard::InvalidStepError
+2	raises an error causing an internal server error
+2	re-renders the form
+2	reactivates the requested casa_case
+2	reassigns the volunteer to the casa_case
+2	redirects away without changing the reimbursement status
+2	redirects back to 'Generate Court Report' page
+2	redirects back to referer or fallback location
+2	redirects to CASA org show page, with notice flash
+2	redirects to admin edit page
+2	redirects to admin edition page
+2	redirects to case contact form
+2	redirects to case_contacts_path
+2	redirects to contact form with the same draft_case_id, ignore_referer
+2	redirects to edit casa_org
+2	redirects to login page
+2	redirects to new contact with the same draft_case_ids, :ignore_referer
+2	redirects to referrer (fallback /case_contacts?success=true)
+2	redirects to referrer (fallback) page
+2	redirects to referrer/root without creating a contact topic answer
+2	redirects to referrer/root without creating an additional expense
+2	redirects to referrer/root without destroying the additional expense
+2	redirects to referrer/root without destroying the contact topic answer
+12	redirects to root
+4	redirects to root and displays an unauthorized message
+14	redirects to root path
+4	redirects to root path if note does not belong to volunteer
+2	redirects to root with an authorization failure message
+2	redirects to root/sign in
+2	redirects to the all-CASA sign-in
+12	redirects to the casa_case
+2	redirects to the casa_org edit
+2	redirects to the case contacts index without a UrlGenerationError
+2	redirects to the case group index
+2	redirects to the case_groups index
+2	redirects to the court_date
+2	redirects to the created casa_case
+2	redirects to the dashboard
+2	redirects to the edit casa_org
+2	redirects to the edit page for an admin
+2	redirects to the emancipation checklist page for that case
+2	redirects to the new case contact
+2	redirects to the notification event URL
+2	redirects to the sign-in page
+2	redirects to the updated record
+2	reduces contact types from multiple to single without errors
+2	rejects an answer attribute without an id (neither creates nor updates)
+2	removes a language from a volunteer languages list
+2	removes all options associated with the category
+2	removes court date record
+2	removes the category
+2	removes the option
+8	render a successful response
+10	renders a csv file to download
+4	renders a csv with all case contacts
+4	renders a json file
+2	renders a minimal, self-contained ops status page
+2	renders a redirect
+2	renders a response with N status (i.e. to display the 'edit' template)
+2	renders a response with N status (i.e. to display the 'new' template)
+46	renders a successful response
+2	renders a successful response (a json with a list of errors)
+4	renders a successful response (a json with an ok status)
+2	renders a successful response for admin user
+2	renders a successful response for supervisor user
+2	renders a successful response only for admin user
+2	renders a successful response when the user is an admin
+6	renders an unprocessable entity response (i.e. to display the 'new' template)
+4	renders an unprocessable entity response displaying the edit template
+2	renders an unsuccessful response when the user is not an admin
+4	renders csv with contacts from the casa cases
+4	renders csv with only the volunteer
+2	renders details form with success status
+4	renders edit page
+6	renders new page
+6	renders new template
+2	renders the admin dashboard with cases needing attention
+2	renders the chapter analytics dashboard
+8	renders the edit page with errors
+2	renders the edit template
+2	renders the error test page
+2	renders the form without creating a record
+2	renders the form without creating anything
+2	renders the invitation acceptance form
+2	renders the new template
+2	renders the new template on success
+2	renders the platform metrics dashboard
+2	renders the supervisor dashboard with the assigned volunteer
+2	renders the volunteer dashboard
+2	replaces all contact types with completely different ones
+2	reports the exception to Bugsnag
+4	resends an invitation email
+2	resends an invitation email as a supervisor
+2	resends an invitation email as an admin
+2	responds :unprocessable_content and returns the errors
+6	responds with N
+2	responds with N if no step in url
+2	responds with N when Language does not exist
+2	return unauthorized
+4	returns N No Content
+2	returns a N OK status
+8	returns a N response
+14	returns a successful response
+4	returns all case contacts
+10	returns an unprocessable_content response
+4	returns correct payload
+4	returns errors as json
+2	returns http status ok
+10	returns http success
+2	returns http unauthorized if invalid token
+2	returns no volunteers ever assigned if include_unassigned param is false
+2	returns only currently assigned cases
+4	returns success with proper headers
+4	returns the CSV report
+2	returns the new contact topic answer as json
+2	returns the record as json
+2	returns the table state
+2	returns volunteers ever assigned if include_unassigned param is present
+4	same org
+2	send an alert and a confirmation email
+2	send response as a .DOCX file
+2	send response with a status :ok
+2	sends SMS when phone number is provided
+4	sends a Followup Notifier to the case contact creator and the setter
+2	sends a SMS when a phone number exists
+2	sends a SMS when phone number exists
+2	sends a deactivation email
+2	sends a notification to the case_contact's creator
+2	sends a notification to the case_contact's creator and supervisor
+4	sends a password reset SMS to existing user
+4	sends a password reset email to existing user
+4	sends an activation email
+2	sends an activation mail
+2	sends an invitation email
+2	sends an reactivation SMS
+2	sends downloadable data correctly
+2	sends no CC when the volunteer has no supervisor
+2	sends reimbursement email
+4	sends response as a JSON string
+2	sends response with status :not_found
+2	sends response with status :ok
+2	sends the stored report bytes using the case number as the filename
+2	set the requested contact_topic to soft_deleted
+2	sets an alert message
+2	sets associations to inactive
+2	sets body message correctly
+2	sets casa_case and draft_case_ids per contact
+2	sets contact_type_ids for all contacts
+4	sets errors correctly
+6	sets fields correctly
+20	sets flash message correctly
+2	sets session variable
+2	sets that association to active
+2	sets the case_contact's casa_case_id and status: 'active'
+2	sets the court_report_due_date to be N weeks before the court_date
+2	sets the invitation_token on the resource
+4	sets the is_active flag for assignment of a volunteer to a supervisor to false
+2	sets the option according to the right category
+2	sets to active
+2	shows a fallback error message when the failed import CSV expired
+2	shows a fallback error message when the failed import CSV was never created
+2	shows a flash message indicating the volunteer has been activated and sent an email
+2	shows a flash messages indicating the volunteer has been activated and sent an email
+2	shows a generic error message
+4	shows all my organization's cases
+2	shows casa org correctly
+2	shows casa orgs
+2	shows correct admin
+14	shows correct error message
+2	shows correct error messages
+20	shows correct flash message
+2	shows correct supervisor options
+2	shows correct volunteer
+4	shows error message
+2	shows every contact with no filters
+2	shows json indicating the patch note could not be created
+2	shows json indicating the patch note was created
+2	shows json with the id of the patch note created
+2	shows mileage rates correctly
+2	shows my cases
+2	shows only cases assigned to user
+2	shows only duties from the volunteer
+2	shows only the patch notes available to their user group
+2	shows the chapter KPI cards
+2	shows the correct error message
+6	shows the correct flash message
+2	shows the draft badge exactly once
+4	shows the no notification message
+2	signs in the user
+4	soft deletes the case_contact
+2	still sends a notification
+2	still updates the first order
+2	still withholds the notification
+2	stills set the association as active
+2	strips whitespace from email
+10	succeeds
+2	succeeds when wants_driving_reimbursement is not true
+2	successfullies activate another casa admin's profile
+2	successfullies deactivate another casa admin's profile
+2	successfully create a hearing type
+2	successfully resets the password
+2	successfully update hearing type with active status
+2	successfully update hearing type with inactive status
+2	supervisor can view the edit supervisor page
+2	supervisor cannot update another supervisor
+2	supervisor cannot view the edit supervisor page
+2	supervisor updates their own email and receives a confirmation email
+2	supervisor updates their own name
+2	supervisors can not view the new supervisor page
+2	the edit page should load successfully
+2	the new checklist item page should load successfully
+2	toggles allow_reimbursement
+2	toggles to hide case contacts
+2	toggles to show case contacts
+2	triggers report generation correctly
+30	unauthenticated request
+2	unauthorized
+2	updates fields (except case_number)
+4	updates note and redirects to edit volunteer page
+2	updates only active, details, question contact_topic
+2	updates permitted fields
+2	updates supervisor email and sends a confirmation email
+2	updates the all_casa_admin
+2	updates the all_casa_admin password
+2	updates the case contact with the info
+2	updates the duty and redirects to other duties page
+2	updates the existing contact topic answers
+4	updates the learning hour type successfully and redirects to the organization's edit page
+2	updates the mileage_rate
+2	updates the placement successfully
+2	updates the requested casa_case
+2	updates the requested casa_org
+2	updates the requested case_contact
+2	updates the requested case_contact attributes
+2	updates the requested contact_type_ids
+2	updates the requested court_date
+2	updates the requested patch_note
+2	updates the requested record
+2	updates the table state
+2	updates the user
+6	updates the user email
+6	updates the user password
+2	updates the volunteer
+2	updates the volunteer email without requiring reconfirmation
+2	updates the volunteer's address with the new address
+2	updates with the attributes
+2	uploads the company logo
+2	user signed in
+2	user signed out
+2	uses the custom template
+2	uses the default template
+2	validates cases CSV header
+2	validates supervisors CSV header
+2	validates volunteers CSV header
+2	when a banner has expires_at
+2	when a custom template is set
+2	when a judge is attached
+2	when a previous mileage rate exists for the effective date
+2	when a valid / existing case is sent
+2	when activation fails
+2	when additional expenses in params
+14	when admin
+2	when admin edits volunteer contact
+4	when an INVALID / non-existing case is sent
+2	when an inactive association between supervisor and volunteer exists
+2	when an inactive association between the volunteer and a different supervisor exists
+8	when an unauthenticated request is made
+2	when an unpredictable error occurs
+2	when assignment belongs to another organization
+2	when association already exists
+2	when attribute is invalid
+2	when blank volunteer address in params
+2	when casa case does not have court_dates
+2	when casa case has court_dates
+2	when casa case is not within organization
+4	when casa_admin
+2	when casa_case is not transitioning
+6	when casa_case is not within organization
+8	when casa_case is within organization
+2	when case contacts are hidden
+2	when case contacts are visible
+2	when check_item_action is invalid
+2	when check_item_id is invalid
+2	when client timezone is ahead of UTC
+2	when client timezone is behind UTC
+2	when contact created by another casa org volunteer
+2	when contact is in active status
+2	when contact is in details status
+2	when contact topic answers in params
+2	when contact types were previously assigned
+2	when court orders are in params
+2	when create_another option is truthy
+2	when creating a banner
+2	when creating new admin
+2	when current org has contact topics
+4	when deactivation fails
+2	when different casa org's case group
+2	when expires_at is after today
+2	when expires_at is before today
+2	when exporting a csv
+2	when exporting a xlsx
+16	when failure
+4	when filter is provided
+4	when filter not provided
+16	when in a different organization
+16	when in the same organization
+2	when json request (autosave)
+28	when logged in as a non-admin user
+8	when logged in as a supervisor
+10	when logged in as a volunteer
+18	when logged in as admin user
+2	when logged in as admin, but invalid data
+12	when logged in as an admin
+6	when logged in as an admin of another organization
+10	when logged in as an admin user
+2	when logged in as volunteer
+2	when metadata create_another attribute is truthy
+6	when missing params
+2	when new_case_contact_table flag is disabled
+2	when new_case_contact_table flag is enabled
+2	when no custom template is set
+2	when no pre-existing association between supervisor and volunteer exists
+2	when no volunteer address in params
+2	when none passed as supervisor
+10	when not logged in
+2	when not signed in as an all-CASA admin
+2	when note belongs to volunteer
+2	when notes attribute in params
+2	when nothing was chosen
+4	when occurs send errors
+2	when passing the supervisor_id as the supervisor_volunteer_params
+2	when reactivation fails
+2	when redirect_to_path is volunteer
+2	when reimbursement info is in params
+4	when reimbursement_complete arrives as the string "N" instead of a boolean
+2	when request format is json
+2	when request format is word document
+2	when request is not .docx
+4	when request params are invalid
+8	when request params are valid
+4	when requested as JSON
+4	when signed in as a supervisor
+4	when signed in as an admin
+2	when signed in as an all-CASA admin
+2	when signed out
+2	when step is not :details
+2	when submitted time is ahead of client and ahead of UTC
+2	when submitted time is ahead of client but behind UTC
+2	when submitted time is behind client and behind UTC
+2	when submitted time is behind client but ahead of UTC
+20	when successfully
+18	when supervisor
+2	when supervisor edits volunteer contact
+4	when the case assignment parent is a casa_case
+4	when the case assignment parent is a volunteer
+4	when the case belongs to another organization
+2	when the case contact has a supervisor
+2	when the case contact has no casa_case
+2	when the case_assignment is active
+2	when the category is already added to the case
+2	when the category is not added to the case
+2	when the court date is in the future
+2	when the court date is in the past
+2	when the court date is today
+2	when the email exists already and the supervisor has volunteers assigned
+2	when the logged in user is a supervisor
+2	when the logged in user is an admin
+2	when the logged in user is not an admin or supervisor
+2	when the mileage rate belongs to another organization
+2	when the option is already added to the case
+2	when the option is not added to the case
+6	when the params are invalid
+4	when the params are not valid
+12	when the params are valid
+2	when the request is authenticated
+2	when the request is unauthenticated
+2	when the resolver is the only party to notify
+2	when the signed-in user is a supervisor
+4	when the user has access
+4	when the user is not authorized to access
+2	when the user tries to add the same language again
+4	when the user tries to make an existing order empty
+2	when the volunteer belongs to another organization
+2	when the volunteer has been previously assigned to the casa_case
+2	when there are no patch notes
+2	when there are patch notes
+4	when there is a deploy date
+2	when there is no deploy date
+2	when twilio is disabled
+2	when updating note belonging to volunteer
+2	when updating the mileage rate effective date and already exists one
+2	when user dismisses a banner
+2	when user is authorized
+2	when user is casa admin
+2	when user is not authorized
+2	when user is supervisor
+2	when user is volunteer
+2	when user logs out and back in
+2	when user timezone
+2	when viewing other's record
+2	when viewing own record
+2	when viewing the page as a volunteer
+2	when viewing the page with exactly one transitioning case
+2	when viewing the page with more than one transitioning cases
+2	when viewing the page with zero transitioning cases
+16	when volunteer
+2	when volunteer updating other person's record
+2	when volunteer updating own duty
+2	when who resolves the followup is not the followup's creator
+2	when zip report fails
+4	while signed in as a supervisor
+2	while signed in as a volunteer
+4	while signed in as an admin
+4	with a all_casa_admin signed in
+2	with a court order
+2	with a hearing type
+2	with a new logo
+2	with a volunteer signed in
+2	with admin from different organization
+2	with an admin signed in
+2	with another org params
+2	with blank password
+4	with case_court_orders_attributes being passed as a parameter
+2	with date filtering
+2	with duplicate contact type ids in params
+2	with filters applied
+2	with invalid attributes
+2	with invalid case_contact
+44	with invalid parameters
+8	with invalid params
+2	with mismatched passwords
+2	with multiple cases selected
+2	with no cases in the organization
+2	with no logo
+2	with one active case
+2	with password too short
+4	with start_date and end_date
+4	with supervisor_ids filter
+2	with the add_category action
+2	with the add_option action
+2	with the delete_category action
+2	with the delete_option action
+2	with the set_option action
+2	with valid assigned_volunteer_id
+2	with valid invitation token
+42	with valid parameters
+10	with valid params
+2	with valid password
+2	with wrong parameters
+2	without a court order
+2	without a hearing type
+2	without a judge
+2	without an assigned_volunteer_id
+2	without authenctication
+4	without invitation token
+4	without start_date and end_date
+2	writes a fallback message when exported rows exceed max size

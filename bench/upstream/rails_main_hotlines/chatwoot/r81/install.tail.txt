@@ -1,0 +1,7 @@
+Successfully installed lowrail-profile-0.1.0.rc1
+1 gem installed
+Your bundle is locked to rails (7.2.3.1) from https://github.com/rails/rails.git
+(at 3f290b7@3f290b7), but that version can no longer be found in that source.
+That means the author of rails (7.2.3.1) has removed it. You'll need to update
+your bundle to a version other than rails (7.2.3.1) that hasn't been removed in
+order to install.

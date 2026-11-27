@@ -1,0 +1,2 @@
+# confirm.sh sure r81 (10 files, no profiler)
+372 runs, 1611 assertions, 0 failures, 0 errors, 0 skips

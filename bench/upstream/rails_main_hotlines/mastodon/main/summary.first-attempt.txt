@@ -1,0 +1,13 @@
+profiled exit 1 wall .405331113 at 11:52:18 rails /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.23/lib/bundler/definition.rb:736:in 'Bundler::Definition#materialize': Could not find pg-1.7.0, nokogiri-1.19.6, ffi-1.17.4, mini_portile2-2.8.9, google-protobuf-4.36.2 in locally installed gems (Bundler::GemNotFound)
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.23/lib/bundler/definition.rb:250:in 'Bundler::Definition#specs'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.23/lib/bundler/definition.rb:323:in 'Bundler::Definition#specs_for'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.23/lib/bundler/runtime.rb:18:in 'Bundler::Runtime#setup'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.23/lib/bundler.rb:164:in 'Bundler.setup'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.23/lib/bundler/setup.rb:32:in 'block in <top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.23/lib/bundler/ui/shell.rb:177:in 'Bundler::UI::Shell#with_level'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.23/lib/bundler/ui/shell.rb:122:in 'Bundler::UI::Shell#silence'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/bundler-4.0.23/lib/bundler/setup.rb:32:in '<top (required)>'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/rubygems.rb:1464:in 'Kernel#require'
+	from /home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/rubygems.rb:1464:in '<top (required)>'
+	from <internal:gem_prelude>:13:in '<internal:gem_prelude>'
+profiled.log: 0 distinct outcomes, 0 lines; 

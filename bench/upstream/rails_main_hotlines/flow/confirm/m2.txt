@@ -1,0 +1,3 @@
+# confirm.sh flow m2 test/controllers/api/v1/terminal_sessions_controller_test.rb (no profiler)
+21 runs, 35 assertions, 0 failures, 17 errors, 0 skips
+     17 ArgumentError: You tried to define a scope named "default_order" on the model "CompanyMembership", but Active Record already defined a class method with the sam

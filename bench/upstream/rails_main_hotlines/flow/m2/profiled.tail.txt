@@ -1,0 +1,40 @@
+| ruby default gem: uri | 61.6 | 66.2 | `common.rb:108` 8.1, `rfc3986_parser.rb:85` 5.4, `common.rb:194` 4.3 |
+| gem: jwt | 61.3 | 67.0 | `decode_verifier.rb:33` 6.8, `encoded_token.rb:36` 4.6, `rsa.rb:156` 4.5 |
+| gem: faraday | 55.1 | 61.6 | `options.rb:97` 2.8, `rack_builder.rb:119` 2.5, `headers.rb:59` 2.3 |
+| ruby stdlib | 49.9 | 58.1 | `formatter.rb:174` 24.7, `normalize.rb:138` 7.2, `bundled_gems.rb:111` 3.7 |
+| gem: json | 46.6 | 46.9 | `common.rb:364` 45.5, `common.rb:1089` 1.1 |
+| gem: rack | 45.3 | 48.3 | `utils.rb:693` 20.1, `body_proxy.rb:12` 4.8, `request.rb:604` 4.5 |
+| gem: mocha | 40.7 | 42.1 | `expectation_list.rb:55` 6.8, `parameters_matcher.rb:37` 6.8, `mock.rb:328` 3.4 |
+| gem: bullet | 40.0 | 47.5 | `base.rb:9` 8.6, `string.rb:9` 6.8, `object.rb:20` 5.2 |
+| gem: lograge | 38.5 | 40.2 | `key_value.rb:19` 22.3, `key_value.rb:27` 2.9, `logger.rb:21` 1.9 |
+| gem: omniauth | 28.7 | 31.0 | `paths.rb:67` 7.7, `paths.rb:94` 3.8, `strategy.rb:281` 3.8 |
+| ruby default gem: net-http | 24.8 | 26.4 | `header.rb:205` 3.3, `header.rb:284` 2.5, `header.rb:227` 2.1 |
+| gem: debug | 22.2 | 24.7 | `thread_client.rb:903` 6.3, `thread_client.rb:234` 3.2, `thread_client.rb:239` 3.2 |
+| gem: rack-cors | 16.2 | 16.7 | `cors.rb:123` 12.4, `resource.rb:40` 1.9, `result.rb:38` 1.0 |
+| gem: enumerize | 14.7 | 16.2 | `attribute.rb:41` 3.7, `attribute_map.rb:13` 3.0, `base.rb:58` 1.6 |
+| gem: base64 | 14.0 | 15.0 | `base64.rb:310` 5.3, `base64.rb:377` 3.3, `base64.rb:283` 3.1 |
+| rails: activejob | 12.6 | 13.9 | `enqueuing.rb:67` 1.9, `queue_adapter.rb:11` 1.2, `core.rb:133` 1.2 |
+| gem: tzinfo | 10.0 | 10.9 | `timestamp.rb:208` 4.0, `constant_offset_data_timezone_info.rb:36` 2.0, `timestamp.rb:193` 2.0 |
+| rails: actionview | 7.3 | 7.8 | `view_paths.rb:99` 0.9, `view_paths.rb:103` 0.9, `lookup_context.rb:46` 0.9 |
+| gem: faraday-net_http | 5.6 | 6.0 | `net_http.rb:81` 1.4, `net_http.rb:38` 0.7, `net_http.rb:80` 0.7 |
+| rails: railties | 4.8 | 5.2 | `logger.rb:29` 1.0, `engine.rb:852` 1.0, `logger.rb:65` 1.0 |
+| gem: pg | 4.6 | 5.3 | `connection.rb:403` 4.6, `result.rb:17` 0.0 |
+| ruby default gem: securerandom | 4.6 | 4.7 | `securerandom.rb:71` 4.6 |
+| gem: inertia_rails | 3.8 | 5.2 | `middleware.rb:117` 1.0, `middleware.rb:139` 1.0, `middleware.rb:54` 1.0 |
+| gem: propshaft | 3.5 | 3.8 | `server.rb:16` 1.6, `server.rb:13` 1.0, `server.rb:14` 1.0 |
+| gem: vite_ruby | 2.9 | 3.0 | `dev_server_proxy.rb:41` 1.0, `dev_server_proxy.rb:40` 1.0, `dev_server_proxy.rb:39` 1.0 |
+| gem: rack-session | 2.9 | 3.0 | `id.rb:368` 1.0, `id.rb:275` 1.0, `id.rb:277` 1.0 |
+| ruby default gem: openssl | 2.2 | 2.4 | `pkey.rb:354` 1.1, `pkey.rb:394` 0.6, `cipher.rb:56` 0.5 |
+| gem: request_store | 1.9 | 2.0 | `middleware.rb:28` 1.0, `middleware.rb:21` 1.0 |
+| gem: solid_queue | 1.8 | 2.0 | `batch_id.rb:20` 1.2, `batch_id.rb:24` 0.6 |
+| gem: aasm | 1.6 | 2.1 | `state_machine_store.rb:29` 0.3, `state_machine_store.rb:73` 0.1, `state_machine.rb:11` 0.1 |
+| gem: config | 1.0 | 1.2 | `options.rb:125` 1.0, `options.rb:123` 0.0, `options.rb:124` 0.0 |
+| gem: bootsnap | 0.4 | 1.8 | `cache.rb:218` 0.2, `loaded_features_index.rb:115` 0.1, `loaded_features_index.rb:118` 0.1 |
+| gem: concurrent-ruby | 0.3 | 0.6 | `map.rb:237` 0.1, `non_concurrent_map_backend.rb:131` 0.1, `non_concurrent_map_backend.rb:120` 0.0 |
+| ruby default gem: erb | 0.3 | 0.4 | `util.rb:65` 0.3 |
+| gem: msgpack | 0.0 | 0.7 | `factory.rb:37` 0.0, `factory.rb:9` 0.0, `factory.rb:29` 0.0 |
+| gem: hashie | 0.0 | 6.9 | `mash.rb:329` 0.0, `mash.rb:641` 0.0, `mash.rb:587` 0.0 |
+| gem: zeitwerk | 0.0 | 3.9 | `file_system.rb:199` 0.0, `cref.rb:47` 0.0, `loader.rb:511` 0.0 |
+| lowrail-profile | 0.0 | 0.0 | `profile.rb:56` 0.0 |
+lowrail-profile: report in /home/user/rmh-out/flow/m2/profiled/report.md
+lowrail-profile: the command exited 1, 1

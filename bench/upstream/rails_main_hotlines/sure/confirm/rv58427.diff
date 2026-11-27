@@ -1,0 +1,13 @@
+diff --git a/activerecord/lib/active_record/querying.rb b/activerecord/lib/active_record/querying.rb
+index 1f7069719b..ef403cf6ad 100644
+--- a/activerecord/lib/active_record/querying.rb
++++ b/activerecord/lib/active_record/querying.rb
+@@ -155,7 +155,7 @@ def _sql_for_find(sql)
+         return sql unless sql.is_a?(Array)
+ 
+         statement, *values = sql
+-        bound_sql_literal_for(statement, values)
++        sanitize_sql(sql)
+       end
+   end
+ end

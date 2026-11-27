@@ -1,0 +1,3 @@
+bundle exec rspec spec/requests/list_controller_spec.rb spec/requests/topics_controller_spec.rb spec/requests/posts_controller_spec.rb spec/requests/categories_controller_spec.rb spec/requests/tags_controller_spec.rb spec/requests/search_controller_spec.rb --seed 1234 --format documentation
+seed 1234
+exit 1 1

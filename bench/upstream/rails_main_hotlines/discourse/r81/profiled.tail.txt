@@ -1,0 +1,40 @@
+| gem: mustache | 1.2 | 2.3 | `parser.rb:271` 0.2, `template.rb:41` 0.2, `parser.rb:198` 0.1 |
+| gem: aws-sdk-core | 0.8 | 8.6 | `handler_list_entry.rb:33` 0.1, `handler_list_entry.rb:73` 0.1, `configuration.rb:159` 0.0 |
+| ruby default gem: openssl | 0.7 | 0.7 | `cipher.rb:56` 0.7, `hmac.rb:36` 0.0, `hmac.rb:38` 0.0 |
+| gem: fastimage | 0.7 | 0.7 | `fastimage.rb:397` 0.1, `png.rb:4` 0.1, `type_parser.rb:14` 0.1 |
+| gem: racc | 0.6 | 0.6 | `parser.rb:263` 0.6 |
+| gem: zeitwerk | 0.4 | 0.4 | `cref.rb:47` 0.1, `constant_path_validator.rb:13` 0.1, `file_system.rb:203` 0.1 |
+| ruby default gem: net-http | 0.3 | 0.4 | `http.rb:1062` 0.1, `header.rb:203` 0.1, `http.rb:1061` 0.0 |
+| gem: rails-html-sanitizer | 0.3 | 0.3 | `scrubbers.rb:59` 0.0, `sanitizer.rb:33` 0.0, `scrubbers.rb:55` 0.0 |
+| gem: mini_mime | 0.3 | 0.3 | `mini_mime.rb:54` 0.2, `mini_mime.rb:56` 0.1, `mini_mime.rb:175` 0.0 |
+| gem: sassc-embedded | 0.2 | 0.3 | `embedded.rb:81` 0.2, `embedded.rb:603` 0.0, `embedded.rb:137` 0.0 |
+| gem: lru_redux | 0.2 | 0.2 | `cache.rb:63` 0.1, `cache.rb:34` 0.1, `cache.rb:62` 0.0 |
+| gem: sass-embedded | 0.2 | 0.2 | `session.rb:104` 0.1, `importer_registry.rb:19` 0.0, `connection.rb:83` 0.0 |
+| gem: csv | 0.2 | 0.2 | `parser.rb:1003` 0.0, `parser.rb:62` 0.0, `parser.rb:1004` 0.0 |
+| gem: htmlentities | 0.1 | 0.1 | `decoder.rb:10` 0.0, `decoder.rb:25` 0.0, `decoder.rb:35` 0.0 |
+| gem: aws-sigv4 | 0.1 | 0.2 | `signer.rb:611` 0.0, `signer.rb:633` 0.0, `signer.rb:140` 0.0 |
+| gem: excon | 0.1 | 0.1 | `connection.rb:248` 0.0, `connection.rb:303` 0.0, `connection.rb:469` 0.0 |
+| gem: crass | 0.1 | 0.1 | `scanner.rb:97` 0.0, `tokenizer.rb:301` 0.0, `scanner.rb:85` 0.0 |
+| gem: aws-sdk-s3 | 0.0 | 12.8 | `endpoint_provider.rb:490` 0.0, `endpoint_provider.rb:877` 0.0, `endpoint_parameters.rb:169` 0.0 |
+| gem: pg | 0.0 | 0.0 | `date.rb:14` 0.0, `result.rb:17` 0.0, `json.rb:13` 0.0 |
+| gem: messageformat-wrapper | 0.0 | 0.1 | `messageformat.rb:25` 0.0, `messageformat.rb:34` 0.0, `messageformat.rb:38` 0.0 |
+| gem: mini_racer | 0.0 | 0.0 | `mini_racer.rb:101` 0.0 |
+| gem: certified | 0.0 | 0.0 | `certified.rb:7` 0.0 |
+| rails: actionmailer | 0.0 | 0.0 | `base.rb:953` 0.0, `base.rb:636` 0.0, `delivery_methods.rb:66` 0.0 |
+| gem: dry-initializer | 0.0 | 0.1 | `root.rb:11` 0.0, `wrap_type.rb:29` 0.0, `attribute.rb:62` 0.0 |
+| other | 0.0 | 0.0 | `discourse_plugin_outlet__ApplicationHelper:1` 0.0, `anonymous_cache.rb:41):2` 0.0 |
+| gem: mini_suffix | 0.0 | 0.0 | `mini_suffix.rb:26` 0.0 |
+| gem: test-prof | 0.0 | 0.0 | `let_it_be.rb:131` 0.0, `active_record_refind.rb:15` 0.0, `let_it_be.rb:65` 0.0 |
+| lowrail-profile | 0.0 | 0.0 | `profile.rb:115` 0.0, `profile.rb:66` 0.0, `profile.rb:56` 0.0 |
+| gem: request_store | 0.0 | 0.0 | `request_store.rb:7` 0.0 |
+| gem: discourse-fonts | 0.0 | 0.0 | `discourse_fonts.rb:7` 0.0 |
+| gem: rubyzip | 0.0 | 0.4 | `null_encryption.rb:15` 0.0, `fake_io.rb:6` 0.0, `dos_time.rb:6` 0.0 |
+| gem: bigdecimal | 0.0 | 0.0 | `util.rb:51` 0.0, `util.rb:24` 0.0 |
+| ruby default gem: bundler | 0.0 | 0.0 | `rubygems_integration.rb:192` 0.0 |
+| gem: mini_scheduler | 0.0 | 0.0 | `web.rb:21` 0.0, `web.rb:5` 0.0, `web.rb:78` 0.0 |
+| gem: aws-partitions | 0.0 | 0.1 | `metadata.rb:26` 0.0, `metadata.rb:27` 0.0 |
+| test harness: rspec-expectations | 0.0 | 0.0 | `expectation_target.rb:45` 0.0, `matchers.rb:559` 0.0 |
+| gem: maxminddb | 0.0 | 0.0 | `maxminddb.rb:14` 0.0, `reader.rb:9` 0.0, `reader.rb:10` 0.0 |
+| gem: discourse-emojis | 0.0 | 0.0 | `discourse_emojis.rb:16` 0.0, `discourse_emojis.rb:22` 0.0, `discourse_emojis.rb:25` 0.0 |
+| gem: msgpack | 0.0 | 0.0 | `msgpack.rb:32` 0.0, `factory.rb:9` 0.0, `factory.rb:137` 0.0 |
+lowrail-profile: report in /home/user/rmh-out/discourse/r81/profiled/report.md

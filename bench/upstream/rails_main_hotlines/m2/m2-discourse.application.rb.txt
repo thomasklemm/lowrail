@@ -1,0 +1,2 @@
+# Discourse main-m2 also adds, for its run only, in config/application.rb after require "action_mailer/railtie":
+require "active_job/railtie"

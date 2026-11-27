@@ -1,0 +1,40 @@
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from RequireDependencyBackwardCompatibility#require_dependency at /home/user/workspace/repo/.corpus/hl-discourse/lib/require_dependency_backward_compatibility.rb:18)
+DEPRECATION WARNING: Calling `protect_from_forgery` without specifying a strategy is deprecated and will default to `with: :exception` in a future version of Rails. To opt into the new behavior now, use `config.action_controller.default_protect_from_forgery_with = :exception`. To silence this warning without changing behavior, explicitly pass `protect_from_forgery with: :null_session`. (called from <class:ApplicationController> at /home/user/workspace/repo/.corpus/hl-discourse/app/controllers/application_controller.rb:23)
+
+An error occurred while loading rails_helper.
+Failure/Error: require "rspec/rails"
+
+LoadError:
+  cannot load such file -- active_job
+# ./spec/rails_helper.rb:39:in '<top (required)>'
+No examples found.
+No examples found.
+
+
+Finished in 0.00008 seconds (files took 2.57 seconds to load)
+0 examples, 0 failures, 1 error occurred outside of examples
+
+Finished in 0.00008 seconds (files took 2.57 seconds to load)
+0 examples, 0 failures, 1 error occurred outside of examples
+
+
+lowrail-profile: no report: no runs with requests, jobs or mails under /home/user/rmh-out/discourse/main/profiled (a request counts when it goes through the app, as in integration, request and system tests; controller tests and controller specs call the controller directly and are not counted); the command exited 1, 1

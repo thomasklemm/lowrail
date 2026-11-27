@@ -1,0 +1,8 @@
+# confirm.sh sure m2 (10 files, no profiler)
+372 runs, 1256 assertions, 0 failures, 91 errors, 0 skips
+      1 ActionView::Template::Error: PG::SyntaxError: ERROR:  syntax error at or near "$N"
+      1 ActiveRecord::StatementInvalid: PG::InFailedSqlTransaction: ERROR:  current transaction is aborted, commands ignored unt
+      8 ActiveRecord::StatementInvalid: PG::SyntaxError: ERROR:  syntax error at or near "$N"
+     46 ActiveRecord::StatementInvalid: PG::UndefinedFunction: ERROR:  operator does not exist: date >= integer
+      1 RuntimeError: Neutered Exception ActionView::Template::Error: PG::InFailedSqlTransaction: ERROR:  current transaction is
+     34 RuntimeError: Neutered Exception ActionView::Template::Error: PG::SyntaxError: ERROR:  syntax error at or near "$N"

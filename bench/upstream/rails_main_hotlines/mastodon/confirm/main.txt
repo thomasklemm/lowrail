@@ -1,0 +1,4 @@
+# confirm.sh mastodon main spec/requests/api/v1/statuses/reblogged_by_accounts_spec.rb spec/requests/api/v1/bookmarks_spec.rb -b (no profiler)
+8 examples, 8 failures
+      4 undefined method 'filter_proxies' for an instance of ActionDispatch::RemoteIp::GetIp
+      4 undefined method 'name' for an instance of String

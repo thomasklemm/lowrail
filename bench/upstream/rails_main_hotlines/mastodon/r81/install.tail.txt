@@ -1,0 +1,40 @@
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/markup/inline_parser.rb:13: warning: previous definition of WORD_PAIRS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc/markup/inline_parser.rb:27: warning: already initialized constant RDoc::Markup::InlineParser::TAGS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/markup/inline_parser.rb:25: warning: previous definition of TAGS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc/markup/inline_parser.rb:35: warning: already initialized constant RDoc::Markup::InlineParser::STANDALONE_TAGS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/markup/inline_parser.rb:33: warning: previous definition of STANDALONE_TAGS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc/markup/inline_parser.rb:37: warning: already initialized constant RDoc::Markup::InlineParser::CODEBLOCK_TAGS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/markup/inline_parser.rb:35: warning: previous definition of CODEBLOCK_TAGS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc/markup/inline_parser.rb:39: warning: already initialized constant RDoc::Markup::InlineParser::TOKENS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/markup/inline_parser.rb:37: warning: previous definition of TOKENS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc/markup/inline_parser.rb:54: warning: already initialized constant RDoc::Markup::InlineParser::SCANNER_REGEXP
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/markup/inline_parser.rb:52: warning: previous definition of SCANNER_REGEXP was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc/markup/inline_parser.rb:62: warning: already initialized constant RDoc::Markup::InlineParser::ESCAPING_CHARS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/markup/inline_parser.rb:60: warning: previous definition of ESCAPING_CHARS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc/markup/inline_parser.rb:65: warning: already initialized constant RDoc::Markup::InlineParser::CODEBLOCK_REGEXPS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/markup/inline_parser.rb:63: warning: previous definition of CODEBLOCK_REGEXPS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc/markup/inline_parser.rb:70: warning: already initialized constant RDoc::Markup::InlineParser::WORD_REGEXPS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/markup/inline_parser.rb:68: warning: previous definition of WORD_REGEXPS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc/version.rb:8: warning: already initialized constant RDoc::VERSION
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc/version.rb:8: warning: previous definition of VERSION was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc.rb:68: warning: already initialized constant RDoc::VISIBILITIES
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc.rb:68: warning: previous definition of VISIBILITIES was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc.rb:74: warning: already initialized constant RDoc::DOT_DOC_FILENAME
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc.rb:74: warning: previous definition of DOT_DOC_FILENAME was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc.rb:79: warning: already initialized constant RDoc::GENERAL_MODIFIERS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc.rb:79: warning: previous definition of GENERAL_MODIFIERS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc.rb:84: warning: already initialized constant RDoc::CLASS_MODIFIERS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc.rb:84: warning: previous definition of CLASS_MODIFIERS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc.rb:89: warning: already initialized constant RDoc::ATTR_MODIFIERS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc.rb:89: warning: previous definition of ATTR_MODIFIERS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc.rb:94: warning: already initialized constant RDoc::CONSTANT_MODIFIERS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc.rb:94: warning: previous definition of CONSTANT_MODIFIERS was here
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-8.1.0/lib/rdoc.rb:99: warning: already initialized constant RDoc::METHOD_MODIFIERS
+/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/gems/rdoc-7.2.0/lib/rdoc.rb:99: warning: previous definition of METHOD_MODIFIERS was here
+WARN: Unresolved or ambiguous specs during Gem::Specification.reset:
+      prism (>= 1.6.0)
+      Available/installed versions of this gem:
+      - 1.9.0
+      - 1.8.2
+WARN: Clearing out unresolved specs. Try 'gem cleanup <gem>'
+Please report a bug if this causes problems.
