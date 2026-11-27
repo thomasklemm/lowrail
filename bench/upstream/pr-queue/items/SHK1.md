@@ -28,13 +28,25 @@ passes:
     head: "2bda3f18fa443e82d3172db13deeede7c567734a"
     date: 2026-11-27
     verdict: approve
-    open: "Head, test and commit message approved; report and PR text approved after mode qualifications. One reviewer applied both thermos rubrics. Body without ticket: delta confirm pending."
+    open: "Head, test and commit message approved; report and PR text approved after mode qualifications. One reviewer applied both thermos rubrics. Body delta confirmed below."
   - reviewer: astra
     orb: T-01a21eca-63e1-76f7-b473-ee3433ea1051
     head: "2bda3f18fa443e82d3172db13deeede7c567734a"
     date: 2026-11-27
     verdict: approve
-    open: "Head approved after adversarial hash-shape probes in all modes and both parsers; mode-qualified texts approved. Body without ticket: delta confirm pending."
+    open: "Head approved after adversarial hash-shape probes in all modes and both parsers; mode-qualified texts approved. Body delta confirmed below."
+  - reviewer: thermos-sol
+    orb: T-01a21eca-5c03-7779-b80e-e03aef7db05c
+    head: "2bda3f18fa443e82d3172db13deeede7c567734a"
+    date: 2026-11-27
+    verdict: approve
+    open: "Delta confirm of the ticketless body at lowrail 62ee8953: every sentence checked against retained runs and source; no change requested."
+  - reviewer: astra
+    orb: T-01a21eca-63e1-76f7-b473-ee3433ea1051
+    head: "2bda3f18fa443e82d3172db13deeede7c567734a"
+    date: 2026-11-27
+    verdict: approve
+    open: "Delta confirm of the ticketless body at lowrail 62ee8953 after its three wording fixes (2134d778 review: changes); no remaining must-fix."
 ---
 
 # Fix shareable constant hash literals with keys after `**` in prism
