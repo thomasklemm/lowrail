@@ -453,6 +453,11 @@ Models (Thomas, 2026-11-17 to 11-25): Sol is GPT-6.1 Sol, not 6.2, always `xhigh
 review threads run as plain Opus 5.5 (`anthropic/claude-opus-5-5`), not Claude Code external agents (same model on the
 linked subscription), at `high` for reviews, exactness work and hard builds, `medium` for record updates, reruns and
 small follow-ups. Fable is `anthropic/claude-fable-5-2`, for special reviews only, not for build threads.
+Sonnet trial (Thomas, 2026-11-27; a Claude account lasts about a day and a half): Sonnet 5.5
+(`anthropic/claude-sonnet-5-5`) runs mechanical threads: watchers, ledger and inventory updates, scripted reruns
+and measurement runs with a fixed recipe, CI follow-ups, rebases without conflicts in logic. Opus keeps builds,
+exactness work, upstream text, design questions and reviews. A Sonnet thread whose task turns into one of these
+hands it to Opus. Record in the thread's report whether Sonnet's result needed corrections; decide after a week.
 
 ### Exactness checklist
 
