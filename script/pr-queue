@@ -370,8 +370,7 @@ module PrQueue
     list.each do |item|
       blocker = open_blocker(item, live[item.id], by_id) || rooms[item["repo"]]
       next puts("skip #{item.id}: #{blocker}") if blocker
-      draft = item["repo"] == "rails/rails" ? " --draft" : ""
-      return puts("#{item.id} (rank #{item['rank']}): #{item.title}\n  script/pr-queue open #{item.id}#{draft}")
+      return puts("#{item.id} (rank #{item['rank']}): #{item.title}\n  script/pr-queue open #{item.id}")
     end
     puts "nothing to open"
   end
