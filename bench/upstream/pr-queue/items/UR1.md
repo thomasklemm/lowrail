@@ -16,7 +16,7 @@ evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/up
 impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
-state: ready
+state: draft
 pr: 276
 ownership: {date: 2026-11-27, checked: ["open ruby/uri PRs touching lib/uri/common.rb decode/encode (none change the method; #253 and #264 only change MailTo callers of it, #269 is URI.for/parse, #274 a WHATWG parser)", "ruby/uri commits on common.rb since 2025 (none on _decode_uri_component)", "rack/rack#2557 (ours) moves Rack off this method; Rails' QueryParser still calls it"], hits: []}
 note: >-
