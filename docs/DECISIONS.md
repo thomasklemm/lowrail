@@ -9,6 +9,11 @@ and why. The paused runtime-lowering prototype's decisions are in [decisions-pro
 
 These hold above everything below.
 
+* **Two approvals replace Thomas's** (Thomas, 2026-11-27): the coordinator decides as it would recommend, and posts
+  comments and replies, opens PRs and pushes to open PRs itself, on our PRs and others', once `thermos-sol` and Astra
+  both approved the exact text or head. Thomas gets the overview afterwards. The etiquette below still decides whether
+  a comment belongs at all (no pings, no burndown data); the three bullets below apply where those two reviews are
+  missing. Releases and publishing lowrail-profile still need Thomas.
 * **No comments on other people's PRs or issues** (measurements, reviews, suggestions, thanks) **unless Thomas approved
   that specific comment** ([details](#no-comments-on-others-prs-without-thomass-approval-thomas-2026-11-04)). Orbs
   draft at most and ask the coordinator, who asks Thomas.
