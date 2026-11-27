@@ -57,6 +57,15 @@ and master+ZJIT, and the same probe finds 16 differing rows on `d1f403e` (`c1/di
 benchmarked paths are all suffixed, so their allocations are unchanged (13, 5, 5). The body's Callgrind and YJIT wall
 runs were repeated on `eae505a` (`body/HM2-eae505a`, `c1/wall-4.0.10-yjit-eae505a`).
 
+### Head 1af7ad9 after thermos-sol's must-fix
+
+On `eae505a`, a non-Symbol name without a suffix went through `to_s` twice, which a String with its own `to_s` can
+observe. thermos-sol's repro is a StrictKeyAccess KeyError message: master names the second result, `eae505a` the third
+(`probes/sol_repro.rb`). `1af7ad9` returns `name` for non-Symbols and `Symbol#to_s` for Symbols, using thermos-sol's
+validated one-line fix. Both repros now match master. `c1_diff.rb` gives 10,400 identical rows on 4.0.9 and
+master+ZJIT, `rake spec` passes 1,076/0, rubocop is clean, and suffixed allocations are 13, 5, 5. Duel on the final
+head: fork PR #26 (`duel/`).
+
 ## 2. `deep_merge` copies the whole tree: a real win, not exact, not opened
 
 Confirmed: `dup` is `self.class.new(self, ...)`, so every key goes through `custom_writer` again, including the
@@ -117,7 +126,7 @@ For both reviewers' approval of the exact text; `#661` is HM2's number if nothin
 Thanks for digging these up. I measured each one on master with Duel (YJIT and ZJIT) and locally:
 
 1. #661 finds the suffix in `Symbol#name`, one String fewer per split: "read keys with suffixes" goes from 16 to 13 objects, CPU time the same.
-2. Copying already converted values in `dup` makes `deep_merge` about three times faster (31 to 13 objects), but it skips the subclass's `initialize`, which `MethodAccessWithOverride`'s `dup` specs need, and stops re-logging key conflict warnings. Keeping both means keeping the per-key conflict check, which is where the time goes, so I left it.
-3. `Mash.new` allocates about 25 objects for the fixture in Duel, not 56. Without a JIT it is 20, and 10 of them build the conflict warning for the two licenses' `key` fields, even though the benchmarks' logger discards it.
+2. Copying already converted values in `dup` makes `deep_merge` about three times faster (31 to 13 objects), but it skips the subclass's `initialize`, which `MethodAccessWithOverride`'s `dup` specs need, and stops re-logging key conflict warnings. This prototype breaks existing behavior, so I left it.
+3. `Mash.new` allocates about 25 objects for the fixture in Duel, not 56. The two licenses' `key` fields cause warning Strings to be built even though the benchmark logger discards the warnings.
 4. `dig` with `map!` saves two objects, but Duel found the `[]` and `dig` benchmark 12% slower under YJIT. I left `method_missing`'s `*args` too: the setter needs the argument, and a fixed arity would reject the extra arguments it accepts today.
 ```
