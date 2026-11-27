@@ -1,0 +1,15 @@
+SEP1 Astra short confirm, 2026-11-27
+Reviewer orb: T-01a21d5c-3bca-76ba-9b8d-c6960f5eabf9
+Head: d9c0210def7db1b07d47b930715aca622c0e892d
+Verdict: approve. Must-fix: none.
+PASS: full reply differs from previous reviewed head by the exact required replacement only.
+Before: @nobu, is turning off the autoswitch still planned for 4.1?
+After: Is turning off the autoswitch still planned for Ruby 4.1?
+PASS: no @nobu mention remains. All other reply bytes are unchanged.
+PASS: prior raw-evidence archive SHA256: 30d4e55f840958591a3292eb52eb6774baa1143a1473b7a718ac3b24a9113950
+The recorded plan from ruby/rubygems#9236 agrees with the previously read discussion:
+phases 4+ remain open; no 4.1 deadline is established. This is a search finding, not proof no other plan exists.
+The prior independently built master, 20 isolated probes, permalink and sentence audit remain applicable.
+No rebuild, execution-matrix rerun or new upstream search: this is a text-only confirmation.
+Approval covers the reply, not the dropped restoration/Redmine plans or permission to post.
+SEP1 remains held. Nothing posted upstream.

@@ -147,6 +147,26 @@ passes:
         its forthcoming release from Bundler 4.1, which has already shipped.
         Evidence: docs/DECISIONS.md, Upstream etiquette; the reviewed reply and
         logs/bundler-release.json in astra-reply-976c193a76.tar.gz.
+  - reviewer: astra
+    orb: T-01a21d5c-3bca-76ba-9b8d-c6960f5eabf9
+    head: "d9c0210def7db1b07d47b930715aca622c0e892d"
+    date: 2026-11-27
+    verdict: approve
+    must_fix: []
+    open: >-
+      Short text-only confirm of reply-16909.md. Read the full reply and
+      verified byte-for-byte that its sole change from 976c193a76 is the exact
+      requested replacement: no mention, and the question names Ruby 4.1.
+      The only must-fix is resolved. The record's citation of the open merge
+      proposal agrees with the previously read discussion: phases 4+ remain
+      open and no 4.1 deadline is established, without claiming no other plan
+      exists. The previous independent build, 20 isolated probes, permalink
+      and sentence audit still apply; raw archive hash verified unchanged.
+      No rebuild, matrix rerun or new upstream search for this prose-only fix.
+      Evidence: bench/upstream/gem-differential/evidence/separator-pat/astra-confirm-d9c0210def.txt
+      and astra-reply-976c193a76.tar.gz beside it. Approval covers this reply,
+      not the dropped restoration/Redmine plans or permission to post.
+      SEP1 remains held. Nothing posted upstream.
 ---
 
 # Keep Pathname::SEPARATOR_PAT as a deprecated constant
