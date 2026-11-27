@@ -1,0 +1,45 @@
+unchanged | 4.0.9 | survives
+unchanged | 4.0.9 no C decoder | survives
+unchanged | truffleruby-40.0.0 | survives
+no b copy | 4.0.9 | uri_component:272 www_form_component:216
+no b copy | 4.0.9 no C decoder | uri_component:268 www_form_component:212
+no b copy | truffleruby-40.0.0 | uri_component:268 www_form_component:212
+no force_encoding | 4.0.9 | uri_component:265 www_form_component:209
+no force_encoding | 4.0.9 no C decoder | uri_component:265 www_form_component:209
+no force_encoding | truffleruby-40.0.0 | uri_component:265 www_form_component:209
+CGI picks the result encoding | 4.0.9 | uri_component:270 www_form_component:214
+CGI picks the result encoding | 4.0.9 no C decoder | uri_component:265 www_form_component:209
+CGI picks the result encoding | truffleruby-40.0.0 | uri_component:265 www_form_component:209
+lone % accepted | 4.0.9 | uri_component:274 www_form_component:218
+lone % accepted | 4.0.9 no C decoder | uri_component:274 www_form_component:218
+lone % accepted | truffleruby-40.0.0 | uri_component:274 www_form_component:218
+lone % check takes \w for hex | 4.0.9 | uri_component:276 www_form_component:220
+lone % check takes \w for hex | 4.0.9 no C decoder | uri_component:276 www_form_component:220
+lone % check takes \w for hex | truffleruby-40.0.0 | uri_component:276 www_form_component:220
+lone % check accepts one hex digit | 4.0.9 | uri_component:275 www_form_component:219
+lone % check accepts one hex digit | 4.0.9 no C decoder | uri_component:275 www_form_component:219
+lone % check accepts one hex digit | truffleruby-40.0.0 | uri_component:275 www_form_component:219
+native www_form keeps + | 4.0.9 | www_form_component:205
+native www_form keeps + | 4.0.9 no C decoder | survives
+native www_form keeps + | truffleruby-40.0.0 | survives
+native uri_component decodes + | 4.0.9 | uri_component:261
+native uri_component decodes + | 4.0.9 no C decoder | survives
+native uri_component decodes + | truffleruby-40.0.0 | survives
+fallback www_form keeps + | 4.0.9 | survives
+fallback www_form keeps + | 4.0.9 no C decoder | www_form_component:205
+fallback www_form keeps + | truffleruby-40.0.0 | www_form_component:205
+fallback uri_component decodes + | 4.0.9 | survives
+fallback uri_component decodes + | 4.0.9 no C decoder | uri_component:261
+fallback uri_component decodes + | truffleruby-40.0.0 | uri_component:261
+fallback www_form gsub! | 4.0.9 | survives
+fallback www_form gsub! | 4.0.9 no C decoder | www_form_component:215
+fallback www_form gsub! | truffleruby-40.0.0 | www_form_component:215
+fallback uri_component gsub! | 4.0.9 | survives
+fallback uri_component gsub! | 4.0.9 no C decoder | uri_component:271
+fallback uri_component gsub! | truffleruby-40.0.0 | uri_component:271
+fallback uri_component upper-case hex only | 4.0.9 | survives
+fallback uri_component upper-case hex only | 4.0.9 no C decoder | uri_component:269
+fallback uri_component upper-case hex only | truffleruby-40.0.0 | uri_component:269
+native check dropped | 4.0.9 | survives
+native check dropped | 4.0.9 no C decoder | survives
+native check dropped | truffleruby-40.0.0 | uri_component:272

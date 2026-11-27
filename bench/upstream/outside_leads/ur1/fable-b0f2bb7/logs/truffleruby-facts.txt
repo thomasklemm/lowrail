@@ -1,0 +1,2 @@
+truffleruby 40.0.0 (2026-09-17), like ruby 4.0.2, GraalVM CE Native [x86_64-linux]
+{b_keeps_subclass: true, unescape_source: "lib/mri/cgi/escape.rb", cgi_escape_ext_defined: "constant"}

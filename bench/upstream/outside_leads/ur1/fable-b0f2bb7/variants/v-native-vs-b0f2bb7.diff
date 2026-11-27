@@ -1,0 +1,155 @@
+diff -ru uri/lib/uri/common.rb v-native/lib/uri/common.rb
+--- uri/lib/uri/common.rb
++++ v-native/lib/uri/common.rb
+@@ -399,57 +399,60 @@
+     _encode_uri_component(/[^*\-.0-9A-Z_a-z]/, TBLENCWWWCOMP_, str, enc)
+   end
+ 
+-  # Returns a string decoded from the given \URL-encoded string +str+.
+-  #
+-  # The given string is first encoded as Encoding::ASCII-8BIT (using String#b),
+-  # then decoded (as below), and finally force-encoded to the given encoding +enc+.
+-  #
+-  # The returned string:
+-  #
+-  # - Preserves:
+-  #
+-  #   - Characters <tt>'*'</tt>, <tt>'.'</tt>, <tt>'-'</tt>, and <tt>'_'</tt>.
+-  #   - Character in ranges <tt>'a'..'z'</tt>, <tt>'A'..'Z'</tt>,
+-  #     and <tt>'0'..'9'</tt>.
+-  #
+-  #   Example:
+-  #
+-  #     URI.decode_www_form_component('*.-_azAZ09')
+-  #     # => "*.-_azAZ09"
+-  #
+-  # - Converts:
+-  #
+-  #   - Character <tt>'+'</tt> to character <tt>' '</tt>.
+-  #   - Each "percent notation" to an ASCII character.
+-  #
+-  #   Example:
+-  #
+-  #     URI.decode_www_form_component('Here+are+some+punctuation+characters%3A+%2C%3B%3F%3A')
+-  #     # => "Here are some punctuation characters: ,;?:"
+-  #
+-  # Related: URI.decode_uri_component (preserves <tt>'+'</tt>).
+-  def self.decode_www_form_component(str, enc=Encoding::UTF_8)
+-    _decode_uri_component(str, enc) {|bytes| CGI.unescape(bytes, Encoding::BINARY) }
+-  end
+-
+-  # Like URI.encode_www_form_component, except that <tt>' '</tt> (space)
+-  # is encoded as <tt>'%20'</tt> (instead of <tt>'+'</tt>).
+-  def self.encode_uri_component(str, enc=nil)
+-    _encode_uri_component(/[^*\-.0-9A-Z_a-z]/, TBLENCURICOMP_, str, enc)
+-  end
+-
+-  # Only where cgi/escape decodes in C or Java (cgi 0.3.3 and later).
+   if CGI.respond_to?(:unescapeURIComponent) && !CGI.method(:unescapeURIComponent).source_location
++    # Returns a string decoded from the given \URL-encoded string +str+.
++    #
++    # The given string is first encoded as Encoding::ASCII-8BIT (using String#b),
++    # then decoded (as below), and finally force-encoded to the given encoding +enc+.
++    #
++    # The returned string:
++    #
++    # - Preserves:
++    #
++    #   - Characters <tt>'*'</tt>, <tt>'.'</tt>, <tt>'-'</tt>, and <tt>'_'</tt>.
++    #   - Character in ranges <tt>'a'..'z'</tt>, <tt>'A'..'Z'</tt>,
++    #     and <tt>'0'..'9'</tt>.
++    #
++    #   Example:
++    #
++    #     URI.decode_www_form_component('*.-_azAZ09')
++    #     # => "*.-_azAZ09"
++    #
++    # - Converts:
++    #
++    #   - Character <tt>'+'</tt> to character <tt>' '</tt>.
++    #   - Each "percent notation" to an ASCII character.
++    #
++    #   Example:
++    #
++    #     URI.decode_www_form_component('Here+are+some+punctuation+characters%3A+%2C%3B%3F%3A')
++    #     # => "Here are some punctuation characters: ,;?:"
++    #
++    # Related: URI.decode_uri_component (preserves <tt>'+'</tt>).
++    def self.decode_www_form_component(str, enc=Encoding::UTF_8)
++      _decode_uri_component(str, enc) {|bytes| CGI.unescape(bytes, Encoding::ASCII_8BIT) }
++    end
++
+     # Like URI.decode_www_form_component, except that <tt>'+'</tt> is preserved.
+     def self.decode_uri_component(str, enc=Encoding::UTF_8)
+-      _decode_uri_component(str, enc) {|bytes| CGI.unescapeURIComponent(bytes, Encoding::BINARY) }
++      _decode_uri_component(str, enc) {|bytes| CGI.unescapeURIComponent(bytes, Encoding::ASCII_8BIT) }
+     end
+-  else
+-    def self.decode_uri_component(str, enc=Encoding::UTF_8) # :nodoc:
++  else # cgi before 0.3.3, or cgi/escape written in Ruby
++    def self.decode_www_form_component(str, enc=Encoding::UTF_8)
++      _decode_uri_component(str, enc) {|bytes| bytes.gsub(/\+|%\h\h/, TBLDECWWWCOMP_) }
++    end
++
++    def self.decode_uri_component(str, enc=Encoding::UTF_8)
+       _decode_uri_component(str, enc) {|bytes| bytes.gsub(/%\h\h/, TBLDECWWWCOMP_) }
+     end
+   end
+ 
++  # Like URI.encode_www_form_component, except that <tt>' '</tt> (space)
++  # is encoded as <tt>'%20'</tt> (instead of <tt>'+'</tt>).
++  def self.encode_uri_component(str, enc=nil)
++    _encode_uri_component(/[^*\-.0-9A-Z_a-z]/, TBLENCURICOMP_, str, enc)
++  end
++
+   # Returns a string derived from the given string +str+ with
+   # URI-encoded characters matching +regexp+ according to +table+.
+   def self._encode_uri_component(regexp, table, str, enc)
+@@ -466,8 +469,8 @@
+   end
+   private_class_method :_encode_uri_component
+ 
+-  # Returns a string decoded by the block from the bytes of the given
+-  # \URL-encoded string +str+.
++  # Returns the given \URL-encoded string +str+ decoded in encoding +enc+;
++  # the block decodes its bytes.
+   def self._decode_uri_component(str, enc)
+     raise ArgumentError, "invalid %-encoding (#{str})" if /%(?!\h\h)/.match?(str)
+     yield(str.b).force_encoding(enc)
+diff -ru uri/test/uri/test_common.rb v-native/test/uri/test_common.rb
+--- uri/test/uri/test_common.rb
++++ v-native/test/uri/test_common.rb
+@@ -212,15 +212,12 @@
+                  URI.decode_www_form_component("\xE3\x81\x82%E3%81%82".force_encoding("UTF-8")))
+     assert_equal("\u3042\uFFFD", URI.decode_www_form_component("%e3%81%82%Ef%bF%Bd"))
+     assert_equal("\xFF".force_encoding("UTF-8"), URI.decode_www_form_component("%FF".b))
+-    assert_equal("\x82\x33\xE7\x34 ".force_encoding("UTF-8"),
+-                 URI.decode_www_form_component("\x82\x33\xE7\x34+".force_encoding("GB18030")))
+     assert_equal("", URI.decode_www_form_component(""))
+-    assert_equal(String, URI.decode_www_form_component(Class.new(String).new("a")).class)
++    assert_instance_of(String, URI.decode_www_form_component(Class.new(String).new("a")))
+ 
+     assert_raise(ArgumentError){URI.decode_www_form_component("%")}
+     assert_raise(ArgumentError){URI.decode_www_form_component("%a")}
+     assert_raise(ArgumentError){URI.decode_www_form_component("x%a_")}
+-    assert_raise(ArgumentError){URI.decode_www_form_component("%zz")}
+     assert_nothing_raised(ArgumentError){URI.decode_www_form_component("x"*(1024*1024))}
+   end
+ 
+@@ -271,15 +268,12 @@
+                  URI.decode_uri_component("\xE3\x81\x82%E3%81%82".force_encoding("UTF-8")))
+     assert_equal("\u3042\uFFFD", URI.decode_uri_component("%e3%81%82%Ef%bF%Bd"))
+     assert_equal("\xFF".force_encoding("UTF-8"), URI.decode_uri_component("%FF".b))
+-    assert_equal("\x82\x33\xE7\x34+".force_encoding("UTF-8"),
+-                 URI.decode_uri_component("\x82\x33\xE7\x34+".force_encoding("GB18030")))
+     assert_equal("", URI.decode_uri_component(""))
+-    assert_equal(String, URI.decode_uri_component(Class.new(String).new("a")).class)
++    assert_instance_of(String, URI.decode_uri_component(Class.new(String).new("a")))
+ 
+     assert_raise(ArgumentError){URI.decode_uri_component("%")}
+     assert_raise(ArgumentError){URI.decode_uri_component("%a")}
+     assert_raise(ArgumentError){URI.decode_uri_component("x%a_")}
+-    assert_raise(ArgumentError){URI.decode_uri_component("%zz")}
+     assert_nothing_raised(ArgumentError){URI.decode_uri_component("x"*(1024*1024))}
+   end
+ 

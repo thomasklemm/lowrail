@@ -1,0 +1,4 @@
+100000 cases, differences: {error: 18001, subclass: 3461, encoding: 3316}
+error: ["\xE3\x81\x82 Z", #<Encoding:EUC-JP>, [:error, ArgumentError], [String, #<Encoding:EUC-JP>, "\xE3\x81\x82 Z", false, false]]
+subclass: ["%%", #<Encoding:EUC-JP>, [String, #<Encoding:EUC-JP>, "%%", true, false], [#<Class:0x00007f0332f4fb50>, #<Encoding:EUC-JP>, "%%", true, false]]
+encoding: ["%41%Z%e3%81%82%%", #<Encoding:US-ASCII>, [String, #<Encoding:UTF-8>, "A%Z\xE3\x81\x82%%", true, false], [String, #<Encoding:US-ASCII>, "A%Z\xE3\x81\x82%%", false, false]]

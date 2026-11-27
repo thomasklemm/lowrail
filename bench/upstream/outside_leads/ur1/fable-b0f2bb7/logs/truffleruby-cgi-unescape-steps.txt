@@ -1,0 +1,6 @@
+tr	603.7 ns
+b	22.5 ns
+gsub! block, no match	36.7 ns
+force_encoding + valid_encoding?	23.5 ns
+CGI.unescape(S.b, BINARY)	668.5 ns
+S.b.gsub(regexp, hash)	38.4 ns

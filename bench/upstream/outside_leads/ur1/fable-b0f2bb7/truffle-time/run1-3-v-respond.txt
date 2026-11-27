@@ -1,0 +1,11 @@
+hello	689.0
+form key	1916.5
+form value	830.5
+cookie	2306.2
+plain 16 KiB	48647.3
+dense 16 KiB	447476.4
+uri hello	77.9
+uri user	747.4
+uri plain 16 KiB	11750.0
+uri dense 16 KiB	410354.9
+checksum	985

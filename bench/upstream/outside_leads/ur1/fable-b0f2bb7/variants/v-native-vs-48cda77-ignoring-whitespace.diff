@@ -1,0 +1,71 @@
+diff --git a/uri-base/lib/uri/common.rb b/v-native/lib/uri/common.rb
+index 971a684..bf2e714 100644
+--- a/uri-base/lib/uri/common.rb
++++ b/v-native/lib/uri/common.rb
+@@ -11,6 +11,7 @@
+ 
+ require_relative "rfc2396_parser"
+ require_relative "rfc3986_parser"
++require "cgi/escape"
+ 
+ module URI
+   # The default parser instance for RFC 2396.
+@@ -398,6 +399,7 @@ module URI
+     _encode_uri_component(/[^*\-.0-9A-Z_a-z]/, TBLENCWWWCOMP_, str, enc)
+   end
+ 
++  if CGI.respond_to?(:unescapeURIComponent) && !CGI.method(:unescapeURIComponent).source_location
+     # Returns a string decoded from the given \URL-encoded string +str+.
+     #
+     # The given string is first encoded as Encoding::ASCII-8BIT (using String#b),
+@@ -428,7 +430,21 @@ module URI
+     #
+     # Related: URI.decode_uri_component (preserves <tt>'+'</tt>).
+     def self.decode_www_form_component(str, enc=Encoding::UTF_8)
+-    _decode_uri_component(/\+|%\h\h/, str, enc)
++      _decode_uri_component(str, enc) {|bytes| CGI.unescape(bytes, Encoding::ASCII_8BIT) }
++    end
++
++    # Like URI.decode_www_form_component, except that <tt>'+'</tt> is preserved.
++    def self.decode_uri_component(str, enc=Encoding::UTF_8)
++      _decode_uri_component(str, enc) {|bytes| CGI.unescapeURIComponent(bytes, Encoding::ASCII_8BIT) }
++    end
++  else # cgi before 0.3.3, or cgi/escape written in Ruby
++    def self.decode_www_form_component(str, enc=Encoding::UTF_8)
++      _decode_uri_component(str, enc) {|bytes| bytes.gsub(/\+|%\h\h/, TBLDECWWWCOMP_) }
++    end
++
++    def self.decode_uri_component(str, enc=Encoding::UTF_8)
++      _decode_uri_component(str, enc) {|bytes| bytes.gsub(/%\h\h/, TBLDECWWWCOMP_) }
++    end
+   end
+ 
+   # Like URI.encode_www_form_component, except that <tt>' '</tt> (space)
+@@ -437,11 +453,6 @@ module URI
+     _encode_uri_component(/[^*\-.0-9A-Z_a-z]/, TBLENCURICOMP_, str, enc)
+   end
+ 
+-  # Like URI.decode_www_form_component, except that <tt>'+'</tt> is preserved.
+-  def self.decode_uri_component(str, enc=Encoding::UTF_8)
+-    _decode_uri_component(/%\h\h/, str, enc)
+-  end
+-
+   # Returns a string derived from the given string +str+ with
+   # URI-encoded characters matching +regexp+ according to +table+.
+   def self._encode_uri_component(regexp, table, str, enc)
+@@ -458,11 +469,11 @@ module URI
+   end
+   private_class_method :_encode_uri_component
+ 
+-  # Returns a string decoding characters matching +regexp+ from the
+-  # given \URL-encoded string +str+.
+-  def self._decode_uri_component(regexp, str, enc)
++  # Returns the given \URL-encoded string +str+ decoded in encoding +enc+;
++  # the block decodes its bytes.
++  def self._decode_uri_component(str, enc)
+     raise ArgumentError, "invalid %-encoding (#{str})" if /%(?!\h\h)/.match?(str)
+-    str.b.gsub(regexp, TBLDECWWWCOMP_).force_encoding(enc)
++    yield(str.b).force_encoding(enc)
+   end
+   private_class_method :_decode_uri_component
+ 

@@ -1,0 +1,10 @@
+ {uri-base => v-native}/lib/uri/common.rb | 91 ++++++++++++++++++--------------
+ 1 file changed, 51 insertions(+), 40 deletions(-)
+ {uri-base => v-native}/lib/uri/common.rb | 31 +++++++++++++++++++++----------
+ 1 file changed, 21 insertions(+), 10 deletions(-)
+ {uri-base => uri}/lib/uri/common.rb | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
+ {uri-base => v-native}/test/uri/test_common.rb | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+ {uri-base => uri}/test/uri/test_common.rb | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)

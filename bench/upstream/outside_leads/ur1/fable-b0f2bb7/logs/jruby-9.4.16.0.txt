@@ -1,0 +1,12 @@
+== uri
+{:engine=>"jruby", :version=>"9.4.16.0"}
+{:unescape_native=>true, :uri_component_native=>false, :b_keeps_subclass=>true}
+{"decode_www_form_component"=>[false, false, true, true]}
+{"decode_uri_component"=>[true, true, true, true]}
+suite: 94 tests, 3044 assertions, 1 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications test_common.rb:218:in `test_decode_www_form_component 
+== v-native
+{:engine=>"jruby", :version=>"9.4.16.0"}
+{:unescape_native=>true, :uri_component_native=>false, :b_keeps_subclass=>true}
+{"decode_www_form_component"=>[true, true, true, true]}
+{"decode_uri_component"=>[true, true, true, true]}
+suite: 94 tests, 3044 assertions, 0 failures, 0 errors, 0 pendings, 1 omissions, 0 notifications 
