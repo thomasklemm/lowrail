@@ -1,0 +1,93 @@
+
+Randomized with seed 1234
+
+Sessions
+  DELETE /sessions/:id
+    destroys the session
+  GET /sign_in
+    renders the sign in page
+    redirects authenticated users
+  POST /sign_in
+    with valid credentials
+      signs in and sets a session cookie
+    with invalid credentials
+      redirects back with an alert
+
+Settings::Emails
+  PATCH /settings/email
+    with invalid password challenge
+      does not update the email and returns inertia errors
+    with valid password challenge
+      updates the email
+  GET /settings/email
+    renders the email settings page
+
+Settings::Passwords
+  GET /settings/password
+    renders the password settings page
+  PATCH /settings/password
+    with valid password challenge
+      updates the password
+    with invalid password challenge
+      does not update the password and returns inertia errors
+
+Identity::EmailVerifications
+  GET /identity/email_verification
+    with invalid token
+      redirects to settings email
+    with valid token
+      verifies the email
+    with expired token
+      does not verify the email
+  POST /identity/email_verification
+    resends the verification email
+
+Users
+  GET /sign_up
+    redirects authenticated users
+    renders the sign up page
+  POST /sign_up
+    creates a new user
+    rejects invalid user
+  DELETE /users
+    rejects account deletion with wrong password
+    destroys current user with valid password
+
+Identity::PasswordResets
+  GET /identity/password_reset/new
+    renders the forgot password page
+  POST /identity/password_reset
+    with a verified user
+      sends a password reset email
+    with a nonexistent email
+      does not send a password reset email
+    with an unverified user
+      does not send a password reset email
+  GET /identity/password_reset/edit
+    renders the reset page with valid token
+    rejects invalid reset token
+  PATCH /identity/password_reset
+    with valid token
+      updates the password
+    with mismatched password confirmation
+      rejects the password change
+    with expired token
+      rejects the password change
+
+UserMailer
+  email_verification
+    has the correct subject
+    sends to the user's email
+  password_reset
+    has the correct subject
+    sends to the user's email
+
+Settings::Sessions
+  GET /settings/sessions
+    renders the sessions index
+
+Finished in 1.09 seconds (files took 2.72 seconds to load)
+35 examples, 0 failures
+
+Randomized with seed 1234
+

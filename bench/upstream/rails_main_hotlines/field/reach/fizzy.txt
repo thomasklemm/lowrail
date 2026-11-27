@@ -1,2 +1,3 @@
-pid=243365 exception=0 blocked_host=0
-app=fizzy tree=main exit=1 wall=4.680083638
+pid=268027 exception=1 blocked_host=0
+app=fizzy tree=main exit=0 wall=23.152017605
+50 runs, 255 assertions, 0 failures, 0 errors, 0 skips

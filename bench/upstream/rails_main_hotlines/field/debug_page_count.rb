@@ -2,7 +2,7 @@
 # suite, by the middleware that built it, and appends one line per process to $DEBUG_PAGE_COUNT_OUT at exit.
 counts = Hash.new(0)
 TracePoint.new(:end) do |tp|
-  next unless tp.self.name == "ActionDispatch::DebugView"
+  next unless Module.instance_method(:name).bind_call(tp.self) == "ActionDispatch::DebugView"
   tp.self.prepend(Module.new do
     define_method(:initialize) do |assigns|
       who = caller_locations(1, 8).map(&:path).find { _1.include?("host_authorization") } ? "blocked_host" : "exception"

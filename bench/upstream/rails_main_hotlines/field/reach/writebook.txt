@@ -1,2 +1,3 @@
-pid=244077 exception=0 blocked_host=0
-app=writebook tree=main exit=1 wall=7.800069381
+pid=258690 exception=3 blocked_host=0
+app=writebook tree=main exit=0 wall=51.719697451
+119 runs, 381 assertions, 0 failures, 0 errors, 0 skips

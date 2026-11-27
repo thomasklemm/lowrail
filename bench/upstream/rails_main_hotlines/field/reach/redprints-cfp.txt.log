@@ -1,22 +1,379 @@
-Could not load Rails: uninitialized constant Faker::Name
-/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker.rb:152:in 'Module#const_get'
-/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker.rb:152:in 'block in Faker::Base.parse'
-/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker.rb:149:in 'Array#map'
-/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker.rb:149:in 'Faker::Base.parse'
-/home/user/.local/share/mise/installs/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/faker-3.8.0/lib/faker/default/company.rb:18:in 'Faker::Company.name'
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
 
-While loading ./spec/deliveries/proposal_delivery_spec.rb an `exit` / `raise SystemExit` occurred, RSpec will now quit.
-Failure/Error: exit(1)
+- Recommendations for applications:
 
-SystemExit:
-  exit
-# ./spec/rails_helper.rb:9:in 'Kernel#exit'
-# ./spec/rails_helper.rb:9:in '<top (required)>'
-# ./spec/deliveries/proposal_delivery_spec.rb:1:in '<top (required)>'
-# ------------------
-# --- Caused by: ---
-# NameError:
-#   uninitialized constant Faker::Name
-#   /home/user/workspace/repo/bench/upstream/rails_main_hotlines/field/debug_page_count.rb:5:in 'block in <top (required)>'
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
 
-All examples were filtered out; ignoring {}
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <compiled> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/app/controllers/avo/evaluations_controller.rb:3)
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
+
+- Recommendations for applications:
+
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <compiled> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/app/controllers/avo/evaluations_controller.rb:3)
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
+
+- Recommendations for applications:
+
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/config/environment.rb:5)
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
+
+- Recommendations for applications:
+
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/config/environment.rb:5)
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
+
+- Recommendations for applications:
+
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/config/environment.rb:5)
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
+
+- Recommendations for applications:
+
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/config/environment.rb:5)
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
+
+- Recommendations for applications:
+
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/config/environment.rb:5)
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
+
+- Recommendations for applications:
+
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/config/environment.rb:5)
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
+
+- Recommendations for applications:
+
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/config/environment.rb:5)
+DEPRECATION WARNING: require_dependency is deprecated without replacement and will be removed
+in Rails 9.
+
+- Recommendations for applications:
+
+    - If the call is an old one written in the days of the classic autoloader to ensure a
+      certain constant is loaded for constant lookup to work as expected, you can simply
+      remove it.
+
+    - In order to preload classes when the application boots, which may be necessary for
+      things like STIs or Kafka consumers, please check the autoloading guide for modern
+      approaches.
+
+- Recommendations for engines that depend on Rails >= 7.0:
+
+  Same recommendations as for applications, since the classic autoloader is no longer
+  available starting with Rails 7.0.
+
+- Recommendations for engines that support Rails < 7.0:
+
+  Guard the call with a version check just in case the parent application is using
+  the classic autoloader:
+
+      require_dependency "some_file" if Rails::VERSION::MAJOR < 7
+ (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-redprints-cfp/config/environment.rb:5)
+Run options: exclude {type: :system}
+
+Randomized with seed 1234
+
+🚀️️  No system test selected. Skip assets compilation.
+
+Evaluation::SubmitForm
+  #save
+    updates proposal statuses for submitted proposals only
+    delivers notifications only to newly updated proposals
+  validations
+    with invalid statuses
+      is invalid
+    with blank proposals
+      is invalid
+    with missing ids or statuses
+      is invalid
+
+Auth::OAuthForm
+  #save
+    when user exists
+      doesn't create a new user
+    when user doesn't exist
+      creates a new user, account and oauth credentials
+
+/evaluations/:id/reviews
+  GET /
+    renders the index page with the reviews
+    when evaluation does not belong to the reviewer
+      raises an ActiveRecord::RecordNotFound error
+  PATCH /:id
+    updates the review and the proposal's score
+    when evaluation has no deadline
+      updates the review normally
+    when some scores are missing
+      doesn't update anything
+    when evaluation deadline has passed
+      redirects back with an alert message
+      doesn't update the review
+    when evaluation is personal
+      updates only the review score
+
+ProposalDelivery
+  #proposal_accepted
+    sends an email
+  #proposal_submitted
+    sends an email
+    sends a notification
+  #proposal_rejected
+    sends an email
+  #proposal_waitlisted
+    sends an email
+
+/proposals
+  GET /new
+    is expected to be present
+  PATCH /:id
+    updates the proposal
+    does not notify the author
+    when validation fails
+      renders the form with errors
+    when proposal is draft
+      notifies the author
+  DELETE /:id
+    deletes the proposal
+  POST /
+    creates a new proposal
+    notifies the author
+    when saving draft
+      does not notify the author
+      creates a draft
+  GET /:id/edit
+    is expected to be present
+  GET /:id
+    is expected to eq "Optio exercitationem nostrum molestiae."
+  GET /
+    is expected to eq 3
+    with inactive CFPs
+      doesn't show proposals for inactive CFPs
+
+Proposal
+  .tracks
+    only include tracks from active CFPs
+  #invalidate_score!
+    updates score and reviews_count and take into account only submitted reviews
+
+/evaluations
+  GET /
+    when reviewer has only one evaluation
+      redirects to the evaluation show page
+    when reviewer has multiple evaluations
+      renders the index page with evaluations
+      with inactive CFPs
+        doesn't show evaluations for inactive CFPs
+
+/evaluations/:id/results
+  GET /
+    renders results index page
+  POST /
+    when user is not admin
+      raises routing error
+    when user is admin
+      updates the proposal status and delivers a notification
+
+/proposals/:proposal_id/confirmations
+  POST /
+    changes status to confirmed
+    when proposal is not accepted
+      does not change the status
+    when accessing another user's proposal
+      does not change the status
+  DELETE /
+    changes status to declined
+    when proposal is not accepted
+      does not change the status
+    when accessing another user's proposal
+      does not change the status
+
+Evaluation::Distribution
+  #invalidate!
+    creates pending reviews for all missing proposal-reviewer pairs
+    when submitted reviews exist
+      doesn't affect existing reviews
+
+Finished in 2.17 seconds (files took 9.99 seconds to load)
+50 examples, 0 failures
+
+Randomized with seed 1234
+

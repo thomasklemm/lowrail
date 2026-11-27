@@ -1,0 +1,9 @@
+r81 3f290b759c: rails 8.1.4.1 yjit=false stub=true status=400: 19.714 ms/request, 7998 objects/request
+main 088fc0cf61: rails 8.2.0.alpha yjit=false stub=true status=400: 27.514 ms/request, 15712 objects/request
+dvc 1a359ee5f9: rails 8.2.0.alpha yjit=false stub=true status=400: 8.075 ms/request, 4518 objects/request
+r81 3f290b759c: rails 8.1.4.1 yjit=false stub=false status=400: 96.899 ms/request, 121191 objects/request
+main 088fc0cf61: rails 8.2.0.alpha yjit=false stub=false status=400: 94.948 ms/request, 130204 objects/request
+dvc 1a359ee5f9: rails 8.2.0.alpha yjit=false stub=false status=400: 77.978 ms/request, 118999 objects/request
+# Ruby 4.0.9, interpreter, 200 requests after 20 warm-up, one process each, run while other suites shared the orb:
+# object counts repeat exactly across runs (earlier runs in this thread: 8,129/15,834/4,518 stubbed); the ms are
+# not controlled (no A/A, shared CPU) and support no claim.

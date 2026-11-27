@@ -1,84 +1,380 @@
-bin/rails aborted!
-Bundler::GemRequireError: There was an error while trying to load the gem 'webmock'. (Bundler::GemRequireError)
-Gem Load Error is: undefined method '[]' for nil
-Backtrace for gem load error is:
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/functions.rb:89:in 'REXML::Functions.get_namespace'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/functions.rb:81:in 'REXML::Functions.name'
-/home/user/workspace/repo/bench/upstream/rails_main_hotlines/field/debug_page_count.rb:5:in 'block in <top (required)>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/functions.rb:445:in '<module:Functions>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/functions.rb:10:in '<module:REXML>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/functions.rb:2:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/xpath.rb:2:in 'Kernel#require_relative'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/xpath.rb:2:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/element.rb:6:in 'Kernel#require_relative'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/element.rb:6:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/document.rb:3:in 'Kernel#require_relative'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rexml-3.4.4/lib/rexml/document.rb:3:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.2/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/skylight-7.1.1/lib/skylight/probes.rb:166:in 'Kernel#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/crack-1.0.1/lib/crack/xml.rb:5:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.2/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/skylight-7.1.1/lib/skylight/probes.rb:166:in 'Kernel#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/webmock-3.26.3/lib/webmock/util/parsers/xml.rb:2:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/webmock-3.26.3/lib/webmock.rb:20:in 'Kernel#require_relative'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/webmock-3.26.3/lib/webmock.rb:20:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel.replace_require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/zeitwerk-2.8.2/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel.require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:63:in 'block (2 levels) in Bundler::Runtime#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:58:in 'Array#each'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:58:in 'block in Bundler::Runtime#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:52:in 'Array#each'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler/runtime.rb:52:in 'Bundler::Runtime#require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundler.rb:214:in 'Bundler.require'
-/home/user/workspace/repo/.corpus/hl-codetriage/config/application.rb:9:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-/home/user/workspace/repo/.corpus/hl-codetriage/Rakefile:23:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rake-13.4.2/lib/rake/rake_module.rb:29:in 'Kernel#load'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rake-13.4.2/lib/rake/rake_module.rb:29:in 'Rake.load_rakefile'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rake-13.4.2/lib/rake/application.rb:735:in 'Rake::Application#raw_load_rakefile'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rake-13.4.2/lib/rake/application.rb:127:in 'block in Rake::Application#load_rakefile'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rake-13.4.2/lib/rake/application.rb:209:in 'Rake::Application#standard_exception_handling'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rake-13.4.2/lib/rake/application.rb:126:in 'Rake::Application#load_rakefile'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/commands/rake/rake_command.rb:48:in 'block in Rails::Command::RakeCommand.with_rake'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/rake-13.4.2/lib/rake/rake_module.rb:59:in 'Rake.with_application'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/commands/rake/rake_command.rb:46:in 'Rails::Command::RakeCommand.with_rake'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/commands/rake/rake_command.rb:20:in 'Rails::Command::RakeCommand.perform'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/commands/test/test_command.rb:80:in 'Rails::Command::TestCommand#run_prepare_task'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/commands/test/test_command.rb:32:in 'Rails::Command::TestCommand#perform'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/thor-1.5.0/lib/thor/command.rb:28:in 'Thor::Command#run'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/thor-1.5.0/lib/thor/invocation.rb:127:in 'Thor::Invocation#invoke_command'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/command/base.rb:180:in 'Rails::Command::Base#invoke_command'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/thor-1.5.0/lib/thor.rb:538:in 'Thor.dispatch'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/command/base.rb:71:in 'Rails::Command::Base.perform'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/command.rb:65:in 'block in Rails::Command.invoke'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/command.rb:147:in 'Rails::Command.with_argv'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/command.rb:63:in 'Rails::Command.invoke'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/commands.rb:18:in '<main>'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'
-/home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-bin/rails:4:in '<main>'
-Bundler Error Backtrace:
-/home/user/workspace/repo/.corpus/hl-codetriage/config/application.rb:9:in '<main>'
-/home/user/workspace/repo/.corpus/hl-codetriage/Rakefile:23:in '<main>'
-bin/rails:4:in '<main>'
+DEPRECATION WARNING: `config.active_support.to_time_preserves_timezone` is deprecated and will be removed in Rails 8.2 (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-codetriage/config/initializers/new_framework_defaults.rb:18)
+DEPRECATION WARNING: Time::DATE_FORMATS is deprecated, to register custom time formats use ActiveSupport::TimeFormats.register (called from <top (required)> at /home/user/workspace/repo/.corpus/hl-codetriage/config/initializers/time_formats.rb:3)
+⛔️ `require "sidekiq/testing"` is deprecated and will be removed in Sidekiq 9.0. See https://sidekiq.org/wiki/Testing#new-api
+Run options: --verbose --seed 1234
 
-Caused by:
-NoMethodError: undefined method '[]' for nil (NoMethodError)
+# Running:
 
-        yield @@context[:node] if @@context[:node].respond_to?(:namespace)
-                                           ^^^^^^^
-/home/user/workspace/repo/bench/upstream/rails_main_hotlines/field/debug_page_count.rb:5:in 'block in <top (required)>'
-/home/user/workspace/repo/.corpus/hl-codetriage/config/application.rb:9:in '<main>'
-/home/user/workspace/repo/.corpus/hl-codetriage/Rakefile:23:in '<main>'
-bin/rails:4:in '<main>'
-(See full trace by running task with --trace)
+BackgroundInactiveEmailJobTest#test_does_not_send_email_when_user_has_active_repo_subscriptions = 0.16 s = .
+BackgroundInactiveEmailJobTest#test_sends_poke_inactive_email_for_user_without_subscriptions = 0.65 s = .
+GithubFetcher::ReposTest#test_can_get_owned_repos = 0.03 s = .
+GithubFetcher::ReposTest#test_#as_json_returns_{}_when_error = 0.00 s = .
+GithubFetcher::ReposTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+GithubFetcher::ReposTest#test_#as_json_returns_json = 0.01 s = .
+GithubFetcher::ReposTest#test_can_get_subscribed_repos = 0.01 s = .
+GithubFetcher::ReposTest#test_can_set_response_size = 0.01 s = .
+GithubFetcher::ReposTest#test_can_get_starred_repos = 0.01 s = .
+GithubFetcher::ReposTest#test_raises_error_when_kind_is_invalid = 0.00 s = .
+UserMailerTest#test_sends_subscribed/created_email = 0.00 s = E
+
+
+Error:
+UserMailerTest#test_sends_subscribed/created_email:
+NoMethodError: undefined method '<=' for an instance of UserMailerTest
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:345:in 'ActiveRecord::TestFixtures#method_missing'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:58:in 'ActiveJob::TestHelper::TestQueueAdapter.compute_excluded'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:26:in 'block in ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'Hash#fetch'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:44:in 'ActiveJob::TestHelper::TestQueueAdapter.adapter_for'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:67:in 'ActiveJob::TestHelper::TestQueueAdapter#queue_adapter'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:752:in 'ActiveJob::TestHelper#using_test_adapter?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:756:in 'ActiveJob::TestHelper#clear_enqueued_jobs'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:81:in 'ActiveJob::TestHelper#before_setup'
+
+Error:
+UserMailerTest#test_sends_subscribed/created_email:
+NoMethodError: undefined method 'each' for nil
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:238:in 'ActiveRecord::TestFixtures#teardown_transactional_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:170:in 'ActiveRecord::TestFixtures#teardown_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:17:in 'ActiveRecord::TestFixtures#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/setup_and_teardown.rb:105:in 'ActiveSupport::Testing::SetupAndTeardown#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/tests_without_assertions.rb:10:in 'ActiveSupport::Testing::TestsWithoutAssertions#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:87:in 'ActiveJob::TestHelper#after_teardown'
+
+bin/rails test test/emails/send_daily_triage_email_test.rb:43
+
+UserMailerTest#test_poke_inactive_works = 0.00 s = E
+
+
+Error:
+UserMailerTest#test_poke_inactive_works:
+NoMethodError: undefined method '<=' for an instance of UserMailerTest
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:345:in 'ActiveRecord::TestFixtures#method_missing'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:58:in 'ActiveJob::TestHelper::TestQueueAdapter.compute_excluded'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:26:in 'block in ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'Hash#fetch'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:44:in 'ActiveJob::TestHelper::TestQueueAdapter.adapter_for'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:67:in 'ActiveJob::TestHelper::TestQueueAdapter#queue_adapter'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:752:in 'ActiveJob::TestHelper#using_test_adapter?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:756:in 'ActiveJob::TestHelper#clear_enqueued_jobs'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:81:in 'ActiveJob::TestHelper#before_setup'
+
+Error:
+UserMailerTest#test_poke_inactive_works:
+NoMethodError: undefined method 'each' for nil
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:238:in 'ActiveRecord::TestFixtures#teardown_transactional_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:170:in 'ActiveRecord::TestFixtures#teardown_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:17:in 'ActiveRecord::TestFixtures#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/setup_and_teardown.rb:105:in 'ActiveSupport::Testing::SetupAndTeardown#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/tests_without_assertions.rb:10:in 'ActiveSupport::Testing::TestsWithoutAssertions#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:87:in 'ActiveJob::TestHelper#after_teardown'
+
+bin/rails test test/functional/user_mailer_test.rb:20
+
+UserMailerTest#test_send_triage_works = 0.00 s = E
+
+
+Error:
+UserMailerTest#test_send_triage_works:
+NoMethodError: undefined method '<=' for an instance of UserMailerTest
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:345:in 'ActiveRecord::TestFixtures#method_missing'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:58:in 'ActiveJob::TestHelper::TestQueueAdapter.compute_excluded'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:26:in 'block in ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'Hash#fetch'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:44:in 'ActiveJob::TestHelper::TestQueueAdapter.adapter_for'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:67:in 'ActiveJob::TestHelper::TestQueueAdapter#queue_adapter'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:752:in 'ActiveJob::TestHelper#using_test_adapter?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:756:in 'ActiveJob::TestHelper#clear_enqueued_jobs'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:81:in 'ActiveJob::TestHelper#before_setup'
+
+Error:
+UserMailerTest#test_send_triage_works:
+NoMethodError: undefined method 'each' for nil
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:238:in 'ActiveRecord::TestFixtures#teardown_transactional_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:170:in 'ActiveRecord::TestFixtures#teardown_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:17:in 'ActiveRecord::TestFixtures#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/setup_and_teardown.rb:105:in 'ActiveSupport::Testing::SetupAndTeardown#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/tests_without_assertions.rb:10:in 'ActiveSupport::Testing::TestsWithoutAssertions#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:87:in 'ActiveJob::TestHelper#after_teardown'
+
+bin/rails test test/functional/user_mailer_test.rb:6
+
+UserMailerTest#test_sends_docs = 0.00 s = E
+
+
+Error:
+UserMailerTest#test_sends_docs:
+NoMethodError: undefined method '<=' for an instance of UserMailerTest
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:345:in 'ActiveRecord::TestFixtures#method_missing'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:58:in 'ActiveJob::TestHelper::TestQueueAdapter.compute_excluded'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:26:in 'block in ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'Hash#fetch'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:44:in 'ActiveJob::TestHelper::TestQueueAdapter.adapter_for'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:67:in 'ActiveJob::TestHelper::TestQueueAdapter#queue_adapter'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:752:in 'ActiveJob::TestHelper#using_test_adapter?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:756:in 'ActiveJob::TestHelper#clear_enqueued_jobs'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:81:in 'ActiveJob::TestHelper#before_setup'
+
+Error:
+UserMailerTest#test_sends_docs:
+NoMethodError: undefined method 'each' for nil
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:238:in 'ActiveRecord::TestFixtures#teardown_transactional_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:170:in 'ActiveRecord::TestFixtures#teardown_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:17:in 'ActiveRecord::TestFixtures#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/setup_and_teardown.rb:105:in 'ActiveSupport::Testing::SetupAndTeardown#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/tests_without_assertions.rb:10:in 'ActiveSupport::Testing::TestsWithoutAssertions#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:87:in 'ActiveJob::TestHelper#after_teardown'
+
+bin/rails test test/emails/send_daily_triage_email_test.rb:27
+
+UserMailerTest#test_sends_issues = 0.00 s = E
+
+
+Error:
+UserMailerTest#test_sends_issues:
+NoMethodError: undefined method '<=' for an instance of UserMailerTest
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:345:in 'ActiveRecord::TestFixtures#method_missing'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:58:in 'ActiveJob::TestHelper::TestQueueAdapter.compute_excluded'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:26:in 'block in ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'Hash#fetch'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:25:in 'ActiveJob::TestHelper::TestQueueAdapter.excluded?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:44:in 'ActiveJob::TestHelper::TestQueueAdapter.adapter_for'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:67:in 'ActiveJob::TestHelper::TestQueueAdapter#queue_adapter'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:752:in 'ActiveJob::TestHelper#using_test_adapter?'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:756:in 'ActiveJob::TestHelper#clear_enqueued_jobs'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:81:in 'ActiveJob::TestHelper#before_setup'
+
+Error:
+UserMailerTest#test_sends_issues:
+NoMethodError: undefined method 'each' for nil
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:238:in 'ActiveRecord::TestFixtures#teardown_transactional_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:170:in 'ActiveRecord::TestFixtures#teardown_fixtures'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/test_fixtures.rb:17:in 'ActiveRecord::TestFixtures#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/setup_and_teardown.rb:105:in 'ActiveSupport::Testing::SetupAndTeardown#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/testing/tests_without_assertions.rb:10:in 'ActiveSupport::Testing::TestsWithoutAssertions#after_teardown'
+    /home/user/.local/share/mise/installs/ruby/4.0.7/lib/ruby/gems/4.0.0/bundler/gems/rails-088fc0cf61e4/activejob/lib/active_job/test_helper.rb:87:in 'ActiveJob::TestHelper#after_teardown'
+
+bin/rails test test/emails/send_daily_triage_email_test.rb:8
+
+FilteringLanguageTest#test_filtering_language_in_normal_projects = DEPRECATION WARNING: Calling `protect_from_forgery` without specifying a strategy is deprecated and will default to `with: :exception` in a future version of Rails. To opt into the new behavior now, use `config.action_controller.default_protect_from_forgery_with = :exception`. To silence this warning without changing behavior, explicitly pass `protect_from_forgery with: :null_session`. (called from <class:ApplicationController> at /home/user/workspace/repo/.corpus/hl-codetriage/app/controllers/application_controller.rb:6)
+0.63 s = .
+PHPParserTest#test_returns_nothing_on_invalid_composer.lock = 0.00 s = .
+PHPParserTest#test_returns_the_list_of_dependencies_(with_dev_dependencies)_for_a_small_composer.lock_file = 0.00 s = .
+GroupedIssuesDocsTest#test_only_a_read_doc = 0.06 s = .
+GroupedIssuesDocsTest#test_issue_and_a_doc_for_same_repo = 0.05 s = .
+GroupedIssuesDocsTest#test_two_issues_different_repos_in_random_order = 0.05 s = .
+GroupedIssuesDocsTest#test_empty_group_works = 0.01 s = .
+GroupedIssuesDocsTest#test_only_an_assignment = 0.02 s = .
+GroupedIssuesDocsTest#test_only_a_write_doc = 0.02 s = .
+RepoTest#test_normalizing_names_to_lowercase = 0.03 s = .
+RepoTest#test_#issues_fetcher = 0.00 s = .
+RepoTest#test_update_repo_info_from_github = 0.02 s = .
+RepoTest#test_issues_fetcher.api_path_(private_method)_returns_issues_path_with_Github_api = 0.00 s = .
+RepoTest#test_repos_needing_help_when_user_has_ruby_language = 0.00 s = .
+RepoTest#test_repos_needing_help_when_user_is_null = 0.00 s = .
+RepoTest#test_#all_languages_does_not_contain_empty_string = 0.01 s = .
+RepoTest#test_#fetcher = 0.00 s = .
+RepoTest#test_uniqueness_of_repo_with_case_insensitivity = 0.01 s = .
+RepoTest#test_check_existence_of_repo_by_its_name_and_user's_name = 0.00 s = .
+RepoTest#test_#commit_sha_fetcher = 0.01 s = .
+RepoTest#test_github_url_validation_attempts_to_use_issue_fetcher = 0.00 s = .
+RepoTest#test_counts_number_of_subscribers = Test is missing assertions: `test_counts_number_of_subscribers` /home/user/workspace/repo/.corpus/hl-codetriage/test/unit/repo_test.rb:43
+0.02 s = .
+RepoTest#test_#populate_docs!_does_not_delete_a_caller-provided_location = 0.10 s = .
+RepoTest#test_repos_needing_help_when_user_has_no_languages = 0.01 s = .
+RepoTest#test_#populate_docs!_removes_the_working_directory_it_cloned = 0.02 s = .
+RepoTest#test_.without_user_subscriptions = 0.02 s = .
+RepoTest#test_search_by_returns_repo_by_name_and_user_name = 0.02 s = .
+PagesControllerTest#test_cache_control_for_headers = 0.03 s = .
+PagesControllerTest#test_not_signed_in_user = 0.03 s = .
+PagesControllerTest#test_siged_in_user = 0.04 s = .
+UsersControllerTest#test_#show = 0.02 s = .
+UsersControllerTest#test_#token_delete = 0.04 s = .
+UsersControllerTest#test_#update_should_update_an_user = 0.03 s = .
+UsersControllerTest#test_should_destroy_a_user_with_the_correct_account_delete_token = 0.03 s = .
+PopulateIssuesJobTest#test_updates_existing_issues = 0.04 s = .
+PopulateIssuesJobTest#test_#perform_kicks_off_populate_multi_issues! = 0.01 s = .
+PopulateIssuesJobTest#test_#populate_multi_issues_creates_issues = 0.03 s = .
+PopulateIssuesJobTest#test_#populate_multi_issues_stores_error_info_when_fails = 0.03 s = .
+PopulateIssuesJobTest#test_Works_when_there's_no_issues = Test is missing assertions: `test_Works_when_there's_no_issues` /home/user/workspace/repo/.corpus/hl-codetriage/test/jobs/populate_issues_job_test.rb:11
+0.02 s = .
+GithubFetcher::IssueCommentsTest#test_#as_json_returns_[]_when_error = 0.01 s = .
+GithubFetcher::IssueCommentsTest#test_#as_json_returns_list_of_comments = 0.01 s = .
+GithubFetcher::IssueCommentsTest#test_#commenters_returns_list_of_unique_commenters = 0.01 s = .
+GithubFetcher::IssueCommentsTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+ApplicationHelperTest#test_flash_class_levels = 0.00 s = .
+ApplicationHelperTest#test_star_svg = 0.01 s = .
+ApplicationHelperTest#test_warning_svg = 0.00 s = .
+GithubFetcher::IssuesTest#test_call_will_retry_API_calls = 0.02 s = .
+GithubFetcher::IssuesTest#test_#as_json_returns_{}_when_error = 0.00 s = .
+GithubFetcher::IssuesTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+GithubFetcher::IssuesTest#test_#as_json_returns_first_page_of_open_issues,_sorted_by_comments_desc_(by_default) = 0.02 s = .
+GithubFetcher::IssuesTest#test_#as_json_can_get_second_page_of_issues = 0.02 s = .
+GithubFetcher::IssuesTest#test_correctly_caches_when_paginating = 0.02 s = .
+GithubFetcher::IssuesTest#test_#last_page_is_false_when_it's_not_the_last_page = 0.01 s = .
+GithubFetcher::IssuesTest#test_#last_page_is_true_when_it's_the_last_page = 0.00 s = .
+GithubFetcher::IssuesTest#test_bad_credentials = 0.01 s = .
+GithubFetcher::IssuesTest#test_#error? = 0.00 s = .
+UserUpdateTest#test_updating_the_user_daily_issue_limit_to_unlimited = 0.13 s = .
+UserUpdateTest#test_updating_the_user_daily_issue_limit = 0.05 s = .
+UserUpdateTest#test_updating_the_users_skip_issues_with_pr_setting_to_false = 0.05 s = .
+UserUpdateTest#test_routing = 0.01 s = .
+UserUpdateTest#test_updating_the_user_email_frequency = 0.12 s = .
+UserUpdateTest#test_updating_the_user_email_time_of_day = 0.15 s = .
+UserUpdateTest#test_updating_the_user_email_address = 0.11 s = .
+UserUpdateTest#test_updating_the_users_skip_issues_with_pr_setting_to_true = 0.09 s = .
+AddingReposTest#test_supports_URL_without_github.com = 0.39 s = .
+AddingReposTest#test_add_page_without_login = 0.02 s = .
+AddingReposTest#test_adding_a_new_valid_repo_passing_the_URL = 0.13 s = .
+AddingReposTest#test_adding_invalid_repo_with_blank_params = 0.13 s = .
+AddingReposTest#test_modifies_the_URL_when_it_has_invalid_params = 0.24 s = .
+IssueAssignmentTest#test_can_check_github_API = 0.06 s = .
+IssueAssignmentTest#test_issue_assigner_class_works = 0.05 s = .
+IssueAssignmentTest#test_respects_email_limits = 0.08 s = .
+IssueAssignmentTest#test_validates_presence_of_relevant_ids = 0.01 s = .
+DocMethodsControllerTest#test_click_method_redirect_with_a_DocAssignment_redirects_to_the_doc_method_url = 0.13 s = .
+DocMethodsControllerTest#test_click_method_redirect_without_any_DocAssignment_returns_to_root_an_displays_an_error = 0.03 s = .
+RubyParserTest#test_returns_nothing_on_invalid_Gemfile.lock = [DEPRECATED] Your Gemfile.main.lock does not appear to be a valid lockfile. Run `rm Gemfile.main.lock` and then `bundle install` to generate a new lockfile. This will raise a LockfileError in a future version of Bundler.
+0.00 s = .
+RubyParserTest#test_returns_the_list_of_gems_for_a_small_Gemfle = 0.15 s = .
+RepoLabelsAssignerTest#test_#create_and_associate_labels!_associates_labels_with_the_repo = 0.20 s = .
+RepoLabelsAssignerTest#test_#create_and_associate_labels!_creates_labels = 0.23 s = .
+RepoLabelsAssignerTest#test_#create_and_associate_labels!_it_does_not_care_about_label_case = 0.40 s = .
+RepoLabelsAssignerTest#test_#create_and_associate_labels!_it_does_not_create_existing_labels = 0.42 s = .
+RepoSubscriptionsControllerTest#test_not_update_schneems'_subscription_when_signed_in_as_mockstar = 0.02 s = .
+RepoSubscriptionsControllerTest#test_not_destroy_schneems'_subscription_when_signed_in_as_mockstar = 0.02 s = .
+RepoSubscriptionsControllerTest#test_update_subscription_limit_when_email_limit_is_valid = 0.03 s = .
+RepoSubscriptionsControllerTest#test_destroy_a_subscription = 0.02 s = .
+RepoSubscriptionsControllerTest#test_receive_failure_message_when_subscription_did_not_created_when_signed_in_as_mockstar = 0.01 s = .
+RepoSubscriptionsControllerTest#test_successfully_subscribe_to_a_repo_when_signed_in_as_mockstar = 0.02 s = .
+RepoSubscriptionsControllerTest#test_not_update_subscription_when_email_limit_is_invalid = 0.01 s = .
+TopicsControllerTest#test_redirect_invalid_topic = 0.01 s = .
+UserSessionTest#test_sign_in_screen_renders = 0.03 s = .
+UserTest#test_public_scope_should_only_return_public_users = 0.01 s = .
+UserTest#test_#own_repos_json = 0.01 s = .
+UserTest#test_valid_email?_is_true_when_valid = 0.00 s = .
+UserTest#test_negative_count = 0.00 s = .
+UserTest#test_user_assignments_to_deliver_updates_assignments = Test is missing assertions: `test_user_assignments_to_deliver_updates_assignments` /home/user/workspace/repo/.corpus/hl-codetriage/test/unit/user_test.rb:127
+0.01 s = .
+UserTest#test_user_favorite_language? = 0.00 s = .
+UserTest#test_#fetcher = 0.00 s = .
+UserTest#test_#issue_assignments_to_deliver_should_ignore_repos_not_active = 0.01 s = .
+UserTest#test_valid_email?_is_false_when_bad = 0.00 s = .
+UserTest#test_able_to_edit_repo_allows_the_correct_rights = 0.00 s = .
+UserTest#test_#github_url_returns_github_url = 0.00 s = .
+UserTest#test_account_delete_token_should_be_saved_unless_it_is_a_new_record = 0.01 s = .
+UserTest#test_account_delete_token_should_be_created_on_first_use = 0.00 s = .
+UserTest#test_#repos_fetcher = 0.00 s = .
+UserTest#test_streak_tests = 0.00 s = .
+UserTest#test_#starred_repos_json = 0.02 s = .
+UserTest#test_#subscribed_repos_json = 0.02 s = .
+UserTest#test_user_has_favorite_languages? = 0.00 s = .
+SendDailyTriageEmailJobTest#test_when_run_multiple_times_a_day,_it_does_not_deliver_again = 0.04 s = .
+SendDailyTriageEmailJobTest#test_send_out_daily_triage_email = 0.03 s = .
+SendDailyTriageEmailJobTest#test_does_not_deliver_if_no_subscriptions = 0.02 s = .
+SendDailyTriageEmailJobTest#test_does_not_deliver_if_email_should_be_skipped = 0.00 s = .
+SendDailyTriageEmailJobTest#test_when_preference_changed,_sends_at_preferred_time_next_day = 0.04 s = .
+SendDailyTriageEmailJobTest#test_when_email_time_of_day_not_set,_it_does_not_deliver_before_default_time_of_day = 0.01 s = .
+SendDailyTriageEmailJobTest#test_when_email_time_of_day_set,_it_delivers_at_preferred_time_of_day = 0.03 s = .
+SendDailyTriageEmailJobTest#test_when_email_time_of_day_set,_it_does_not_deliver_before_preferred_time_of_day = 0.00 s = .
+SendDailyTriageEmailJobTest#test_when_email_time_of_day_not_set,_it_delivers_after_default_time_of_day = 0.03 s = .
+GitHubAuthenticatorTest#test_creates_new_user_user_when_user_does_not_exist_and_oauth_contains_email = 0.03 s = .
+GitHubAuthenticatorTest#test_creates_new_user_user_when_user_does_not_exist_and_oauth_does_not_contains_email = 0.05 s = .
+GitHubAuthenticatorTest#test_updates_existing_user_params = 0.03 s = .
+SortedRepoCollectionTest#test_yields_repos_sorted_by_full_name,_case-insensitive = 0.00 s = .
+SortedRepoCollectionTest#test_yields_the_correct_length = 0.00 s = .
+EmailRateLimitTest#test_wait = 0.01 s = .
+EmailRateLimitTest#test_decides_daily_email_frequency = 0.00 s = .
+EmailRateLimitTest#test_once_a_month = 0.00 s = .
+EmailRateLimitTest#test_once_a_week = 0.01 s = .
+EmailRateLimitTest#test_twice_a_week = 0.00 s = .
+GithubFetcher::EmailTest#test_#as_json_includes_list_of_emails_for_given_user = 0.01 s = .
+GithubFetcher::EmailTest#test_#as_json_returns_null_response_when_bad_request = 0.00 s = .
+GithubFetcher::EmailTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+GitBranchnameGeneratorTest#test_does_not_allow_periods = 0.00 s = .
+GitBranchnameGeneratorTest#test_does_not_allow_pounds_(#) = 0.00 s = .
+GitBranchnameGeneratorTest#test_replaces_non_alpha-numerics_and_underscores_with_dashes = 0.02 s = .
+IssueAssignmentsControllerTest#test_#click_issue_redirect_redirects_to_error_when_there_is_a_bad_url = 0.01 s = .
+IssueAssignmentsControllerTest#test_#click_issue_redirect_redirects_user_when_assignment_matches_the_user_id = 0.04 s = .
+IssueAssignmentsControllerTest#test_#create_redirects_when_the_user_request_a_new_issue = 0.02 s = .
+UpdateRepoInfoJobTest#test_repo_deleted_or_made_private = 0.01 s = .
+UpdateRepoInfoJobTest#test_repo_rename_conflict = 0.01 s = .
+UpdateRepoInfoJobTest#test_repo_with_information_updated = 0.01 s = .
+RepoSubscriptionsTest#test_the_get_issue_for_triage_for_user_with_existing_issue_assignments = 0.03 s = .
+RepoSubscriptionsTest#test_.subscriptions_for_a_repo = 0.02 s = .
+RepoSubscriptionsTest#test_email_limit_allows_multiple_issues_per_repo = 0.05 s = .
+RepoSubscriptionsTest#test_the_assign_issue_creates_an_assignment_for_the_user = 0.07 s = .
+RepoSubscriptionsTest#test_the_get_issue_for_triage_for_new_user = 0.04 s = .
+SubscribersControllerTest#test_list_subscribers_for_a_repo = 0.05 s = .
+GithubFetcher::UserTest#test_#valid?_returns_false_if_user_token_is_invalid = 0.00 s = .
+GithubFetcher::UserTest#test_#as_json_returns_{}_when_error = 0.00 s = .
+GithubFetcher::UserTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+GithubFetcher::UserTest#test_#as_json_returns_user_json = 0.00 s = .
+GithubFetcher::UserTest#test_#valid?_returns_true_if_user_token_is_valid = 0.00 s = .
+GithubFetcher::UserTest#test_#valid?_returns_false_when_API_error_occurs = 0.00 s = .
+GithubFetcher::ResourceTest#test_#not_found?_is_false_on_non_404_status_responses = 0.00 s = .
+GithubFetcher::ResourceTest#test_#not_found?_is_true_on_404_status_responses = 0.00 s = .
+GithubFetcher::RepoTest#test_#safe_clone_url?_only_allows_https_github.com_URLs = 0.00 s = .
+GithubFetcher::RepoTest#test_#cleanup_is_a_safe_no-op_when_nothing_was_cloned = 0.00 s = .
+GithubFetcher::RepoTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+GithubFetcher::RepoTest#test_#as_json_returns_{}_when_error = 0.00 s = .
+GithubFetcher::RepoTest#test_#as_json_returns_json = 0.01 s = .
+GithubFetcher::RepoTest#test_default_branch_returns_nil_when_error = 0.00 s = .
+GithubFetcher::RepoTest#test_#clone_refuses_an_unsafe_clone_url_before_running_git = 0.00 s = .
+GithubFetcher::RepoTest#test_#default_branch_returns_the_default_branch = 0.01 s = .
+GithubFetcher::RepoTest#test_#git_clone_argv_runs_git_without_a_shell_and_guards_option_injection = 0.00 s = .
+GithubFetcher::RepoTest#test_#cleanup_removes_the_temporary_working_directory_it_created = 0.00 s = .
+ParseDocsTest#test_process_ignores_the_repo's_.yardopts_and_still_parses_methods = 0.01 s = .
+ParseDocsTest#test_Can_parse_yard_docs = 0.05 s = .
+ParseDocsTest#test_Does_not_error = Test is missing assertions: `test_Does_not_error` /home/user/workspace/repo/.corpus/hl-codetriage/test/jobs/parse_docs_test.rb:21
+0.05 s = .
+ParseDocsTest#test_Errors_are_caught_in_fork = 0.25 s = .
+ParseDocsTest#test_process_enables_YARD_safe_mode = 0.01 s = .
+UserUnsubscribeTest#test_unsubscribing_more_than_once = 0.07 s = .
+UserUnsubscribeTest#test_unsubscribing_successfully = 0.04 s = .
+GithubFetcher::IssueTest#test_#as_json_includes_issue_details = 0.01 s = .
+GithubFetcher::IssueTest#test_#as_json_returns_{}_when_error = 0.00 s = .
+GithubFetcher::IssueTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+MaintainingRepoSubscriptionsTest#test_listing_subscribers = 0.16 s = .
+MaintainingRepoSubscriptionsTest#test_send_an_issue!_button = 0.15 s = .
+MaintainingRepoSubscriptionsTest#test_subscribing_to_a_repo = 0.23 s = .
+IssueTest#test_valid_for_user?_when_has_open_issue_and_user_skipped_with_PR = 0.01 s = .
+IssueTest#test_issue_with_extra_long_title = 0.01 s = .
+IssueTest#test_issue_counter_cache = 0.06 s = .
+IssueTest#test_commenting_users = 0.03 s = .
+IssueTest#test_valid_for_user?_when_has_open_issue_and_user_has_not_skipped_issues_with_PR = 0.02 s = .
+IssueTest#test_permitted_state_values = 0.01 s = .
+IssueTest#test_public_url = 0.02 s = .
+IssueTest#test_valid_for_user? = 0.03 s = .
+IssueTest#test_open_issues = 0.03 s = .
+ReposControllerTest#test_do_not_send_email_for_repo_without_issues = 0.06 s = .
+ReposControllerTest#test_logged_in_user_can_create_repo = 0.04 s = .
+ReposControllerTest#test_responds_with_404_if_repo_does_not_exist = 0.02 s = .
+ReposControllerTest#test_trying_to_create_repo_without_logged_in_will_redirect_to_login_page = 0.02 s = .
+ReposTest#test_repo_subscriber_route = 0.01 s = .
+ReposTest#test_access_valid_repo = 0.03 s = .
+ReposTest#test_route_with_.js_in_it = 0.00 s = .
+ReposTest#test_update_repo = 0.02 s = .
+ReposTest#test_access_deleted_from_github_repo = 0.01 s = .
+ReposTest#test_access_archived_repo = 0.01 s = .
+ReposTest#test_repo_index = 0.00 s = .
+ReposTest#test_edit_deleted_from_github_repo = 0.03 s = .
+ReposTest#test_edit_repo_where_user_is_not_the_owner = 0.02 s = .
+ReposTest#test_regular_repo_routes = 0.00 s = .
+ReposTest#test_edit_archived_repo = 0.03 s = .
+Users::OmniauthCallbacksControllerTest#test_make_user_feel_good_when_legit_email_address = 0.01 s = .
+Users::OmniauthCallbacksControllerTest#test_redirect_to_user_page_and_inform_when_bad_e-mail_address = 0.01 s = .
+GithubFetcher::CommitShaTest#test_quacks_like_a_GithubFetcher::Resource = 0.00 s = .
+GithubFetcher::CommitShaTest#test_#as_json_returns_json = 0.01 s = .
+GithubFetcher::CommitShaTest#test_#as_json_returns_{}_when_error = 0.00 s = .
+GithubFetcher::CommitShaTest#test_#commit_sha_returns_nil_when_error = 0.00 s = .
+GithubFetcher::CommitShaTest#test_#commit_sha_returns_the_sha_branch = 0.01 s = .
+
+Finished in 8.595278s, 25.8281 runs/s, 52.7034 assertions/s.
+222 runs, 453 assertions, 0 failures, 5 errors, 0 skips
+Coverage report generated for Minitest, Minitest (subprocess: 1) to coverage/index.html
+Line coverage: 1144 / 1514 (75.56%)

@@ -1,2 +1,4 @@
-pid=243235 exception=0 blocked_host=0
-app=codetriage tree=main exit=1 wall=5.067916558
+pid=267978 (fork) exception=0 blocked_host=0
+pid=267855 exception=0 blocked_host=0
+app=codetriage tree=main exit=1 wall=13.447464311
+222 runs, 453 assertions, 0 failures, 5 errors, 0 skips

@@ -1,134 +1,860 @@
-/home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/bundler-4.0.6/lib/bundler/rubygems_integration.rb:215:in 'block (2 levels) in Kernel#replace_gem': Error loading the 'postgresql' Active Record adapter. Missing a gem it depends on? pg is not part of the bundle. Add it to your Gemfile.main. (LoadError)
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:3:in '<compiled>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'Kernel.require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'block (2 levels) in Kernel#replace_require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_adapters.rb:47:in 'ActiveRecord::ConnectionAdapters.resolve'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/database_configurations/database_config.rb:22:in 'ActiveRecord::DatabaseConfigurations::DatabaseConfig#adapter_class'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/database_configurations/database_config.rb:39:in 'ActiveRecord::DatabaseConfigurations::DatabaseConfig#validate!'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_adapters/abstract/connection_handler.rb:291:in 'ActiveRecord::ConnectionAdapters::ConnectionHandler#resolve_pool_config'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_adapters/abstract/connection_handler.rb:123:in 'ActiveRecord::ConnectionAdapters::ConnectionHandler#establish_connection'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_handling.rb:64:in 'ActiveRecord::ConnectionHandling#establish_connection'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/railtie.rb:281:in 'block (2 levels) in <class:Railtie>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'Module#class_eval'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'block in ActiveSupport::LazyLoadHooks#execute_hook'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:96:in 'ActiveSupport::LazyLoadHooks#with_execution_control'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:101:in 'ActiveSupport::LazyLoadHooks#execute_hook'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:69:in 'block in ActiveSupport::LazyLoadHooks#on_load'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:68:in 'Array#each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:68:in 'ActiveSupport::LazyLoadHooks#on_load'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/railtie.rb:278:in 'block in <class:Railtie>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:24:in 'BasicObject#instance_exec'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:24:in 'Rails::Initializable::Initializer#run'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:114:in 'block in Rails::Initializable#run_initializers'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:231:in 'block in TSort.tsort_each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:353:in 'block (2 levels) in TSort.each_strongly_connected_component'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:434:in 'TSort.each_strongly_connected_component_from'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:352:in 'block in TSort.each_strongly_connected_component'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:70:in 'Array#each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:70:in 'Rails::Initializable::Collection#each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:350:in 'Method#call'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:350:in 'TSort.each_strongly_connected_component'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:229:in 'TSort.tsort_each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:208:in 'TSort#tsort_each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:113:in 'Rails::Initializable#run_initializers'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/application.rb:474:in 'Rails::Application#initialize!'
-	from /home/user/workspace/repo/.corpus/hl-thinkroom/config/environment.rb:5:in '<compiled>'
-	from /home/user/workspace/repo/.corpus/hl-thinkroom/test/test_helper.rb:2:in 'Kernel#require_relative'
-	from /home/user/workspace/repo/.corpus/hl-thinkroom/test/test_helper.rb:2:in '<compiled>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'Kernel.require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'block (2 levels) in Kernel#replace_require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
-	from /home/user/workspace/repo/.corpus/hl-thinkroom/test/channels/application_cable/connection_test.rb:1:in '<compiled>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'Kernel.require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'block (2 levels) in Kernel#replace_require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/test_unit/runner.rb:70:in 'block in Rails::TestUnit::Runner.load_tests'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/test_unit/runner.rb:68:in 'Array#each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/test_unit/runner.rb:68:in 'Rails::TestUnit::Runner.load_tests'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/minitest/rails_plugin.rb:147:in 'block in Minitest.plugin_rails_options'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1793:in 'block in OptionParser#parse_in_order'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:925:in 'OptionParser::List#search'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1923:in 'block in OptionParser#visit'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1922:in 'Array#reverse_each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1922:in 'OptionParser#visit'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1793:in 'OptionParser#parse_in_order'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1703:in 'OptionParser#order!'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1830:in 'OptionParser#permute!'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1855:in 'OptionParser#parse!'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:254:in 'block in Minitest.process_args'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1188:in 'OptionParser#initialize'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:160:in 'Class#new'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:160:in 'Minitest.process_args'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:300:in 'Minitest.run'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:84:in 'block in Minitest.autorun'
-/home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/bundler-4.0.6/lib/bundler/rubygems_integration.rb:215:in 'block (2 levels) in Kernel#replace_gem': pg is not part of the bundle. Add it to your Gemfile.main. (Gem::LoadError)
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_adapters/postgresql_adapter.rb:3:in '<compiled>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'Kernel.require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'block (2 levels) in Kernel#replace_require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_adapters.rb:47:in 'ActiveRecord::ConnectionAdapters.resolve'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/database_configurations/database_config.rb:22:in 'ActiveRecord::DatabaseConfigurations::DatabaseConfig#adapter_class'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/database_configurations/database_config.rb:39:in 'ActiveRecord::DatabaseConfigurations::DatabaseConfig#validate!'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_adapters/abstract/connection_handler.rb:291:in 'ActiveRecord::ConnectionAdapters::ConnectionHandler#resolve_pool_config'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_adapters/abstract/connection_handler.rb:123:in 'ActiveRecord::ConnectionAdapters::ConnectionHandler#establish_connection'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/connection_handling.rb:64:in 'ActiveRecord::ConnectionHandling#establish_connection'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/railtie.rb:281:in 'block (2 levels) in <class:Railtie>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'Module#class_eval'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:106:in 'block in ActiveSupport::LazyLoadHooks#execute_hook'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:96:in 'ActiveSupport::LazyLoadHooks#with_execution_control'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:101:in 'ActiveSupport::LazyLoadHooks#execute_hook'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:69:in 'block in ActiveSupport::LazyLoadHooks#on_load'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:68:in 'Array#each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activesupport/lib/active_support/lazy_load_hooks.rb:68:in 'ActiveSupport::LazyLoadHooks#on_load'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/activerecord/lib/active_record/railtie.rb:278:in 'block in <class:Railtie>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:24:in 'BasicObject#instance_exec'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:24:in 'Rails::Initializable::Initializer#run'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:114:in 'block in Rails::Initializable#run_initializers'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:231:in 'block in TSort.tsort_each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:353:in 'block (2 levels) in TSort.each_strongly_connected_component'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:434:in 'TSort.each_strongly_connected_component_from'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:352:in 'block in TSort.each_strongly_connected_component'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:70:in 'Array#each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:70:in 'Rails::Initializable::Collection#each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:350:in 'Method#call'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:350:in 'TSort.each_strongly_connected_component'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:229:in 'TSort.tsort_each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/tsort-0.2.0/lib/tsort.rb:208:in 'TSort#tsort_each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/initializable.rb:113:in 'Rails::Initializable#run_initializers'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/application.rb:474:in 'Rails::Application#initialize!'
-	from /home/user/workspace/repo/.corpus/hl-thinkroom/config/environment.rb:5:in '<compiled>'
-	from /home/user/workspace/repo/.corpus/hl-thinkroom/test/test_helper.rb:2:in 'Kernel#require_relative'
-	from /home/user/workspace/repo/.corpus/hl-thinkroom/test/test_helper.rb:2:in '<compiled>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'Kernel.require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'block (2 levels) in Kernel#replace_require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
-	from /home/user/workspace/repo/.corpus/hl-thinkroom/test/channels/application_cable/connection_test.rb:1:in '<compiled>'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'Kernel.require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/bundled_gems.rb:82:in 'block (2 levels) in Kernel#replace_require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/bootsnap-1.25.0/lib/bootsnap/load_path_cache/core_ext/kernel_require.rb:33:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/zeitwerk-2.8.3/lib/zeitwerk/core_ext/kernel.rb:34:in 'Kernel#require'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/test_unit/runner.rb:70:in 'block in Rails::TestUnit::Runner.load_tests'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/test_unit/runner.rb:68:in 'Array#each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/rails/test_unit/runner.rb:68:in 'Rails::TestUnit::Runner.load_tests'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/bundler/gems/rails-088fc0cf61e4/railties/lib/minitest/rails_plugin.rb:147:in 'block in Minitest.plugin_rails_options'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1793:in 'block in OptionParser#parse_in_order'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:925:in 'OptionParser::List#search'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1923:in 'block in OptionParser#visit'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1922:in 'Array#reverse_each'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1922:in 'OptionParser#visit'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1793:in 'OptionParser#parse_in_order'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1703:in 'OptionParser#order!'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1830:in 'OptionParser#permute!'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1855:in 'OptionParser#parse!'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:254:in 'block in Minitest.process_args'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/3.4.0/optparse.rb:1188:in 'OptionParser#initialize'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:160:in 'Class#new'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:160:in 'Minitest.process_args'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:300:in 'Minitest.run'
-	from /home/user/.local/share/mise/installs/ruby/3.4.2/lib/ruby/gems/3.4.0/gems/minitest-6.0.6/lib/minitest.rb:84:in 'block in Minitest.autorun'
+
+Run options: -v --seed 1234
+
+# Running:
+
+CompoundWriting::LensSetTest#test_nobody_and_an_account_without_packs_have_an_empty_set = 0.13 s = .
+CompoundWriting::LensSetTest#test_returns_enabled_lenses_across_packs_in_order,_skipping_disabled_keys_and_duplicate_keys = 0.10 s = .
+CompoundWriting::LensSetTest#test_select!_validates_requested_keys_against_the_enabled_set = 0.04 s = .
+DocumentPlainTextTest#test_extracts_sketch_description_and_labels_without_exposing_scene_JSON = 0.01 s = .
+DocumentPlainTextTest#test_extracts_rendered_text_from_markdown = 0.00 s = .
+DocumentPlainTextTest#test_normalizes_blank_and_binary_content_to_UTF-8 = 0.01 s = .
+DocumentPlainTextTest#test_extracts_rendered_text_from_html = 0.00 s = .
+DocumentPlainTextTest#test_leaves_an_invalid-id_excalidraw_fence_visible,_matching_the_editor = 0.00 s = .
+DocumentPlainTextTest#test_markdown_Thinkroom_markup_contributes_content_but_not_tags = 0.00 s = .
+DocumentPlainTextTest#test_leaves_a_malformed_excalidraw_fence_body_visible_instead_of_raising = 0.00 s = .
+RubyLlmTest#test_typesafe_provider_is_registered_after_boot = 0.00 s = .
+RubyLlmTest#test_an_absent_key_leaves_the_provider_unconfigured = 0.00 s = .
+RubyLlmTest#test_enabled?_follows_the_key_or_the_fake_judge_outside_production = 0.00 s = .
+RubyLlmTest#test_model_defaults_to_jev-latest = 0.00 s = .
+RubyLlmTest#test_settings_read_the_key,_base,_and_timeout_from_the_environment = 0.00 s = .
+DocumentTest#test_editing_lock_changes_log_and_broadcast_once = 0.07 s = .
+DocumentTest#test_plain_markdown_leaves_semantic_ins/del_without_suggestion_ids_untouched = 0.00 s = .
+DocumentTest#test_plain_markdown_still_strips_provenance_spans = 0.01 s = .
+DocumentTest#test_claim_on_the_demo_slug_raises_UnclaimableError = 0.01 s = .
+DocumentTest#test_claim_logs_one_activity_with_the_claimer_name_and_broadcasts_ownership_and_activities = 0.03 s = .
+DocumentTest#test_format-neutral_source_accessors_use_existing_columns = 0.00 s = .
+DocumentTest#test_display_title_falls_back_to_the_stored_title_when_content_has_no_heading = 0.01 s = .
+DocumentTest#test_editing_lock_allows_only_the_owner_to_write = 0.05 s = .
+DocumentTest#test_seed_author_name_longer_than_255_chars_is_rejected_by_validation = 0.02 s = .
+DocumentTest#test_replace_content_resets_stale_live_state_back_to_a_seedable_source = 0.06 s = .
+DocumentTest#test_plain_markdown_strips_highlighter_spans_keeping_content = 0.02 s = .
+DocumentTest#test_replace_content!_leaves_a_suggestion_pending_when_its_target_text_survives = 0.03 s = .
+DocumentTest#test_replace_content!_on_a_document_without_state_writes_no_replacement_archive = 0.02 s = .
+DocumentTest#test_owner_name_longer_than_255_chars_is_rejected_by_validation = 0.00 s = .
+DocumentTest#test_provenance_summary_cold_read_reports_agent-seeded_docs_as_unreviewed_AI = 0.00 s = .
+DocumentTest#test_auto_reject_stale!_continues_the_loop_when_one_row's_transition_genuinely_races_and_loses = 0.02 s = .
+DocumentTest#test_content_format_accepts_html_and_cannot_change_after_creation = 0.02 s = .
+DocumentTest#test_slug_is_immutable_after_create = 0.00 s = .
+DocumentTest#test_slug_must_be_unique = 0.01 s = .
+DocumentTest#test_link_access_rejects_values_outside_the_access_lattice = 0.00 s = .
+DocumentTest#test_claim_rolls_back_ownership_when_the_activity_insert_fails = 0.01 s = .
+DocumentTest#test_claim_on_already-claimed_doc_raises_and_keeps_the_first_owner = 0.03 s = .
+DocumentTest#test_replace_content!_increments_content_generation_by_exactly_one_per_call = 0.02 s = .
+DocumentTest#test_content_format_defaults_to_markdown = 0.00 s = .
+DocumentTest#test_display_title_derives_the_first_H1_from_the_current_content = 0.01 s = .
+DocumentTest#test_only_the_owner_can_change_the_editing_lock = 0.00 s = .
+DocumentTest#test_yjs_state_archives_reject_unknown_kinds_and_die_with_the_document = 0.19 s = .
+DocumentTest#test_tags_normalize_whitespace_and_deduplicate_without_losing_display_case = 0.02 s = .
+DocumentTest#test_account_claim_stores_only_the_user_owner = 0.03 s = .
+DocumentTest#test_provenance_summary_with_no_spans_is_all_zeros = 0.00 s = .
+DocumentTest#test_to_param_returns_the_slug = 0.00 s = .
+DocumentTest#test_account_ownership_takes_precedence_over_an_anonymous_token = 0.01 s = .
+DocumentTest#test_provenance_summary_prefers_pushed_spans_over_the_seed_fallback = 0.01 s = .
+DocumentTest#test_replace_content!_archives_the_wiped_state_with_the_pre-bump_generation = 0.05 s = .
+DocumentTest#test_provenance_summary_cold_read_stays_zeros_for_human-seeded_docs = 0.01 s = .
+DocumentTest#test_a_new_document_defaults_content_generation_to_zero = 0.02 s = .
+DocumentTest#test_claim_truncates_oversized_names_instead_of_failing = 0.02 s = .
+DocumentTest#test_an_empty_snapshot_remains_authoritative_for_markdown_and_HTML = 0.01 s = .
+DocumentTest#test_plain_markdown_unwraps_suggestion_ins/del_tags_keeping_content = 0.01 s = .
+DocumentTest#test_provenance_summary_cold_read_stays_zeros_for_legacy_docs_without_authorship = 0.01 s = .
+DocumentTest#test_tags_default_to_an_empty_list = 0.00 s = .
+DocumentTest#test_claim_on_unclaimed_doc_sets_token,_name,_and_claimed_at = 0.01 s = .
+DocumentTest#test_database_rejects_unknown_content_formats = 0.00 s = .
+DocumentTest#test_blank_claim_name_falls_back_to_Anonymous = 0.03 s = .
+DocumentTest#test_owned_by?_is_false_for_nil_or_blank_tokens_even_on_unclaimed_docs = 0.02 s = .
+DocumentTest#test_replace_content!_rolls_back_the_whole_reset_when_auto-rejecting_a_suggestion_fails_to_log_its_activity = 0.03 s = .
+DocumentTest#test_replace_content!_does_not_raise_or_re-reject_a_suggestion_whose_target_text_is_gone_but_that_is_no_longer_pending = 0.03 s = .
+DocumentTest#test_tags_enforce_count_and_length_limits = 0.01 s = .
+DocumentTest#test_replace_content!_auto-rejects_a_suggestion_whose_target_text_is_gone = 0.03 s = .
+DocumentTest#test_ownership_props_shapes_the_client_payload_without_leaking_the_token = 0.02 s = .
+DocumentTest#test_non-replacement_updates_never_change_content_generation = 0.02 s = .
+DocumentTest#test_re-claim_by_the_same_token_no-ops_without_changing_claimed_at,_logging,_or_broadcasting = 0.02 s = .
+DocumentTest#test_generates_a_slug_on_create = 0.01 s = .
+DocumentTest#test_replace_content!_on_an_HTML_document_compares_replaces_against_rendered_text,_not_raw_markup = 0.03 s = .
+DocumentTest#test_content_format_rejects_unknown_values = 0.00 s = .
+DocumentTest#test_link_access_grants_edit,_comment,_and_view_capabilities_while_owners_retain_all_access = 0.05 s = .
+DocumentTest#test_same-token_requests_racing_each_other_resolve_as_no-op_success,_not_a_lost_race = 0.02 s = .
+DocumentTest#test_concurrent_claims_pick_exactly_one_winner = 0.01 s = .
+DocumentTest#test_seed_author_kind_outside_human/agent_is_rejected_by_validation = 0.01 s = .
+DocumentTest#test_provenance_summary_computes_percentages_from_spans = 0.00 s = .
+DocumentTest#test_display_title_falls_back_to_the_stored_title_when_content_is_blank = 0.00 s = .
+DocumentTest#test_replace_content!_leaves_suggestions_without_a_replaces_target_untouched = 0.05 s = .
+GoogleOauthFlowTest#test_verified_Google_callback_creates_and_signs_in_a_Google-only_user = 0.52 s = .
+GoogleOauthFlowTest#test_Google_never_auto-links_a_colliding_password_email = 0.03 s = .
+GoogleOauthFlowTest#test_Google_rejects_unverified_or_incomplete_identity_payloads = 0.01 s = .
+GoogleOauthFlowTest#test_OAuth_request_phase_is_post_only = 1.09 s = .
+GoogleOauthFlowTest#test_existing_Google_subject_signs_into_the_same_account = 0.05 s = .
+CompoundWriting::SegmenterTest#test_word_count_counts_words_not_punctuation = 0.00 s = .
+CompoundWriting::SegmenterTest#test_a_heading_or_a_sentence_without_terminal_punctuation_is_one_sentence = 0.00 s = .
+CompoundWriting::SegmenterTest#test_lowercase_continuations_such_as_e.g._do_not_split = 0.00 s = .
+CompoundWriting::SegmenterTest#test_ngrams_run_one_to_three_words_and_never_cross_a_comma_or_dash = 0.02 s = .
+CompoundWriting::SegmenterTest#test_sentences_split_on_terminal_punctuation_and_keep_offsets = 0.00 s = .
+FeedbackRunTest#test_client_session_IDs_are_unique_per_user = 0.05 s = .
+FeedbackRunTest#test_public_status_excludes_private_result_text_and_identifiers = 0.00 s = .
+IdentityFlowTest#test_setting_a_name_serves_viewer.name_on_subsequent_pages = 0.13 s = .
+IdentityFlowTest#test_no_name_set_means_guest_mode = 0.06 s = .
+IdentityFlowTest#test_GET_requests_never_set_or_change_the_name = 0.12 s = .
+IdentityFlowTest#test_non-string_name_params_clear_rather_than_stringify = 0.03 s = .
+IdentityFlowTest#test_suggestion_accept_and_reject_resolve_with_the_session_name = 0.03 s = .
+IdentityFlowTest#test_blank_name_clears_back_to_guest_—_session_key_gone,_not_Anonymous = 0.06 s = .
+IdentityFlowTest#test_names_are_stripped_and_capped_at_255 = 0.04 s = .
+IdentityFlowTest#test_forged_identity_POST_without_CSRF_token_is_rejected_when_protection_is_active = 0.58 s = .
+IdentityFlowTest#test_HTML_in_the_name_arrives_as_an_inert_JSON_string = 0.12 s = .
+IdentityFlowTest#test_name_persists_across_requests_in_the_same_session = 0.17 s = .
+IdentityFlowTest#test_guests_keep_the_client-posted_fallback_everywhere = 0.16 s = .
+IdentityFlowTest#test_comment_resolution_logs_the_session_name = 0.10 s = .
+IdentityFlowTest#test_comments_carry_the_session_name_over_the_posted_author_name = 0.05 s = .
+IdentityFlowTest#test_create_stamps_the_session_name_over_the_posted_name = 0.04 s = .
+IdentityFlowTest#test_claim_stamps_the_session_name_over_the_posted_name = 0.04 s = .
+IdentityFlowTest#test_viewer_is_delivered_on_a_partial_reload = 0.07 s = .
+DocumentPinsTest#test_guest_pins_and_unpins_any_readable_document = 0.08 s = .
+DocumentPinsTest#test_forged_pin_POST_without_CSRF_token_is_rejected = 0.47 s = .
+DocumentPinsTest#test_signed_in_pins_belong_to_the_account,_not_the_browser = 0.08 s = .
+DocumentPinsTest#test_a_missing_document_redirects_home = 0.13 s = .
+DocumentPinsTest#test_pinning_past_the_cap_is_refused_with_an_error_message = 0.65 s = .
+DocumentPinsTest#test_repeated_pin_and_unpin_requests_both_succeed = 0.11 s = .
+DocumentPinsTest#test_pinning_is_rate_limited_per_IP = 0.36 s = .
+SuggestionFlowTest#test_accept_all_with_nothing_pending_returns_an_empty_list_and_logs_no_activity = 0.03 s = .
+SuggestionFlowTest#test_a_human-authored_suggestion_flows_through_the_same_accept_machinery = 0.03 s = .
+SuggestionFlowTest#test_rejecting_a_pending_suggestion_discards_it_from_the_pending_list = 0.01 s = .
+SuggestionFlowTest#test_accept_all_on_an_unknown_doc_returns_a_JSON_404,_not_an_HTML_error_page = 0.01 s = .
+SuggestionFlowTest#test_accept_all_excludes_suggestions_already_resolved_before_the_call = 0.01 s = .
+SuggestionFlowTest#test_accept_all_with_ids_transitions_only_the_selected_pending_suggestions = 0.02 s = .
+SuggestionFlowTest#test_locked_non-owner_cannot_create_or_review_suggestions = 0.03 s = .
+SuggestionFlowTest#test_accept_broadcasts_a_suggestions_event_to_connected_editors = 0.02 s = .
+SuggestionFlowTest#test_browser_POST_ignores_a_client-posted_author_kind_—_always_human = 0.01 s = .
+SuggestionFlowTest#test_browser_POST_creates_a_pending_human_suggestion_with_activity_and_broadcast = 0.01 s = .
+SuggestionFlowTest#test_accept_all_broadcasts_one_suggestions_event_for_the_whole_batch = 0.03 s = .
+SuggestionFlowTest#test_resolving_an_already-resolved_suggestion_reports_an_error = 0.01 s = .
+SuggestionFlowTest#test_session_display_name_wins_over_a_client-posted_author_name = 0.01 s = .
+SuggestionFlowTest#test_a_different_resolver_cannot_reopen_an_accepted_suggestion = 0.01 s = .
+SuggestionFlowTest#test_accept_all_transitions_every_pending_suggestion_and_returns_winners_in_id_order = 0.02 s = .
+SuggestionFlowTest#test_oversized_intent_is_rejected = 0.01 s = .
+SuggestionFlowTest#test_document_show_exposes_pending_suggestions_as_props = 0.03 s = .
+SuggestionFlowTest#test_oversized_replaces_and_anchor_text_are_rejected = 0.03 s = .
+SuggestionFlowTest#test_accepting_a_pending_suggestion_marks_it_accepted_and_logs_activity = 0.01 s = .
+SuggestionFlowTest#test_accept_all_without_a_name_uses_one_fallback_for_resolver_and_actor_alike = 0.01 s = .
+SuggestionFlowTest#test_empty_body_is_rejected = 0.01 s = .
+SuggestionFlowTest#test_transition!_is_compare-and-set:_a_stale_in-memory_record_cannot_double-accept = 0.01 s = .
+SuggestionFlowTest#test_missing_author_name_falls_back_to_Anonymous = 0.02 s = .
+SuggestionFlowTest#test_accepting_client_can_reopen_its_suggestion_after_a_failed_merge = 0.02 s = .
+SuggestionFlowTest#test_oversized_body_is_rejected_with_a_validation_error_and_no_record = 0.01 s = .
+SuggestionFlowTest#test_accept_all_with_an_explicit_empty_id_list_accepts_nothing = 0.01 s = .
+SuggestionFlowTest#test_locked_owner_keeps_browser_contribution_access = 0.02 s = .
+SuggestionFlowTest#test_browser_POST_to_an_unknown_doc_redirects_home_without_a_500 = 0.01 s = .
+DocumentOgImageIntegrationTest#test_honors_the_image_ETag = 0.02 s = .
+DocumentOgImageIntegrationTest#test_returns_404_for_an_unknown_document = 0.31 s = .
+DocumentOgImageIntegrationTest#test_serves_a_public_inline_PNG_without_minting_an_ownership_cookie = 0.02 s = .
+CompoundWriting::ParagraphDigestTest#test_is_stable,_order-sensitive,_and_eight_hex_characters = 0.00 s = .
+CompoundWriting::ParagraphDigestTest#test_matches_the_reference_vector_the_browser_projection_uses = 0.00 s = .
+CompoundWriting::PackInstallerTest#test_install!_pins_the_head,_reads_the_manifest,_and_derives_lenses_in_skill_order = 0.01 s = .
+CompoundWriting::PackInstallerTest#test_a_pack_whose_lens_content_breaks_a_bound_fails_to_install = 0.00 s = .
+CompoundWriting::PackInstallerTest#test_re-adding_a_locator_moves_only_the_requester's_subscription_and_keeps_choices_for_surviving_lenses = 0.04 s = .
+CompoundWriting::PackInstallerTest#test_a_pack_row_cannot_be_rewritten_after_it_is_created = 0.00 s = .
+CompoundWriting::PackInstallerTest#test_a_marketplace_with_several_plugins_needs_a_plugin_name = 0.00 s = .
+CompoundWriting::PackInstallerTest#test_parse_accepts_owner/repo_with_an_optional_ref = 0.00 s = .
+CompoundWriting::PackInstallerTest#test_an_invalid_manifest_or_an_empty_plugin_is_an_installer_error = 0.00 s = .
+CompoundWriting::PackInstallerTest#test_archive_and_hosted-URL_plugin_sources_are_refused = 0.00 s = .
+CompoundWriting::PackInstallerTest#test_github_plugin_sources_must_name_the_marketplace_repository_itself = 0.00 s = .
+CompoundWriting::PackInstallerTest#test_a_version_is_immutable:_the_same_commit_returns_the_same_row_untouched,_a_new_commit_is_a_new_row = 0.01 s = .
+HomeClaimTest#test_lost_race_from_the_index_surfaces_the_winner_without_a_server_error = 0.07 s = .
+HomeClaimTest#test_demo_doc_row_is_never_claimable = 0.07 s = .
+HomeClaimTest#test_recent_rows_show_claimed_state_and_owner_name_for_a_doc_claimed_by_another_token = 0.07 s = .
+HomeClaimTest#test_claiming_from_the_index_moves_the_doc_into_yours_and_out_of_recent = 0.06 s = .
+HomeClaimTest#test_recent_rows_never_include_the_owner_token = 0.07 s = .
+HomeClaimTest#test_recent_rows_include_claimable_true_for_an_unclaimed_agent-created_doc = 0.06 s = .
+AgentGuideWebmcpTest#test_names_and_descriptions_fit_Chrome's_guardrails_on_both_manifests = 0.00 s = .
+AgentGuideWebmcpTest#test_request_tools_expose_the_endpoint's_burst_rate-limit_window_when_present = 0.00 s = .
+AgentGuideWebmcpTest#test_every_endpoint_is_a_WebMCP_tool_or_explicitly_excluded_with_a_reason = 0.00 s = .
+AgentGuideWebmcpTest#test_every_non-read-only_tool_requires_agent_identity_with_a_bounded_agent_name = 0.00 s = .
+AgentGuideWebmcpTest#test_create_document_caps_content_in_bytes_and_needs_no_link_access = 0.00 s = .
+AgentGuideWebmcpTest#test_suggestion_wording_follows_the_document's_content_format = 0.00 s = .
+AgentGuideWebmcpTest#test_index_manifest_offers_exactly_guide_and_create_document_without_a_share_url = 0.00 s = .
+AgentGuideWebmcpTest#test_guide_is_a_static,_read-only_tool_with_viewer_context_and_no_document_text = 0.00 s = .
+AgentGuideWebmcpTest#test_comment_and_resolve_comment_name_comment_access = 0.00 s = .
+AgentGuideWebmcpTest#test_names_and_descriptions_fit_Chrome's_guardrails_on_the_writable_manifest_too = 0.00 s = .
+AgentGuideWebmcpTest#test_update_document_is_an_editor_tool_that_replaces_the_document_in-page_with_agent_provenance = 0.00 s = .
+AgentGuideWebmcpTest#test_the_document_page_adds_the_in-page_update_tool_when_the_viewer_can_write = 0.00 s = .
+AgentGuideWebmcpTest#test_the_document_page_registers_exactly_the_R6_tool_set_for_a_viewer_who_cannot_write = 0.00 s = .
+AgentGuideWebmcpTest#test_read_document_is_a_read-only,_identity-free_tool_with_viewer_context = 0.00 s = .
+AgentGuideWebmcpTest#test_request_tools_mirror_their_endpoint's_method,_url,_body_keys,_and_purpose = 0.00 s = .
+AgentGuideWebmcpTest#test_propose_suggestion_requires_identity_and_body,_caps_body_in_bytes,_and_names_edit_access = 0.00 s = .
+AgentGuideWebmcpTest#test_notes_mention_WebMCP_browser_tools = 0.00 s = .
+AgentGuideWebmcpTest#test_update_document_is_offered_only_to_viewers_who_can_write_and_never_on_the_index = 0.00 s = .
+AgentGuideWebmcpTest#test_request_URLs_stay_under_same-origin_/api_and_never_target_cli_or_uploads = 0.01 s = .
+AgentGuideWebmcpTest#test_manifest_strings_never_embed_document_content,_titles,_or_comments = 0.02 s = .
+AgentGuideWebmcpTest#test_untrusted_content_hint_follows_the_threat_model = 0.00 s = .
+AgentGuideWebmcpTest#test_resolve_comment_moves_id_into_the_URL = 0.00 s = .
+ApplicationCable::ConnectionTest#test_connects_readers_without_an_ownership_identity = 0.00 s = .
+ApplicationCable::ConnectionTest#test_reads_the_signed-in_user_from_the_encrypted_session_cookie = 0.00 s = .
+ApplicationCable::ConnectionTest#test_reads_the_signed_guest_owner_token_without_identifying_the_connection_by_it = 0.00 s = .
+CompoundWriting::SelectionTest#test_candidates_under_the_threshold_are_dropped_after_selection = 0.00 s = .
+CompoundWriting::SelectionTest#test_picks_never_overlap_and_come_back_in_document_order = 0.00 s = .
+CompoundWriting::SelectionTest#test_the_shortness_bias_lets_the_hit_beat_the_phrase_that_contains_it = 0.00 s = .
+FeedbackRunSyncTest#test_a_missing_status_is_handled_as_a_retryable_refresh_failure = 0.01 s = .
+FeedbackRunSyncTest#test_a_retryable_refresh_failure_preserves_running_state_and_exposes_safe_backoff_copy = 0.01 s = .
+FeedbackRunSyncTest#test_terminal_errors_and_bundle_URLs_are_bounded_and_redacted = 0.01 s = .
+FeedbackRunSyncTest#test_the_next_successful_refresh_clears_a_transient_error = 0.01 s = .
+WritingPacksFlowTest#test_a_bad_locator_is_an_inline_error,_not_an_exception = 0.02 s = .
+WritingPacksFlowTest#test_a_featured_account_switches_lenses_off_and_on_for_its_own_subscription_only = 0.06 s = .
+WritingPacksFlowTest#test_pack_endpoints_refuse_signed-out_visitors_and_accounts_without_the_feature = 0.06 s = .
+WritingPacksFlowTest#test_removing_a_pack_drops_only_this_account's_subscription;_the_version_row_stays = 0.04 s = .
+RubyNativeTest#test_native_sign-in_is_always_remembered,_even_without_the_checkbox = 0.01 s = .
+RubyNativeTest#test_browser_requests_share_nativeApp:_false = 0.02 s = .
+RubyNativeTest#test_web_Google_OAuth_sign-in_stays_a_browser-session_cookie = 0.01 s = .
+RubyNativeTest#test_auth_pages_share_nativeForm:_true_so_native_back_navigation_skips_them = 0.01 s = .
+RubyNativeTest#test_/native/config_serves_the_shell_configuration_without_tabs = 0.01 s = .
+RubyNativeTest#test_native_signup_is_always_remembered = 0.01 s = .
+RubyNativeTest#test_layout_carries_viewport-fit=cover_and_the_ruby_native_stylesheet = 0.02 s = .
+RubyNativeTest#test_native_Google_OAuth_sign-in_is_remembered_via_the_gem's_tracking_cookie = 0.01 s = .
+RubyNativeTest#test_native_app_requests_share_nativeApp:_true_with_every_Inertia_page = 0.02 s = .
+RubyNativeTest#test_browser_sign-in_without_remember_me_stays_a_browser-session_cookie = 0.02 s = .
+WritingPassTest#test_start!_reruns_a_failed_pass_with_the_same_text_and_reviewers = 0.07 s = .
+WritingPassTest#test_start!_refuses_to_replace_a_pass_that_is_still_running_until_it_has_stalled = 0.05 s = .
+WritingPassTest#test_a_pass_keeps_judging_from_its_own_lens_snapshot_when_the_pack_changes = 0.03 s = .
+WritingPassTest#test_start!_replaces_the_document's_finished_pass_and_its_findings_after_the_cooldown = 0.09 s = .
+WritingPassTest#test_start!_returns_the_finished_pass_unchanged_when_text_and_reviewers_repeat = 0.05 s = .
+WritingPassTest#test_as_props_lists_active_findings_in_document_order_with_the_question_note = 0.02 s = .
+WritingPassTest#test_start!_refuses_no_reviewers_and_oversized_documents = 0.03 s = .
+WritingPassTest#test_start!_enforces_a_cooldown_between_passes_on_one_document = 0.06 s = .
+WritingPassTest#test_a_pass_whose_every_reviewer_failed_is_failed = 0.02 s = .
+WritingPassTest#test_start!_records_the_estimated_spend_and_refuses_a_pass_over_the_question_budget = 0.02 s = .
+WritingPassTest#test_prepare_paragraphs_drops_blanks,_defaults_kinds,_and_keeps_the_client's_indexes = 0.00 s = .
+WritingPassTest#test_record_run!_merges_entries_under_lock_and_derives_the_pass_status = 0.02 s = .
+WritingPassTest#test_start!_creates_a_queued_pass,_one_queued_run_per_lens,_a_lens_snapshot,_an_activity,_and_one_job_per_lens = 0.02 s = .
+WritingPassTest#test_dismiss!_broadcasts_a_writing_pass_event_once = 0.02 s = .
+DocumentPinTest#test_destroying_a_pinned_document_removes_its_pins = 0.01 s = .
+DocumentPinTest#test_an_owner_can_hold_at_most_the_cap_and_other_owners_are_unaffected = 0.36 s = .
+DocumentPinTest#test_unpinning_a_document_that_was_never_pinned_is_a_no-op = 0.02 s = .
+DocumentPinTest#test_a_blank_guest_token_pins_nothing_and_matches_nothing = 0.02 s = .
+DocumentPinTest#test_pinning_twice_keeps_one_pin_per_owner = 0.03 s = .
+DocumentPinTest#test_the_database_requires_exactly_one_owner_column = 0.01 s = .
+DocumentPinTest#test_for_owner_prefers_the_account_over_the_guest_token = 0.01 s = .
+ThemePersistenceTest#test_layout_renders_the_persisted_theme_from_the_cookie = 0.03 s = .
+ThemePersistenceTest#test_unknown_theme_cookie_values_fall_back_to_the_default = 0.02 s = .
+BrandingTest#test_application_metadata_identifies_Thinkroom = 0.02 s = .
+BrandingTest#test_both_production_hostnames_serve_the_application = 0.05 s = .
+BrandingTest#test_web_app_manifest_carries_the_Thinkroom_identity = 0.00 s = .
+WebmcpOriginTrialIntegrationTest#test_emits_one_origin-trial_meta_tag_per_configured_token = 0.03 s = .
+WebmcpOriginTrialIntegrationTest#test_omits_the_origin-trial_meta_tag_when_no_token_is_configured = 0.03 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_strip_malformed_sketch_point_tuples = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_strip_highlighter_spans_with_unknown_colors = 0.01 s = .
+HtmlDocumentSanitizerTest#test_external_html_cannot_forge_highlighter_spans = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_strip_malformed_or_unsafe_sketch_data = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_strip_sketches_with_oversized_descriptions = 0.00 s = .
+HtmlDocumentSanitizerTest#test_external_html_removes_executable_and_unsupported_content = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_reject_sketch_heights_outside_the_paper_limits = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_preserve_valid_Thinkroom_metadata = 0.00 s = .
+HtmlDocumentSanitizerTest#test_external_html_cannot_forge_provenance_or_suggestions = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_preserve_valid_sketch_data_but_external_html_cannot_forge_it = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_preserve_valid_highlighter_spans = 0.00 s = .
+HtmlDocumentSanitizerTest#test_only_active_storage_images_survive = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_strip_invalid_Thinkroom_metadata = 0.00 s = .
+HtmlDocumentSanitizerTest#test_only_table_alignment_style_survives = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_preserve_multibyte_author_names_by_character_count = 0.00 s = .
+HtmlDocumentSanitizerTest#test_external_html_strips_orphaned_Thinkroom_metadata = 0.00 s = .
+HtmlDocumentSanitizerTest#test_trusted_snapshots_strip_sketch_colors_that_could_reference_remote_resources = 0.00 s = .
+CursorClientTest#test_creates_a_v1_agent_with_bearer_auth_and_an_idempotency_key = 0.00 s = .
+CursorClientTest#test_refuses_to_call_Cursor_without_a_configured_API_key = 0.00 s = .
+CursorClientTest#test_treats_an_HTTP_timeout_response_as_retryable = 0.00 s = .
+DocumentOgImageServiceTest#test_keeps_the_excerpt_out_of_the_card's_right_gutter = 2.04 s = .
+DocumentOgImageServiceTest#test_escapes_user-authored_copy_in_the_SVG = 0.00 s = .
+DocumentOgImageServiceTest#test_wraps_wide_glyphs_within_the_image's_visual_line_budget = 0.00 s = .
+DocumentOgImageServiceTest#test_cache_identity_and_URL_version_change_with_the_document_version = 0.01 s = .
+DocumentOgImageServiceTest#test_renders_the_author_and_labels_when_the_document_carries_them = 0.00 s = .
+DocumentOgImageServiceTest#test_renders_the_wordmark,_source_label,_and_tagline_for_an_unattributed_document = 0.00 s = .
+DocumentOgImageServiceTest#test_renders_a_social-compatible_PNG_at_the_declared_dimensions = 2.07 s = .
+CompoundWriting::LensBuilderTest#test_colour_slots_follow_lens_order_and_wrap_at_sixteen = 0.01 s = .
+CompoundWriting::LensBuilderTest#test_a_malformed_sidecar_is_a_readable_error = 0.00 s = .
+CompoundWriting::LensBuilderTest#test_title-case_or_spaced_marketplace_and_skill_names_become_stable_slugs_in_the_key,_unique_within_the_pack = 0.00 s = .
+CompoundWriting::LensBuilderTest#test_with_a_curated_set,_only_curated_skills_become_lenses,_in_curated_order = 0.00 s = .
+CompoundWriting::LensBuilderTest#test_a_generated_suffix_never_collides_with_a_folder_whose_natural_slug_is_that_string = 0.00 s = .
+CompoundWriting::LensBuilderTest#test_a_generated_lens_reduces_a_multi-line_description_with_format_characters_to_one_bounded_line = 0.00 s = .
+CompoundWriting::LensBuilderTest#test_a_skill_without_sidecar_or_curated_set_gets_a_generated_lens_from_its_description = 0.00 s = .
+CompoundWriting::LensBuilderTest#test_a_plugin_with_no_lens-yielding_skill_is_an_error = 0.00 s = .
+CompoundWriting::LensBuilderTest#test_a_sidecar_beside_SKILL.md_wins_and_is_used_verbatim = 0.00 s = .
+CompoundWriting::LensBuilderTest#test_a_skill_folder_that_opens_with_a_separator_still_yields_a_parsable_key = 0.00 s = .
+CompoundWriting::LensBuilderTest#test_a_plugin_with_more_than_forty_lens-yielding_skills_is_refused = 0.00 s = .
+DirectUploadTest#test_generic_Active_Storage_direct_uploads_are_disabled = 0.01 s = .
+MarkdownSketchAuditTest#test_treats_malformed_JSON_in_the_fence_as_unrecognized = 0.00 s = .
+MarkdownSketchAuditTest#test_ignores_a_non-excalidraw_code_block_that_merely_holds_a_scene_key = 0.00 s = .
+MarkdownSketchAuditTest#test_treats_valid-JSON-but-non-Hash_and_unencodable_bodies_as_unrecognized_without_raising = 0.00 s = .
+MarkdownSketchAuditTest#test_warning_message_is_nil,_singular,_or_pluralized_by_count = 0.00 s = .
+MarkdownSketchAuditTest#test_flags_the_documented-but-wrong_shape_as_unrecognized = 0.00 s = .
+MarkdownSketchAuditTest#test_counts_each_fence_independently_when_valid_and_invalid_are_mixed = 0.00 s = .
+MarkdownSketchAuditTest#test_treats_a_missing_or_invalid_id_as_unrecognized,_matching_the_editor = 0.00 s = .
+MarkdownSketchAuditTest#test_recognizes_a_valid_sketch_fence = 0.00 s = .
+MarkdownSketchAuditTest#test_reports_nothing_for_content_with_no_fences_or_blank_content = 0.00 s = .
+MarkdownSketchAuditTest#test_treats_a_fence_missing_the_scene_key_as_unrecognized = 0.00 s = .
+MarkdownSketchAuditTest#test_recognition_matches_what_DocumentPlainText_renders = 0.00 s = .
+DocumentMetaChannelTest#test_subscribing_reports_the_running_release_version = 0.01 s = .
+DocumentMetaChannelTest#test_subscribing_to_a_missing_document_is_rejected = 0.00 s = .
+DeployConfigTest#test_unset_optional_variables_render_as_empty_strings,_not_nil = 0.00 s = .
+DeployConfigTest#test_TYPESAFE_API_KEY_is_a_required_secret_on_every_deploy,_with_or_without_the_old_KAMAL_COMPOUND_WRITING_switch = 0.00 s = .
+DeployConfigTest#test_bin/typesafe-key_resolves_the_exported_variable,_then_the_checkout's_.env,_else_fails = 0.02 s = .
+DeployConfigTest#test_set_optional_variables_render_verbatim = 0.00 s = .
+DeployConfigTest#test_the_pre-build_hook_fails_without_a_resolvable_key_and_passes_with_one = 0.01 s = .
+CompoundWriting::FirstPackTest#test_builds_the_compound-writing_pack_offline_at_the_pinned_SHA_with_thirteen_curated_lenses,_once = 0.01 s = .
+CompoundWriting::FirstPackTest#test_seed!_leaves_an_account_that_already_chose_another_version_on_that_version = 0.02 s = .
+CompoundWriting::FirstPackTest#test_seed!_subscribes_an_account_once_and_never_again_after_it_removes_the_pack = 0.02 s = .
+CommentFlowTest#test_creating_a_comment_anchors_it,_logs_activity,_and_broadcasts = 0.01 s = .
+CommentFlowTest#test_resolving_a_comment_timestamps_it_and_keeps_it_out_of_open_scope = 0.01 s = .
+CommentFlowTest#test_view-only_non-owner_cannot_create_or_resolve_comments = 0.03 s = .
+CommentFlowTest#test_agent_comments_keep_agent_attribution = 0.02 s = .
+CommentFlowTest#test_resolving_a_nonexistent_comment_redirects_back_with_an_error_instead_of_404ing = 0.01 s = .
+CommentFlowTest#test_resolving_an_already-resolved_comment_re-stamps_but_does_not_reopen_it = 0.04 s = .
+CommentFlowTest#test_API_resolve_requires_an_X-Agent-Name_header = 0.01 s = .
+CommentFlowTest#test_API_resolve_of_an_unknown_comment_id_returns_404_with_a_clear_error = 0.01 s = .
+CommentFlowTest#test_blank_body_is_rejected_with_an_error = 0.01 s = .
+CommentFlowTest#test_comment_creation_broadcasts_a_comments_event = 0.01 s = .
+CommentFlowTest#test_comment_link_can_create_and_resolve_comments_without_document_write_access = 0.02 s = .
+CommentFlowTest#test_an_agent_resolves_a_comment_over_the_API_(no_CSRF)_attributed_to_its_name = 0.02 s = .
+DocumentIndexTest#test_non_owner_cannot_change_tags = 0.13 s = .
+DocumentIndexTest#test_pinned_lists_the_owner's_pins_newest_first_beyond_the_fifty_newest_documents = 0.30 s = .
+DocumentIndexTest#test_tag_endpoint_rejects_non_list_input_and_redirects_missing_documents_safely = 0.04 s = .
+DocumentIndexTest#test_created_labels_and_week_grouping_follow_the_viewer's_timezone_cookie = 0.24 s = .
+DocumentIndexTest#test_shared_with_you_lists_only_documents_the_viewer_does_not_own = 0.18 s = .
+DocumentIndexTest#test_signed_in_owner_can_replace_tags = 0.02 s = .
+DocumentIndexTest#test_continue_reading_is_the_most_recently_opened_document_that_still_exists = 0.26 s = .
+DocumentIndexTest#test_background_preference_is_read_from_its_cookie_with_a_safe_default = 0.05 s = .
+DocumentIndexTest#test_guest_owner_can_replace_and_clear_tags = 0.08 s = .
+DocumentIndexTest#test_index_serializes_stable_date_groups_and_tags_for_owned_and_recent_documents = 0.07 s = .
+DocumentIndexTest#test_invalid_tag_input_leaves_persisted_tags_unchanged = 0.04 s = .
+DocumentIndexTest#test_greeting_and_date_line_follow_the_viewer's_timezone = 0.13 s = .
+RedirectStatusTest#test_accepting_a_suggestion_redirects_with_303 = 0.02 s = .
+RedirectStatusTest#test_creating_a_document_via_the_form_redirects_with_303 = 0.01 s = .
+RedirectStatusTest#test_rejecting_a_suggestion_redirects_with_303 = 0.03 s = .
+RedirectStatusTest#test_session_recents_are_scoped_per_session_and_skip_agent_fetches = 0.13 s = .
+CompoundWriting::ParagraphReviewTest#test_text_review_answers_whole-text_questions_without_an_anchor = 0.02 s = .
+CompoundWriting::ParagraphReviewTest#test_a_paragraph_yields_phrase,_sentence,_and_paragraph_findings_with_paragraph_offsets = 0.37 s = .
+CompoundWriting::ParagraphReviewTest#test_a_reviewer_without_a_hit_makes_no_findings_and_an_empty_paragraph_asks_nothing = 0.01 s = .
+CompoundWriting::ParagraphReviewTest#test_headings_receive_phrase_questions_only = 0.06 s = .
+CompoundWriting::ParagraphReviewTest#test_short_paragraphs_skip_paragraph-scope_questions = 0.05 s = .
+DocumentUiPreferencesTest#test_resolved_comment_expansion_is_validated_for_first_paint = 0.27 s = .
+DocumentUiPreferencesTest#test_document_width_preference_is_exposed_for_first_paint = 0.02 s = .
+DocumentUiPreferencesTest#test_theme_preference_agrees_with_the_initial_HTML_for_both_legacy_choices = 0.09 s = .
+DocumentUiPreferencesTest#test_document_width_preference_is_clamped_to_safe_bounds = 0.11 s = .
+DocumentUiPreferencesTest#test_activity_preferences_are_validated_and_exposed_for_first_paint = 0.07 s = .
+DocumentUiPreferencesTest#test_rich_content_width_preference_is_exposed_and_clamped_independently = 0.14 s = .
+DocumentUiPreferencesTest#test_invalid_rich_content_width_uses_the_responsive_default = 0.05 s = .
+DocumentUiPreferencesTest#test_missing_and_invalid_activity_preferences_use_safe_defaults = 0.13 s = .
+DocumentUiPreferencesTest#test_missing_and_invalid_theme_preferences_use_the_same_server_default = 0.08 s = .
+DocumentUiPreferencesTest#test_invalid_document_width_preference_uses_the_theme_default = 0.03 s = .
+SuggestionTest#test_valid_with_defaults = 0.01 s = .
+SuggestionTest#test_as_props_exposes_the_client_contract = 0.01 s = .
+SuggestionTest#test_accept!_transitions_pending_to_accepted_and_records_resolver = 0.01 s = .
+SuggestionTest#test_HTML_proposals_are_sanitized_and_report_normalization = 0.01 s = .
+SuggestionTest#test_transitions_from_a_resolved_state_raise = 0.01 s = .
+SuggestionTest#test_pending_scope_excludes_resolved_suggestions = 0.01 s = .
+SuggestionTest#test_reject!_transitions_pending_to_rejected = 0.01 s = .
+SuggestionTest#test_requires_body_and_author_name = 0.00 s = .
+SuggestionTest#test_author_kind_restricted_to_ai,_agent,_or_human = 0.00 s = .
+FeedbackRunsTest#test_a_tampered_bundle_token_is_rejected = 0.01 s = .
+FeedbackRunsTest#test_a_signed_bundle_token_with_the_wrong_purpose_is_rejected = 0.12 s = .
+FeedbackRunsTest#test_upload_rejects_an_empty_archive_and_a_wrong_extension = 0.05 s = .
+FeedbackRunsTest#test_a_purpose-scoped_bundle_token_redirects_without_exposing_a_permanent_blob_URL = 0.11 s = .
+FeedbackRunsTest#test_only_the_owner_can_read_status_and_raw_Cursor_output_stays_server-side = 0.49 s = .
+FeedbackRunsTest#test_upload_rejects_a_file_that_is_not_a_Riffrec_ZIP = 0.02 s = .
+FeedbackRunsTest#test_feedback_upload_requires_a_signed-in_allowlisted_account = 0.02 s = .
+FeedbackRunsTest#test_valid_feedback_uploads_privately_and_starts_one_idempotent_Cursor_run = 0.06 s = .
+AdminToolsTest#test_Flipper_UI_is_404_for_visitors_and_non-admin_accounts,_and_renders_for_admins = 0.36 s = .
+AdminToolsTest#test_available_to?_follows_the_flag:_per_actor,_through_the_admins_group,_or_fully_enabled = 0.01 s = .
+AdminToolsTest#test_the_compound_writing_flag_is_registered_from_the_defaults_and_disabled = 0.00 s = .
+FeedbackRunLauncherTest#test_an_incomplete_success_response_retains_the_attempt_key = 0.02 s = .
+FeedbackRunLauncherTest#test_Cursor_is_called_outside_the_feedback_row_transaction = 0.02 s = .
+FeedbackRunLauncherTest#test_a_definitive_launch_failure_creates_a_fresh_attempt_on_retry = 0.02 s = .
+FeedbackRunLauncherTest#test_a_launch_error_is_redacted_before_persistence = 0.01 s = .
+FeedbackRunLauncherTest#test_a_retryable_launch_reuses_the_same_idempotency_key = 0.01 s = .
+CliAccessTokenTest#test_invalid_and_revoked_tokens_do_not_authenticate = 0.03 s = .
+CliAccessTokenTest#test_issue_stores_only_a_digest_and_authenticate_returns_the_user_token = 0.01 s = .
+DocumentOpenGraphTest#test_document_HTML_exposes_escaped_Open_Graph_and_Twitter_metadata = 0.10 s = .
+DocumentOpenGraphTest#test_the_image_URL_version_changes_after_a_document_update = 0.14 s = .
+WebmcpPropsTest#test_index_pin_reloads_do_not_re-ship_the_manifest = 0.02 s = .
+WebmcpPropsTest#test_document_page_ships_the_writable_manifest_with_share_url_to_a_guest_on_an_edit_link = 0.05 s = .
+WebmcpPropsTest#test_the_owner_of_a_view-link_document_still_gets_the_in-page_update_tool = 0.14 s = .
+WebmcpPropsTest#test_a_non-owner_on_a_view_link_gets_the_manifest_without_the_in-page_update_tool = 0.03 s = .
+WebmcpPropsTest#test_partial_reloads_that_do_not_ask_for_webmcp_skip_it = 0.01 s = .
+WebmcpPropsTest#test_index_ships_the_index_manifest = 0.02 s = .
+FlagsTasksTest#test_admin:grant,_admin:list,_and_admin:revoke = 0.04 s = .
+FlagsTasksTest#test_flags:enable_and_flags:disable_target_one_account;_flags:list_shows_them = 0.03 s = .
+FlagsTasksTest#test_unknown_flags_and_emails_abort = Name a flag from config/flipper_flag_defaults.yml: compound_writing
+No account with email "nobody@example.com"
+0.03 s = .
+SiteOpenGraphTest#test_the_landing_page_exposes_site-level_Open_Graph_and_Twitter_metadata = 0.02 s = .
+SyncChannelTest#test_an_update_that_fails_persistence_is_not_relayed_to_peers = 0.01 s = .
+SyncChannelTest#test_first_subscriber_still_gets_the_seed_after_an_empty_sync-reply_was_merged = 0.01 s = .
+SyncChannelTest#test_a_malformed_frame_emits_a_frame_dropped_event = 0.01 s = .
+SyncChannelTest#test_a_frame_carrying_a_stale_generation_is_rejected,_not_merged = 0.02 s = .
+SyncChannelTest#test_unsubscribing_while_another_subscriber_remains_does_not_fold = 0.01 s = .
+SyncChannelTest#test_awareness_messages_relay_without_persisting = 0.01 s = .
+SyncChannelTest#test_a_frame_with_no_generation_key_still_merges_(rollout_compatibility) = 0.03 s = .
+SyncChannelTest#test_stale-claim_reclaim_still_carries_agent_authorship = 0.02 s = .
+SyncChannelTest#test_locked_readers_still_relay_awareness = 0.01 s = .
+SyncChannelTest#test_locked_non-owner_updates_are_rejected_without_persistence_or_relay = 0.02 s = .
+SyncChannelTest#test_sequenced_updates_are_persisted_and_relayed_in_client_order = 0.05 s = .
+SyncChannelTest#test_subscribing_to_an_unknown_slug_is_rejected = 0.00 s = .
+SyncChannelTest#test_HTML_seed_grant_carries_generic_source_without_the_legacy_markdown_key = 0.01 s = .
+SyncChannelTest#test_a_frame_carrying_the_current_generation_persists_normally = 0.02 s = .
+SyncChannelTest#test_the_last_unsubscribe_folds_the_update_tail_into_the_snapshot = 0.03 s = .
+SyncChannelTest#test_subscribing_transmits_the_sync_handshake = 0.02 s = .
+SyncChannelTest#test_seed-decline_from_a_pre-replacement_grant_leaves_the_new_generation's_claim_untouched = 0.02 s = .
+SyncChannelTest#test_an_HTTP_page-render_claim_blocks_the_channel_grant_while_fresh = 0.01 s = .
+SyncChannelTest#test_no-grant_sync_carries_no_seed_authorship_fields = 0.01 s = .
+SyncChannelTest#test_subscribing_transmits_the_document's_current_content_generation = 0.01 s = .
+SyncChannelTest#test_first_subscriber_to_an_unseeded_doc_gets_the_seed_flag,_second_does_not = 0.01 s = .
+SyncChannelTest#test_documents_with_existing_state_never_seed = 0.01 s = .
+SyncChannelTest#test_seed-decline_after_the_seed_was_consumed_does_not_re-open_seeding = 0.01 s = .
+SyncChannelTest#test_update_messages_are_broadcast_to_the_document_stream_and_persisted = 0.01 s = .
+SyncChannelTest#test_subscribing_to_a_document_with_a_corrupt_blob_heals_instead_of_bricking = 0.02 s = .
+SyncChannelTest#test_seed-decline_without_a_grant_leaves_another_claimant's_seed_untouched = 0.01 s = .
+SyncChannelTest#test_locked_guest_owner_updates_still_persist_and_relay = 0.00 s = E
+
+
+Error:
+SyncChannelTest#test_locked_guest_owner_updates_still_persist_and_relay:
+NoMethodError: undefined method 'owner_token=' for an instance of ApplicationCable::Connection
+    test/channels/sync_channel_test.rb:231:in 'block in <class:SyncChannelTest>'
+
+bin/rails test test/channels/sync_channel_test.rb:224
+
+SyncChannelTest#test_seed_grant_carries_agent_authorship_for_agent-seeded_docs = 0.01 s = .
+SyncChannelTest#test_an_excessive_sequence_gap_emits_a_frame_dropped_event_and_drops_the_frame = 0.01 s = .
+SyncChannelTest#test_seed-decline_releases_a_claim_granted_by_this_subscription's_handshake = 0.01 s = .
+SyncChannelTest#test_malformed_update_frames_are_dropped_without_raising_or_relaying = 0.03 s = .
+AgentApiTest#test_explicit_format_validates_content_and_rejects_unknown_formats = 0.03 s = .
+AgentApiTest#test_update_returns_409_once_an_editor_snapshot_shadows_the_seed_even_if_yjs_state_is_blank = 0.02 s = .
+AgentApiTest#test_update_with_an_unrecognized_markdown_sketch_fence_reports_a_warning = 0.04 s = .
+AgentApiTest#test_update_returns_409_once_a_human_has_claimed_the_document = 0.02 s = .
+AgentApiTest#test_regex_metacharacters_in_a_targeted_replacement_are_matched_and_inserted_literally = 0.05 s = .
+AgentApiTest#test_presence_announce_upserts_and_re-announce_refreshes_last_seen_at = 0.05 s = .
+AgentApiTest#test_docs_index_is_an_anonymous_API_entry_point_without_leaking_documents = 0.01 s = .
+AgentApiTest#test_unknown_slug_returns_a_clean_404 = 0.02 s = .
+AgentApiTest#test_authenticated_owner_updates_their_own_claimed_seed-stage_document_in_place = 0.05 s = .
+AgentApiTest#test_owner_title-only_update_past_live_state_renames_without_resetting_content = 0.05 s = .
+AgentApiTest#test_HTML_suggestion_is_sanitized_and_reports_normalization = 0.04 s = .
+AgentApiTest#test_targeted_replacement_auto-rejects_pending_suggestions_whose_target_it_removed = 0.05 s = .
+AgentApiTest#test_owner_update_past_the_seed_stage_replaces_live_content_and_broadcasts_reset = 0.03 s = .
+AgentApiTest#test_owner_update_past_a_content_snapshot_replaces_snapshot_content = 0.02 s = .
+AgentApiTest#test_plain_markdown_suggestion_stays_unnormalized = 0.01 s = .
+AgentApiTest#test_title-only_update_leaves_content_and_seed_authorship_untouched = 0.02 s = .
+AgentApiTest#test_a_well-formed_targeted_replacement_on_a_claimed_document_is_a_409_even_when_the_target_is_absent = 0.02 s = .
+AgentApiTest#test_update_conflict_does_not_require_comment_resolution_when_there_are_no_open_comments = 0.01 s = .
+AgentApiTest#test_state_read_returns_content,_provenance,_suggestions,_comments = 0.02 s = .
+AgentApiTest#test_create_response_advertises_the_update_endpoint_to_agents = 0.01 s = .
+AgentApiTest#test_docs_index_lists_only_bearer_token_account_documents = 0.02 s = .
+AgentApiTest#test_a_malformed_sketch_fence_body_returns_201_with_a_warning,_not_a_500 = 0.03 s = .
+AgentApiTest#test_agent_comment_is_agent-attributed_and_logged = 0.01 s = .
+AgentApiTest#test_suggestion_without_body_returns_an_instructive_422 = 0.01 s = .
+AgentApiTest#test_markdown_create_with_an_above-max_sketch_height_is_recognized_without_warning = 0.01 s = .
+AgentApiTest#test_cold_read_reports_agent-seeded_docs_as_unreviewed_AI_with_authorship = 0.05 s = .
+AgentApiTest#test_plain-text_share_guide_documents_updating_a_created_document = 0.02 s = .
+AgentApiTest#test_markdown_create_with_a_valid_sketch_fence_reports_clean_success = 0.03 s = .
+AgentApiTest#test_event_polling_returns_human_activity_since_last_ack = 0.06 s = .
+AgentApiTest#test_update_reports_HTML_normalization_the_same_way_create_does = 0.04 s = .
+AgentApiTest#test_route_suffix_does_not_override_the_document_format_body_field = 0.04 s = .
+AgentApiTest#test_targeted_replacement_parameter_shape_is_validated_before_anything_else = 0.02 s = .
+AgentApiTest#test_state_read_exposes_ownership_without_leaking_the_token = 0.04 s = .
+AgentApiTest#test_presence_done_removes_the_agent_from_the_active_list = 0.02 s = .
+AgentApiTest#test_targeted_replacement_with_an_ambiguous_target_changes_nothing = 0.01 s = .
+AgentApiTest#test_an_unrecognized_sketch_via_the_content_field_also_reports_the_warning = 0.01 s = .
+AgentApiTest#test_an_empty_with_deletes_the_targeted_text = 0.01 s = .
+AgentApiTest#test_state_omits_the_comment_revision_workflow_when_no_comments_are_open = 0.02 s = .
+AgentApiTest#test_update_accepts_a_format_that_matches_the_stored_format = 0.02 s = .
+AgentApiTest#test_anonymous_content_update_preserves_the_original_seed_authorship = 0.02 s = .
+AgentApiTest#test_a_non-owner_cannot_targeted-replace_a_claimed_document_even_with_a_valid_target = 0.02 s = .
+AgentApiTest#test_a_targeted_replacement_that_would_exceed_the_byte_cap_is_refused = 0.13 s = .
+AgentApiTest#test_locked_document_stays_readable_but_rejects_agent_contributions = 0.04 s = .
+AgentApiTest#test_agent_updates_a_seed-stage_document_in_place_keeping_its_slug = 0.03 s = .
+AgentApiTest#test_an_unclaimable_document_is_not_updatable_even_with_a_bearer_token = 0.02 s = .
+AgentApiTest#test_authenticated_owner_targeted-replaces_text_in_their_claimed_seed-stage_document = 0.02 s = .
+AgentApiTest#test_markdown_suggestion_with_an_unrecognized_sketch_fence_reports_a_warning = 0.01 s = .
+AgentApiTest#test_targeted_replacement_on_an_html_document_re-sanitizes_the_result_and_reports_normalization = 0.02 s = .
+AgentApiTest#test_comment_without_body_returns_an_instructive_422 = 0.02 s = .
+AgentApiTest#test_update_rejects_content_larger_than_the_byte_cap = 0.12 s = .
+AgentApiTest#test_a_malformed_targeted_replacement_on_a_claimed_document_is_a_422,_not_a_409 = 0.01 s = .
+AgentApiTest#test_seed-stage_updates_never_report_auto_rejected_suggestions = 0.02 s = .
+AgentApiTest#test_content-only_update_leaves_the_title_untouched = 0.02 s = .
+AgentApiTest#test_owner_replacement_response_reports_how_many_pending_suggestions_were_auto-rejected = 0.04 s = .
+AgentApiTest#test_agent_doc_without_markdown_gets_DEFAULT_SEED_with_no_seed_authorship = 0.01 s = .
+AgentApiTest#test_update_rejects_a_format_that_differs_from_the_immutable_stored_format = 0.02 s = .
+AgentApiTest#test_an_account-owned_unclaimable_document_still_cannot_be_updated_via_the_owner_path = 0.02 s = .
+AgentApiTest#test_clean_HTML_update_reports_no_normalization = 0.02 s = .
+AgentApiTest#test_markdown_create_with_an_unrecognized_sketch_fence_is_non-silent = 0.01 s = .
+AgentApiTest#test_update_of_an_unknown_slug_returns_a_clean_404 = 0.01 s = .
+AgentApiTest#test_markdown_create_pluralizes_the_warning_for_multiple_bad_fences = 0.01 s = .
+AgentApiTest#test_presence_announce_returns_an_explicit_200 = 0.01 s = .
+AgentApiTest#test_a_targeted_replacement_that_would_empty_the_document_is_refused = 0.01 s = .
+AgentApiTest#test_oversized_agent_name_is_capped_at_255_chars_in_seed_authorship = 0.01 s = .
+AgentApiTest#test_agent_suggestion_lands_pending,_attributed,_logged,_and_broadcast = 0.02 s = .
+AgentApiTest#test_agent_creates_sanitized_HTML_and_receives_generic_source_fields = 0.01 s = .
+AgentApiTest#test_an_overlapping_self-similar_target_reads_as_ambiguous = 0.01 s = .
+AgentApiTest#test_a_bearer_token_cannot_update_a_document_claimed_only_by_a_guest_cookie = 0.02 s = .
+AgentApiTest#test_a_bearer_token_from_a_non-owner_account_cannot_update_a_claimed_document = 0.02 s = .
+AgentApiTest#test_HTML_state_exposes_generic_fields_without_markdown_aliases = 0.03 s = .
+AgentApiTest#test_agent_creates_a_document_from_markdown_and_gets_a_shareable_slug = 0.03 s = .
+AgentApiTest#test_state_payload_advertises_the_update_endpoint_and_explains_it_in_notes = 0.03 s = .
+AgentApiTest#test_update_with_neither_title_nor_content_is_rejected = 0.01 s = .
+AgentApiTest#test_doc_created_without_X-Agent-Name_records_no_seed_authorship = 0.02 s = .
+AgentApiTest#test_event_ack_with_non-numeric_last_event_id_is_rejected_and_does_not_reset_the_high-water_mark = 0.05 s = .
+AgentApiTest#test_non-string_replaces_or_with_values_are_rejected,_never_coerced = 0.02 s = .
+AgentApiTest#test_writes_without_X-Agent-Name_are_refused_with_instructive_guidance = 0.01 s = .
+AgentApiTest#test_targeted_replacement_combined_with_a_title_updates_both = 0.02 s = .
+AgentApiTest#test_state_read_falls_back_to_seed_markdown_before_any_editor_session = 0.02 s = .
+AgentApiTest#test_plain_markdown_create_stays_unnormalized = 0.01 s = .
+AgentApiTest#test_update_re-attributes_seed_authorship_to_the_updating_agent = 0.03 s = .
+AgentApiTest#test_update_writes_are_rate_limited_per_source_IP = 0.60 s = .
+AgentApiTest#test_markdown_create_with_a_below-min_sketch_height_is_recognized_without_warning = 0.01 s = .
+AgentApiTest#test_comment_link_permits_agent_comments_but_rejects_suggestions = 0.02 s = .
+AgentApiTest#test_authenticated_owner_update_without_an_agent_name_succeeds_without_spurious_attribution = 0.02 s = .
+AgentApiTest#test_another_account's_bearer_token_cannot_targeted-replace_a_claimed_document = 0.02 s = .
+AgentApiTest#test_missing_identity_examples_match_each_write_endpoint = 0.01 s = .
+AgentApiTest#test_agent_targeted-replaces_text_in_an_unclaimed_seed-stage_document = 0.01 s = .
+AgentApiTest#test_authenticated_owner_can_rename_their_own_claimed_seed-stage_document = 0.02 s = .
+AgentApiTest#test_targeted_replacement_with_a_missing_target_changes_nothing_and_teaches_the_fix = 0.01 s = .
+AgentApiTest#test_owner_targeted_replacement_on_a_live_document_swaps_one_span_and_resets_live_state = 0.02 s = .
+AgentApiTest#test_event_ack_without_last_event_id_returns_422 = 0.00 s = .
+AgentApiTest#test_update_on_a_collaborative_document_returns_409_with_a_route_to_suggestions = 0.01 s = .
+AgentApiTest#test_markdown_suggestion_with_a_valid_sketch_fence_reports_clean_success = 0.03 s = .
+AuthenticationFlowTest#test_safe_return_path_survives_login_while_external_return_path_is_discarded = 0.09 s = .
+AuthenticationFlowTest#test_remembered_session_slides_the_expiry_window_on_later_requests = 0.04 s = .
+AuthenticationFlowTest#test_auth_pages_expose_modes_and_hide_Google_when_credentials_are_absent = 0.04 s = .
+AuthenticationFlowTest#test_safe_return_path_survives_a_failed_login_before_success = 0.05 s = .
+AuthenticationFlowTest#test_shared_viewer_props_prefer_the_authenticated_account = 0.03 s = .
+AuthenticationFlowTest#test_logout_clears_the_remembered_session_persistence = 0.03 s = .
+AuthenticationFlowTest#test_remembered_session_keeps_its_expiry_on_rescue_from-handled_requests = 0.05 s = .
+AuthenticationFlowTest#test_registration_signs_in_and_promotes_this_browser's_claimed_documents = 0.09 s = .
+AuthenticationFlowTest#test_login_moves_this_browser's_pins_to_the_account_and_logout_leaves_them_there = 0.05 s = .
+AuthenticationFlowTest#test_remembered_login_issues_a_session_cookie_that_persists_for_30_days = 0.01 s = .
+AuthenticationFlowTest#test_password_login_is_rate_limited = 3.18 s = .
+AuthenticationFlowTest#test_password_login_uses_a_generic_failure_and_promotes_claimed_documents = 0.48 s = .
+AuthenticationFlowTest#test_plain_login_keeps_a_browser-session_cookie = 0.01 s = .
+AuthenticationFlowTest#test_logout_removes_account_ownership_from_the_guest_session = 0.04 s = .
+DocumentPreviewHtmlTest#test_falls_back_to_the_default_height_when_the_sketch_omits_one = 0.00 s = .
+DocumentPreviewHtmlTest#test_keeps_an_invalid-id_sketch_fence_as_a_code_block,_matching_the_editor = 0.00 s = .
+DocumentPreviewHtmlTest#test_counts_the_paragraph_the_trailing_plugin_appends_after_a_non-paragraph_block = 0.00 s = .
+DocumentPreviewHtmlTest#test_collapses_inter-block_whitespace_so_the_preview_matches_the_editor_DOM = 0.00 s = .
+DocumentPreviewHtmlTest#test_strips_the_newline_Commonmarker_emits_after_every_<br> = 0.00 s = .
+DocumentPreviewHtmlTest#test_hides_Mermaid_source_when_the_editor_will_not_be_editable = 0.00 s = .
+DocumentPreviewHtmlTest#test_counts_blocks_the_way_the_editor_counts_doc.childCount = 0.00 s = .
+DocumentPreviewHtmlTest#test_never_shares_a_cache_entry_across_differing_inputs = 0.00 s = .
+DocumentPreviewHtmlTest#test_mermaid_source_hash_matches_the_editor's_FNV-1a_base36_hash = 0.00 s = .
+DocumentPreviewHtmlTest#test_renders_an_html_sketch_figure_at_its_reserved_height = 0.00 s = .
+DocumentPreviewHtmlTest#test_strips_event_handlers_and_scripts_on_the_html_passthrough_path = 0.00 s = .
+DocumentPreviewHtmlTest#test_returns_empty_string_for_blank_content = 0.00 s = .
+DocumentPreviewHtmlTest#test_counts_an_editable_Mermaid_figure_and_its_source_as_the_editor's_single_block = 0.00 s = .
+DocumentPreviewHtmlTest#test_strips_event_handlers_from_raw_markdown_HTML = 0.00 s = .
+DocumentPreviewHtmlTest#test_serves_a_repeat_render_with_identical_inputs_from_the_cache = 0.00 s = .
+DocumentPreviewHtmlTest#test_clamps_sketch_height_to_the_allowed_range = 0.00 s = .
+DocumentPreviewHtmlTest#test_does_NOT_skeletonize_a_non-sketch_code_block_that_merely_has_a_scene_key = 0.00 s = .
+DocumentPreviewHtmlTest#test_raw_script_blocks_render_as_inert_text,_matching_the_editor = 0.00 s = .
+DocumentPreviewHtmlTest#test_sizes_the_Mermaid_figure_from_persisted_render_hints = 0.00 s = .
+DocumentPreviewHtmlTest#test_keeps_provenance_spans_from_raw_markdown_HTML_so_tints_paint_first_frame = 0.00 s = .
+DocumentPreviewHtmlTest#test_hides_the_empty_caption_on_non-interactive_sketches_like_the_editor_does = 0.00 s = .
+DocumentPreviewHtmlTest#test_renders_a_Mermaid_fence_as_the_editor's_loading_figure_plus_visible_source_when_editable = 0.00 s = .
+DocumentPreviewHtmlTest#test_wraps_tables_in_the_editor's_table-block_structure = 0.00 s = .
+DocumentPreviewHtmlTest#test_replaces_a_real_sketch_fence_with_the_live_sketch_figure_and_drawn_scene = 0.00 s = .
+DocumentPreviewHtmlTest#test_marks_sketches_editable_only_when_the_viewer_gets_sketch_controls = 0.00 s = .
+DocumentPreviewHtmlTest#test_replicates_ProseMirror's_trailing_break_after_a_block_image = 0.00 s = .
+DocumentPreviewHtmlTest#test_does_not_replace_an_ordinary_code_fence_that_mentions_Mermaid = 0.00 s = .
+DocumentPreviewHtmlTest#test_renders_markdown_to_sanitized_prose_html = 0.00 s = .
+DocumentPreviewHtmlTest#test_preserves_whitespace_inside_code_blocks = 0.00 s = .
+WritingReviewerJobTest#test_a_pass_replaced_mid-run_stops_asking_the_judge_and_leaves_no_rows_behind = 0.04 s = .
+WritingReviewerJobTest#test_a_judge_failure_marks_only_that_reviewer_failed = 0.02 s = .
+WritingReviewerJobTest#test_the_pass_finishes_when_the_last_reviewer_finishes = 0.40 s = .
+WritingReviewerJobTest#test_a_job_for_a_replaced_pass_exits_without_raising_or_broadcasting = 0.02 s = .
+WritingReviewerJobTest#test_broadcasts_as_paragraphs_land = 0.48 s = .
+WritingReviewerJobTest#test_persists_the_reviewer's_findings_with_paragraph_anchors_and_finishes_its_run = 0.33 s = .
+WritingReviewerJobTest#test_an_unexpected_error_marks_the_reviewer_failed_instead_of_leaving_it_running = 0.02 s = .
+WritingReviewerJobTest#test_whole-text_questions_land_as_text_findings = 0.03 s = .
+CompoundWriting::JudgeTest#test_an_answer_map_missing_a_question_is_a_JudgeError = 0.01 s = .
+CompoundWriting::JudgeTest#test_a_request_releases_its_slot_even_when_the_provider_raises = 0.02 s = .
+CompoundWriting::JudgeTest#test_splits_a_long_list_into_requests_under_the_noul_cap_and_keeps_alignment = 0.04 s = .
+CompoundWriting::JudgeTest#test_a_provider_failure_becomes_a_JudgeError_naming_the_reviewer = 0.02 s = .
+CompoundWriting::JudgeTest#test_asks_q0..qN_over_the_state_and_returns_probabilities_in_order = 0.02 s = .
+CompoundWriting::JudgeTest#test_in-flight_requests_share_one_process-wide_slot_limit = 0.07 s = .
+CompoundWriting::JudgeTest#test_an_empty_list_makes_no_request = 0.00 s = .
+CompoundWriting::JudgeTest#test_the_fake_judge_flags_a_reviewer's_lexicon_and_nothing_else = 0.04 s = .
+CliAuthenticationFlowTest#test_authorization_page_reports_invalid,_expired,_and_completed_codes = 0.25 s = .
+CliAuthenticationFlowTest#test_approval_redirects_through_login_and_preserves_the_complete_local_return_path = 0.03 s = .
+CliAuthenticationFlowTest#test_existing_anonymous_agent_creation_remains_unclaimed = 0.01 s = .
+CliAuthenticationFlowTest#test_an_explicit_invalid_bearer_token_never_degrades_to_anonymous_creation = 0.01 s = .
+CliAuthenticationFlowTest#test_browser_approval_exchanges_for_an_account_token_exactly_once = 0.06 s = .
+CliAuthenticationFlowTest#test_device_authorization_exposes_a_browser_link_and_polling_status = 0.01 s = .
+CliAuthenticationFlowTest#test_bearer_identity,_account-owned_creation,_and_revocation_work_together = 0.04 s = .
+AgentUploadTest#test_upload_requires_agent_identity_with_a_copyable_example = 0.00 s = .
+AgentUploadTest#test_HTML_suggestion_claims_an_uploaded_image_for_the_target_document = 0.05 s = .
+AgentUploadTest#test_uploaded_src_survives_HTML_creation_and_becomes_document-owned = 0.04 s = .
+AgentUploadTest#test_upload_requires_a_multipart_file = 0.00 s = .
+AgentUploadTest#test_content_length_guard_rejects_oversized_requests_before_multipart_parsing = 0.00 s = .
+AgentUploadTest#test_upload_response_escapes_a_hostile_filename_in_ready_HTML = 0.03 s = F
+
+
+Failure:
+AgentUploadTest#test_upload_response_escapes_a_hostile_filename_in_ready_HTML [test/integration/agent_upload_test.rb:107]:
+Expected "<img src=\"/rails/active_storage/blobs/redirect/eyJfcmFpbHMiOnsiZGF0YSI6MSwicHVyIjoiYmxvYl9pZCJ9fQ==--08b112f9b0d81179a772e523a7e5f40c0624b4e8/plot-%20onerror=-alert(1).png\" alt=\"plot- onerror=-alert(1)\">" to include "&quot;".
+
+bin/rails test test/integration/agent_upload_test.rb:99
+
+AgentUploadTest#test_upload_rejects_malformed_image_data_after_MIME_detection = 0.01 s = .
+AgentUploadTest#test_agent_uploads_a_decoded_image_and_receives_source-ready_metadata = 0.06 s = .
+AgentUploadTest#test_upload_rejects_non-image_bytes_even_when_declared_as_an_image = 0.00 s = .
+AgentUploadTest#test_storage_failure_removes_the_temporary_asset_and_blob_row = 0.06 s = .
+AgentUploadTest#test_upload_endpoint_throttles_repeated_requests_by_IP = 0.80 s = .
+AgentUploadTest#test_upload_rejects_files_larger_than_the_policy_limit = 0.05 s = .
+AgentUploadTest#test_document_deletion_purges_its_claimed_image = 0.09 s = .
+CompoundWriting::LensTest#test_caps_the_length_of_every_text_field = 0.00 s = .
+CompoundWriting::LensTest#test_caps_questions_per_lens_and_lexicon_size = 0.00 s = .
+CompoundWriting::LensTest#test_structural_rules_still_apply = 0.00 s = .
+CompoundWriting::LensTest#test_a_well-formed_lens_round-trips_and_trims_surrounding_whitespace = 0.00 s = .
+CompoundWriting::LensTest#test_slug_normalises_marketplace_and_skill_names = 0.00 s = .
+CompoundWriting::LensTest#test_every_field_must_be_one_line_of_printable_text = 0.00 s = .
+SiteOgImageIntegrationTest#test_honors_the_image_ETag = 0.01 s = .
+SiteOgImageIntegrationTest#test_serves_a_public_inline_PNG_without_minting_a_cookie = 0.00 s = .
+YjsPersistenceTest#test_a_stale-generation_rejection_emits_a_rejected_stale_event_and_still_raises = 0.02 s = .
+YjsPersistenceTest#test_replace_content!_clears_the_stored_state_vector_until_the_next_fold = 0.03 s = .
+YjsPersistenceTest#test_compact!_reports_healed_when_the_load_restored_a_checkpoint = 0.03 s = .
+YjsPersistenceTest#test_a_duplicate_full-state_row_is_deleted_as_self-contained = 0.02 s = .
+YjsPersistenceTest#test_a_corrupt_stored_vector_falls_back_to_the_blob_for_the_snapshot_gate = 0.02 s = .
+YjsPersistenceTest#test_a_no-op_update_does_not_persist_or_flip_seed_state = 0.01 s = .
+YjsPersistenceTest#test_snapshot_persistence_rejects_a_client_behind_the_current_Yjs_state = 0.01 s = .
+YjsPersistenceTest#test_a_state_b64_failure_is_not_classified_as_a_success_event = 0.01 s = .
+YjsPersistenceTest#test_the_merge_threshold_triggers_an_inline_fold = 0.44 s = .
+YjsPersistenceTest#test_merge_emits_an_appended_event = 0.01 s = .
+YjsPersistenceTest#test_compact!_shrinks_a_blob_that_still_carries_deleted_content_and_keeps_the_old_one_as_a_checkpoint = 0.02 s = .
+YjsPersistenceTest#test_compact!_folds_the_tail_and_re-encodes_without_changing_content = 0.02 s = .
+YjsPersistenceTest#test_merge_persists_an_update_and_survives_reload = 0.01 s = .
+YjsPersistenceTest#test_the_snapshot_staleness_gate_reads_the_stored_vector_without_building_a_doc = 0.01 s = .
+YjsPersistenceTest#test_the_snapshot_gate_folds_an_unfolded_tail_before_comparing = 0.02 s = .
+YjsPersistenceTest#test_a_corrupt_legacy_row_without_a_checksum_heals_at_fold_time = 0.02 s = .
+YjsPersistenceTest#test_a_legacy_row_without_a_stored_vector_falls_back_to_rebuilding = 0.01 s = .
+YjsPersistenceTest#test_a_valid_blob_written_by_pre-checksum_code_is_re-stamped,_not_destroyed = 0.04 s = .
+YjsPersistenceTest#test_state_b64_folds_and_serves_when_the_tail_is_non-empty = 0.01 s = .
+YjsPersistenceTest#test_a_fold_that_cannot_produce_a_loadable_blob_degrades_without_persisting = 0.01 s = .
+YjsPersistenceTest#test_a_delete-only_update_folds,_persists,_and_leaves_no_retained_row = 0.02 s = .
+YjsPersistenceTest#test_archive_pruning_keeps_the_newest_entries_per_kind = 0.02 s = .
+YjsPersistenceTest#test_a_locked_rejection_emits_a_rejected_locked_event_and_still_raises = 0.00 s = .
+YjsPersistenceTest#test_a_no-op_merge_emits_a_noop_event = 0.00 s = .
+YjsPersistenceTest#test_merging_updates_from_two_independent_clients_keeps_both_edits = 0.01 s = .
+YjsPersistenceTest#test_compact!_on_a_document_with_no_state_reports_empty_and_writes_nothing = 0.01 s = .
+YjsPersistenceTest#test_compact!_stamps_a_legacy_row's_missing_vector_and_checksum_without_rewriting_the_blob = 0.03 s = .
+YjsPersistenceTest#test_a_corrupt_blob_heals_from_the_latest_same-generation_checkpoint_at_fold_time = 0.05 s = .
+YjsPersistenceTest#test_merge_appends_to_the_update_log_without_loading_the_stored_document = 0.01 s = .
+YjsPersistenceTest#test_the_snapshot_gate_heals_a_corrupt_legacy_row_instead_of_raising = 0.03 s = .
+YjsPersistenceTest#test_a_corrupt_blob_on_the_join_path_heals_instead_of_bricking = 0.09 s = .
+YjsPersistenceTest#test_folding_matches_the_result_of_merging_the_old_way = 0.05 s = .
+YjsPersistenceTest#test_snapshot_persistence_accepts_reordered_multi-client_state_vectors = 0.07 s = .
+YjsPersistenceTest#test_corrupt_base64_raises_and_leaves_the_document_untouched = 0.05 s = .
+YjsPersistenceTest#test_a_corrupt_blob_does_not_raise_out_of_the_snapshot_gate = 0.06 s = .
+YjsPersistenceTest#test_a_joiner's_delete-set_echo_on_a_document_with_deletion_history_is_not_retained = 0.09 s = .
+YjsPersistenceTest#test_a_corrupt_blob_with_no_checkpoint_heals_to_empty = 0.06 s = .
+YjsPersistenceTest#test_concurrent_merges_do_not_lose_updates = 0.06 s = .
+YjsPersistenceTest#test_healing_never_restores_a_replacement_archive_from_a_previous_generation = 0.08 s = .
+YjsPersistenceTest#test_state_b64_serves_the_handshake_from_columns_without_building_a_doc = 0.01 s = .
+YjsPersistenceTest#test_a_fold_persists_blob,_state_vector,_and_checksum,_and_clears_the_tail = 0.01 s = .
+YjsPersistenceTest#test_a_new_generation_gets_its_own_checkpoint_despite_a_recent_old-generation_one = 0.04 s = .
+YjsPersistenceTest#test_a_corrupt_legacy_row_without_a_checksum_heals_on_the_join_path = 0.02 s = .
+YjsPersistenceTest#test_compact!_is_a_no-op_the_second_time_and_never_archives_an_unchanged_blob = 0.01 s = .
+YjsPersistenceTest#test_state_b64_round-trips_through_a_fresh_client_doc = 0.01 s = .
+YjsPersistenceTest#test_merge_trusts_a_frame_with_no_generation_(rollout_compatibility) = 0.02 s = .
+YjsPersistenceTest#test_snapshot_outcomes_are_taxonomized_in_events = 0.02 s = .
+YjsPersistenceTest#test_merge_rejects_a_frame_whose_generation_is_behind_the_document's_current_one = 0.02 s = .
+YjsPersistenceTest#test_compact!_reports_a_corrupt_blob_as_healed_instead_of_stamping_the_emptied_state = 0.02 s = .
+YjsPersistenceTest#test_checkpoints_are_interval-gated = 0.04 s = .
+YjsPersistenceTest#test_merge_marks_the_document_seeded = 0.01 s = .
+YjsPersistenceTest#test_an_undecodable_state_vector_emits_invalid_state_vector,_warns,_and_returns_false = 0.01 s = .
+YjsPersistenceTest#test_snapshot_persistence_accepts_clients_at_or_ahead_of_the_server_state = 0.01 s = .
+YjsPersistenceTest#test_a_locked_snapshot_emits_rejected_locked_and_still_raises = 0.00 s = .
+YjsPersistenceTest#test_an_undecodable_update_is_rejected_before_it_becomes_durable = 0.01 s = .
+YjsPersistenceTest#test_snapshot_staleness_gate_works_from_a_legacy_row_without_a_stored_vector = 0.02 s = .
+YjsPersistenceTest#test_a_legacy_row_without_a_checksum_loads_without_verification = 0.03 s = .
+YjsPersistenceTest#test_state_b64_emits_a_state_event_with_the_stored_blob_size = 0.02 s = .
+YjsPersistenceTest#test_merge_accepts_a_frame_whose_generation_matches_the_document's_current_one = 0.02 s = .
+YjsPersistenceTest#test_a_pending_row_is_retained_across_folds_and_quarantined_after_the_TTL = 0.04 s = .
+YjsPersistenceTest#test_rows_from_an_older_generation_are_deleted_without_folding = 0.01 s = .
+HighlightNamesTest#test_show_ships_highlight_names_as_a_prop = 0.04 s = .
+HighlightNamesTest#test_renames_merge_and_blank_names_clear_their_entry = 0.03 s = .
+HighlightNamesTest#test_writer_names_a_color_and_every_rail_reloads_via_broadcast = 0.02 s = .
+HighlightNamesTest#test_names_are_squished_and_capped_at_64_characters = 0.03 s = .
+HighlightNamesTest#test_view-only_non-owner_cannot_name_colors = 0.03 s = .
+HighlightNamesTest#test_unknown_colors_and_non-hash_payloads_are_rejected = 0.01 s = .
+InertiaSsrTimeoutTest#test_a_hung_SSR_server_fails_fast_instead_of_blocking_~60s = 2.00 s = .
+InertiaSsrTimeoutTest#test_the_timeout_patch_is_wired_into_the_renderer_and_Net::HTTP = 0.00 s = .
+YjsTasksTest#test_yjs:reset_seeds_the_default_template_when_the_document_has_neither_snapshot_nor_seed = 0.06 s = .
+YjsTasksTest#test_both_tasks_fail_loudly_on_an_unknown_slug = 0.02 s = .
+YjsTasksTest#test_yjs:compact_folds_and_re-encodes,_reporting_sizes = 0.04 s = .
+YjsTasksTest#test_yjs:reset_falls_back_to_the_seed_when_no_snapshot_was_ever_accepted = 0.08 s = .
+YjsTasksTest#test_yjs:reset_replaces_the_live_state_with_the_saved_source_and_archives_the_old_state = 0.11 s = .
+CompoundWriting::PassBudgetTest#test_check!_passes_under_the_limits_and_raises_a_readable_message_over_them = 0.02 s = .
+CompoundWriting::PassBudgetTest#test_estimates_one_noul_per_gram,_sentence,_paragraph,_and_text_question,_batched_per_request = 0.02 s = .
+CompoundWriting::PassBudgetTest#test_limits_read_their_environment_overrides_live_and_fall_back_on_junk = 0.00 s = .
+CompoundWriting::PassBudgetTest#test_text-scope_questions_add_one_request_per_reviewer_with_content = 0.01 s = .
+UserTest#test_password_has_bounded_length = 0.01 s = .
+UserTest#test_adopt_pins_moves_guest_pins_to_the_account_without_duplicates = 0.03 s = .
+UserTest#test_adopt_pins_keeps_the_newest_guest_pins_that_fit_under_the_cap = 0.29 s = .
+UserTest#test_account_requires_exactly_one_authentication_method = 0.00 s = .
+UserTest#test_password_account_normalizes_name = 0.00 s = .
+UserTest#test_email_and_google_uid_are_unique = 0.01 s = .
+UserTest#test_google_account_is_valid_without_a_password = 0.00 s = .
+UserTest#test_password_account_normalizes_email_and_authenticates = 0.01 s = .
+UserTest#test_claim_documents_promotes_only_matching_anonymous_ownership = 0.01 s = .
+DocumentTitleTest#test_extracts_an_HTML_H1_while_ignoring_markup = 0.00 s = .
+DocumentTitleTest#test_extracts_the_first_rendered_Markdown_H1 = 0.00 s = .
+DocumentTitleTest#test_normalizes_binary_source_to_UTF-8 = 0.00 s = .
+DocumentTitleTest#test_returns_nil_when_the_document_has_no_nonblank_H1 = 0.00 s = .
+SiteOgImageServiceTest#test_cache_identity_and_URL_version_track_both_renderer_versions = 0.00 s = .
+SiteOgImageServiceTest#test_renders_a_social-compatible_PNG_at_the_declared_dimensions = 2.20 s = .
+SiteOgImageServiceTest#test_renders_the_wordmark,_tagline,_and_byline = 0.00 s = .
+SiteOgImageServiceTest#test_tagline_lines_fit_the_shared_title_measure = 0.00 s = .
+SnapshotTest#test_HTML_snapshot_rejects_the_legacy_markdown_field = 0.01 s = .
+SnapshotTest#test_durable_sync_update_with_the_current_generation_persists_normally = 0.01 s = .
+SnapshotTest#test_HTML_snapshot_preserves_a_valid_sketch_and_exposes_its_semantics = 0.02 s = .
+SnapshotTest#test_snapshot_rejects_conflicting_generic_and_legacy_source_fields = 0.01 s = .
+SnapshotTest#test_invalid_and_non-hash_span_entries_are_dropped = 0.02 s = .
+SnapshotTest#test_agent_snapshot_auto-rejects_pending_suggestions_whose_target_text_vanished = 0.04 s = .
+SnapshotTest#test_snapshot_without_agent_name_logs_no_activity = 0.01 s = .
+SnapshotTest#test_HTML_snapshot_claims_an_image_uploaded_by_the_browser_API = 0.06 s = .
+SnapshotTest#test_oversized_markdown_is_rejected_without_mutating_the_document = 0.03 s = .
+SnapshotTest#test_snapshot_with_agent_name_logs_an_agent_updated_document_activity = 0.01 s = .
+SnapshotTest#test_locked_requests_are_denied_before_snapshot_and_sync_payload_validation = 0.01 s = .
+SnapshotTest#test_durable_sync_update_rejects_a_stale_generation_instead_of_resurrecting_replaced_content = 0.02 s = .
+SnapshotTest#test_HTML_snapshot_is_sanitized_while_valid_review_metadata_survives = 0.01 s = .
+SnapshotTest#test_durable_sync_update_with_no_generation_key_still_merges_(rollout_compatibility) = 0.01 s = .
+SnapshotTest#test_durable_sync_update_rejects_malformed_and_oversized_payloads = 0.06 s = .
+SnapshotTest#test_HTML_snapshot_requires_a_state_vector = 0.01 s = .
+SnapshotTest#test_locked_non-owner_cannot_persist_a_snapshot_or_sync_update = 0.01 s = .
+SnapshotTest#test_durable_sync_update_persists_and_broadcasts_the_Yjs_diff = 0.03 s = .
+SnapshotTest#test_persists_markdown_and_sanitized_spans = 0.03 s = .
+DocumentSeedClaimTest#test_page_render_ships_seed_authorship_alongside_the_grant = 0.09 s = .
+DocumentSeedClaimTest#test_a_page_load_without_the_grant_ships_no_seed_template = 0.05 s = .
+DocumentSeedClaimTest#test_the_page_omits_a_Yjs_state_larger_than_the_embed_cap_and_leaves_it_to_the_handshake = 0.02 s = .
+DocumentSeedClaimTest#test_first_HTML_page_load_of_a_stateless_doc_gets_the_seed_grant = 0.04 s = .
+DocumentSeedClaimTest#test_read-only_viewers_never_burn_the_seed_claim = 0.06 s = .
+DocumentSeedClaimTest#test_second_page_load_while_the_claim_is_fresh_gets_no_grant = 0.11 s = .
+DocumentSeedClaimTest#test_HTML_page_load_ships_HTML_source_and_format_with_the_seed_grant = 0.03 s = .
+DocumentSeedClaimTest#test_a_fresh_page_load_after_replacement_reflects_the_replacement_even_when_a_stale_client_tried_to_resync = 0.03 s = .
+DocumentSeedClaimTest#test_the_page_embeds_the_Yjs_state_when_it_is_under_the_cap = 0.03 s = .
+DocumentSeedClaimTest#test_documents_with_existing_state_never_grant_the_seed = 0.04 s = .
+DocumentSeedClaimTest#test_Inertia_partial_reloads_never_touch_the_seed_claim = 0.02 s = .
+DocumentSeedClaimTest#test_exactly_one_of_two_competing_claims_wins_at_the_model_level = 0.01 s = .
+DocumentSeedClaimTest#test_documents_without_seed_markdown_never_grant_the_seed = 0.05 s = .
+DocumentSeedClaimTest#test_a_stale_claim_is_reclaimable_by_a_later_page_load = 0.14 s = .
+DocumentSeedClaimTest#test_prefetch-shaped_requests_never_claim_the_seed = 0.05 s = .
+DocumentSeedClaimTest#test_agent_and_JSON_fetches_never_burn_the_claim = 0.02 s = .
+DocumentSeedClaimTest#test_an_HTML_grant_blocks_the_channel_grant_while_fresh = 0.03 s = .
+DocumentSeedClaimTest#test_seed_version_changes_after_source_replacement_at_the_same_slug = 0.11 s = .
+DocumentModeRoutingTest#test_comment_link_permits_Comment_mode_but_redirects_Edit_and_Suggest = 0.03 s = .
+DocumentModeRoutingTest#test_canonical_document_URL_renders_Read_mode_even_with_a_stale_mode_cookie = 0.03 s = .
+DocumentModeRoutingTest#test_unavailable_mode_redirect_does_not_claim_a_pending_document_seed = 0.01 s = .
+DocumentModeRoutingTest#test_/read_canonicalizes_to_the_bare_document_URL_instead_of_404ing = 0.01 s = .
+DocumentModeRoutingTest#test_explicit_mode_URLs_render_their_matching_mode = 0.09 s = .
+DocumentModeRoutingTest#test_locked_owner_can_open_an_explicit_mode_but_another_viewer_is_redirected_to_Read = 0.06 s = .
+DocumentModeRoutingTest#test_demo_keeps_its_established_URL_locked_to_Edit = 0.03 s = .
+DocumentModeRoutingTest#test_unknown_mode_URLs_do_not_route_to_the_document_page = 0.09 s = .
+DocumentArchiveTest#test_a_missing_page_redirects_home = 0.02 s = .
+DocumentArchiveTest#test_an_archived_page_still_opens_by_link = 0.05 s = .
+DocumentArchiveTest#test_only_the_owner_can_archive = 0.04 s = .
+DocumentArchiveTest#test_owner_archives_a_page_out_of_Contents_and_Pinned_and_restores_it = 0.19 s = .
+WritingPassFlowTest#test_a_featured_writer_starts_a_pass:_303,_one_pass,_one_job_per_lens,_one_activity,_lens_snapshot = 0.04 s = .
+WritingPassFlowTest#test_attempts_refused_for_access_or_the_gate_do_not_count_against_the_caps = 0.05 s = .
+WritingPassFlowTest#test_a_featured_account_without_document_write_access_is_refused = 0.04 s = .
+WritingPassFlowTest#test_oversized_documents_create_nothing_and_redirect_with_an_error = 0.05 s = .
+WritingPassFlowTest#test_dismissing_a_finding_hides_it;_a_featured_account_without_write_access_cannot = 0.05 s = .
+WritingPassFlowTest#test_a_pass_over_the_question_budget_is_refused_before_anything_is_enqueued = 0.05 s = .
+WritingPassFlowTest#test_a_lens_the_account_disabled_or_does_not_own_is_refused = 0.16 s = .
+WritingPassFlowTest#test_a_failed_pass_can_be_rerun_with_the_same_text_and_reviewers = 0.13 s = .
+WritingPassFlowTest#test_a_signed-out_viewer_in_Comment_mode_gets_no_compound_props = 0.05 s = .
+WritingPassFlowTest#test_the_daily_window_is_a_fixed_UTC_day,_so_a_refused_attempt_cannot_extend_the_lockout = 0.06 s = .
+WritingPassFlowTest#test_the_compound_route_is_gone = 0.10 s = .
+WritingPassFlowTest#test_an_identical_rerun_of_a_finished_pass_is_a_notice,_not_a_new_pass = 0.09 s = .
+WritingPassFlowTest#test_an_enabled_account_with_no_packs_yet_is_subscribed_to_the_first_pack_on_its_first_Comment-mode_visit,_once = 0.11 s = .
+WritingPassFlowTest#test_a_signed-out_writer_cannot_start_a_pass_or_dismiss_a_finding = 0.03 s = .
+WritingPassFlowTest#test_a_signed-in_account_without_the_feature_gets_no_compound_props_either = 0.07 s = .
+WritingPassFlowTest#test_a_featured_account_in_Comment_mode_gets_the_lens_set,_its_packs,_and_the_pass = 0.06 s = .
+WritingPassFlowTest#test_the_per-document_daily_cap_answers_429_with_a_message_and_counts_only_started_passes = 0.06 s = .
+WritingPassFlowTest#test_an_unconfigured_server_refuses_to_run_and_says_so = 0.03 s = .
+WritingPassFlowTest#test_a_second_run_while_the_first_is_still_being_judged_is_refused_with_a_message = 0.08 s = .
+WritingPassFlowTest#test_the_per-address_daily_cap_answers_429_with_a_message_across_documents = 0.08 s = .
+WritingPassFlowTest#test_other_modes_skip_the_pass_prop_until_a_partial_reload_asks_for_it = 0.13 s = .
+AgentDiscoveryTest#test_link_preview_crawlers_get_metadata_HTML_without_claiming_or_adding_a_recent = 0.10 s = .
+AgentDiscoveryTest#test_JSON_state_on_the_share_URL_includes_ownership = 0.05 s = .
+AgentDiscoveryTest#test_text_guide_explains_owner-controlled_link_access = 0.01 s = .
+AgentDiscoveryTest#test_text_guide_marks_claiming_browser-only_and_explains_deletion_404_semantics = 0.02 s = .
+AgentDiscoveryTest#test_JSON_accept_on_the_share_URL_returns_machine-readable_state_+_endpoints = 0.03 s = .
+AgentDiscoveryTest#test_HTML_text_guide_uses_readable_native_HTML_in_its_suggestion_example = 0.02 s = .
+AgentDiscoveryTest#test_explicit_?format=txt_works_regardless_of_user_agent = 0.02 s = .
+AgentDiscoveryTest#test_curl-like_fetch_of_the_share_URL_surfaces_the_plain-text_guide = 0.02 s = .
+AgentDiscoveryTest#test_embedded_browser_guide_stays_compact_because_SSR_already_includes_the_document = 0.00 s = .
+AgentDiscoveryTest#test_explicit_?format=json_returns_machine-readable_state = 0.01 s = .
+AgentDiscoveryTest#test_browsers_get_the_editor_HTML_with_the_agent_guide_embedded_invisibly = 0.02 s = .
+DocumentCreateTest#test_browser_creation_ignores_unknown_format_parameters = 0.01 s = .
+DocumentCreateTest#test_browser_creation_stays_Markdown_when_an_HTML_format_is_requested = 0.01 s = .
+DocumentCreateTest#test_human-created_doc_records_human_seed_authorship_matching_owner_name = 0.01 s = .
+DocumentCreateTest#test_human-created_doc_without_a_name_falls_back_to_Anonymous = 0.01 s = .
+DocumentSocialPreviewTest#test_removes_an_unbounded_long_heading_before_truncating_the_excerpt = 0.00 s = .
+DocumentSocialPreviewTest#test_bounds_social_descriptions_to_mobile-friendly_copy = 0.00 s = .
+DocumentSocialPreviewTest#test_uses_the_display_title_and_removes_it_from_the_body_excerpt = 0.00 s = .
+DocumentSocialPreviewTest#test_bounds_long_unicode_copy_without_splitting_a_grapheme = 0.00 s = .
+DocumentSocialPreviewTest#test_bounds_a_very_long_document's_description_without_scanning_all_of_it = 0.07 s = .
+DocumentSocialPreviewTest#test_surfaces_the_owner_as_the_author_with_an_initial_and_the_tags_as_labels = 0.00 s = .
+DocumentSocialPreviewTest#test_falls_back_to_the_seed_author_and_omits_attribution_when_anonymous = 0.01 s = .
+DocumentSocialPreviewTest#test_falls_back_to_the_title_for_a_title-only_document = 0.00 s = .
+DocumentSocialPreviewTest#test_projects_HTML_and_sketch-aware_content_to_plain_text = 0.00 s = .
+DocumentSocialPreviewTest#test_does_not_remove_a_stored_title_that_is_only_a_body-word_prefix = 0.00 s = .
+CliDeviceAuthorizationTest#test_unknown_and_expired_device_secrets_do_not_issue_tokens = 0.01 s = .
+CliDeviceAuthorizationTest#test_approval_rejects_expired_grants_and_another_account_cannot_replace_approval = 0.02 s = .
+CliDeviceAuthorizationTest#test_exchange_waits_for_approval,_enforces_polling_interval,_and_issues_once = 0.02 s = .
+CliDeviceAuthorizationTest#test_start_stores_a_digest_and_creates_a_readable_expiring_code = 0.01 s = .
+CliDeviceAuthorizationTest#test_starting_a_grant_prunes_only_authorizations_expired_for_more_than_a_day = 0.01 s = .
+OwnershipFlowTest#test_delete_by_non-owner_is_refused_and_the_doc_survives = 0.03 s = .
+OwnershipFlowTest#test_yours_caps_at_50_newest_docs = 0.82 s = .
+OwnershipFlowTest#test_claiming_the_demo_doc_redirects_back_with_the_unclaimable_message = 0.03 s = .
+OwnershipFlowTest#test_forged_claim_POST_without_CSRF_token_is_rejected_when_protection_is_active = 0.25 s = .
+OwnershipFlowTest#test_signed-in_browser_leaves_an_older_unclaimed_document_claimable = 0.04 s = .
+OwnershipFlowTest#test_UI_create_assigns_ownership_to_the_creator_in_the_same_insert = 0.04 s = .
+OwnershipFlowTest#test_account_owner_can_delete_from_another_signed-in_browser = 0.08 s = .
+OwnershipFlowTest#test_index_excludes_docs_owned_by_another_token_from_yours = 0.05 s = .
+OwnershipFlowTest#test_ownership_prop_never_contains_the_owner_token = 0.07 s = .
+OwnershipFlowTest#test_index_lists_docs_claimed_by_this_session_under_yours,_newest_first = 0.07 s = .
+OwnershipFlowTest#test_delete_of_an_already-deleted_slug_redirects_home_idempotently = 0.06 s = .
+OwnershipFlowTest#test_delete_of_unclaimed_doc_is_refused_—_claim_first = 0.05 s = .
+OwnershipFlowTest#test_old_guest_token_cannot_delete_a_document_after_account_promotion = 0.12 s = .
+OwnershipFlowTest#test_API_create_leaves_the_doc_unclaimed = 0.02 s = .
+OwnershipFlowTest#test_delete_by_owner_destroys_doc_and_dependents_and_redirects_home = 0.04 s = .
+OwnershipFlowTest#test_claim_via_POST_sets_ownership_and_redirects_303 = 0.03 s = .
+OwnershipFlowTest#test_account-owned_document_is_yours_after_signing_in_from_a_fresh_browser = 0.08 s = .
+OwnershipFlowTest#test_claim_logs_an_activity_with_the_claimer's_name = 0.05 s = .
+OwnershipFlowTest#test_a_doc_both_owned_and_recently_viewed_appears_only_under_yours = 0.08 s = .
+OwnershipFlowTest#test_owner_can_set_explicit_link_access_and_non-owner_cannot = 0.05 s = .
+OwnershipFlowTest#test_signed-in_prefetch_never_auto-claims_a_fresh_document = 0.03 s = .
+OwnershipFlowTest#test_signed-in_UI_create_assigns_account_ownership_without_an_owner_token = 0.02 s = .
+OwnershipFlowTest#test_forged_editing_lock_PATCH_without_CSRF_token_is_rejected = 0.19 s = .
+OwnershipFlowTest#test_signed-in_claim_assigns_account_ownership_using_the_account_name = 0.04 s = .
+OwnershipFlowTest#test_show_includes_ownership_prop_with_yours_true_only_for_the_owner's_session = 0.11 s = .
+OwnershipFlowTest#test_delete_broadcasts_a_document_deleted_event_after_a_successful_destroy = 0.03 s = .
+OwnershipFlowTest#test_ownership_prop_marks_the_demo_doc_unclaimable = 0.02 s = .
+OwnershipFlowTest#test_claim_broadcasts_ownership_and_activities_events = 0.03 s = .
+OwnershipFlowTest#test_forged_claim_POST_with_JSON_content_type_and_no_CSRF_token_is_rejected = 0.28 s = .
+OwnershipFlowTest#test_unowned_recently_viewed_docs_still_appear_under_recent = 0.09 s = .
+OwnershipFlowTest#test_signed-in_Inertia_partial_reload_never_auto-claims_a_fresh_document = 0.07 s = .
+OwnershipFlowTest#test_link_access_rejects_unknown_values = 0.07 s = .
+OwnershipFlowTest#test_signed-in_browser_auto-claims_a_fresh_unclaimed_document = 0.07 s = .
+OwnershipFlowTest#test_signed-in_agent_and_JSON_reads_never_auto-claim_a_fresh_document = 0.03 s = .
+OwnershipFlowTest#test_show_exposes_viewer-specific_write_access_for_a_locked_document = 0.07 s = .
+OwnershipFlowTest#test_owner_can_lock_and_unlock_editing = 0.07 s = .
+OwnershipFlowTest#test_losing_claimer_gets_a_redirect,_not_an_error_status,_and_the_first_owner_survives = 0.03 s = .
+OwnershipFlowTest#test_editing_lock_rejects_missing_and_invalid_values = 0.04 s = .
+OwnershipFlowTest#test_non-owner_cannot_change_editing_lock = 0.03 s = .
+OwnershipFlowTest#test_delete_by_owner_succeeds_for_a_pinned_doc_and_removes_every_pin = 0.07 s = .
+OwnershipFlowTest#test_signed-in_link_preview_never_auto-claims_a_fresh_document = 0.03 s = .
+OwnershipFlowTest#test_guest_GET_show_never_sets_ownership = 0.03 s = .
+WebmcpOriginTrialTest#test_returns_one_token_per_registered_origin_from_a_separated_list = 0.00 s = .
+WebmcpOriginTrialTest#test_drops_a_value_carrying_markup_and_keeps_the_well-formed_ones = 0.00 s = .
+WebmcpOriginTrialTest#test_returns_a_well-formed_token = 0.00 s = .
+WebmcpOriginTrialTest#test_returns_no_tokens_when_the_variable_is_empty = 0.00 s = .
+WebmcpOriginTrialTest#test_returns_no_tokens_when_the_variable_is_missing = 0.00 s = .
+WriteRateLimitTest#test_agent_document_creation_returns_a_JSON_429_after_the_burst_limit = 0.02 s = .
+WriteRateLimitTest#test_browser_contributions_return_a_429_after_the_burst_limit = 0.62 s = .
+
+Finished in 45.825393s, 18.1777 runs/s, 112.2958 assertions/s.
+833 runs, 5146 assertions, 1 failures, 1 errors, 0 skips

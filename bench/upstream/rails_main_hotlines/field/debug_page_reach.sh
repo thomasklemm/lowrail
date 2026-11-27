@@ -4,10 +4,10 @@
 here=$(cd "$(dirname "$0")" && pwd); hl=$here/../../profile_hotlines_census
 mkdir -p "$here/reach"
 for app in "$@"; do
-  DIR=/home/user/workspace/repo/.corpus/hl-$app; tree=main; [ -f "$DIR/Gemfile.main-a.done" ] && tree=main-a
-  PREP() { :; }; source "$hl/apps/$app.sh"
   out=$here/reach/$app.txt; : > "$out"; : > "$out.log"
   (
+    DIR=/home/user/workspace/repo/.corpus/hl-$app; tree=main; [ -f "$DIR/Gemfile.main-a.done" ] && tree=main-a
+    PREP() { :; }; source "$hl/apps/$app.sh"
     export PATH="$(~/.local/bin/mise where ruby@$RUBY)/bin:$HOME/.local/bin:$PATH"
     unset RUBYLIB BUNDLE_GEMFILE
     export SEED=1234 DISABLE_SPRING=1 PARALLEL_WORKERS=1 XDG_CACHE_HOME=/home/user/rmh-out/$app/cache

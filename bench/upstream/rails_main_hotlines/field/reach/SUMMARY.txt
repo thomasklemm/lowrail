@@ -1,0 +1,19 @@
+DV1 reach: debug pages (ActionDispatch::DebugView.new) per test suite on Rails main 088fc0cf61, counted by
+debug_page_count.rb preloaded into each census app's hot-lines command (debug_page_reach.sh; adapted Gemfile where the
+round used one). hackatime and lobsters not run (they were busy with the adapted reruns).
+
+app                 tests  debug pages (exception / blocked host)
+blog                   21   0 / 0
+campfire              634  10 / 0
+codetriage            222   0 / 0
+fizzy                  50   1 / 0
+pingcrm                26   0 / 0
+react-starter-kit      35   0 / 0
+redprints-cfp          50   0 / 0
+thinkroom             833  13 / 0
+writebook             119   3 / 0
+total               1,990  27 / 0
+
+Per page with source extracts stubbed (debug_page_results.txt): 8.1.4.1 7,998 objects, main 15,712, DV1 4,518.
+At about 11k objects and roughly 10-20 ms (uncontrolled) saved per page, 27 pages are well under a second across all
+nine suites: not measurable against suite wall time. DV1 held.

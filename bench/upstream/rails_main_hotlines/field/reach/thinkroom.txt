@@ -1,2 +1,6 @@
-pid=243691 exception=0 blocked_host=0
-app=thinkroom tree=main exit=1 wall=6.172200572
+pid=258137 exception=0 blocked_host=0
+pid=258167 exception=0 blocked_host=0
+pid=258563 exception=0 blocked_host=0
+pid=257807 exception=13 blocked_host=0
+app=thinkroom tree=main exit=1 wall=50.542483915
+833 runs, 5146 assertions, 1 failures, 1 errors, 0 skips

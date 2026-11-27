@@ -1,2 +1,6 @@
-pid=243021 exception=0 blocked_host=0
-app=campfire tree=main exit=1 wall=9.955177747
+pid=266575 exception=0 blocked_host=0
+pid=266659 exception=0 blocked_host=0
+pid=266747 exception=0 blocked_host=0
+pid=264798 exception=10 blocked_host=0
+app=campfire tree=main exit=1 wall=41.303744953
+634 runs, 3846 assertions, 9 failures, 0 errors, 2 skips
