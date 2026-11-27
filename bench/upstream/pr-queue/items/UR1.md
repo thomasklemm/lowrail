@@ -12,14 +12,18 @@ built_on: "48cda77031"
 depends_on: []
 stacked_on:
 alternative_of:
-evidence: [bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27]
+evidence: [bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz]
 impact: "Every Rails request with a query string or urlencoded form body decodes each key and value through URI.decode_www_form_component (ActionDispatch::QueryParser.each_pair, Rails 8.0+ and main), and released Rack (3.2.9) decodes query and cookie components with it. Per call -9% to -66% instructions, 4-8 objects down to 1-2 (4.0.10 interpreter; YJIT -21% to -73%). Whole requests as a method overlay on Rails main 2e299253f9: interpreter -3.1% blog PATCH, -1.2% blog POST comment, -0.8% pingcrm PUT, -0.35% blog GET article and codetriage GET repo; YJIT 4.0.10 -5.7% / -1.9% / -1.0%; ZJIT master -5.2% / -0.6% (JIT-flat). Path runs on Ruby master and Rails main."
 rank: 2
-risky: false
+risky: true
 state: built
 pr:
 ownership: {date: 2026-11-27, checked: ["open ruby/uri PRs touching lib/uri/common.rb decode/encode (none change the method; #253 and #264 only change MailTo callers of it, #269 is URI.for/parse, #274 a WHATWG parser)", "ruby/uri commits on common.rb since 2025 (none on _decode_uri_component)", "rack/rack#2557 (ours) moves Rack off this method; Rails' QueryParser still calls it"], hits: []}
 note: >-
+  2026-11-27 Astra requested changes on a3b201f05b: new input hooks can mutate input after validation; additional
+  singleton, duck, subclass and CGI/URI override differences reproduced. This supersedes the builder's boundary
+  acceptance below. Full repros, citation audit and limits: bench/upstream/outside_leads/ur1/astra-2026-11-27.md;
+  raw probes and outputs retained in the adjacent archive. No upstream action.
   2026-11-27 built on ruby/uri master 48cda77031 (fork branch pushed, no PR). ruby/uri is a ruby-org repository and
   parked in DECISIONS (Bets): Thomas decides whether this opens. ruby/uri's merges since 2026-03-16 are maintainers' own
   (hsbt, mame, olleolleolle) and Dependabot; the last outside merge was y-yagi's #209 on 2026-03-16; about 30 outside PRs
@@ -40,7 +44,28 @@ note: >-
   Timing (benchmark-ips, wall cohort) delegated to an a1.xxlarge orb (T-01a21e8f-2651-73ed-9ab5-9406bb545fe2); the
   body's ips table comes from it. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
-passes: []
+passes:
+  - reviewer: astra
+    head: "a3b201f05b2efd737af193bc45ebd0534b3b6a5c"
+    orb: T-01a21e96-8207-76d7-8f64-404eb741d298
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      Demonstrated on Ruby 4.0.9 with native CGI and the shipped pure-Ruby fallback: an input singleton encoding
+      that replaces the input with %zz runs after validation only on head (base returns aA b unchanged; head returns
+      %zz and mutates input). Singleton/private b errors are skipped; singleton/private encoding and instance_of?
+      errors are newly raised. Extended/prepended b and a frozen result from b are ignored. A String subclass
+      spoofing instance_of?(String) bypasses its b; BasicObject with to_str and b succeeds on base but raises on head.
+      CGI unescape prepend changes only head's result; a frozen singleton CGI result raises FrozenError only on head;
+      a private URI _decode_uri_component prepend is bypassed. Fallback also newly invokes singleton/private tr.
+      These are Ruby-hook boundaries, not a demonstrated request-bytes-only exploit; resolve them before approval
+      under the escaping exception to normal boundary allowances. Independent 47,653 value cases per backend have
+      no differences; native/fallback suites, threads, Ractors, encoding ducks, fibers and load orders pass.
+      Rails 8.1.4.1 and Rack 3.2.9 are current, their cited SHAs/lines verified, and main still calls this method.
+      Put Rack before Rails by reach (1.401B versus 823M total gem downloads; 5,136 versus 59,158 stars);
+      Rack query_parser.rb:268 is the direct query caller in addition to the cited utils.rb:59.
+      Body counts checked against retained raw logs/A/A, not remeasured. Details and limitations in
+      bench/upstream/outside_leads/ur1/astra-2026-11-27.md. No new benchmark or Ruby master/ZJIT/JRuby/TruffleRuby run.
 ---
 
 # Decode www-form components with cgi/escape
