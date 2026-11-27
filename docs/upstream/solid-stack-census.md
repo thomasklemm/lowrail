@@ -302,6 +302,43 @@ not become a caveat list. Keep configuration/boundary detail here; a short defau
 repeat does not replace that evidence. Initial missing-msgpack suite and the unsuitable large-input 3,000-call
 GC-off allocation attempt are retained and excluded, with reasons in the archive's `reproduce.md`.
 
+### SCB1 confirm review: thermos-sol, 2026-11-27
+
+**Verdict: changes; no new code defect.** New head `155a2fbe9878ca820a593abf1cb22df646010d2e` has the same tree
+`e737b3f89231ba7ebbc2d9fc1de4d00f10c1965d` and parent `40dd29ffdc4ff76f27f0bbef1de1606fdd21cfee` as the
+previously reviewed `ef534cc`. Confirmed directly with `git show` and empty `git diff --exit-code OLD NEW`.
+The earlier pass stays attributed to its actual old head; the new confirm pass is appended, not substituted.
+
+**Confirmed fixes.** The body/commit now qualify the default cache and explain the pool Solid Cable uses, including
+the shared-primary case and restoration. Impact names the lazily started listener. The unqualified scaling sentence
+is gone, the record labels the 51% attribution inclusive, and the body leads with the retained SC1-xxl benchmark-ips
+row. Its +16% rounding agrees with the independently recalculated +15.8603%. Re-ran `audit_numbers.py` against all
+three committed body cohorts; the original results and timing gates still agree. No new timing was measured here.
+The two body paragraphs and small table remain plain and within the requested scope.
+
+**Remaining, smallest fixes:**
+
+* In body and commit, "with subscribed channels ... its binds, one per channel" still excludes the demonstrated
+  SQLite boundary. A fresh new-head shape probe again gives 999 binds for 998 channels, **zero binds for 999**.
+  Cut the generalization: say "builds and hashes a cache key before storing the result". In impact, likewise cut
+  "with one bind per subscribed channel" and replace "999 channels and more ... −0.3%" with the measured points:
+  999 channels −0.274%, 65,536 channels −0.372%, rather than a claim about every larger size.
+* The record's Exactness bullet above still says "the primary pool keeps its cache" without qualification. Add
+  "when primary and cable use separate pools; a shared primary pool is disabled during the poll and restored
+  afterwards". This is a remaining part of the original wording finding, not a new code issue.
+* Need to inspect the committed master × ZJIT `--wall` A/A cohort **before unconditional approval**. The requested
+  `body/SC1-zjit-wall` was still pending when this confirm ran. DECISIONS requires that evidence and blocks an
+  unexplained claimed loss; an approval now would silently waive an unresolved required gate. A noisy/non-flat
+  result is recorded honestly, not required to become a win. Its placement in this record, not the body, is fine.
+
+**Validation carried and repeated.** Same tree and parent carry the original full correctness/maintainability
+review, all eight exactness items, Rails 7.2–main and PR 91/96 combination suites unchanged; those suites were not
+claimed rerun. Additionally reran both sides of the original ten-step differential and eight-case state probe on
+SQLite and PostgreSQL at the new head: all four base/head comparisons are byte-identical. L0 and the shared-helper
+check stand. Fresh logs, the messages/tree/parent comparison and commands are kept in
+[`scb1-confirm-155a2fbe-20261127.tar.gz`](../../bench/upstream/solid_stack/raw/scb1-confirm-155a2fbe-20261127.tar.gz).
+Review orb: `T-01a21eb4-4fce-7727-bded-abfba4ffb64e`. No fork push or upstream post.
+
 ## Held and dropped
 
 | ID | Lead | Numbers | Why not now |

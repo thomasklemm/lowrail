@@ -13,7 +13,7 @@ depends_on: []
 stacked_on:
 alternative_of:
 impact: "By default (query cache on, the Rails 8 cable template's 0.1 s polling), each started Solid Cable listener (24.7 M downloads; started lazily on the first subscription) polls with one bind per subscribed channel. With 20 channels an idle poll runs -14.5% instructions without a JIT, -23.2% under YJIT, -23.7% under ZJIT on master (A/A <= 0.06%, JIT-flat), 3 fewer objects; benchmark-ips under YJIT on a1.xxlarge +15.9% (body/SC1-xxl; wall cohort -14.8%, A/A interval contains 0). The saving depends on the bind count: on SQLite 998 channels -31.9%, 999 channels and more (no binds past the limit) -0.3%. Worst measured cost: zero channels +5.1% instructions, query_cache: false +2.9% (thermos-sol record), no wall-time loss shown. Path runs on Ruby master and Rails main."
-evidence: [bench/upstream/solid_stack/body/SC1, bench/upstream/solid_stack/body/SC1-xxl, bench/upstream/solid_stack/body/SC1-zjit, bench/upstream/solid_stack/raw/probes-p1-p2.tar.gz, bench/upstream/solid_stack/sc1_differential.rb, bench/upstream/solid_stack/raw/scb1-thermos-sol-20261127.tar.gz]
+evidence: [bench/upstream/solid_stack/body/SC1, bench/upstream/solid_stack/body/SC1-xxl, bench/upstream/solid_stack/body/SC1-zjit, bench/upstream/solid_stack/raw/probes-p1-p2.tar.gz, bench/upstream/solid_stack/sc1_differential.rb, bench/upstream/solid_stack/raw/scb1-thermos-sol-20261127.tar.gz, bench/upstream/solid_stack/raw/scb1-confirm-155a2fbe-20261127.tar.gz]
 rank: 1
 risky: true
 state: built
@@ -22,7 +22,7 @@ note: "2026-11-27 (T-01a21e77, after thermos-sol changes on ef534cc): head 155a2
 ownership: {date: 2026-11-27, checked: ["open PRs naming listen that change lib/action_cable/subscription_adapter/solid_cable.rb"], hits: []}
 passes:
   - reviewer: thermos-sol
-    head: "155a2fbe9878ca820a593abf1cb22df646010d2e"
+    head: "ef534cc9414375d5c97339a4c05bb8f3c50fe81a"
     date: 2026-11-27
     orb: T-01a21eb4-4fce-7727-bded-abfba4ffb64e
     verdict: changes
@@ -32,6 +32,19 @@ passes:
       supply required master ZJIT --wall A/A evidence; lead body with existing SC1-xxl benchmark-ips row.
       Full sentence-by-sentence audit, exactness checklist, suites, PR 91/96 combinations, measured worst input
       and exclusions in docs/upstream/solid-stack-census.md (SCB1 detailed review, 2026-11-27).
+  - reviewer: thermos-sol
+    head: "155a2fbe9878ca820a593abf1cb22df646010d2e"
+    date: 2026-11-27
+    orb: T-01a21eb4-4fce-7727-bded-abfba4ffb64e
+    verdict: changes
+    open: >-
+      Confirm: tree and parent identical; fresh SQLite/PG differential and state probes match. Default-cache,
+      lazy-listener and shared-pool body wording, inclusive attribution and benchmark-ips lead confirmed.
+      Remaining: cut one-bind-per-channel generalization from body/commit/impact (999 channels has zero binds);
+      report measured 999/65536 costs separately rather than all larger counts as -0.3%; qualify the record's
+      primary-pool-keeps-cache sentence as separate pools only. Must inspect committed master ZJIT --wall A/A
+      cohort before unconditional approval; no waiver for the pending run. No new code defect or complexity.
+      See SCB1 confirm review in docs/upstream/solid-stack-census.md and scb1-confirm-155a2fbe-20261127.tar.gz.
 ---
 
 # Poll for messages without the query cache
