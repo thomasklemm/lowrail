@@ -458,6 +458,10 @@ Sonnet trial (Thomas, 2026-11-27; a Claude account lasts about a day and a half)
 and measurement runs with a fixed recipe, CI follow-ups, rebases without conflicts in logic. Opus keeps builds,
 exactness work, upstream text, design questions and reviews. A Sonnet thread whose task turns into one of these
 hands it to Opus. Record in the thread's report whether Sonnet's result needed corrections; decide after a week.
+Sol as lead model (Thomas, 2026-11-27): some build and measurement orbs run on GPT-6.2 Sol (`openai/gpt-6.2-sol`) or
+GPT-6.1 Sol, so the load spreads over Claude and OpenAI. Good fits: clearly specified builds, measurement rounds and
+sweeps. When the builder is Sol, thermos-sol still reviews, and an `opus` pass is added next to Astra so one review
+comes from another model family.
 
 ### Exactness checklist
 
