@@ -3,7 +3,7 @@
 jeremyevans on lib/rack/query_parser.rb:282 (PR approved at e26338b40a): avoid the duplicated `unescape`; since
 `utils` requires `query_parser`, move it into a module that both `Rack::Utils` and `Rack::QueryParser` include.
 
-Built as a third commit on e26338b40a: fork branch `unescape-cgi-5`, head `0046982320094e11d80d2ec19bf0ab69f05ba41b`
+Built as a third commit on e26338b40a: fork branch `unescape-cgi-5`, head `0046982320094e11d80d2ec19bf0ab69f05ba41b`; after the review rounds the PR head is `3ca13466d5` (see the RK3 item note: docs kept as RDoc and YARD entries, the comment removed)
 (Thomas as author and committer, no trailers). The PR branch `thomasklemm/unescape-cgi` stays at e26338b40a.
 
 ## The change
