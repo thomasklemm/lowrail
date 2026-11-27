@@ -28,8 +28,8 @@ rails/rails and 17 in ruby/ruby, and more in Prism, graphql-ruby, sqlite3-ruby, 
 other gems. The
 [contributions ledger](docs/upstream/contributions.md) lists every merged, open and closed PR with its measured result
 and caveats, and the candidates investigated and not submitted, with the reasons. Our merged Rails PRs measured
-together save 5.48% of allocations across 104 workloads in eleven apps
-([combined effect](docs/upstream/combined-effect.md), round 3).
+together save 6.60% of allocations across 105 workloads in eleven apps on Ruby 4.0.10
+([combined effect](docs/upstream/combined-effect.md), round 4).
 
 ## Reproduce
 

@@ -1,0 +1,86 @@
+# pr	merge	revert
+59617	621ad9a25b	clean
+59668	33efc59003	clean
+59810	9ed75f692f	clean
+59851	de4a71a2ca	clean
+59976	e1e3937797	clean
+59832	53f224023d	clean
+59986	8dc1ec6683	clean
+59824	0e531ca769	clean
+59661	ab840dcb3b	clean
+59569	828f4bef46	clean
+59987	28a86e1d2e	clean
+59804	271b595e9e	clean
+59817	99fa0fb673	clean
+59812	31f27a6b37	clean
+59985	58893983f3	clean
+59984	a946944748	clean
+59800	6f81bf3f08	clean
+59735	2c211fbf50	clean
+59611	4ab078fad6	clean
+59627	86c23bed6c	clean
+59983	ecbd6042af	clean
+59574	4c3694f3a5	resolved: CHANGELOG keeps main
+59809	e9c26763e2	clean
+59642	0e655babbc	resolved: query_methods.rb takes the pre-PR "(#{opts})" line over 518784d2e3's opts.to_s; CHANGELOG and where_test.rb keep main
+59629	e39506b600	clean
+59676	9ba8b1edee	clean
+59570	bdb3d96012	clean
+59640	f9c9402721	not reverted (correctness fix): byroot's #59714 rewrote local_cache_key
+59634	06eae38e6e	not reverted (correctness fix): conflicts in four Active Record files kamipo changed later
+59584	3b2702adea	not reverted: already reverted on main by #59713
+59626	d7875e3fb1	clean
+59625	c9fc37095f	clean
+59624	d09361d7cf	clean
+59620	fa03095c6f	clean
+59619	32c132d134	clean
+59614	e64f5a4258	clean
+59618	088a9ad445	clean
+59616	8b06b0eb98	clean
+59615	6c23cb8f2a	clean
+59613	8fbab49e46	clean
+59608	98f3793369	clean
+59607	4e76f138b8	clean
+59606	d2ab41e65a	clean
+59605	9cf3693a0a	clean
+59603	1ca7528bac	resolved: the String branch goes; Alexander Senko's 43f969a353 Set in when Array, Hash, Set stays
+59598	f2dfd1ace1	clean
+59597	03ccff57a7	clean
+59596	6b95940a24	clean
+59585	2cbfd2decb	clean
+59583	4881cd9b2c	clean
+59562	d47dc59e65	clean
+59576	1597d576bd	clean once #59642 is reverted
+59571	2915abbf91	clean
+59568	ee0d58f5c3	not reverted: _load_from_sql was rewritten by #59141; the PR's line is not on main
+59563	107b889051	clean
+59561	e13604faa0	clean
+59560	98353c4ba2	clean
+59558	25e5dd34e7	clean
+59556	e2e002be27	resolved: Merger#initialize reads other.values again; the #59572 self-merge check compares other.values_for_merge, so values_for_merge stays; merging_test.rb keeps main (as round 3)
+59552	e64b660612	clean
+59555	3bdc579090	not reverted (correctness fix): conflicts with f9fe866f49 in enumerable.rb
+59551	bd77235be5	resolved: extending! unconditional again; the later with_values line stays (as round 3)
+59554	c9a34da167	resolved: NORMAL_VALUES.each with :"#{name}!" again; later unscope qualification and self-merge check stay (as round 3)
+59553	f21e7f42b5	clean
+59544	5810776eec	clean
+59543	f861e1e0ce	resolved: except/only read values (the copy) again; the later with_recursive lines stay (as round 3)
+59542	ee16712354	clean
+59541	1c4feea25b	clean
+59534	090f5408f4	clean
+59539	d9ed22eef0	clean
+59538	f4a40dc8a1	clean
+59537	45de402637	clean
+59536	4740314734	clean
+59535	c0cacea4cd	clean
+59533	b5be03636e	clean once #59642 is reverted
+59329	843fa132cb	clean
+59316	10eee71222	clean in lib; url_for_test.rb keeps main
+59278	fb7501ad2d	clean
+59274	e4fd6cb967	clean
+59270	ab5a78a7c2	clean
+59252	0213cf5f41	clean
+59244	9998e98857	clean
+59236	596da00373	not reverted: resolve_defaults was rewritten in 84048ad477; the PR's code is not on main
+59235	206f2c927a	clean
+7260	85bc29e80c	not reverted: 2012 docs change
