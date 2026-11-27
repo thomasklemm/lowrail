@@ -3,14 +3,17 @@ name: CI
 on:
   push:
     branches: [main]
+    # Records (queue items, ledger, docs) don't change what the tests run.
+    paths-ignore: ["**/*.md"]
   pull_request:
+    paths-ignore: ["**/*.md"]
 
 permissions:
   contents: read
 
 concurrency:
-  # Every push to main gets its own run (a shared group would drop queued runs); a pull request keeps only its newest.
-  group: ci-${{ github.event_name == 'pull_request' && github.ref || github.sha }}
+  # One run per branch plus its newest pending push; main finishes the running one, a pull request cancels it.
+  group: ci-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
@@ -18,10 +21,9 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     strategy:
-      fail-fast: false
       matrix:
-        # Lowrail::RailsPins releases; each job's gem home holds only that Rails.
-        rails: ["8.1.4", "8.1.4.1"]
+        # The newest Lowrail::RailsPins release; the paused lowering prototype doesn't need every patch release.
+        rails: ["8.1.4.1"]
     name: test (Rails ${{ matrix.rails }})
     env:
       GEM_HOME: /home/runner/gems
@@ -45,7 +47,6 @@ jobs:
           echo "$GEM_HOME/bin" >> "$GITHUB_PATH"
           ruby script/gate-gems
       - name: Rust tests
-        if: matrix.rails == '8.1.4'
         run: cargo test --locked
       - name: Gem tests
         working-directory: gem
