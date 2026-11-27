@@ -102,6 +102,9 @@ lead. Each bet's doc is the source of truth for its state.
 * **Decide, then document** (Thomas, 2026-11-03): within these rules, take the recommendation you think is right and
   record it here with its reason instead of asking. What needs Thomas is at the top.
 * **Orb reports are claims.** Check a decision-bearing fact before relaying it.
+* **Judge today's situation on its merits** (Thomas, 2026-11-27): old maintainer decisions and issues are context,
+  not authority. Where a current case would be better served by a different choice, propose it; argue upstream
+  from current behaviour and evidence rather than from years-old threads.
 * **Child orbs don't notify Thomas** (2026-11-04): they report only to the coordinating thread with
   send_thread_message, never notify_user, and are snoozed indefinitely. The coordinator relays.
 * **At most 8 working orbs at once** (Thomas, 2026-11-03).
