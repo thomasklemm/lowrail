@@ -1,0 +1,1003 @@
+# frozen_string_literal: true
+
+require "active_record/connection_adapters/abstract_adapter"
+require "active_record/connection_adapters/statement_pool"
+require "active_record/connection_adapters/sqlite3/column"
+require "active_record/connection_adapters/sqlite3/explain_pretty_printer"
+require "active_record/connection_adapters/sqlite3/quoting"
+require "active_record/connection_adapters/sqlite3/database_statements"
+require "active_record/connection_adapters/sqlite3/schema_creation"
+require "active_record/connection_adapters/sqlite3/schema_definitions"
+require "active_record/connection_adapters/sqlite3/schema_dumper"
+require "active_record/connection_adapters/sqlite3/schema_statements"
+
+gem "sqlite3", ">= 2.1"
+require "sqlite3"
+
+# Suppress the warning that SQLite3 issues when open writable connections are carried across fork()
+SQLite3::ForkSafety.suppress_warnings!
+
+module ActiveRecord
+  module ConnectionAdapters # :nodoc:
+    # Active Record \SQLite3 Adapter
+    # ==============================
+    #
+    # The \SQLite3 adapter works with the [sqlite3](https://sparklemotion.github.io/sqlite3-ruby/)
+    # driver.
+    #
+    # #### Options
+    #
+    # * `:database` (String): Filesystem path to the database file.
+    # * `:statement_limit` (Integer): Maximum number of prepared statements to cache per database connection. (default: 1000)
+    # * `:timeout` (Integer): Timeout in milliseconds to use when waiting for a lock. (default: no wait)
+    # * `:strict` (Boolean): Enable or disable strict mode. When enabled, this will
+    #   {disallow double-quoted string literals in SQL
+    #   statements}[https://www.sqlite.org/quirks.html#double_quoted_string_literals_are_accepted].
+    #   (default: see strict_strings_by_default)
+    # * `:extensions` (Array): (**requires sqlite3 v2.4.0**) Each entry specifies a sqlite extension
+    #   to load for this database. The entry may be a filesystem path, or the name of a class that
+    #   responds to `.to_path` to provide the filesystem path for the extension. See {sqlite3-ruby
+    #   documentation}[https://sparklemotion.github.io/sqlite3-ruby/SQLite3/Database.html#class-SQLite3::Database-label-SQLite+Extensions]
+    #   for more information.
+    #
+    # There may be other options available specific to the SQLite3 driver. Please read the
+    # documentation for
+    # [SQLite3::Database.new](https://sparklemotion.github.io/sqlite3-ruby/SQLite3/Database.html#method-c-new)
+    #
+    class SQLite3Adapter < AbstractAdapter
+      ADAPTER_NAME = "SQLite"
+
+      class << self
+        def new_client(config)
+          ::SQLite3::Database.new(config[:database].to_s, config)
+        rescue Errno::ENOENT => error
+          if error.message.include?("No such file or directory")
+            raise ActiveRecord::NoDatabaseError
+          else
+            raise
+          end
+        end
+
+        def dbconsole(config, options = {})
+          args = []
+
+          args << "-#{options[:mode]}" if options[:mode]
+          args << "-header" if options[:header]
+          args << File.expand_path(config.database, defined?(Rails.root) ? Rails.root : nil)
+
+          find_cmd_and_exec(ActiveRecord.database_cli[:sqlite], *args)
+        end
+
+        def ractor_connection_proxy_class # :nodoc:
+          RactorConnectionHandler::SQLite3ProxyAdapter
+        end
+
+        def native_database_types # :nodoc:
+          NATIVE_DATABASE_TYPES
+        end
+
+        # Returns a filesystem path to the database.
+        #
+        # The configuration's :database value may be a (slightly nonstandard) SQLite URI, so this
+        # method will resolve those URIs to a string path.
+        #
+        # If Rails.root is available, this is guaranteed to be an absolute path.
+        #
+        # See https://www.sqlite.org/uri.html
+        def resolve_path(database, root: nil)
+          database = database.to_s
+          root ||= defined?(Rails.root) ? Rails.root : nil
+
+          path = if database.start_with?("file:/")
+            URI.parse(database).path
+          elsif database.start_with?("file:")
+            URI.parse(database.split("?").first).opaque
+          else
+            database
+          end
+
+          if root.present?
+            File.expand_path(path, root)
+          else
+            path
+          end
+        end
+      end
+
+      include SQLite3::Quoting
+      include SQLite3::SchemaStatements
+      include SQLite3::DatabaseStatements
+
+      def ractor_connection_capabilities # :nodoc:
+        super.merge(supports_insert_on_conflict?: supports_insert_on_conflict?)
+      end
+
+      ##
+      # :singleton-method:
+      #
+      # Configure the SQLite3Adapter to be used in a "strict strings" mode. When enabled, this will
+      # {disallow double-quoted string literals in SQL
+      # statements}[https://www.sqlite.org/quirks.html#double_quoted_string_literals_are_accepted],
+      # which may prevent some typographical errors like creating an index for a non-existent
+      # column. The default is `false`.
+      #
+      # If you wish to enable this mode you can add the following line to your application.rb file:
+      #
+      # ```
+      # config.active_record.sqlite3_adapter_strict_strings_by_default = true
+      # ```
+      #
+      # This can also be configured on individual databases by setting the `strict:` option.
+      #
+      class_attribute :strict_strings_by_default, default: false
+
+      NATIVE_DATABASE_TYPES = { # rubocop:disable Style/MutableConstant
+        primary_key:  "integer PRIMARY KEY AUTOINCREMENT NOT NULL",
+        string:       { name: "varchar" },
+        text:         { name: "text" },
+        integer:      { name: "integer" },
+        float:        { name: "float" },
+        decimal:      { name: "decimal" },
+        datetime:     { name: "datetime" },
+        time:         { name: "time" },
+        date:         { name: "date" },
+        binary:       { name: "blob" },
+        boolean:      { name: "boolean" },
+        json:         { name: "json" },
+      }
+
+      DEFAULT_PRAGMAS = {
+        "foreign_keys"        => true,
+        "journal_mode"        => :wal,
+        "synchronous"         => :normal,
+        "mmap_size"           => 134217728, # 128 megabytes
+        "journal_size_limit"  => 67108864, # 64 megabytes
+        "cache_size"          => 2000
+      }.freeze
+
+      class StatementPool < ConnectionAdapters::StatementPool # :nodoc:
+        alias reset clear
+
+        private
+          def dealloc(stmt)
+            stmt.close unless stmt.closed?
+          end
+      end
+
+      def initialize(...)
+        super
+
+        @memory_database = false
+        case @config[:database].to_s
+        when ""
+          raise ArgumentError, "No database file specified. Missing argument: database"
+        when ":memory:"
+          @memory_database = true
+        else
+          database_path = SQLite3Adapter.resolve_path(@config[:database])
+          @config[:database] = database_path unless @config[:database].to_s.start_with?("file:")
+          dirname = File.dirname(database_path)
+          unless File.directory?(dirname)
+            begin
+              FileUtils.mkdir_p(dirname)
+            rescue SystemCallError
+              raise ActiveRecord::NoDatabaseError.new(connection_pool: @pool)
+            end
+          end
+        end
+
+        @previous_read_uncommitted = nil
+        @config[:strict] = ConnectionAdapters::SQLite3Adapter.strict_strings_by_default unless @config.key?(:strict)
+
+        extensions = @config.fetch(:extensions, []).map do |extension|
+          extension.safe_constantize || extension
+        end
+
+        @connection_parameters = @config.merge(
+          database: @config[:database].to_s,
+          results_as_hash: true,
+          default_transaction_mode: :immediate,
+          extensions: extensions
+        )
+      end
+
+      def database_exists?
+        @config[:database] == ":memory:" || File.exist?(@config[:database].to_s)
+      end
+
+      def supports_ddl_transactions?
+        true
+      end
+
+      def supports_savepoints?
+        true
+      end
+
+      def supports_transaction_isolation?
+        true
+      end
+
+      def supports_partial_index?
+        true
+      end
+
+      def supports_expression_index?
+        true
+      end
+
+      def requires_reloading?
+        true
+      end
+
+      def supports_foreign_keys?
+        true
+      end
+
+      def supports_check_constraints?
+        true
+      end
+
+      def supports_views?
+        true
+      end
+
+      def supports_json?
+        true
+      end
+
+      def supports_common_table_expressions?
+        true
+      end
+
+      def supports_insert_returning?
+        true
+      end
+
+      def supports_insert_on_conflict?
+        true
+      end
+      alias supports_insert_on_duplicate_skip? supports_insert_on_conflict?
+      alias supports_insert_on_duplicate_update? supports_insert_on_conflict?
+      alias supports_insert_conflict_target? supports_insert_on_conflict?
+
+      def supports_concurrent_connections?
+        !@memory_database
+      end
+
+      def supports_virtual_columns?
+        true
+      end
+
+      def connected?
+        !(@raw_connection.nil? || @raw_connection.closed?)
+      end
+
+      def active?
+        if connected?
+          verified!
+          true
+        end
+      end
+
+      alias :reset! :reconnect!
+
+      # Disconnects from the database if already connected. Otherwise, this
+      # method does nothing.
+      def disconnect!
+        super
+
+        @raw_connection&.close rescue nil
+        @raw_connection = nil
+      end
+
+      def supports_index_sort_order?
+        true
+      end
+
+      # Returns the current database encoding format as a string, e.g. 'UTF-8'
+      def encoding
+        any_raw_connection.encoding.to_s
+      end
+
+      def supports_explain?
+        true
+      end
+
+      def supports_lazy_transactions?
+        true
+      end
+
+      def supports_deferrable_constraints?
+        true
+      end
+
+      # REFERENTIAL INTEGRITY ====================================
+
+      def disable_referential_integrity # :nodoc:
+        old_foreign_keys = query_value("PRAGMA foreign_keys", nil)
+        old_defer_foreign_keys = query_value("PRAGMA defer_foreign_keys", nil)
+
+        begin
+          execute("PRAGMA defer_foreign_keys = ON")
+          execute("PRAGMA foreign_keys = OFF")
+          yield
+        ensure
+          execute("PRAGMA defer_foreign_keys = #{old_defer_foreign_keys}")
+          execute("PRAGMA foreign_keys = #{old_foreign_keys}")
+        end
+      end
+
+      def check_all_foreign_keys_valid! # :nodoc:
+        sql = "PRAGMA foreign_key_check"
+        result = execute(sql)
+
+        unless result.blank?
+          tables = result.map { |row| row["table"] }
+          raise ActiveRecord::StatementInvalid.new("Foreign key violations found: #{tables.join(", ")}", sql: sql, connection_pool: @pool)
+        end
+      end
+
+      # SCHEMA STATEMENTS ========================================
+
+      def primary_keys(table_name) # :nodoc:
+        result = fetch_primary_keys(Array(table_name).map(&:to_s))
+        table_name.is_a?(Array) ? result : result[table_name.to_s]
+      end
+
+      def remove_index(table_name, column_name = nil, **options) # :nodoc:
+        return if options[:if_exists] && !index_exists?(table_name, column_name, **options)
+
+        index_name = index_name_for_remove(table_name, column_name, options)
+
+        exec_query "DROP INDEX #{quote_column_name(index_name)}"
+      end
+
+      VIRTUAL_TABLE_REGEX = /USING\s+(\w+)\s*\((.*)\)/i
+
+      # Returns a list of defined virtual tables
+      def virtual_tables
+        query = <<~SQL
+          SELECT name, sql FROM sqlite_master WHERE sql LIKE 'CREATE VIRTUAL %';
+        SQL
+
+        query_rows(query).each_with_object({}) do |(table_name, sql), memo|
+          _, module_name, arguments = sql.match(VIRTUAL_TABLE_REGEX).to_a
+          memo[table_name] = [module_name, arguments]
+        end.to_a
+      end
+
+      # Creates a virtual table
+      #
+      # Example:
+      #
+      # ```
+      # create_virtual_table :emails, :fts5, ['sender', 'title', 'body']
+      # ```
+      def create_virtual_table(table_name, module_name, values)
+        exec_query "CREATE VIRTUAL TABLE IF NOT EXISTS #{table_name} USING #{module_name} (#{values.join(", ")})"
+      end
+
+      # Drops a virtual table
+      #
+      # Although this command ignores `module_name` and `values`,
+      # it can be helpful to provide these in a migration's `change` method so it can be reverted.
+      # In that case, `module_name`, `values` and `options` will be used by #create_virtual_table.
+      def drop_virtual_table(table_name, module_name, values, **options)
+        drop_table(table_name)
+      end
+
+      # Renames a table.
+      #
+      # Example:
+      #
+      # ```
+      # rename_table('octopuses', 'octopi')
+      # ```
+      def rename_table(table_name, new_name, **options)
+        validate_table_length!(new_name) unless options[:_uses_legacy_table_name]
+        schema_cache.clear_data_source_cache!(table_name.to_s)
+        schema_cache.clear_data_source_cache!(new_name.to_s)
+        exec_query "ALTER TABLE #{quote_table_name(table_name)} RENAME TO #{quote_table_name(new_name)}"
+        rename_table_indexes(table_name, new_name, **options)
+      end
+
+      def add_column(table_name, column_name, type, **options) # :nodoc:
+        type = type.to_sym
+        if invalid_alter_table_type?(type, options)
+          alter_table(table_name) do |definition|
+            definition.column(column_name, type, **options)
+          end
+        else
+          super
+        end
+      end
+
+      def remove_column(table_name, column_name, type = nil, **options) # :nodoc:
+        alter_table(table_name) do |definition|
+          definition.remove_column column_name
+          definition.foreign_keys.delete_if { |fk| fk.column == column_name.to_s }
+        end
+      end
+
+      def remove_columns(table_name, *column_names, type: nil, **options) # :nodoc:
+        alter_table(table_name) do |definition|
+          column_names.each do |column_name|
+            definition.remove_column column_name
+          end
+          column_names = column_names.map(&:to_s)
+          definition.foreign_keys.delete_if { |fk| column_names.include?(fk.column) }
+        end
+      end
+
+      def change_column_default(table_name, column_name, default_or_changes) # :nodoc:
+        default = extract_new_default_value(default_or_changes)
+
+        alter_table(table_name) do |definition|
+          definition[column_name].options[:default] = default
+        end
+      end
+
+      def change_column_null(table_name, column_name, null, default = nil) # :nodoc:
+        validate_change_column_null_argument!(null)
+
+        unless null || default.nil?
+          query_command("UPDATE #{quote_table_name(table_name)} SET #{quote_column_name(column_name)}=#{quote(default)} WHERE #{quote_column_name(column_name)} IS NULL")
+        end
+        alter_table(table_name) do |definition|
+          definition[column_name].options[:null] = null
+        end
+      end
+
+      def change_column(table_name, column_name, type, **options) # :nodoc:
+        alter_table(table_name) do |definition|
+          definition.change_column(column_name, type, **options)
+        end
+      end
+
+      def rename_column(table_name, column_name, new_column_name) # :nodoc:
+        column = column_for(table_name, column_name)
+        at = build_alter_table_definition(table_name)
+        at.rename_column(column.name, new_column_name)
+        execute_alter_table(at)
+        rename_column_indexes(table_name, column.name, new_column_name)
+      end
+
+      def add_timestamps(table_name, **options)
+        options[:null] = false if options[:null].nil?
+
+        if !options.key?(:precision)
+          options[:precision] = 6
+        end
+
+        alter_table(table_name) do |definition|
+          definition.column :created_at, :datetime, **options
+          definition.column :updated_at, :datetime, **options
+        end
+      end
+
+      def add_reference(table_name, ref_name, **options) # :nodoc:
+        super(table_name, ref_name, type: :integer, **options)
+      end
+      alias :add_belongs_to :add_reference
+
+      FK_NAME_REGEX = /\ACONSTRAINT\s+"([^"]+)"/
+      FK_REGEX = /.*FOREIGN KEY\s+\("([^"]+)"\)\s+REFERENCES\s+"(\w+)"\s+\("(\w+)"\)/
+      DEFERRABLE_REGEX = /DEFERRABLE INITIALLY (\w+)/
+      def foreign_keys(table_name)
+        result = fetch_foreign_keys(Array(table_name).map(&:to_s))
+        table_name.is_a?(Array) ? result : result[table_name.to_s]
+      end
+
+      def build_insert_sql(insert) # :nodoc:
+        sql = +"INSERT #{insert.into} #{insert.values_list}"
+
+        if insert.skip_duplicates?
+          sql << " ON CONFLICT #{insert.conflict_target} DO NOTHING"
+        elsif insert.update_duplicates?
+          sql << " ON CONFLICT #{insert.conflict_target} DO UPDATE SET "
+          if insert.raw_update_sql?
+            sql << insert.raw_update_sql
+          else
+            sql << insert.touch_model_timestamps_unless { |column| "#{column} IS excluded.#{column}" }
+            sql << insert.updatable_columns.map { |column| "#{column}=excluded.#{column}" }.join(",")
+          end
+        end
+
+        sql << " RETURNING #{insert.returning}" if insert.returning
+        sql
+      end
+
+      def shared_cache? # :nodoc:
+        @config.fetch(:flags, 0).anybits?(::SQLite3::Constants::Open::SHAREDCACHE)
+      end
+
+      def get_database_version # :nodoc:
+        SQLite3Adapter::Version.new(query_value("SELECT sqlite_version(*)"))
+      end
+
+      def check_version # :nodoc:
+        if database_version < "3.35.0"
+          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
+        end
+      end
+
+      class SQLite3Integer < Type::Integer # :nodoc:
+        private
+          def _limit
+            # INTEGER storage class can be stored 8 bytes value.
+            # See https://www.sqlite.org/datatype3.html#storage_classes_and_datatypes
+            limit || 8
+          end
+      end
+
+      ActiveRecord::Type.register(:integer, SQLite3Integer, adapter: :sqlite3)
+
+      class << self
+        private
+          def initialize_type_map(m)
+            super
+            register_class_with_limit m, %r(int)i, SQLite3Integer
+          end
+      end
+
+      TYPE_MAP = Type::TypeMap.new.tap { |m| initialize_type_map(m) }
+      EXTENDED_TYPE_MAPS = Concurrent::Map.new
+
+      private
+        def fetch_column_definitions(tables)
+          structures = table_structures(tables)
+
+          tables.index_with do |table|
+            create_table_sql, structure = structure_for(structures, table)
+
+            build_table_structure(structure, split_table_structure_sql(create_table_sql, structure.map { |column| column["name"] }))
+          end
+        end
+
+        def fetch_primary_keys(tables)
+          structures = table_structures(tables)
+
+          tables.index_with do |table|
+            _, structure = structure_for(structures, table)
+            pks = structure.select { |f| f["pk"] > 0 }
+            pks.sort_by { |f| f["pk"] }.map { |f| f["name"] }
+          end
+        end
+
+        def structure_for(structures, table)
+          structures.fetch(table) do
+            raise ActiveRecord::StatementInvalid.new("Could not find table '#{table}'", connection_pool: @pool)
+          end
+        end
+
+        def fetch_foreign_keys(tables)
+          return {} if tables.empty?
+
+          # SQLite returns 1 row for each column of composite foreign keys.
+          fk_infos = query_all(<<~SQL).group_by { |row| row["table_name"] }
+            #{MASTER_CTE}
+            SELECT m.name AS table_name, fk.id, fk.seq, fk."table", fk."from", fk."to", fk.on_update, fk.on_delete
+            FROM master m
+            JOIN pragma_foreign_key_list(m.name) fk
+            WHERE m.type = 'table'
+              AND m.name IN (#{quoted_table_names(tables)})
+          SQL
+
+          structures = table_structures(tables)
+
+          tables.index_with do |table_name|
+            create_table_sql, structure = structures[table_name] || [nil, []]
+            column_strings = split_table_structure_sql(create_table_sql, structure.map { |column| column["name"] })
+
+            build_foreign_keys(table_name, fk_infos.fetch(table_name, []), column_strings)
+          end
+        end
+
+        def build_foreign_keys(table_name, fk_info, column_strings)
+          # Deferred or immediate foreign keys and the constraint name can only be
+          # seen in the CREATE TABLE sql.
+          fk_defs = column_strings
+                      .select do |column_string|
+                        column_string.start_with?("CONSTRAINT") &&
+                        column_string.include?("FOREIGN KEY")
+                      end
+                      .to_h do |fk_string|
+                        _, from, table, to = fk_string.match(FK_REGEX).to_a
+                        _, mode = fk_string.match(DEFERRABLE_REGEX).to_a
+                        _, name = fk_string.match(FK_NAME_REGEX).to_a
+                        deferred = mode&.downcase&.to_sym || false
+                        [[table, from, to], { deferrable: deferred, name: name }]
+                      end
+
+          grouped_fk = fk_info.group_by { |row| row["id"] }.values.each { |group| group.sort_by! { |row| row["seq"] } }
+          grouped_fk.map do |group|
+            row = group.first
+            fk_def = fk_defs[[row["table"], row["from"], row["to"]]]
+            options = {
+              on_delete: extract_foreign_key_action(row["on_delete"]),
+              on_update: extract_foreign_key_action(row["on_update"]),
+              deferrable: fk_def && fk_def[:deferrable],
+              name: fk_def && fk_def[:name],
+            }
+
+            if group.one?
+              options[:column] = row["from"]
+              options[:primary_key] = row["to"]
+            else
+              options[:column] = group.map { |row| row["from"] }
+              options[:primary_key] = group.map { |row| row["to"] }
+            end
+            ForeignKeyDefinition.new(table_name, row["table"], options)
+          end
+        end
+
+        # See https://www.sqlite.org/limits.html,
+        # the default value is 999 when not configured.
+        def bind_params_length
+          999
+        end
+
+        def table_structure(table_name)
+          structure = table_info(table_name)
+          raise ActiveRecord::StatementInvalid.new("Could not find table '#{table_name}'", connection_pool: @pool) if structure.empty?
+          table_structure_with_collation(table_name, structure)
+        end
+        alias column_definitions table_structure
+
+        def extract_value_from_default(default)
+          case default
+          when /^null$/i
+            nil
+          when /^false$/i
+            false
+          when /^true$/i
+            true
+          # Quoted types
+          when /^'([^|]*)'$/m
+            $1.gsub("''", "'")
+          # Quoted types
+          when /^"([^|]*)"$/m
+            $1.gsub('""', '"')
+          # Numeric types
+          when /\A-?\d+(\.\d*)?\z/
+            $&
+          # Binary columns
+          when /x'(.*)'/
+            [ $1 ].pack("H*")
+          else
+            # Anything else is blank or some function
+            # and we can't know the value of that, so return nil.
+            nil
+          end
+        end
+
+        def extract_default_function(default_value, default)
+          default if has_default_function?(default_value, default)
+        end
+
+        def has_default_function?(default_value, default)
+          !default_value && %r{\w+\(.*\)|CURRENT_TIME|CURRENT_DATE|CURRENT_TIMESTAMP|\|\|}.match?(default)
+        end
+
+        # See: https://www.sqlite.org/lang_altertable.html
+        # SQLite has an additional restriction on the ALTER TABLE statement
+        def invalid_alter_table_type?(type, options)
+          type == :primary_key || options[:primary_key] ||
+            options[:null] == false && options[:default].nil? ||
+            (type == :virtual && options[:stored])
+        end
+
+        def alter_table(
+          table_name,
+          foreign_keys = foreign_keys(table_name),
+          check_constraints = check_constraints(table_name)
+        )
+          altered_table_name = "a#{table_name}"
+
+          caller = lambda do |definition|
+            foreign_keys.each do |fk|
+              to_table = strip_table_name_prefix_and_suffix(fk.to_table)
+              definition.foreign_key(to_table, **fk.options)
+            end
+
+            check_constraints.each do |chk|
+              definition.check_constraint(chk.expression, **chk.options)
+            end
+
+            yield definition if block_given?
+          end
+
+          disable_referential_integrity do
+            transaction do
+              move_table(table_name, altered_table_name, temporary: true)
+              move_table(altered_table_name, table_name, &caller)
+            end
+          end
+        end
+
+        def move_table(from, to, options = {}, &block)
+          copy_table(from, to, options, &block)
+          drop_table(from)
+        end
+
+        def copy_table(from, to, options = {})
+          from_primary_key = primary_key(from)
+          options[:id] = false
+          create_table(to, **options) do |definition|
+            @definition = definition
+            if from_primary_key.is_a?(Array)
+              @definition.primary_keys from_primary_key
+            end
+
+            columns(from).each do |column|
+              column_options = {
+                limit: column.limit,
+                precision: column.precision,
+                scale: column.scale,
+                collation: column.collation,
+                primary_key: column.name == from_primary_key
+              }
+
+              # column.null is true unless there is an explicit NOT NULL
+              # constraint:
+              #
+              #   // The PK gets rowids, but column.null is technically true.
+              #   CREATE TABLE foo (id INTEGER PRIMARY KEY)
+              #
+              # We always add a NOT NULL constraint for PKs, and `null: true` is
+              # invalid for them. That is why we skip in that case.
+              column_options[:null] = column.null unless column.name == from_primary_key
+
+              if column.virtual?
+                column_options[:as] = column.default_function
+                column_options[:stored] = column.virtual_stored?
+                column_options[:type] = column.type
+              elsif column.has_default?
+                default = column.cast_type.deserialize(column.default)
+                default = -> { column.default_function } if default.nil?
+
+                unless column.auto_increment?
+                  column_options[:default] = default
+                end
+              end
+
+              column_type = column.virtual? ? :virtual : (column.bigint? ? :bigint : column.type)
+              @definition.column(column.name, column_type, **column_options)
+            end
+
+            yield @definition if block_given?
+          end
+          copy_table_indexes(from, to)
+
+          columns_to_copy = @definition.columns.reject { |col| col.options.key?(:as) }.map(&:name)
+          copy_table_contents(from, to, columns_to_copy)
+        end
+
+        def copy_table_indexes(from, to)
+          indexes(from).each do |index|
+            name = index.name
+            if to == "a#{from}"
+              name = "t#{name}"
+            elsif from == "a#{to}"
+              name = name[1..-1]
+            end
+
+            columns = index.columns
+            if columns.is_a?(Array)
+              to_column_names = columns(to).map(&:name)
+              columns = columns.select { |column| to_column_names.include?(column) }
+            end
+
+            unless columns.empty?
+              # index name can't be the same
+              options = { name: name.gsub(/(^|_)(#{from})_/, "\\1#{to}_"), internal: true }
+              options[:unique] = true if index.unique
+              options[:where] = index.where if index.where
+              options[:order] = index.orders if index.orders
+              add_index(to, columns, **options)
+            end
+          end
+        end
+
+        def copy_table_contents(from, to, columns)
+          from_columns = columns(from).collect(&:name)
+          columns = columns.find_all { |col| from_columns.include?(col) }
+          quoted_columns = columns.map { |col| quote_column_name(col) } * ","
+
+          query_command("INSERT INTO #{quote_table_name(to)} (#{quoted_columns})
+                     SELECT #{quoted_columns} FROM #{quote_table_name(from)}")
+        end
+
+        def translate_exception(exception, message:, sql:, binds:)
+          # SQLite 3.8.2 returns a newly formatted error message:
+          #   UNIQUE constraint failed: *table_name*.*column_name*
+          # Older versions of SQLite return:
+          #   column *column_name* is not unique
+          if exception.message.match?(/(column(s)? .* (is|are) not unique|UNIQUE constraint failed: .*)/i)
+            RecordNotUnique.new(message, sql: sql, binds: binds, connection_pool: @pool)
+          elsif exception.message.match?(/(.* may not be NULL|NOT NULL constraint failed: .*)/i)
+            NotNullViolation.new(message, sql: sql, binds: binds, connection_pool: @pool)
+          elsif exception.message.match?(/FOREIGN KEY constraint failed/i)
+            InvalidForeignKey.new(message, sql: sql, binds: binds, connection_pool: @pool)
+          elsif exception.message.match?(/CHECK constraint failed: .*/i)
+            CheckViolation.new(message, sql: sql, binds: binds, connection_pool: @pool)
+          elsif exception.message.match?(/(cannot use|called on) a closed database/i)
+            ConnectionNotEstablished.new(exception, connection_pool: @pool)
+          elsif exception.is_a?(::SQLite3::BusyException)
+            StatementTimeout.new(message, sql: sql, binds: binds, connection_pool: @pool)
+          else
+            super
+          end
+        end
+
+        COLLATE_REGEX = /.*"(\w+)".*collate\s+"(\w+)".*/i
+        PRIMARY_KEY_AUTOINCREMENT_REGEX = /.*"(\w+)".+PRIMARY KEY AUTOINCREMENT/i
+        GENERATED_ALWAYS_AS_REGEX = /.*"(\w+)".+GENERATED ALWAYS AS \((.+)\) (?:STORED|VIRTUAL)/i
+
+        def table_structure_with_collation(table_name, basic_structure)
+          column_strings = table_structure_sql(table_name, basic_structure.map { |column| column["name"] })
+
+          build_table_structure(basic_structure, column_strings)
+        end
+
+        def build_table_structure(basic_structure, column_strings)
+          collation_hash = {}
+          auto_increments = {}
+          generated_columns = {}
+
+          if column_strings.any?
+            column_strings.each do |column_string|
+              # This regex will match the column name and collation type and will save
+              # the value in $1 and $2 respectively.
+              collation_hash[$1] = $2 if COLLATE_REGEX =~ column_string
+              auto_increments[$1] = true if PRIMARY_KEY_AUTOINCREMENT_REGEX =~ column_string
+              generated_columns[$1] = $2 if GENERATED_ALWAYS_AS_REGEX =~ column_string
+            end
+
+            basic_structure.map do |column|
+              column_name = column["name"]
+
+              if collation_hash.has_key? column_name
+                column["collation"] = collation_hash[column_name]
+              end
+
+              if auto_increments.has_key?(column_name)
+                column["auto_increment"] = true
+              end
+
+              if generated_columns.has_key?(column_name)
+                column["dflt_value"] = generated_columns[column_name]
+              end
+
+              column
+            end
+          else
+            basic_structure.to_a
+          end
+        end
+
+        UNQUOTED_OPEN_PARENS_REGEX = /\((?![^'"]*['"][^'"]*$)/
+        FINAL_CLOSE_PARENS_REGEX = /\);*\z/
+
+        def table_structure_sql(table_name, column_names = nil)
+          unless column_names
+            column_info = table_info(table_name)
+            column_names = column_info.map { |column| column["name"] }
+          end
+
+          sql = <<~SQL
+            SELECT sql FROM
+              (SELECT * FROM sqlite_master UNION ALL
+               SELECT * FROM sqlite_temp_master)
+            WHERE type = 'table' AND name = #{quote(table_name)}
+          SQL
+
+          split_table_structure_sql(query_value(sql), column_names)
+        end
+
+        # The sql is the statement the table was created with, and will have the
+        # following sample form
+        # CREATE TABLE "users" ("id" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+        #
+        # ```
+        # "password_digest" varchar COLLATE "NOCASE",
+        # "o_id" integer,
+        # CONSTRAINT "fk_rails_78146ddd2e" FOREIGN KEY ("o_id") REFERENCES "os" ("id"));
+        # ```
+        def split_table_structure_sql(sql, column_names)
+          return [] unless sql
+
+          # Splitting with left parentheses and discarding the first part will return all
+          # columns separated with comma(,).
+          sql.partition(UNQUOTED_OPEN_PARENS_REGEX)
+             .last
+             .sub(FINAL_CLOSE_PARENS_REGEX, "")
+             # column definitions can have a comma in them, so split on commas followed
+             # by a space and a column name in quotes or followed by the keyword CONSTRAINT
+             .split(/,(?=\s(?:CONSTRAINT|"(?:#{Regexp.union(column_names).source})"))/i)
+             .map(&:strip)
+        end
+
+        def table_info(table_name)
+          query_all("PRAGMA #{table_info_pragma}(#{quote_table_name(table_name)})")
+        end
+
+        # Only table_xinfo reports hidden columns, which is how a generated column is
+        # reported.
+        def table_info_pragma
+          supports_virtual_columns? ? "table_xinfo" : "table_info"
+        end
+
+        # The pragmas are table valued functions as well as statements, so they can be
+        # joined to a list of names and read for many tables at once.
+        # See https://www.sqlite.org/pragma.html#pragfunc
+        #
+        # The statement a table was created with comes along because the collation,
+        # auto increment and generated columns are only named there. It repeats once
+        # per column, so it is read from the first row. A view has a statement too,
+        # but it describes the query rather than any columns.
+        def table_structures(tables)
+          return {} if tables.empty?
+
+          fields = ["name", "type", "notnull", "dflt_value", "pk"]
+          fields << "hidden" if supports_virtual_columns?
+
+          query_all(<<~SQL).group_by { |row| row["table_name"] }
+            #{MASTER_CTE}
+            SELECT m.name AS table_name, CASE WHEN m.type = 'table' THEN m.sql END AS create_table_sql,
+                   #{fields.map { |field| "t.#{quote_column_name(field)}" }.join(", ")}
+            FROM master m
+            JOIN pragma_#{table_info_pragma}(m.name) t
+            WHERE m.type IN ('table', 'view')
+              AND m.name IN (#{quoted_table_names(tables)})
+            ORDER BY m.name, t.cid
+          SQL
+            .transform_values do |group|
+              [group.first["create_table_sql"], group.map { |row| row.except("table_name", "create_table_sql") }]
+            end
+        end
+
+        def arel_visitor
+          Arel::Visitors::SQLite.new(self)
+        end
+
+        def build_statement_pool
+          StatementPool.new(self.class.type_cast_config_to_integer(@config[:statement_limit]))
+        end
+
+        def connect
+          @raw_connection = self.class.new_client(@connection_parameters)
+        rescue ConnectionNotEstablished => ex
+          raise ex.set_pool(@pool)
+        end
+
+        def reconnect
+          if active?
+            @raw_connection.rollback rescue nil
+          else
+            connect
+          end
+        end
+
+        def configure_connection
+          if @config[:timeout]
+            timeout = self.class.type_cast_config_to_integer(@config[:timeout])
+            raise TypeError, "timeout must be integer, not #{timeout}" unless timeout.is_a?(Integer)
+            @raw_connection.busy_handler_timeout = timeout
+          end
+
+          super
+
+          pragmas = @config.fetch(:pragmas, {}).stringify_keys
+          DEFAULT_PRAGMAS.merge(pragmas).each do |pragma, value|
+            if ::SQLite3::Pragmas.method_defined?("#{pragma}=")
+              @raw_connection.public_send("#{pragma}=", value)
+            else
+              warn "Unknown SQLite pragma: #{pragma}"
+            end
+          end
+        end
+    end
+    ActiveSupport.run_load_hooks(:active_record_sqlite3adapter, SQLite3Adapter)
+  end
+end

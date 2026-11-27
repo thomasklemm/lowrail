@@ -1,0 +1,44 @@
+version 3.9.0 existing rejection, updated floor message
+version 3.34.9 existing rejection, updated floor message
+version 3.35.0 newly refused
+version 3.35.5 newly refused
+version 3.36.0 newly refused
+version 3.36.99 newly refused
+version_subclass 3.9.0 existing rejection, updated floor message
+version_subclass 3.34.9 existing rejection, updated floor message
+version_subclass 3.35.0 newly refused
+version_subclass 3.35.5 newly refused
+version_subclass 3.36.0 newly refused
+version_subclass 3.36.99 newly refused
+frozen_version 3.9.0 existing rejection, updated floor message
+frozen_version 3.34.9 existing rejection, updated floor message
+frozen_version 3.35.0 newly refused
+frozen_version 3.35.5 newly refused
+frozen_version 3.36.0 newly refused
+frozen_version 3.36.99 newly refused
+duck 3.9.0 existing rejection, updated floor message
+duck 3.34.9 existing rejection, updated floor message
+duck 3.35.0 newly refused
+duck 3.35.5 newly refused
+duck 3.36.0 newly refused
+duck 3.36.99 newly refused
+string 3.34.9 existing rejection, updated floor message
+string 3.35.0 newly refused
+string 3.35.5 newly refused
+string 3.36.0 newly refused
+string 3.36.99 newly refused
+string 3.100.0 existing rejection, updated floor message
+string_subclass 3.34.9 existing rejection, updated floor message
+string_subclass 3.35.0 newly refused
+string_subclass 3.35.5 newly refused
+string_subclass 3.36.0 newly refused
+string_subclass 3.36.99 newly refused
+string_subclass 3.100.0 existing rejection, updated floor message
+frozen_string 3.34.9 existing rejection, updated floor message
+frozen_string 3.35.0 newly refused
+frozen_string 3.35.5 newly refused
+frozen_string 3.36.0 newly refused
+frozen_string 3.36.99 newly refused
+frozen_string 3.100.0 existing rejection, updated floor message
+PASS: 77 base/head input pairs; only 3.35/3.36 newly refused; existing rejections get the new message; all comparisons -1/0/1.
+String inputs retain pre-existing lexical ordering (3.9.0 accepted, 3.100.0 rejected); real database_version returns numeric Version, not String.

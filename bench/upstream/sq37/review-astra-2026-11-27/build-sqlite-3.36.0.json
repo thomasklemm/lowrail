@@ -1,0 +1,6 @@
+{
+  "recipe": "sqlite.org autoconf, CFLAGS=-O2 -fPIC -DSQLITE_DEFAULT_WAL_SYNCHRONOUS=1 -DSQLITE_USE_URI=1 -DSQLITE_ENABLE_DBPAGE_VTAB=1 -DSQLITE_ENABLE_DBSTAT_VTAB=1",
+  "seconds": 29,
+  "built_at": "2026-11-27T12:26:49Z",
+  "url": "https://www.sqlite.org/2021/sqlite-autoconf-3360000.tar.gz"
+}

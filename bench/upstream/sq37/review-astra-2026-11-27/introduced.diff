@@ -1,0 +1,34 @@
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
+index 036b9bb2e5..e554f5447c 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3/schema_statements.rb
+@@ -82,6 +82,10 @@ def remove_foreign_key(from_table, to_table = nil, **options)
+           alter_table(from_table, foreign_keys)
+         end
+ 
++        def virtual_table_exists?(table_name)
++          query_values(data_source_sql(table_name, type: "VIRTUAL TABLE"), "SCHEMA").any?
++        end
++
+         def check_constraints(table_name)
+           table_sql = query_value(<<-SQL, "SCHEMA")
+             SELECT sql
+@@ -176,7 +180,8 @@ def data_source_sql(name = nil, type: nil)
+             scope = quoted_scope(name, type: type)
+             scope[:type] ||= "'table','view'"
+ 
+-            sql = +"SELECT name FROM sqlite_master WHERE name <> 'sqlite_sequence'"
++            sql = +"SELECT name FROM pragma_table_list WHERE schema <> 'temp'"
++            sql << " AND name NOT IN ('sqlite_sequence', 'sqlite_schema')"
+             sql << " AND name = #{scope[:name]}" if scope[:name]
+             sql << " AND type IN (#{scope[:type]})"
+             sql
+@@ -189,6 +194,8 @@ def quoted_scope(name = nil, type: nil)
+                 "'table'"
+               when "VIEW"
+                 "'view'"
++              when "VIRTUAL TABLE"
++                "'virtual'"
+               end
+             scope = {}
+             scope[:name] = quote(name) if name

@@ -1,0 +1,11 @@
+bin/rails aborted!
+ActiveRecord::StatementInvalid: SQLite3::SQLException: no such table: pragma_table_list: (ActiveRecord::StatementInvalid)
+SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table','view')
+
+
+Caused by:
+SQLite3::SQLException: no such table: pragma_table_list: (SQLite3::SQLException)
+SELECT name FROM pragma_table_list WHERE schema <> 'temp' AND name NOT IN ('sqlite_sequence', 'sqlite_schema') AND name = 'schema_migrations' AND type IN ('table','view')
+
+Tasks: TOP => db:prepare
+(See full trace by running task with --trace)

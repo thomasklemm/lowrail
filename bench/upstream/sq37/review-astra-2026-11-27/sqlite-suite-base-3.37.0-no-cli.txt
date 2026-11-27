@@ -1,0 +1,79 @@
+Using sqlite3
+Run options: --seed 41231
+
+# Running:
+
+sh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+Esh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+Esh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+Esh: 1: sqlite3: not found
+sh: 1: sqlite3: not found
+.........E.........................................................................................................S....................................................................................................................
+
+Finished in 0.871851s, 269.5416 runs/s, 683.6033 assertions/s.
+
+  1) Error:
+ActiveRecord::SqliteStructureDumpTest#test_structure_dump:
+RuntimeError: failed to execute:
+sqlite3 /tmp/d20261127-45101-yc5r8t/db_create.sqlite3 .schema --nosys > /tmp/d20261127-45101-yc5r8t/awesome-file.sql
+
+Please check the output above for any errors and make sure that `sqlite3` is installed in your PATH and has proper permissions.
+
+
+    lib/active_record/tasks/abstract_tasks.rb:66:in 'ActiveRecord::Tasks::AbstractTasks#run_cmd'
+    lib/active_record/tasks/sqlite_database_tasks.rb:52:in 'ActiveRecord::Tasks::SQLiteDatabaseTasks#structure_dump'
+    lib/active_record/tasks/database_tasks.rb:377:in 'ActiveRecord::Tasks::DatabaseTasks#structure_dump'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:171:in 'ActiveRecord::SqliteStructureDumpTest#test_structure_dump'
+
+  2) Error:
+ActiveRecord::SqliteStructureDumpTest#test_structure_dump_with_ignore_tables:
+RuntimeError: failed to execute:
+sqlite3 /tmp/d20261127-45101-i6bjdf/db_create.sqlite3 SELECT sql || ';' FROM sqlite_master WHERE tbl_name NOT IN () ORDER BY tbl_name, type DESC, name > /tmp/d20261127-45101-i6bjdf/awesome-file.sql
+
+Please check the output above for any errors and make sure that `sqlite3` is installed in your PATH and has proper permissions.
+
+
+    lib/active_record/tasks/abstract_tasks.rb:66:in 'ActiveRecord::Tasks::AbstractTasks#run_cmd'
+    lib/active_record/tasks/sqlite_database_tasks.rb:52:in 'ActiveRecord::Tasks::SQLiteDatabaseTasks#structure_dump'
+    lib/active_record/tasks/database_tasks.rb:377:in 'ActiveRecord::Tasks::DatabaseTasks#structure_dump'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:188:in 'block in ActiveRecord::SqliteStructureDumpTest#test_structure_dump_with_ignore_tables'
+
+  3) Error:
+ActiveRecord::SqliteStructureDumpTest#test_structure_dump_with_schema_ignored_tables_as_a_set:
+RuntimeError: failed to execute:
+sqlite3 /tmp/d20261127-45101-346z6n/db_create.sqlite3 SELECT sql || ';' FROM sqlite_master WHERE tbl_name NOT IN () ORDER BY tbl_name, type DESC, name > /tmp/d20261127-45101-346z6n/awesome-file.sql
+
+Please check the output above for any errors and make sure that `sqlite3` is installed in your PATH and has proper permissions.
+
+
+    lib/active_record/tasks/abstract_tasks.rb:66:in 'ActiveRecord::Tasks::AbstractTasks#run_cmd'
+    lib/active_record/tasks/sqlite_database_tasks.rb:52:in 'ActiveRecord::Tasks::SQLiteDatabaseTasks#structure_dump'
+    lib/active_record/tasks/database_tasks.rb:377:in 'ActiveRecord::Tasks::DatabaseTasks#structure_dump'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:202:in 'block in ActiveRecord::SqliteStructureDumpTest#test_structure_dump_with_schema_ignored_tables_as_a_set'
+
+  4) Error:
+ActiveRecord::SqliteStructureLoadTest#test_structure_load:
+RuntimeError: failed to execute:
+sqlite3 /tmp/d20261127-45101-m8ksci/db_create.sqlite3 < /tmp/d20261127-45101-m8ksci/awesome-file.sql
+
+Please check the output above for any errors and make sure that `sqlite3` is installed in your PATH and has proper permissions.
+
+
+    lib/active_record/tasks/abstract_tasks.rb:66:in 'ActiveRecord::Tasks::AbstractTasks#run_cmd'
+    lib/active_record/tasks/sqlite_database_tasks.rb:59:in 'ActiveRecord::Tasks::SQLiteDatabaseTasks#structure_load'
+    lib/active_record/tasks/database_tasks.rb:384:in 'ActiveRecord::Tasks::DatabaseTasks#structure_load'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:257:in 'block in ActiveRecord::SqliteStructureLoadTest#test_structure_load'
+    /home/user/workspace/repo/.amp/in/orb-backup/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activesupport/lib/active_support/testing/stream.rb:11:in 'ActiveSupport::Testing::Stream#silence_stream'
+    /home/user/workspace/repo/.amp/in/orb-backup/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activesupport/lib/active_support/testing/stream.rb:19:in 'block in ActiveSupport::Testing::Stream#quietly'
+    /home/user/workspace/repo/.amp/in/orb-backup/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activesupport/lib/active_support/testing/stream.rb:11:in 'ActiveSupport::Testing::Stream#silence_stream'
+    /home/user/workspace/repo/.amp/in/orb-backup/min-versions/trees/088fc0cf61e4ba0c7987decafacc69adb3e22eec/activesupport/lib/active_support/testing/stream.rb:18:in 'ActiveSupport::Testing::Stream#quietly'
+    test/cases/adapters/sqlite3/sqlite_rake_test.rb:257:in 'ActiveRecord::SqliteStructureLoadTest#test_structure_load'
+
+235 runs, 596 assertions, 0 failures, 4 errors, 1 skips
+
+You have skipped tests. Run with --verbose for details.

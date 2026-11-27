@@ -1,0 +1,13 @@
+D, [2026-11-27T12:30:12.184641 #47775] DEBUG -- :   [1m[36mTRANSACTION (2.5ms)[0m  [1m[36mBEGIN immediate TRANSACTION[0m
+D, [2026-11-27T12:30:12.185040 #47775] DEBUG -- :   [1m[36mWidget Create (0.2ms)[0m  [1m[32mINSERT INTO "widgets" ("name") VALUES (?) RETURNING "id"[0m  [["name", "cached rails runner"]]
+D, [2026-11-27T12:30:12.187798 #47775] DEBUG -- :   [1m[36mTRANSACTION (2.4ms)[0m  [1m[36mCOMMIT TRANSACTION[0m
+D, [2026-11-27T12:30:12.189512 #47775] DEBUG -- :   [1m[36mWidget Load (0.1ms)[0m  [1m[34mSELECT "widgets".* FROM "widgets" WHERE "widgets"."id" = ? LIMIT ?[0m  [["id", 7], ["LIMIT", 1]]
+D, [2026-11-27T12:30:12.190192 #47775] DEBUG -- :   [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mBEGIN immediate TRANSACTION[0m
+D, [2026-11-27T12:30:12.190343 #47775] DEBUG -- :   [1m[36mWidget Update (0.1ms)[0m  [1m[33mUPDATE "widgets" SET "name" = ? WHERE "widgets"."id" = ?[0m  [["name", "updated"], ["id", 7]]
+D, [2026-11-27T12:30:12.190507 #47775] DEBUG -- :   [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mCOMMIT TRANSACTION[0m
+D, [2026-11-27T12:30:12.190839 #47775] DEBUG -- :   [1m[36mWidget Load (0.1ms)[0m  [1m[34mSELECT "widgets".* FROM "widgets" WHERE "widgets"."id" = ? LIMIT ?[0m  [["id", 7], ["LIMIT", 1]]
+D, [2026-11-27T12:30:12.191277 #47775] DEBUG -- :   [1m[36mTRANSACTION (0.1ms)[0m  [1m[36mBEGIN immediate TRANSACTION[0m
+D, [2026-11-27T12:30:12.191390 #47775] DEBUG -- :   [1m[36mWidget Destroy (0.0ms)[0m  [1m[31mDELETE FROM "widgets" WHERE "widgets"."id" = ?[0m  [["id", 7]]
+D, [2026-11-27T12:30:12.191518 #47775] DEBUG -- :   [1m[36mTRANSACTION (0.0ms)[0m  [1m[36mCOMMIT TRANSACTION[0m
+D, [2026-11-27T12:30:12.192025 #47775] DEBUG -- :   [1m[36mWidget Exists? (0.1ms)[0m  [1m[34mSELECT 1 AS one FROM "widgets" WHERE "widgets"."id" = ? LIMIT ?[0m  [["id", 7], ["LIMIT", 1]]
+PASS: create/find/update/destroy through Rails runner

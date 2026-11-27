@@ -1,0 +1,478 @@
+[
+  {
+    "shape": "version",
+    "version": "3.9.0",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.9.0) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "version",
+    "version": "3.34.9",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "version",
+    "version": "3.35.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "version",
+    "version": "3.35.5",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "version",
+    "version": "3.36.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "version",
+    "version": "3.36.99",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "version",
+    "version": "3.37.0",
+    "comparison": 0,
+    "result": null
+  },
+  {
+    "shape": "version",
+    "version": "3.37.1",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "version",
+    "version": "3.44.2",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "version",
+    "version": "3.100.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "version",
+    "version": "4.0.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.9.0",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.9.0) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.34.9",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.35.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.35.5",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.36.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.36.99",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.37.0",
+    "comparison": 0,
+    "result": null
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.37.1",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.44.2",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "version_subclass",
+    "version": "3.100.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "version_subclass",
+    "version": "4.0.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.9.0",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.9.0) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.34.9",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.35.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.35.5",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.36.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.36.99",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.37.0",
+    "comparison": 0,
+    "result": null
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.37.1",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.44.2",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "frozen_version",
+    "version": "3.100.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "frozen_version",
+    "version": "4.0.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "duck",
+    "version": "3.9.0",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.9.0) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "duck",
+    "version": "3.34.9",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "duck",
+    "version": "3.35.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "duck",
+    "version": "3.35.5",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "duck",
+    "version": "3.36.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "duck",
+    "version": "3.36.99",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "duck",
+    "version": "3.37.0",
+    "comparison": 0,
+    "result": null
+  },
+  {
+    "shape": "duck",
+    "version": "3.37.1",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "duck",
+    "version": "3.44.2",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "duck",
+    "version": "3.100.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "duck",
+    "version": "4.0.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "string",
+    "version": "3.9.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "string",
+    "version": "3.34.9",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "string",
+    "version": "3.35.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "string",
+    "version": "3.35.5",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "string",
+    "version": "3.36.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "string",
+    "version": "3.36.99",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "string",
+    "version": "3.37.0",
+    "comparison": 0,
+    "result": null
+  },
+  {
+    "shape": "string",
+    "version": "3.37.1",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "string",
+    "version": "3.44.2",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "string",
+    "version": "3.100.0",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.100.0) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "string",
+    "version": "4.0.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.9.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.34.9",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.35.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.35.5",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.36.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.36.99",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.37.0",
+    "comparison": 0,
+    "result": null
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.37.1",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.44.2",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "string_subclass",
+    "version": "3.100.0",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.100.0) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "string_subclass",
+    "version": "4.0.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.9.0",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.34.9",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.34.9) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.35.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.35.5",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.36.0",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.36.99",
+    "comparison": -1,
+    "result": null
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.37.0",
+    "comparison": 0,
+    "result": null
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.37.1",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.44.2",
+    "comparison": 1,
+    "result": null
+  },
+  {
+    "shape": "frozen_string",
+    "version": "3.100.0",
+    "comparison": -1,
+    "error": "RuntimeError",
+    "message": "Your version of SQLite (3.100.0) is too old. Active Record supports SQLite >= 3.35.0."
+  },
+  {
+    "shape": "frozen_string",
+    "version": "4.0.0",
+    "comparison": 1,
+    "result": null
+  }
+]

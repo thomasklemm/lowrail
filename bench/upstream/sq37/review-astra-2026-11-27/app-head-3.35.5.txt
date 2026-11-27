@@ -1,0 +1,5 @@
+bin/rails aborted!
+Your version of SQLite (3.35.5) is too old. Active Record supports SQLite >= 3.37.0.
+
+Tasks: TOP => db:prepare
+(See full trace by running task with --trace)

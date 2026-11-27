@@ -1,0 +1,55 @@
+diff --git a/activerecord/CHANGELOG.md b/activerecord/CHANGELOG.md
+index 47482d874e..c74b1fb635 100644
+--- a/activerecord/CHANGELOG.md
++++ b/activerecord/CHANGELOG.md
+@@ -1,3 +1,12 @@
++*   Bump the minimum supported SQLite version to 3.35.0.
++
++    SQLite 3.35.0 introduced the `RETURNING` clause, which the SQLite3 adapter
++    has depended on since Rails 7.1 (#49290) for reading auto-populated columns
++    such as the primary key after `INSERT`. Older SQLite versions have been
++    silently broken since then; make the requirement explicit.
++
++    *Ryuta Kamizono*
++
+ *   Deprecate the `insert_returning` option in PostgreSQL database
+     configurations, and the `PostgreSQLAdapter#use_insert_returning?` method.
+ 
+diff --git a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+index 125492c67a..cc709b482d 100644
+--- a/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
++++ b/activerecord/lib/active_record/connection_adapters/sqlite3_adapter.rb
+@@ -243,11 +243,11 @@ def supports_common_table_expressions?
+       end
+ 
+       def supports_insert_returning?
+-        database_version >= "3.35.0"
++        true
+       end
+ 
+       def supports_insert_on_conflict?
+-        database_version >= "3.24.0"
++        true
+       end
+       alias supports_insert_on_duplicate_skip? supports_insert_on_conflict?
+       alias supports_insert_on_duplicate_update? supports_insert_on_conflict?
+@@ -258,7 +258,7 @@ def supports_concurrent_connections?
+       end
+ 
+       def supports_virtual_columns?
+-        database_version >= "3.31.0"
++        true
+       end
+ 
+       def connected?
+@@ -536,8 +536,8 @@ def get_database_version # :nodoc:
+       end
+ 
+       def check_version # :nodoc:
+-        if database_version < "3.23.0"
+-          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.23.0."
++        if database_version < "3.35.0"
++          raise "Your version of SQLite (#{database_version}) is too old. Active Record supports SQLite >= 3.35.0."
+         end
+       end
+ 

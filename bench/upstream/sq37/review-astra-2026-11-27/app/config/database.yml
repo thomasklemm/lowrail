@@ -1,0 +1,4 @@
+development:
+  adapter: sqlite3
+  database: <%= ENV.fetch("SQ37_DATABASE") %>
+  schema_cache_path: <%= ENV["SQ37_SCHEMA_CACHE"] %>

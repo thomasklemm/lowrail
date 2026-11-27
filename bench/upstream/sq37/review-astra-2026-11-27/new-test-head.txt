@@ -1,0 +1,11 @@
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: -n test_check_version_requires_sqlite_3_37 --seed 39464
+
+# Running:
+
+.
+
+Finished in 0.001579s, 633.4338 runs/s, 1900.3013 assertions/s.
+
+1 runs, 3 assertions, 0 failures, 0 errors, 0 skips
