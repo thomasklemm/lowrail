@@ -1,4 +1,4 @@
-From 2db1c867821c6ea4af94348c772afacd62c6e519 Mon Sep 17 00:00:00 2001
+From b5c60e0b12fa6d279268165df3a38c046ff992b2 Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Fri, 27 Nov 2026 12:13:50 +0000
 Subject: [PATCH] Keep mocks of shareable objects such as ENV out of instance
@@ -18,10 +18,10 @@ but still allow instance variables, so they keep using @mocha.
  create mode 100644 test/acceptance/stub_env_test.rb
 
 diff --git a/lib/mocha/object_methods.rb b/lib/mocha/object_methods.rb
-index ec4883b4..34c5ccc9 100644
+index ec4883b4..6ed5be5b 100644
 --- a/lib/mocha/object_methods.rb
 +++ b/lib/mocha/object_methods.rb
-@@ -20,9 +20,15 @@ module Mocha
+@@ -20,9 +20,16 @@ module Mocha
        alias_method :_method, :method
      end
  
@@ -31,14 +31,15 @@ index ec4883b4..34c5ccc9 100644
      # @private
      def mocha(instantiate: true)
 -      if instantiate
-+      if mocha_shareable?
-+        SHAREABLE_MOCKS[self] ||= Mocha::Mockery.instance.mock_impersonating(self) if instantiate
++      if mocha_shareable? && instantiate
++        SHAREABLE_MOCKS[self] ||= Mocha::Mockery.instance.mock_impersonating(self)
++      elsif mocha_shareable?
 +        SHAREABLE_MOCKS[self]
 +      elsif instantiate
          @mocha ||= Mocha::Mockery.instance.mock_impersonating(self)
        else
          defined?(@mocha) ? @mocha : nil
-@@ -31,7 +37,18 @@ module Mocha
+@@ -31,7 +38,17 @@ module Mocha
  
      # @private
      def reset_mocha
@@ -51,8 +52,7 @@ index ec4883b4..34c5ccc9 100644
 +    end
 +
 +    # @private
-+    # Ruby 4.1 forbids instance variables on objects that are shareable but not frozen, such as ENV.
-+    # Classes and modules are shareable too, but still have instance variables.
++    # Classes and modules can still have instance variables when shareable.
 +    def mocha_shareable?
 +      !(Module === self) && defined?(Ractor) && Ractor.shareable?(self)
      end
