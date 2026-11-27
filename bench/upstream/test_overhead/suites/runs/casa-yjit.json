@@ -1,0 +1,63 @@
+{
+  "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+  "yjit": true,
+  "zjit": false,
+  "pwd": "/home/user/rdiff/pt2work/8df0833c42",
+  "tests": 2992,
+  "stackprof": "cpu",
+  "boot_wall": 8.421947206999903,
+  "window": {
+    "wall": 111.9502021799999,
+    "cpu": 98.426541593,
+    "allocs": 64191045,
+    "gc_count": 106
+  },
+  "counters": {
+    "app.call": {
+      "calls": 1042,
+      "wall": 17.092190954995203,
+      "allocs": 11321895,
+      "nested": {}
+    },
+    "controller_test.process": {
+      "calls": 31,
+      "wall": 0.3879803380004887,
+      "allocs": 113052,
+      "nested": {}
+    },
+    "factory_bot.run": {
+      "calls": 8096,
+      "wall": 54.794091402998674,
+      "allocs": 22110703,
+      "nested": {}
+    },
+    "fixtures.load": {
+      "calls": 1,
+      "wall": 7.188100016719545e-05,
+      "allocs": 14,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 2971,
+      "wall": 1.0232501510013208,
+      "allocs": 421825,
+      "nested": {
+        "fixtures.load": 7.188100016719545e-05
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 2971,
+      "wall": 1.1221191329759677,
+      "allocs": 287288,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 978,
+      "wall": 16.857998110992412,
+      "allocs": 11460438,
+      "nested": {
+        "app.call": 16.45729058599636
+      }
+    }
+  }
+}

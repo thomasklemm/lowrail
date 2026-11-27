@@ -1,0 +1,98 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +ZJIT +PRISM [x86_64-linux]",
+  "yjit": false,
+  "zjit": true,
+  "pwd": "/home/user/rdiff/pt2work/7c679952d6",
+  "tests": 7748,
+  "stackprof": "cpu",
+  "boot_wall": 17.234967006999796,
+  "window": {
+    "wall": 633.6864154940004,
+    "cpu": 570.763721613,
+    "allocs": 307345892,
+    "gc_count": 723
+  },
+  "counters": {
+    "app.call": {
+      "calls": 2024,
+      "wall": 51.489474068017444,
+      "allocs": 26829896,
+      "nested": {}
+    },
+    "controller_test.process": {
+      "calls": 340,
+      "wall": 15.063447257997723,
+      "allocs": 6059007,
+      "nested": {
+        "fabrication.build": 0.0005520599997907993,
+        "fabrication.create": 0.0178976760007572
+      }
+    },
+    "fabrication.build": {
+      "calls": 16286,
+      "wall": 46.94946599301056,
+      "allocs": 15769067,
+      "nested": {}
+    },
+    "fabrication.create": {
+      "calls": 15654,
+      "wall": 400.19972557303663,
+      "allocs": 195947380,
+      "nested": {
+        "fabrication.build": 44.91001907300779
+      }
+    },
+    "fixtures.load": {
+      "calls": 4,
+      "wall": 0.00009884499922918621,
+      "allocs": 28,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 7743,
+      "wall": 6.8306408709850075,
+      "allocs": 4647276,
+      "nested": {
+        "fixtures.load": 0.00009884499922918621,
+        "fixtures.tx_setup": 6.365877871972771
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 7743,
+      "wall": 9.361991807020786,
+      "allocs": 4351549,
+      "nested": {
+        "fixtures.tx_teardown": 8.98570829505752
+      }
+    },
+    "fixtures.tx_setup": {
+      "calls": 7741,
+      "wall": 6.365877871972771,
+      "allocs": 4381085,
+      "nested": {}
+    },
+    "fixtures.tx_teardown": {
+      "calls": 7741,
+      "wall": 8.98570829505752,
+      "allocs": 4307180,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 2024,
+      "wall": 52.478154954970705,
+      "allocs": 27183558,
+      "nested": {
+        "app.call": 51.489474068017444,
+        "rack_test.request": 52.159355681992565
+      }
+    },
+    "rack_test.request": {
+      "calls": 2024,
+      "wall": 52.159355681992565,
+      "allocs": 27105352,
+      "nested": {
+        "app.call": 51.489474068017444
+      }
+    }
+  }
+}

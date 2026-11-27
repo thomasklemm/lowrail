@@ -1,0 +1,87 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +ZJIT +PRISM [x86_64-linux]",
+  "yjit": false,
+  "zjit": true,
+  "pwd": "/home/user/rdiff/pt2work/0de2ff33b2",
+  "tests": 14236,
+  "stackprof": "cpu",
+  "boot_wall": 16.312545257000238,
+  "window": {
+    "wall": 879.5027879890004,
+    "cpu": 721.9620422889999,
+    "allocs": 351511113,
+    "gc_count": 809
+  },
+  "counters": {
+    "app.call": {
+      "calls": 8519,
+      "wall": 342.1759994420063,
+      "allocs": 184860745,
+      "nested": {}
+    },
+    "controller_test.process": {
+      "calls": 32,
+      "wall": 0.3617208749983547,
+      "allocs": 134851,
+      "nested": {}
+    },
+    "fixtures.access": {
+      "calls": 27557,
+      "wall": 14.465394586986804,
+      "allocs": 4214331,
+      "nested": {}
+    },
+    "fixtures.load": {
+      "calls": 23,
+      "wall": 5.504407626997818,
+      "allocs": 1004353,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 14236,
+      "wall": 10.753300586934529,
+      "allocs": 2547605,
+      "nested": {
+        "fixtures.load": 5.504407626997818,
+        "fixtures.tx_setup": 4.610416062000695
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 14236,
+      "wall": 5.637582696954269,
+      "allocs": 1196353,
+      "nested": {
+        "fixtures.tx_teardown": 5.308576510964485
+      }
+    },
+    "fixtures.tx_setup": {
+      "calls": 14223,
+      "wall": 4.610416062000695,
+      "allocs": 1356260,
+      "nested": {}
+    },
+    "fixtures.tx_teardown": {
+      "calls": 14223,
+      "wall": 5.308576510964485,
+      "allocs": 1151493,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 8519,
+      "wall": 347.79076515700854,
+      "allocs": 188676078,
+      "nested": {
+        "app.call": 342.1759994420063,
+        "rack_test.request": 345.97687301296173
+      }
+    },
+    "rack_test.request": {
+      "calls": 8519,
+      "wall": 345.97687301296173,
+      "allocs": 188345480,
+      "nested": {
+        "app.call": 342.1759994420063
+      }
+    }
+  }
+}

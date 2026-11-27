@@ -3,7 +3,7 @@
 # One profiled run of an app's own suite (docs/upstream/test-overhead-2.md), reusing script/ruby-differential's
 # app table, fresh copies, template databases and private Redis.
 #   RDIFF_RAILS=SHA RDIFF_CORPUS=censuspt2 ruby run_suite.rb APP RUBY_DIR MODE OUT_PREFIX [STACKPROF_MODE]
-# MODE: interp, yjit or zjit. STACKPROF_MODE: wall, cpu, object or none. Writes OUT_PREFIX.PID.json (and
+# MODE: interp, yjit or zjit. STACKPROF_MODE: wall, cpu, object or none. PT2_PARALLEL=N runs N workers. Writes OUT_PREFIX.PID.json (and
 # .stackprof) from suite_profile.rb plus OUT_PREFIX.log, and prints the JSON paths.
 load File.expand_path("../../../script/ruby-differential", __dir__)
 require "rbconfig"
@@ -25,6 +25,7 @@ rd.with_redis do |redis|
   e["RUBYOPT"] = "#{e["RUBYOPT"]} -r#{File.expand_path("suite_profile.rb", __dir__)}"
   e.merge!("PT2_OUT" => File.expand_path(out), "PT2_KIND" => conf.fetch(:kind), "PT2_STACKPROF" => stack.to_s,
     "PT2_STACKPROF_LIB" => gem_lib)
+  e["PARALLEL_WORKERS"] = ENV["PT2_PARALLEL"] if ENV["PT2_PARALLEL"] # ruby-differential runs one worker
   cmd = conf.fetch(:cmd)
   cmd += ["--format", "progress"] if conf[:kind] == "rspec"
   t = Time.now

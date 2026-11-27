@@ -1,6 +1,7 @@
 # P-TEST: the cost outside a Rails test body
 
-2026-11-05–06. Ruby 4.0.9, revision `3e93b23afcec3433f6aecc34b5d832799d754238`.
+2026-11-05–06. Ruby 4.0.9, revision `3e93b23afcec3433f6aecc34b5d832799d754238`. Round 2 (2026-11-27, whole suites):
+[test-overhead-2.md](test-overhead-2.md).
 
 ## Scope and decision
 

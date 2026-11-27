@@ -1,0 +1,326 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/test_overhead/sql_log_body.rb",
+  "at": "2026-11-27T20:20:14Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/tmp/pt2/rails-81",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "3f290b759c8e2ffe7c257951b1255740751355e4",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/tmp/pt2/rails-81b",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "3f290b759c8e2ffe7c257951b1255740751355e4",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp find_by, logger at debug": {
+      "base": 94.998,
+      "base1": 94.998,
+      "base2": 94.998,
+      "candidate": 94.998,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp find_by, logger at info": {
+      "base": 50.0,
+      "base1": 50.0,
+      "base2": 50.0,
+      "candidate": 50.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit find_by, logger at debug": {
+      "base": 96.998,
+      "base1": 96.998,
+      "base2": 96.998,
+      "candidate": 96.998,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit find_by, logger at info": {
+      "base": 50.0,
+      "base1": 50.0,
+      "base2": 50.0,
+      "candidate": 50.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "interp find_by, logger at debug": {
+      "base": 341827.57025,
+      "base1": 341744.894,
+      "base2": 341910.2465,
+      "candidate": 341902.0145,
+      "change": 0.00021778304759201284,
+      "aa": 0.0004837307297334284,
+      "claim": false
+    },
+    "interp find_by, logger at info": {
+      "base": 236587.8155,
+      "base1": 236604.3155,
+      "base2": 236571.3155,
+      "candidate": 236675.841,
+      "change": 0.0003720626939893723,
+      "aa": 0.00013948309185009573,
+      "claim": true
+    },
+    "yjit find_by, logger at debug": {
+      "base": 189733.1865,
+      "base1": 189315.7655,
+      "base2": 190150.6075,
+      "candidate": 189326.79,
+      "change": -0.002141936829801794,
+      "aa": 0.004400084220374406,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                613,
+                613
+              ],
+              "compiled_block_count": [
+                9125,
+                9125
+              ],
+              "invalidation_count": [
+                253,
+                253
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                613,
+                613
+              ],
+              "compiled_block_count": [
+                9141,
+                9141
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                613,
+                613
+              ],
+              "compiled_block_count": [
+                9141,
+                9141
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                613,
+                613
+              ],
+              "compiled_block_count": [
+                9141,
+                9141
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                613,
+                613
+              ],
+              "compiled_block_count": [
+                9142,
+                9142
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                613,
+                613
+              ],
+              "compiled_block_count": [
+                9141,
+                9141
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit find_by, logger at info": {
+      "base": 120515.2905,
+      "base1": 120511.147,
+      "base2": 120519.434,
+      "candidate": 120434.591,
+      "change": -0.0006696204246381399,
+      "aa": 0.00006876305874229813,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                558,
+                558
+              ],
+              "compiled_block_count": [
+                8488,
+                8488
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                558,
+                558
+              ],
+              "compiled_block_count": [
+                8488,
+                8488
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                558,
+                558
+              ],
+              "compiled_block_count": [
+                8488,
+                8488
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                558,
+                558
+              ],
+              "compiled_block_count": [
+                8488,
+                8488
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                558,
+                558
+              ],
+              "compiled_block_count": [
+                8488,
+                8488
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                558,
+                558
+              ],
+              "compiled_block_count": [
+                8488,
+                8488
+              ],
+              "invalidation_count": [
+                256,
+                256
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

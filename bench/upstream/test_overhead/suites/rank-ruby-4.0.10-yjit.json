@@ -1,0 +1,200 @@
+{
+  "campfire": {
+    "tests": 634,
+    "cpu_ms_per_test": 41.6,
+    "objects_per_test": 39334,
+    "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+    "shares": {
+      "SQL and event debug logging": 5.35575276350615,
+      "  of which query source (verbose_query_logs)": 0.0,
+      "Fixtures, all": 4.079090767554103,
+      "  fixture loading": 1.1676786548341895,
+      "  transactional setup and teardown": 0.9497119725984743,
+      "  fixture accessors (record finds)": 1.4790596294566403,
+      "Integration session, outside the request": 1.6036120193056205,
+      "  rack-test request and cookies": 1.1365405573719445,
+      "Controller test plumbing, outside the action": 0.0,
+      "Factories, all (factory_bot, Fabrication)": 0.0,
+      "  factory gem's own code": 0.0,
+      "Test framework (Minitest, RSpec, Rails test helpers), own code": 1.5413358243811304,
+      "Mocks and stubs (Mocha, WebMock, rspec-mocks)": 1.1054024599096994,
+      "Garbage collection": 11.318698427526078
+    }
+  },
+  "writebook": {
+    "tests": 310,
+    "cpu_ms_per_test": 156.2,
+    "objects_per_test": 29639,
+    "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+    "shares": {
+      "SQL and event debug logging": 6.995884773662551,
+      "  of which query source (verbose_query_logs)": 0.0,
+      "Fixtures, all": 2.880658436213992,
+      "  fixture loading": 0.51440329218107,
+      "  transactional setup and teardown": 0.9516460905349794,
+      "  fixture accessors (record finds)": 1.2602880658436213,
+      "Integration session, outside the request": 1.5689300411522633,
+      "  rack-test request and cookies": 1.2345679012345678,
+      "Controller test plumbing, outside the action": 0.0,
+      "Factories, all (factory_bot, Fabrication)": 0.0,
+      "  factory gem's own code": 0.0,
+      "Test framework (Minitest, RSpec, Rails test helpers), own code": 1.6718106995884774,
+      "Mocks and stubs (Mocha, WebMock, rspec-mocks)": 0.0,
+      "Garbage collection": 10.699588477366255
+    }
+  },
+  "fizzy": {
+    "tests": 1787,
+    "cpu_ms_per_test": 40.8,
+    "objects_per_test": 28578,
+    "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+    "shares": {
+      "SQL and event debug logging": 10.110098921365898,
+      "  of which query source (verbose_query_logs)": 0.0,
+      "Fixtures, all": 5.381992958140055,
+      "  fixture loading": 1.5648577656066618,
+      "  transactional setup and teardown": 0.9668585480355446,
+      "  fixture accessors (record finds)": 2.582015313250992,
+      "Integration session, outside the request": 1.3077739898284246,
+      "  rack-test request and cookies": 1.0618677695188061,
+      "Controller test plumbing, outside the action": 0.0,
+      "Factories, all (factory_bot, Fabrication)": 0.0,
+      "  factory gem's own code": 0.0,
+      "Test framework (Minitest, RSpec, Rails test helpers), own code": 1.3971944335773767,
+      "Mocks and stubs (Mocha, WebMock, rspec-mocks)": 0.3297378863242609,
+      "Garbage collection": 10.573967473313587
+    }
+  },
+  "codetriage": {
+    "tests": 219,
+    "cpu_ms_per_test": 19.6,
+    "objects_per_test": 8473,
+    "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+    "shares": {
+      "SQL and event debug logging": 9.08203125,
+      "  of which query source (verbose_query_logs)": 0.0,
+      "Fixtures, all": 9.08203125,
+      "  fixture loading": 2.1484375,
+      "  transactional setup and teardown": 3.61328125,
+      "  fixture accessors (record finds)": 3.02734375,
+      "Integration session, outside the request": 0.09765625,
+      "  rack-test request and cookies": 0.0,
+      "Controller test plumbing, outside the action": 0.390625,
+      "Factories, all (factory_bot, Fabrication)": 0.0,
+      "  factory gem's own code": 0.0,
+      "Test framework (Minitest, RSpec, Rails test helpers), own code": 1.7578125,
+      "Mocks and stubs (Mocha, WebMock, rspec-mocks)": 3.41796875,
+      "Garbage collection": 9.08203125
+    }
+  },
+  "hackatime": {
+    "tests": 794,
+    "cpu_ms_per_test": 35.2,
+    "objects_per_test": 15164,
+    "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+    "shares": {
+      "SQL and event debug logging": 7.038871379258592,
+      "  of which query source (verbose_query_logs)": 0.0,
+      "Fixtures, all": 1.515833708539697,
+      "  fixture loading": 0.0,
+      "  transactional setup and teardown": 1.3057181449797388,
+      "  fixture accessors (record finds)": 0.0,
+      "Integration session, outside the request": 1.3807594176797238,
+      "  rack-test request and cookies": 1.080594326879784,
+      "Controller test plumbing, outside the action": 0.0,
+      "Factories, all (factory_bot, Fabrication)": 26.039321626894793,
+      "  factory gem's own code": 1.3657511631397268,
+      "Test framework (Minitest, RSpec, Rails test helpers), own code": 1.7559657811796487,
+      "Mocks and stubs (Mocha, WebMock, rspec-mocks)": 0.585321927059883,
+      "Garbage collection": 10.340687378057932
+    }
+  },
+  "casa": {
+    "tests": 2992,
+    "cpu_ms_per_test": 32.9,
+    "objects_per_test": 21454,
+    "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+    "shares": {
+      "SQL and event debug logging": 8.513204408400915,
+      "  of which query source (verbose_query_logs)": 0.0,
+      "Fixtures, all": 1.6261176959866916,
+      "  fixture loading": 0.0,
+      "  transactional setup and teardown": 1.4514452069037223,
+      "  fixture accessors (record finds)": 0.0,
+      "Integration session, outside the request": 0.4616344354335621,
+      "  rack-test request and cookies": 0.32439176543980036,
+      "Controller test plumbing, outside the action": 0.045747556664587234,
+      "Factories, all (factory_bot, Fabrication)": 43.66812227074236,
+      "  factory gem's own code": 3.8552713661883966,
+      "Test framework (Minitest, RSpec, Rails test helpers), own code": 2.5202744853399874,
+      "Mocks and stubs (Mocha, WebMock, rspec-mocks)": 0.9898107714701602,
+      "Garbage collection": 10.160116448326056
+    }
+  },
+  "sure": {
+    "tests": 14236,
+    "cpu_ms_per_test": 46.2,
+    "objects_per_test": 25293,
+    "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+    "shares": {
+      "SQL and event debug logging": 14.211818058839066,
+      "  of which query source (verbose_query_logs)": 0.0,
+      "Fixtures, all": 3.278857488871854,
+      "  fixture loading": 0.24221029780271455,
+      "  transactional setup and teardown": 1.0899463401122156,
+      "  fixture accessors (record finds)": 1.7805033593795294,
+      "Integration session, outside the request": 0.7697907071123508,
+      "  rack-test request and cookies": 0.5610775781546925,
+      "Controller test plumbing, outside the action": 0.003220881619716949,
+      "Factories, all (factory_bot, Fabrication)": 0.0,
+      "  factory gem's own code": 0.0,
+      "Test framework (Minitest, RSpec, Rails test helpers), own code": 0.8232573419996522,
+      "Mocks and stubs (Mocha, WebMock, rspec-mocks)": 0.6422437949715596,
+      "Garbage collection": 5.910317772180601
+    }
+  },
+  "loomio": {
+    "tests": 3660,
+    "cpu_ms_per_test": 86.4,
+    "objects_per_test": 53375,
+    "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+    "shares": {
+      "SQL and event debug logging": 0.24810235227851837,
+      "  of which query source (verbose_query_logs)": 0.0,
+      "Fixtures, all": 1.9083764718504412,
+      "  fixture loading": 0.3835528256846284,
+      "  transactional setup and teardown": 0.28431188477322106,
+      "  fixture accessors (record finds)": 1.1238366011318832,
+      "Integration session, outside the request": 0.06705468980500497,
+      "  rack-test request and cookies": 0.04962047045570367,
+      "Controller test plumbing, outside the action": 0.3366145428211249,
+      "Factories, all (factory_bot, Fabrication)": 0.0026821875922001985,
+      "  factory gem's own code": 0.0,
+      "Test framework (Minitest, RSpec, Rails test helpers), own code": 0.6142209586138454,
+      "Mocks and stubs (Mocha, WebMock, rspec-mocks)": 0.1649545369203122,
+      "Garbage collection": 5.6983075396293215
+    }
+  },
+  "mastodon": {
+    "tests": 7748,
+    "cpu_ms_per_test": 62.1,
+    "objects_per_test": 39738,
+    "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+    "shares": {
+      "SQL and event debug logging": 39.064138077988495,
+      "  of which query source (verbose_query_logs)": 33.986788834434265,
+      "Fixtures, all": 2.1811208182399318,
+      "  fixture loading": 0.0,
+      "  transactional setup and teardown": 2.058384828467931,
+      "  fixture accessors (record finds)": 0.0,
+      "Integration session, outside the request": 0.18495631792030684,
+      "  rack-test request and cookies": 0.1150649904112508,
+      "Controller test plumbing, outside the action": 0.07159599403366716,
+      "Factories, all (factory_bot, Fabrication)": 56.72874493927125,
+      "  factory gem's own code": 0.47389729384189216,
+      "Test framework (Minitest, RSpec, Rails test helpers), own code": 1.5265288727892605,
+      "Mocks and stubs (Mocha, WebMock, rspec-mocks)": 1.0867249094395908,
+      "Garbage collection": 10.590240784146602
+    }
+  }
+}

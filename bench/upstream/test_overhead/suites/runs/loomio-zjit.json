@@ -1,0 +1,89 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +ZJIT +PRISM [x86_64-linux]",
+  "yjit": false,
+  "zjit": true,
+  "pwd": "/home/user/rdiff/pt2work/9aebdbe196",
+  "tests": 3660,
+  "stackprof": "cpu",
+  "boot_wall": 9.313891296999827,
+  "window": {
+    "wall": 497.1352877059999,
+    "cpu": 375.551618683,
+    "allocs": 191531453,
+    "gc_count": 499
+  },
+  "counters": {
+    "app.call": {
+      "calls": 370,
+      "wall": 10.379068833996826,
+      "allocs": 9405008,
+      "nested": {}
+    },
+    "controller_test.process": {
+      "calls": 2159,
+      "wall": 48.213070830993274,
+      "allocs": 17401617,
+      "nested": {
+        "fixtures.access": 0.000006634999408561271
+      }
+    },
+    "fixtures.access": {
+      "calls": 15553,
+      "wall": 5.090248327976951,
+      "allocs": 1242339,
+      "nested": {}
+    },
+    "fixtures.load": {
+      "calls": 68,
+      "wall": 3.729248779001864,
+      "allocs": 1223269,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 3617,
+      "wall": 11.7042591810241,
+      "allocs": 1474122,
+      "nested": {
+        "fixtures.load": 3.729248779001864,
+        "fixtures.tx_setup": 0.7586516609962928
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 3617,
+      "wall": 1.5247609109828772,
+      "allocs": 132406,
+      "nested": {
+        "fixtures.tx_teardown": 1.3835118360357228
+      }
+    },
+    "fixtures.tx_setup": {
+      "calls": 3561,
+      "wall": 0.7586516609962928,
+      "allocs": 170788,
+      "nested": {}
+    },
+    "fixtures.tx_teardown": {
+      "calls": 3561,
+      "wall": 1.3835118360357228,
+      "allocs": 120761,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 370,
+      "wall": 10.53926782299095,
+      "allocs": 9535529,
+      "nested": {
+        "app.call": 10.379068833996826,
+        "rack_test.request": 10.505072070996903
+      }
+    },
+    "rack_test.request": {
+      "calls": 370,
+      "wall": 10.505072070996903,
+      "allocs": 9523299,
+      "nested": {
+        "app.call": 10.379068833996826
+      }
+    }
+  }
+}

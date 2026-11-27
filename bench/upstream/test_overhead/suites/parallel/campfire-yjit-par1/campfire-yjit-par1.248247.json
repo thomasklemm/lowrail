@@ -1,0 +1,85 @@
+{
+  "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+  "yjit": true,
+  "zjit": false,
+  "pwd": "/home/user/rdiff/pt2work/0a7358f6ae",
+  "tests": 634,
+  "stackprof": null,
+  "boot_wall": 3.883498332000272,
+  "window": {
+    "wall": 34.61636109699975,
+    "cpu": 24.539251051999997,
+    "allocs": 28991791,
+    "gc_count": 169
+  },
+  "counters": {
+    "app.call": {
+      "calls": 662,
+      "wall": 13.211077723018207,
+      "allocs": 11884528,
+      "nested": {
+        "fixtures.access": 0.00001842399979068432
+      }
+    },
+    "fixtures.access": {
+      "calls": 2469,
+      "wall": 0.3416491680090985,
+      "allocs": 147786,
+      "nested": {}
+    },
+    "fixtures.load": {
+      "calls": 43,
+      "wall": 0.3326587439996729,
+      "allocs": 233851,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 634,
+      "wall": 0.5400443729922699,
+      "allocs": 334215,
+      "nested": {
+        "fixtures.load": 0.3326587439996729,
+        "fixtures.tx_setup": 0.10326001999601431
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 634,
+      "wall": 0.13193906499964214,
+      "allocs": 55596,
+      "nested": {
+        "fixtures.tx_teardown": 0.11166489100833132
+      }
+    },
+    "fixtures.tx_setup": {
+      "calls": 598,
+      "wall": 0.10326001999601431,
+      "allocs": 64628,
+      "nested": {}
+    },
+    "fixtures.tx_teardown": {
+      "calls": 598,
+      "wall": 0.11166489100833132,
+      "allocs": 53607,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 662,
+      "wall": 13.578640193001775,
+      "allocs": 12267678,
+      "nested": {
+        "app.call": 13.211077723018207,
+        "rack_test.request": 13.514136023008177,
+        "fixtures.access": 0.00001842399979068432
+      }
+    },
+    "rack_test.request": {
+      "calls": 662,
+      "wall": 13.514136023008177,
+      "allocs": 12234910,
+      "nested": {
+        "app.call": 13.211077723018207,
+        "fixtures.access": 0.00001842399979068432
+      }
+    }
+  }
+}

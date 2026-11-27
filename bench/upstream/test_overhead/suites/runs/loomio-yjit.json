@@ -1,0 +1,89 @@
+{
+  "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+  "yjit": true,
+  "zjit": false,
+  "pwd": "/home/user/rdiff/pt2work/8042a3dce2",
+  "tests": 3660,
+  "stackprof": "cpu",
+  "boot_wall": 9.095391519000259,
+  "window": {
+    "wall": 444.2357177599997,
+    "cpu": 316.22177305300005,
+    "allocs": 195353462,
+    "gc_count": 366
+  },
+  "counters": {
+    "app.call": {
+      "calls": 370,
+      "wall": 9.020816751985876,
+      "allocs": 10063390,
+      "nested": {}
+    },
+    "controller_test.process": {
+      "calls": 2159,
+      "wall": 44.844389189009235,
+      "allocs": 17679577,
+      "nested": {
+        "fixtures.access": 0.000005402999704529066
+      }
+    },
+    "fixtures.access": {
+      "calls": 15553,
+      "wall": 4.247077983935014,
+      "allocs": 1259446,
+      "nested": {}
+    },
+    "fixtures.load": {
+      "calls": 68,
+      "wall": 3.67697598599716,
+      "allocs": 1244999,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 3617,
+      "wall": 11.737446884040764,
+      "allocs": 1497590,
+      "nested": {
+        "fixtures.load": 3.67697598599716,
+        "fixtures.tx_setup": 0.6631954780086744
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 3617,
+      "wall": 1.4489464640209917,
+      "allocs": 126896,
+      "nested": {
+        "fixtures.tx_teardown": 1.3391152899894223
+      }
+    },
+    "fixtures.tx_setup": {
+      "calls": 3561,
+      "wall": 0.6631954780086744,
+      "allocs": 170771,
+      "nested": {}
+    },
+    "fixtures.tx_teardown": {
+      "calls": 3561,
+      "wall": 1.3391152899894223,
+      "allocs": 115308,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 370,
+      "wall": 9.184308229003364,
+      "allocs": 10194920,
+      "nested": {
+        "app.call": 9.020816751985876,
+        "rack_test.request": 9.150317910998638
+      }
+    },
+    "rack_test.request": {
+      "calls": 370,
+      "wall": 9.150317910998638,
+      "allocs": 10182333,
+      "nested": {
+        "app.call": 9.020816751985876
+      }
+    }
+  }
+}

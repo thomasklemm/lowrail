@@ -1,0 +1,87 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +ZJIT +PRISM [x86_64-linux]",
+  "yjit": false,
+  "zjit": true,
+  "pwd": "/home/user/rdiff/pt2work/439715af0c",
+  "tests": 2992,
+  "stackprof": "cpu",
+  "boot_wall": 8.227912576000563,
+  "window": {
+    "wall": 145.12662082799943,
+    "cpu": 131.807307605,
+    "allocs": 63610498,
+    "gc_count": 280
+  },
+  "counters": {
+    "app.call": {
+      "calls": 1042,
+      "wall": 26.687148305992196,
+      "allocs": 11242652,
+      "nested": {}
+    },
+    "controller_test.process": {
+      "calls": 31,
+      "wall": 0.7581442049986435,
+      "allocs": 112487,
+      "nested": {}
+    },
+    "factory_bot.run": {
+      "calls": 8060,
+      "wall": 66.01973131601699,
+      "allocs": 21710247,
+      "nested": {}
+    },
+    "fixtures.load": {
+      "calls": 1,
+      "wall": 6.364399996527936e-05,
+      "allocs": 14,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 2971,
+      "wall": 1.3708120809924367,
+      "allocs": 428394,
+      "nested": {
+        "fixtures.load": 6.364399996527936e-05,
+        "fixtures.tx_setup": 1.1569394289981574
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 2971,
+      "wall": 1.2350909470033002,
+      "allocs": 294235,
+      "nested": {
+        "fixtures.tx_teardown": 1.1388610099784273
+      }
+    },
+    "fixtures.tx_setup": {
+      "calls": 2971,
+      "wall": 1.1569394289981574,
+      "allocs": 340523,
+      "nested": {}
+    },
+    "fixtures.tx_teardown": {
+      "calls": 2971,
+      "wall": 1.1388610099784273,
+      "allocs": 277613,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 978,
+      "wall": 25.86059003801529,
+      "allocs": 11386381,
+      "nested": {
+        "app.call": 25.268012127990005,
+        "rack_test.request": 25.70399331601675
+      }
+    },
+    "rack_test.request": {
+      "calls": 978,
+      "wall": 25.70399331601675,
+      "allocs": 11348180,
+      "nested": {
+        "app.call": 25.268012127990005
+      }
+    }
+  }
+}

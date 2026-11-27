@@ -1,0 +1,87 @@
+{
+  "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+  "yjit": true,
+  "zjit": false,
+  "pwd": "/home/user/rdiff/pt2work/32aa84ccf1",
+  "tests": 14236,
+  "stackprof": "cpu",
+  "boot_wall": 13.299633932999768,
+  "window": {
+    "wall": 890.250539264,
+    "cpu": 657.629822245,
+    "allocs": 360073964,
+    "gc_count": 363
+  },
+  "counters": {
+    "app.call": {
+      "calls": 8519,
+      "wall": 344.1623688439481,
+      "allocs": 190971644,
+      "nested": {}
+    },
+    "controller_test.process": {
+      "calls": 32,
+      "wall": 0.4115456939998694,
+      "allocs": 137543,
+      "nested": {}
+    },
+    "fixtures.access": {
+      "calls": 27560,
+      "wall": 14.801372774915762,
+      "allocs": 4284477,
+      "nested": {}
+    },
+    "fixtures.load": {
+      "calls": 23,
+      "wall": 5.862091089999012,
+      "allocs": 1008554,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 14236,
+      "wall": 11.636967092997565,
+      "allocs": 2590233,
+      "nested": {
+        "fixtures.load": 5.862091089999012,
+        "fixtures.tx_setup": 5.063364349987296
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 14236,
+      "wall": 7.848484907968668,
+      "allocs": 1210733,
+      "nested": {
+        "fixtures.tx_teardown": 7.386042721026115
+      }
+    },
+    "fixtures.tx_setup": {
+      "calls": 14223,
+      "wall": 5.063364349987296,
+      "allocs": 1384459,
+      "nested": {}
+    },
+    "fixtures.tx_teardown": {
+      "calls": 14223,
+      "wall": 7.386042721026115,
+      "allocs": 1165892,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 8519,
+      "wall": 348.95205628899885,
+      "allocs": 194815286,
+      "nested": {
+        "app.call": 344.1623688439481,
+        "rack_test.request": 347.982144572984
+      }
+    },
+    "rack_test.request": {
+      "calls": 8519,
+      "wall": 347.982144572984,
+      "allocs": 194479163,
+      "nested": {
+        "app.call": 344.1623688439481
+      }
+    }
+  }
+}

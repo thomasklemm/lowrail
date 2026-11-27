@@ -15,7 +15,7 @@ module PT2
   @stack = []
 
   class << self
-    attr_accessor :tests, :window
+    attr_accessor :tests, :window, :parallel
     attr_reader :counters
 
     def now = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -71,6 +71,34 @@ module PT2
       wrap(Fabrication::Generator::Base, :create, "fabrication.create") if defined?(Fabrication::Generator::Base)
     end
 
+    # Parallel workers (Rails' parallelize with processes) write PT2_OUT.PID.worker.json at exit: database
+    # setup after the fork, the queue loop, and the DRb round trips that return each result.
+    def instrument_workers
+      return unless defined?(ActiveSupport::Testing::Parallelization::Worker)
+      ActiveSupport::Testing::Parallelization::Worker.prepend(Module.new do
+        def after_fork
+          PT2.worker_started
+          PT2.measure("parallel.after_fork") { super }
+        end
+
+        def work_from_queue = PT2.measure("parallel.work_from_queue") { super }
+        def perform_job(job) = PT2.measure("parallel.perform_job") { super }
+        def safe_record(...) = PT2.measure("parallel.record") { super }
+      end)
+    end
+
+    def worker_started
+      @tests = 0
+      @counters.clear
+      @stack.clear
+      w0 = now
+      at_exit do
+        require "json"
+        File.write("#{OUT}.#{Process.pid}.worker.json", JSON.pretty_generate(
+          "tests" => @tests, "wall" => now - w0, "counters" => @counters.sort.to_h) + "\n")
+      end
+    end
+
     def detailed? = !ENV["PT2_STACKPROF"].to_s.empty? || ENV["PT2_COUNTERS"] == "1"
 
     # PT2_LOG_LEVEL=info: the suite as if config.log_level were :info, which also turns off Rails.event's
@@ -117,12 +145,35 @@ case ENV["PT2_KIND"]
 when "minitest"
   require "bundler/setup"
   require "minitest"
-  Minitest.singleton_class.prepend(Module.new do
-    def run_all_suites(*)
+  # With Rails' parallelize, run_all_suites only queues the tests; the workers run them until the executor's
+  # shutdown, so the window spans the executor's start to its shutdown instead.
+  module PT2Parallel
+    def start
+      require "active_support/testing/parallelization"
+      PT2.instrument_workers if PT2.detailed?
+      PT2.parallel = true
       PT2.start
+      super
+    end
+
+    def shutdown
       super
     ensure
       PT2.finish
+    end
+  end
+  Minitest.singleton_class.prepend(Module.new do
+    # After process_args, which loads the test files (and their parallelize call), before the executor starts.
+    def init_plugins(*)
+      ActiveSupport::Testing::ParallelizeExecutor.prepend(PT2Parallel) if defined?(ActiveSupport::Testing::ParallelizeExecutor)
+      super
+    end
+
+    def run_all_suites(*)
+      PT2.start unless PT2.parallel
+      super
+    ensure
+      PT2.finish unless PT2.parallel
     end
   end)
   Minitest::Test.prepend(Module.new { def run = super.tap { PT2.tests += 1 } })

@@ -1,0 +1,87 @@
+{
+  "ruby": "ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +ZJIT +PRISM [x86_64-linux]",
+  "yjit": false,
+  "zjit": true,
+  "pwd": "/home/user/rdiff/pt2work/56967ad7ed",
+  "tests": 219,
+  "stackprof": "cpu",
+  "boot_wall": 4.3279587440001706,
+  "window": {
+    "wall": 6.275160833999507,
+    "cpu": 5.3664935179999995,
+    "allocs": 1849518,
+    "gc_count": 8
+  },
+  "counters": {
+    "app.call": {
+      "calls": 100,
+      "wall": 1.7694480239943005,
+      "allocs": 596498,
+      "nested": {}
+    },
+    "controller_test.process": {
+      "calls": 28,
+      "wall": 0.3165332829958061,
+      "allocs": 64021,
+      "nested": {}
+    },
+    "fixtures.access": {
+      "calls": 158,
+      "wall": 0.16391600299994025,
+      "allocs": 30612,
+      "nested": {}
+    },
+    "fixtures.load": {
+      "calls": 1,
+      "wall": 0.23619794299975183,
+      "allocs": 49183,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 219,
+      "wall": 0.38870264499928453,
+      "allocs": 78640,
+      "nested": {
+        "fixtures.load": 0.23619794299975183,
+        "fixtures.tx_setup": 0.1413632450030491
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 219,
+      "wall": 0.14080314400234784,
+      "allocs": 20835,
+      "nested": {
+        "fixtures.tx_teardown": 0.12937708199569897
+      }
+    },
+    "fixtures.tx_setup": {
+      "calls": 219,
+      "wall": 0.1413632450030491,
+      "allocs": 25733,
+      "nested": {}
+    },
+    "fixtures.tx_teardown": {
+      "calls": 219,
+      "wall": 0.12937708199569897,
+      "allocs": 20057,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 7,
+      "wall": 0.0816746790005709,
+      "allocs": 22745,
+      "nested": {
+        "app.call": 0.07725757899788732,
+        "rack_test.request": 0.08049070100150857
+      }
+    },
+    "rack_test.request": {
+      "calls": 7,
+      "wall": 0.08049070100150857,
+      "allocs": 22349,
+      "nested": {
+        "app.call": 0.07725757899788732
+      }
+    }
+  }
+}

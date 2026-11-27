@@ -1319,6 +1319,14 @@ None.
 
 ## Investigated, not submitted
 
+- **P-TEST 2, the framework's share of whole app suites (2026-11-27): nothing opened** ([record](test-overhead-2.md)).
+  Nine census app suites on Rails main, Ruby 4.0.10 YJIT and master ZJIT. SQL debug logging is the one large
+  framework part (median 8.5% / 8.3% of suite CPU), and on main a logged query costs about 61% more instructions in
+  logging than on 8.1.4.1; others' open rails/rails #58957, #59717 and #59330 work on that path (#59717 closes about
+  7% of the gap), so it is recorded, not built. Held: rack-test `Cookie#expired?` parsing `expires` twice (under 0.1%
+  of a suite). Dropped: factory_bot `AttributeAssigner` (1.5% of CASA; reworked by its maintainer the same day),
+  parallel-testing setup (1–3% of a 4-worker run, fixed per worker). PT1 stays parked.
+
 - **inertia-rails round 2, after v3.24.0 (2026-11-26): five leads not submitted** ([record](inertia-round-2.md)).
   Interpreter instructions per request on the Inertia XHR / dashboard XHR action workloads against 3.24.0 `5102d8d`,
   A/A ≤ 0.08%; the bar is about 2%. Below the bar: `inertia_configuration` memoized per controller −0.93% / −0.98%;

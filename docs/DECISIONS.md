@@ -93,7 +93,7 @@ lead. Each bet's doc is the source of truth for its state.
 | G1, I18N | gem census, i18n, gem request census | [gem-census](upstream/gem-census.md) · [i18n](upstream/i18n-performance.md) · [requests](upstream/gem-request-census.md) · [round 2](upstream/gem-request-census-2.md) |
 | R6 | relation delegators `...`, `default_scope` owner checks | [rails-r6-leads](upstream/rails-r6-leads.md) |
 | E2 | the 13 census configurations that fail on Ruby master install, via gem fixes | [gems-on-master](upstream/gems-on-master.md) |
-| P-TEST, P-DRV | per-test framework overhead; database driver result path (planned) | |
+| P-TEST, P-DRV | framework share of whole app suites; database driver result path (planned) | [test-overhead](upstream/test-overhead.md) · [round 2](upstream/test-overhead-2.md) |
 | FLK1 | rails/rails CI flakiness: exact fixes in one PR, one commit per cause | [rails-ci-flakiness](upstream/rails-ci-flakiness.md) |
 | done | Z2/Z11, Z13, Z1-2, P-MAP, QB1, DEF8, VM1 | [differential](upstream/zjit-app-differential.md) · [gap](upstream/zjit-yjit-gap.md) · [gap 2](upstream/zjit-gap-census-2.md) · [p-map](upstream/p-map.md) · [query-building](upstream/query-building.md) · [defaults](upstream/rails8-defaults.md) · [vm-share](upstream/vm-share.md) |
 

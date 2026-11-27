@@ -1,0 +1,121 @@
+{
+  "tests": 159,
+  "wall": 13.568015895999451,
+  "counters": {
+    "app.call": {
+      "calls": 180,
+      "wall": 5.728367512991099,
+      "allocs": 4667298,
+      "nested": {
+        "fixtures.access": 0.0000062590006564278156
+      }
+    },
+    "fixtures.access": {
+      "calls": 364,
+      "wall": 0.17632441900150297,
+      "allocs": 46418,
+      "nested": {}
+    },
+    "fixtures.load": {
+      "calls": 16,
+      "wall": 0.18773126499945647,
+      "allocs": 90903,
+      "nested": {}
+    },
+    "fixtures.setup": {
+      "calls": 159,
+      "wall": 0.30168481399505254,
+      "allocs": 121383,
+      "nested": {
+        "fixtures.load": 0.18773126499945647,
+        "fixtures.tx_setup": 0.060463145997346146
+      }
+    },
+    "fixtures.teardown": {
+      "calls": 159,
+      "wall": 0.06065225100246607,
+      "allocs": 14073,
+      "nested": {
+        "fixtures.tx_teardown": 0.0487266130048738
+      }
+    },
+    "fixtures.tx_setup": {
+      "calls": 149,
+      "wall": 0.060463145997346146,
+      "allocs": 16931,
+      "nested": {}
+    },
+    "fixtures.tx_teardown": {
+      "calls": 149,
+      "wall": 0.0487266130048738,
+      "allocs": 13459,
+      "nested": {}
+    },
+    "integration.process": {
+      "calls": 180,
+      "wall": 5.904338645002099,
+      "allocs": 4767683,
+      "nested": {
+        "app.call": 5.728367512991099,
+        "rack_test.request": 5.867826827993667,
+        "fixtures.access": 0.0000062590006564278156
+      }
+    },
+    "parallel.after_fork": {
+      "calls": 1,
+      "wall": 0.39262209800017445,
+      "allocs": 59097,
+      "nested": {}
+    },
+    "parallel.perform_job": {
+      "calls": 159,
+      "wall": 10.871964755006047,
+      "allocs": 5560735,
+      "nested": {
+        "fixtures.load": 0.18773126499945647,
+        "fixtures.tx_setup": 0.060463145997346146,
+        "fixtures.setup": 0.30168481399505254,
+        "fixtures.access": 0.17632441900150297,
+        "app.call": 5.728367512991099,
+        "rack_test.request": 5.867826827993667,
+        "integration.process": 5.904338645002099,
+        "fixtures.tx_teardown": 0.0487266130048738,
+        "fixtures.teardown": 0.06065225100246607,
+        "parallel.record": 0.1026907410041531
+      }
+    },
+    "parallel.record": {
+      "calls": 159,
+      "wall": 0.1026907410041531,
+      "allocs": 12270,
+      "nested": {}
+    },
+    "parallel.work_from_queue": {
+      "calls": 1,
+      "wall": 13.168594292000307,
+      "allocs": 5571778,
+      "nested": {
+        "fixtures.load": 0.18773126499945647,
+        "fixtures.tx_setup": 0.060463145997346146,
+        "fixtures.setup": 0.30168481399505254,
+        "fixtures.access": 0.17632441900150297,
+        "app.call": 5.728367512991099,
+        "rack_test.request": 5.867826827993667,
+        "integration.process": 5.904338645002099,
+        "fixtures.tx_teardown": 0.0487266130048738,
+        "fixtures.teardown": 0.06065225100246607,
+        "parallel.record": 0.1026907410041531,
+        "parallel.perform_job": 10.871964755006047
+      }
+    },
+    "rack_test.request": {
+      "calls": 180,
+      "wall": 5.867826827993667,
+      "allocs": 4758638,
+      "nested": {
+        "app.call": 5.728367512991099,
+        "fixtures.access": 0.0000062590006564278156
+      }
+    }
+  }
+}

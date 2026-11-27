@@ -1,0 +1,330 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/test_overhead/sql_log_body.rb",
+  "at": "2026-11-27T20:39:46Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/tmp/pt2/rails-main",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "2e299253f942ab94041cc6f210ac9d33884c210d",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/tmp/pt2/rails-59717",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "2e299253f942ab94041cc6f210ac9d33884c210d",
+      "dirty": true
+    }
+  },
+  "objects": {
+    "interp find_by, logger at debug": {
+      "base": 94.999,
+      "base1": 94.999,
+      "base2": 94.999,
+      "candidate": 89.999,
+      "change": -0.05263213296982072,
+      "aa": 0.0,
+      "claim": true
+    },
+    "interp find_by, logger at info": {
+      "base": 38.0,
+      "base1": 38.0,
+      "base2": 38.0,
+      "candidate": 38.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit find_by, logger at debug": {
+      "base": 96.999,
+      "base1": 96.999,
+      "base2": 96.999,
+      "candidate": 91.999,
+      "change": -0.05154692316415632,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit find_by, logger at info": {
+      "base": 38.0,
+      "base1": 38.0,
+      "base2": 38.0,
+      "candidate": 38.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "interp find_by, logger at debug": {
+      "base": 390247.012,
+      "base1": 390225.8425,
+      "base2": 390268.1815,
+      "candidate": 385774.0135,
+      "change": -0.011461967324428834,
+      "aa": 0.00010849282300200703,
+      "claim": true
+    },
+    "interp find_by, logger at info": {
+      "base": 220422.247,
+      "base1": 220423.247,
+      "base2": 220421.247,
+      "candidate": 220479.306,
+      "change": 0.0002588622554056119,
+      "aa": 0.000009073494292071162,
+      "claim": true
+    },
+    "yjit find_by, logger at debug": {
+      "base": 203083.34075,
+      "base1": 203140.3045,
+      "base2": 203026.377,
+      "candidate": 197868.784,
+      "change": -0.025676930125052566,
+      "aa": 0.0005609889003167321,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n2000 compiled_block_count +3",
+          "candidate n2000 compiled_block_count +3",
+          "base2 n2000 compiled_block_count +3"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                788,
+                788
+              ],
+              "compiled_block_count": [
+                11652,
+                11652
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                788,
+                788
+              ],
+              "compiled_block_count": [
+                11652,
+                11655
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                792,
+                792
+              ],
+              "compiled_block_count": [
+                11661,
+                11661
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                791,
+                791
+              ],
+              "compiled_block_count": [
+                11635,
+                11638
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                789,
+                789
+              ],
+              "compiled_block_count": [
+                11653,
+                11653
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                788,
+                788
+              ],
+              "compiled_block_count": [
+                11652,
+                11655
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit find_by, logger at info": {
+      "base": 92007.73625,
+      "base1": 91932.3085,
+      "base2": 92083.164,
+      "candidate": 92102.5535,
+      "change": 0.0010305356252038322,
+      "aa": 0.00163959582257416,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                708,
+                708
+              ],
+              "compiled_block_count": [
+                10705,
+                10705
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                708,
+                708
+              ],
+              "compiled_block_count": [
+                10705,
+                10705
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                708,
+                708
+              ],
+              "compiled_block_count": [
+                10706,
+                10706
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                708,
+                708
+              ],
+              "compiled_block_count": [
+                10706,
+                10706
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                702,
+                702
+              ],
+              "compiled_block_count": [
+                10602,
+                10602
+              ],
+              "invalidation_count": [
+                294,
+                294
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                708,
+                708
+              ],
+              "compiled_block_count": [
+                10705,
+                10705
+              ],
+              "invalidation_count": [
+                296,
+                296
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}
