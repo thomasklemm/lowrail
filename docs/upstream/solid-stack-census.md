@@ -164,6 +164,141 @@ benchmark-ips +15.9%, wall cohort 204.7 → 174.2 µs, −14.8% [−15.3%, −14
 JIT-flat. The one-message case compiled a block in several processes at `--warmup 500`: not JIT-flat, no claim, and
 the body doesn't use it.
 
+### SCB1 detailed review: thermos-sol, 2026-11-27
+
+**Verdict: changes (text and evidence, no demonstrated code defect).** Reviewed head
+`ef534cc9414375d5c97339a4c05bb8f3c50fe81a` against `40dd29ffdc4ff76f27f0bbef1de1606fdd21cfee` in
+`T-01a21eb4-4fce-7727-bded-abfba4ffb64e`. Both Thermos rubrics were applied directly in this thread, without
+delegation, as requested. Evidence, probes, commands, locks and complete raw runs are in
+[`scb1-thermos-sol-20261127.tar.gz`](../../bench/upstream/solid_stack/raw/scb1-thermos-sol-20261127.tar.gz).
+No fork push or upstream post was made. This is not the independent Astra approval.
+
+**Must fix before opening, smallest fixes:**
+
+1. **Qualify the mechanism and reach in the body, commit message, impact and explanation for Thomas.** The cache is
+   enabled by default, not with `query_cache: false`; a zero-channel poll runs no SQL; listeners are started lazily
+   on subscription, not in every process merely loading the gem. Say "By default, each started listener's poll
+   with subscribed channels ..." rather than "every". Say "the pool used by Solid Cable", not an implication of
+   a necessarily separate cable pool: without `connects_to`, primary and cable share the flag during the poll.
+   Separate primary pools and other threads keep their cache; the old flag is restored afterwards in both cases.
+2. **Cut the unqualified scaling sentence from body and impact, and correct the record's attribution.** SQLite's
+   bind limit changes the query shape: 998 channels uses 999 binds, 999 channels uses no binds. The saving drops
+   from 31.9% to 0.27%, not monotonically growing. The roughly 51% census attribution is inclusive instructions in
+   `cache_sql`/`compute_if_absent`, whose block includes the database work, not half a poll of removable hashing.
+   Label it inclusive or cut it; retain the measured net before/after saving instead.
+3. **Finish the required pinned-master ZJIT `--wall` A/A evidence on a1.xxlarge.** `SC1-zjit/results.json` has an
+   empty `wall` object. Its instruction and JIT-flat evidence is valid, but is not the wall pass required by
+   DECISIONS. Record the actual cohort, including a non-flat or in-noise result rather than retrying it away.
+4. **Lead the body with the project's benchmark format.** The new 205 → 174 µs values are supported by the raw
+   a1.xxlarge cohort, but DECISIONS says Rails/gem bodies lead with benchmark-ips/benchmark-driver output. Smallest
+   fix: use the existing SC1-xxl idle benchmark-ips row (4.6k → 5.3k i/s, +15.9%) instead; keep the wall cohort here.
+
+**Correctness and state.** Cold read: while the listener polls, disable the query cache on the Message model's
+current pool, restoring its prior state before completing the executor run. The one-line diff uses the public
+Active Record `uncached` API, with its default `dirties: true`; it does not disable write invalidation, change
+transactions, select rows differently, alter locks, or move executor completion out of `ensure`. Inspected
+`ActiveRecord::QueryCache::ClassMethods#uncached`, pool `disable_query_cache`, `select_all`, executor hooks, and
+Solid Cable's Record/Message/Listener on each pin. Rails main's lazy used-pool hooks differ from released Rails;
+the same probe and suite passed there, rather than assuming the released implementation still applies.
+
+* Re-ran the original differential through `listen`: ten steps each on SQLite and PostgreSQL; `diff -u` on each
+  base/head output is empty. Checked SQL, cached/run marker, binds, deliveries, listener cursor and channel cursors.
+* Additional base/head probes are byte-identical on both databases: enabled/disabled restoration, exception
+  restoration, a separate primary pool, second shard, other-thread isolation, nested executor/cache blocks,
+  frozen String-subclass channels, fresh then idle messages and zero channels. A separate reader-role probe is
+  byte-identical on SQLite. A separate shared-pool
+  probe intentionally sees primary enabled on base and disabled on head inside the poll, with identical delivery
+  and restored true afterwards. This is the intended pool-wide effect, not cross-thread leakage.
+* Head suite on Rails 7.2.4, 8.0.5.2, 8.1.4.1 and main `2e299253f942ab94041cc6f210ac9d33884c210d`:
+  each SQLite run **47 runs, 140 assertions, 0 failures/errors/skips**. Head and base PostgreSQL, and base Rails
+  8.1 SQLite: the same 47/140, all green. Ruby 4.0.10 throughout. MySQL was not run.
+* Applied SCB1 unchanged to open [PR 91](https://github.com/rails/solid_cable/pull/91) head
+  `7995ad429d348c92cb9884c3e336a7d32161ab50` and [PR 96](https://github.com/rails/solid_cable/pull/96) head
+  `f25ec2382aa01b60b36eeba7a8f8520aea7bb0e2`. Both combinations pass the state probe. PR 91 suite: SQLite
+  42/117 with its three PostgreSQL-only tests skipped; PostgreSQL **42/140, no skips**, including late commits.
+  PR 96: **45/172, no skips** on both databases, including timeout/retry/error reporting and normal shutdown.
+  The wrapper changes neither PR's cursor policy or rescue boundary. Metadata/diffs and logs are retained.
+
+**Exactness checklist, all eight items:**
+
+1. Singleton/public and private conversion methods were exercised on a duck channel. No changed dispatch goes to
+   an argument or intermediate user result, so argument `extend`/prepend/method-missing variants gain no new call.
+2. Frozen String-subclass channels deliver identically; no changed Hash/Array/String traversal or subclass check.
+3. Duck `to_s` called exactly twice for add/remove on both sides; private `to_s` raises `NoMethodError` on both.
+4. The only new call is framework-owned `Message.uncached`; skipped calls belong to the query-cache mechanism,
+   not caller-provided values. Poll SQL and subscriber calls are unchanged.
+5. No accumulator, returned user container or copying policy changes. Delivery payloads compare equal.
+6. A callback removing its subscriber and a callback suspended in a fiber behave identically. With fiber isolation
+   enabled, the other fiber's cache remains enabled and the polling fiber restores its flag after resuming.
+7. Frozen channel/payload inputs work; the injected poll error's message and restored flags match. Frozen
+   framework cache internals/global core redefinitions are outside the documented contract, not new guards.
+8. Rails application boot passed on each supported Rails line. Bare `require "solid_cable"` without Rails raises
+   the same pre-existing Rails `NameError` on both sides; requiring Rails/railties first leaves Message unloaded
+   on both. No load/configuration read was moved across the executor entry or message query.
+
+**Maintainability and shared-helper rule.** L0, no new helper, branch, copied internals, configuration, test-only
+guard, or comment. File stays 221 lines. `flog` listen 20.2 → 22.4; identical-configuration RuboCop ABC
+12.21 → 13.19, cyclomatic/perceived 3 → 3, method length 12 → 12. The rise is the one extra block/API call, not
+new decision complexity. Upstream Omakase: **1 file inspected, no offenses detected**. No added comment needs
+cutting, and no behavioural regression justifies an implementation-state test upstream.
+
+The new "Fix the shared helper" rule is satisfied: `rg` finds one `broadcast_messages` caller, in `listen`;
+the batched writer's queue loop performs inserts, not database polling. The optimization belongs at the listener's
+poll boundary, not in a general executor hook that must preserve request caching. No helper logic is duplicated.
+Also inspected Solid Queue main `b9c646a8486ef3e76f70919568cac070276da0e1`: Worker and Dispatcher share
+`Processes::Poller`; their claim/dispatch reads call `non_blocking_lock`, and Active Record bypasses its cache for
+locked Arel queries. QueueSelector's pause/prefix lookups have no stream-bind hashing. The coordinator's separate
+Solid Queue comparison above was not rerun in this review; it is not used to claim a new measured saving here.
+
+**Adversarial performance.** Asked which input adds overhead without removing any work: an existing listener
+after its last unsubscribe (zero channels), or `query_cache: false`. Measured those and the bind-limit transition,
+including SQL larger than 1 MB. Fixed heaps, one Ruby pin, base/head/base2, Callgrind N minus N=0; these are
+instruction counts, not time. Large-input subscription setup is outside the measured poll.
+
+| Input, interpreter | Base Ir/poll (mean of A/A) | Head Ir/poll | Change | A/A spread |
+| --- | ---: | ---: | ---: | ---: |
+| Zero channels, no SQL | 542,129 | 569,854 | +5.11% | 0.044% |
+| One channel, default cache | 1,002,353 | 983,613 | −1.87% | 0.016% |
+| One channel, `query_cache: false` | 944,605 | 972,210 | +2.92% | 0.056% |
+| 998 channels, 999 binds | 37,797,234 | 25,745,694 | −31.88% | 0.022% |
+| 999 channels, no binds | 28,888,929 | 28,809,688 | −0.274% | 0.0023% |
+| 65,536 channels, 1,401,475-byte SQL | 1,665,580,910 | 1,659,384,709 | −0.372% | 0.00008% |
+
+The zero-channel overhead is real instruction work and must not be described as a universal win. It is not a
+demonstrated wall-time loss under DECISIONS' blocking rule; no wall time was measured in this four-CPU review orb.
+Do not add a branch merely to erase it without a material measured reason.
+
+**Claims audit, sentence by sentence.** Commands and logs named below are in the archive unless a repository path
+is given. `audit_numbers.py` recomputes original raw totals, raw JIT gates and the new timing cohort independently;
+its bootstrap uses Python's seeded RNG rather than Ruby's and reaches the same interval verdicts.
+
+| Text in the item/commit/record | Evidence and disposition |
+| --- | --- |
+| Title: "Poll for messages without the query cache" (body and commit) | Exact one-line `git diff` against the stated parent; accurate. |
+| Body sentence 1: executor on every poll; AR enables cache on every executor run | `Listener#listen`, released/main hooks and `CACHE_OFF` probe; first clause true, default-cache qualifier required. Same correction to commit sentence 1. |
+| Body sentence 2: one query, cleared on completion, never hits, key SQL plus one bind per channel, hash/store | True for ordinary subscribed default-cache polls below the adapter's bind limit; original differential shows run, not cached. Zero channels and 999-channel SQL disprove the universal wording. Commit sentences 2–3 need the same qualification. |
+| Body sentence 3: uncached on cable connection/listener thread/duration | `uncached`/pool source, thread and restoration probes; accurate as the pool used by cable, including a shared primary pool. Commit's final two sentences have the same boundary. |
+| Body sentence 4: same query, same messages | Original SQLite/PG differentials and added probes are identical; suites include real listener threads. No claim of byte-identical object identity. |
+| Body timing row: 205 → 174 µs (−15%) | Recomputed 90 raw idle processes: 204.6677 → 174.2007 µs, change −14.755%, independent bootstrap about [−15.24%, −14.33%], A/A interval contains 0; all 90 JIT-flat. Number valid, leading format needs benchmark-ips instead. |
+| Body instruction row: 1,698,352 / 930,367, −14.5% / −23.2% | Original SC1 raw (N500−N0)/500, with both bases, matches exactly; six flat windows per YJIT operation. Not time. |
+| Body final sentence and impact: saving grows with subscribed channels | Rejected by 998/999 boundary above; cut. |
+| Impact: every process, Rails 8 default, 24.7 M downloads, 0.1 s, idle or not | Listener is lazy (`subscribe` → `listener`); fix "every process". Rails generator cable template and Solid Cable configuration confirm default adapter/interval. Opened GitHub/RubyGems APIs: active, 347 stars, last push 2026-11-22, 24,731,839 downloads, release 4.1.0. Reach is current. |
+| Impact: 3 fewer objects, instruction/A/A percentages | Raw SC1 object windows and instruction totals match; own replay also saves three idle objects. |
+| Impact: a1.xxlarge +15.9%, 204.7 → 174.2 µs, intervals, 30 rounds, JIT-flat | Raw SC1-xxl: best IPS base 4567/4651, head 5340; reduction reproduced independently from all wall logs. Recorded intervals/gates agree; no timing rerun on this smaller orb. |
+| Impact: one-message timing not JIT-flat | Raw SC1-xxl has compilation in that operation; correctly unclaimed. This does not invalidate its separate earlier flat instruction cohort. |
+| Impact: path on master/main; ZJIT −23.7% idle, −13.9% message, A/A ≤0.04%, JIT-flat | Main suite/probe ran here; SC1-zjit raw totals and all six counter pairs per operation verified. No master runtime rerun here; missing ZJIT wall evidence remains a gate. |
+| Record: about half of idle poll is query-cache key work; primary keeps cache | Inclusive cache function yields actual query; shared-pool probe disables primary too. Correct those two statements as specified above. |
+
+Body shape otherwise passes: 109 prose words, two mechanism/safety paragraphs, one small table, no internal labels,
+review/test counts or commands, and no upstream code comments. The trailing scaling paragraph should disappear,
+not become a caveat list. Keep configuration/boundary detail here; a short default-cache qualifier suffices upstream.
+
+**Replay and exclusions.** Own body rerun: interpreter idle −14.55%, message −8.98%, A/A ≤0.023%; YJIT message
+−13.70%, A/A 0.016%, six flat windows. Its YJIT idle cohort compiled 3/11 blocks in the two base N500 processes:
+**not JIT-flat, no claim**, retained without retry. Original committed SC1 YJIT idle counters are flat; the invalid
+repeat does not replace that evidence. Initial missing-msgpack suite and the unsuitable large-input 3,000-call
+GC-off allocation attempt are retained and excluded, with reasons in the archive's `reproduce.md`.
+
 ## Held and dropped
 
 | ID | Lead | Numbers | Why not now |
