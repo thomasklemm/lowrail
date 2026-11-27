@@ -49,3 +49,5 @@ pure CGI, JRuby 10.1.3.0, TruffleRuby 40; probe.rb also on 2.5.9 and 3.1.2). `te
 green (7 Rubies x native / no C decoder / Ruby decoder) plus JRuby 9.4.16.0 green. `tests/mutants_by_assert.txt`: base
 passes every assertion; 14 mutants each caught wherever their path runs. Fork CI run 46082238611 green (the first
 JRuby/ubuntu attempt failed in Bundler's jar dependency resolution before tests; rerun green).
+
+Commit message amended to a04eb03 (same tree 3621b78834) after Astra: on TruffleRuby it is CGI.unescapeURIComponent, not CGI.unescape, that keeps the String subclass.
