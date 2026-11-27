@@ -1,0 +1,1173 @@
+duel / Duel	UNKNOWN STEP	﻿2026-11-27T10:55:09.3847368Z Current runner version: '2.338.2'
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3872785Z ##[group]Runner Image Provisioner
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3873709Z Hosted Compute Agent
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3874417Z Version: 20261111.635
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3875084Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3875830Z Build Date: 2026-11-11T01:49:01Z
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3876572Z Worker ID: {7f4070c3-8a9a-4993-b1e0-6d920b7182bf}
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3877327Z Region: westus
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3877865Z Cloud: Azure
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3878672Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3880174Z ##[group]Operating System
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3880904Z Ubuntu
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3881494Z 26.04.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3882040Z LTS
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3882617Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3883180Z ##[group]Runner Image
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3883812Z Image: ubuntu-26.04
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3884442Z Version: 20261122.9.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3885717Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261122.9/images/ubuntu/Ubuntu2604-Readme.md
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3887254Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261122.9
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3888636Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3890028Z ##[group]GITHUB_TOKEN Permissions
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3892263Z Contents: read
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3892919Z Metadata: read
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3893497Z PullRequests: read
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3894174Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3896262Z Secret source: Actions
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3897404Z Cache mode: write
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.3898850Z Prepare workflow directory
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.4485179Z Prepare all required actions
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.4534412Z Getting action download info
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.7942140Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:09.8929850Z Download action repository 'ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0' (SHA:f9c4492e86def3e644ab32a0ef185eda5b0c20d0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.2278960Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3747045Z Uses: sferik/duel-ruby/.github/workflows/duel.yml@3c0c99d95dc2d5620f59e4bb298179422086adf7
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3751645Z ##[group] Inputs
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3752186Z   ruby-version: 4.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3753056Z   version-file: false
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3753557Z   jit: yjit
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3753996Z   runs-on: ubuntu-latest
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3754972Z   timeout-minutes: 60
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3755507Z   working-directory: .
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3756020Z   gemfile: gemfiles/duel.gemfile
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3756558Z   submodules: false
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3757011Z   setup: 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3757440Z   setup-after-ruby: 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3757897Z   report: 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3758504Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.3759012Z Complete job name: duel / Duel
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4604588Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4605692Z with:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4606125Z   fetch-depth: 0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4606595Z   persist-credentials: false
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4607123Z   submodules: false
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4607597Z   repository: thomasklemm/hashie
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4611743Z   token: ***
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4612189Z   ssh-strict: true
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4612632Z   ssh-user: git
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4613077Z   clean: true
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4613525Z   sparse-checkout-cone-mode: true
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4614051Z   fetch-tags: false
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4614504Z   show-progress: true
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4614962Z   lfs: false
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4615396Z   set-safe-directory: true
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4615918Z   allow-unsafe-pr-checkout: false
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.4616731Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7448151Z Syncing repository: thomasklemm/hashie
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7453409Z ##[group]Getting Git version info
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7454268Z Working directory is '/home/runner/work/hashie/hashie'
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7455764Z [command]/usr/bin/git version
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7456424Z git version 2.56.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7458426Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7463414Z Temporarily overriding HOME='/home/runner/work/_temp/e46737ac-b3c5-40b8-bbf5-7e9187c3dee1' before making global git config changes
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7464909Z Adding repository directory to the temporary git global config as a safe directory
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7466110Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/hashie/hashie
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7486030Z Deleting the contents of '/home/runner/work/hashie/hashie'
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7490191Z ##[group]Determining repository object format
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7491840Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7492730Z ##[group]Initializing the repository
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7495733Z [command]/usr/bin/git init /home/runner/work/hashie/hashie
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7595957Z hint: Using 'master' as the name for the initial branch. This default branch name
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7597369Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7599073Z hint: to use in all of your new repositories, which will suppress this warning,
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7599961Z hint: call:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7600431Z hint:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7601001Z hint: 	git config --global init.defaultBranch <name>
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7601833Z hint:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7602713Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7603806Z hint: 'development'. The just-created branch can be renamed via this command:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7604950Z hint:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7605461Z hint: 	git branch -m <name>
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7606025Z hint:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7606928Z hint: Disable this message with "git config set advice.defaultBranchName false"
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7609803Z Initialized empty Git repository in /home/runner/work/hashie/hashie/.git/
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7621146Z [command]/usr/bin/git remote add origin https://github.com/thomasklemm/hashie
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7673256Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7674343Z ##[group]Disabling automatic garbage collection
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7675943Z [command]/usr/bin/git config --local gc.auto 0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7710340Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7711510Z ##[group]Setting up auth
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7712303Z Removing SSH command configuration
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7716042Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.7749694Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8164406Z Removing HTTP extra header
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8170289Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8204509Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8480068Z Removing includeIf entries pointing to credentials config files
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8484805Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8520026Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8797564Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8837380Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/hashie/hashie/.git.path /home/runner/work/_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8871559Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/hashie/hashie/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8907925Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8938746Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8968141Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8969356Z ##[group]Fetching the repository
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:10.8975233Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +83189b52237acd85b09ba4e5c2f7b3666dabe8b6:refs/remotes/pull/6/merge
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5297502Z From https://github.com/thomasklemm/hashie
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5300035Z  * [new branch]      1-1-stable                               -> origin/1-1-stable
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5301897Z  * [new branch]      3-3-stable                               -> origin/3-3-stable
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5303917Z  * [new branch]      calib/aa-1                               -> origin/calib/aa-1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5305993Z  * [new branch]      calib/aa-2                               -> origin/calib/aa-2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5308012Z  * [new branch]      calib/aa-3                               -> origin/calib/aa-3
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5309942Z  * [new branch]      calib/aa-4                               -> origin/calib/aa-4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5312165Z  * [new branch]      calib/aa-5                               -> origin/calib/aa-5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5314094Z  * [new branch]      calib/hm1                                -> origin/calib/hm1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5316196Z  * [new branch]      calib/plant-alloc                        -> origin/calib/plant-alloc
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5318643Z  * [new branch]      calib/plant-cpu                          -> origin/calib/plant-cpu
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5321324Z  * [new branch]      create-github-action                     -> origin/create-github-action
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5323900Z  * [new branch]      duel-calibration                         -> origin/duel-calibration
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5326693Z  * [new branch]      duel-calibration-pre656                  -> origin/duel-calibration-pre656
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5329807Z  * [new branch]      master                                   -> origin/master
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5332206Z  * [new branch]      thomasklemm/duel                         -> origin/thomasklemm/duel
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5334955Z  * [new branch]      thomasklemm/duel-benchmarks              -> origin/thomasklemm/duel-benchmarks
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5338688Z  * [new branch]      thomasklemm/respond-to-missing-allocations -> origin/thomasklemm/respond-to-missing-allocations
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5343237Z  * [new branch]      thomasklemm/respond-to-missing-allocations-2 -> origin/thomasklemm/respond-to-missing-allocations-2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5346673Z  * [new tag]         v0.1.0                                   -> v0.1.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5349281Z  * [new tag]         v0.1.2                                   -> v0.1.2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5351596Z  * [new tag]         v0.1.3                                   -> v0.1.3
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5353888Z  * [new tag]         v0.1.4                                   -> v0.1.4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5356259Z  * [new tag]         v0.1.5                                   -> v0.1.5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5358763Z  * [new tag]         v0.1.6                                   -> v0.1.6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5361171Z  * [new tag]         v0.1.8                                   -> v0.1.8
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5363356Z  * [new tag]         v0.2.0                                   -> v0.2.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5365965Z  * [new tag]         v0.2.1                                   -> v0.2.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5368879Z  * [new tag]         v0.2.2                                   -> v0.2.2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5371972Z  * [new tag]         v0.3.0                                   -> v0.3.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5374812Z  * [new tag]         v0.3.1                                   -> v0.3.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5377007Z  * [new tag]         v0.4.0                                   -> v0.4.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5379615Z  * [new tag]         v1.0.0                                   -> v1.0.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5381780Z  * [new tag]         v1.1.0                                   -> v1.1.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5383961Z  * [new tag]         v1.2.0                                   -> v1.2.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5386144Z  * [new tag]         v2.0.0                                   -> v2.0.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5388487Z  * [new tag]         v2.0.1                                   -> v2.0.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5390747Z  * [new tag]         v2.0.2                                   -> v2.0.2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5392974Z  * [new tag]         v2.0.3                                   -> v2.0.3
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5395160Z  * [new tag]         v2.0.4                                   -> v2.0.4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5397543Z  * [new tag]         v2.0.5                                   -> v2.0.5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5399920Z  * [new tag]         v2.1.0                                   -> v2.1.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5402276Z  * [new tag]         v2.1.1                                   -> v2.1.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5404423Z  * [new tag]         v2.1.2                                   -> v2.1.2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5406778Z  * [new tag]         v3.0.0                                   -> v3.0.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5409147Z  * [new tag]         v3.1.0                                   -> v3.1.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5411257Z  * [new tag]         v3.2.0                                   -> v3.2.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5413543Z  * [new tag]         v3.3.0                                   -> v3.3.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5415629Z  * [new tag]         v3.3.1                                   -> v3.3.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5417706Z  * [new tag]         v3.3.2                                   -> v3.3.2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5419987Z  * [new tag]         v3.4.0                                   -> v3.4.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5422270Z  * [new tag]         v3.4.1                                   -> v3.4.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5425036Z  * [new tag]         v3.4.2                                   -> v3.4.2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5427124Z  * [new tag]         v3.4.3                                   -> v3.4.3
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5429434Z  * [new tag]         v3.4.4                                   -> v3.4.4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5431516Z  * [new tag]         v3.4.5                                   -> v3.4.5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5433579Z  * [new tag]         v3.4.6                                   -> v3.4.6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5435805Z  * [new tag]         v3.5.0                                   -> v3.5.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5438408Z  * [new tag]         v3.5.1                                   -> v3.5.1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5440782Z  * [new tag]         v3.5.2                                   -> v3.5.2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5442914Z  * [new tag]         v3.5.3                                   -> v3.5.3
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5444998Z  * [new tag]         v3.5.4                                   -> v3.5.4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5447087Z  * [new tag]         v3.5.5                                   -> v3.5.5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5449409Z  * [new tag]         v3.5.6                                   -> v3.5.6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5451626Z  * [new tag]         v3.5.7                                   -> v3.5.7
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5453852Z  * [new tag]         v3.6.0                                   -> v3.6.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5455975Z  * [new tag]         v4.0.0                                   -> v4.0.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5458085Z  * [new tag]         v4.1.0                                   -> v4.1.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5460557Z  * [new tag]         v5.0.0                                   -> v5.0.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5462669Z  * [new tag]         v5.1.0                                   -> v5.1.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5464987Z  * [new tag]         v5.2.0                                   -> v5.2.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5467078Z  * [new tag]         v6.0.0                                   -> v6.0.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5469600Z  * [new ref]         83189b52237acd85b09ba4e5c2f7b3666dabe8b6 -> pull/6/merge
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5473970Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5475716Z ##[group]Determining the checkout info
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5477702Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5479364Z [command]/usr/bin/git sparse-checkout disable
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5483026Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5486952Z ##[group]Checking out the ref
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5489076Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/6/merge
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5570045Z Note: switching to 'refs/remotes/pull/6/merge'.
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5571288Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5572422Z You are in 'detached HEAD' state. You can look around, make experimental
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5574981Z changes and commit them, and you can discard any commits you make in this
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5577461Z state without impacting any branches by switching back to a branch.
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5579020Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5580429Z If you want to create a new branch to retain commits you create, you may
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5582849Z do so (now or later) by using -c with the switch command. Example:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5584088Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5584776Z   git switch -c <new-branch-name>
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5585614Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5586289Z Or undo this operation with:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5587030Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5587648Z   git switch -
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5588498Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5589600Z Turn off this advice by setting config variable advice.detachedHead to false
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5591252Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5593114Z HEAD is now at 83189b5 Merge 0c65ba613fceed640913fec176b2e848f4f2aa3b into 4b01c268f6c7beec926082f0e60d2510d9008018
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5598551Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5637135Z [command]/usr/bin/git log -1 --format=%H
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5662724Z 83189b52237acd85b09ba4e5c2f7b3666dabe8b6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5672180Z ##[group]Removing auth
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5673631Z Removing SSH command configuration
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5676113Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5708795Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5988872Z Removing HTTP extra header
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.5992073Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6026581Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6299282Z Removing includeIf entries pointing to credentials config files
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6302620Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6328681Z includeif.gitdir:/home/runner/work/hashie/hashie/.git.path
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6330907Z includeif.gitdir:/home/runner/work/hashie/hashie/.git/worktrees/*.path
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6333344Z includeif.gitdir:/github/workspace/.git.path
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6335014Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6339952Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/hashie/hashie/.git.path
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6363194Z /home/runner/work/_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6377187Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/hashie/hashie/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-3b855fc6\-fc25\-4ce7\-8656\-3e3e67a8db18\.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6416246Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/hashie/hashie/.git/worktrees/*.path
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6440860Z /home/runner/work/_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6452054Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/hashie/hashie/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-3b855fc6\-fc25\-4ce7\-8656\-3e3e67a8db18\.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6491378Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6514500Z /github/runner_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6523889Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-3b855fc6\-fc25\-4ce7\-8656\-3e3e67a8db18\.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6560749Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6587778Z /github/runner_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6599108Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-3b855fc6\-fc25\-4ce7\-8656\-3e3e67a8db18\.config
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6634589Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6909344Z Removing credentials config '/home/runner/work/_temp/git-credentials-3b855fc6-fc25-4ce7-8656-3e3e67a8db18.config'
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.6916534Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7234632Z ##[group]Run # (In a merge queue, the last pull request queued, which the queue's
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7236944Z ^[[36;1m# (In a merge queue, the last pull request queued, which the queue's^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7239275Z ^[[36;1m# branch names: gh-readonly-queue/main/pr-123-<sha>.)^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7240827Z ^[[36;1mif [ -n "$QUEUED" ]; then^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7242008Z ^[[36;1m  PR=${QUEUED##*/pr-}^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7243106Z ^[[36;1m  PR=${PR%%-*}^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7244084Z ^[[36;1mfi^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7244977Z ^[[36;1mif [ -n "$PR" ]; then^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7246665Z ^[[36;1m  labels=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/labels" --jq '[.[].name]')^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7248600Z ^[[36;1melse^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7250380Z ^[[36;1m  labels=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq '[.[0].labels[]?.name]')^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7252452Z ^[[36;1mfi^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7253506Z ^[[36;1mecho "labels=$labels" >> "$GITHUB_OUTPUT"^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7293501Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7294958Z env:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7305653Z   GH_TOKEN: ***
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7306579Z   PR: 6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7307488Z   QUEUED: 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:11.7308441Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3067750Z ##[group]Run echo "BUNDLE_GEMFILE=$(pwd -W 2> /dev/null || pwd)/$GEMFILE" >> "$GITHUB_ENV"
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3068740Z ^[[36;1mecho "BUNDLE_GEMFILE=$(pwd -W 2> /dev/null || pwd)/$GEMFILE" >> "$GITHUB_ENV"^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3101336Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3101765Z env:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3102023Z   GEMFILE: gemfiles/duel.gemfile
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3102327Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3205094Z ##[group]Run case "$JIT" in
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3205455Z ^[[36;1mcase "$JIT" in^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3205808Z ^[[36;1m  yjit) echo "RUBY_YJIT_ENABLE=1" >> "$GITHUB_ENV" ;;^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3206283Z ^[[36;1m  zjit) echo "RUBY_ZJIT_ENABLE=1" >> "$GITHUB_ENV" ;;^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3206769Z ^[[36;1m  *) echo "::error::jit: $JIT: give none, yjit or zjit" && exit 1 ;;^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3207190Z ^[[36;1mesac^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3237835Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3238780Z env:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3239159Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3239620Z   JIT: yjit
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3239867Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3381103Z ##[group]Run ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3381589Z with:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3381843Z   working-directory: .
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3382127Z   ruby-version: 4.0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3382404Z   bundler-cache: true
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3385085Z   token: ***
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3385336Z env:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3385693Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3386133Z   RUBY_YJIT_ENABLE: 1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.3386400Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.4710768Z ##[group]Modifying PATH
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.4711638Z Entries added to PATH to use selected Ruby:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.4712337Z   /opt/hostedtoolcache/Ruby/4.0.10/x64/bin
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.4713407Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.4714283Z ##[group]Print Ruby version
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.4732173Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/ruby --version
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5014137Z ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5038146Z Took   0.03 seconds
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5039419Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5040553Z ##[group]Installing Bundler
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5044328Z Using Bundler shipped with ruby-4.0.10
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5045311Z Took   0.00 seconds
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5046129Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5046604Z > bundle install
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5050399Z Setting BUNDLER_VERSION=4 for "bundle config|lock" commands below to ensure Bundler 4 is used
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:12.5070383Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/bundle config set --local path /home/runner/work/hashie/hashie/vendor/bundle
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:13.1301103Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/bundle lock
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:14.1511025Z Writing lockfile to /home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:15.7499577Z Fetching gem metadata from http://rubygems.org/.........
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:15.9371731Z Resolving dependencies...
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7799720Z ##[group]Print lockfile
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7812420Z [command]/usr/bin/cat /home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7856198Z PATH
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7856703Z   remote: ..
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7857076Z   specs:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7857431Z     hashie (6.0.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7857816Z       logger
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7858014Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7858148Z GEM
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7858709Z   remote: http://rubygems.org/
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7859190Z   specs:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7859562Z     activesupport (5.2.8.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7860046Z       concurrent-ruby (~> 1.0, >= 1.0.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7860552Z       i18n (>= 0.7, < 2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7860975Z       minitest (~> 5.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7861419Z       tzinfo (~> 1.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7861834Z     addressable (2.10.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7862286Z       public_suffix (>= 2.0.2, < 8.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7862761Z     asciidoctor (2.0.26)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7863170Z     ast (2.4.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7863545Z     base64 (0.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7863909Z     bigdecimal (4.1.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7864302Z     canon (0.3.130)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7864641Z       diff-lcs
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7864968Z       json
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7865419Z       leptris (~> 1.9.446)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7866045Z       moxml (~> 0.6.19)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7866446Z       paint
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7866770Z       rainbow
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7867096Z       table_tennis
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7867449Z       thor (~> 1.4)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7867811Z       unicode-name
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7868390Z       yeptris (~> 0.6.86)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7868801Z     celluloid (0.16.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7869162Z       timers (~> 4.0.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7869512Z     claide (1.1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7870230Z     claide-plugins (0.9.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7870610Z       cork
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7870909Z       nap
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7871227Z       open4 (~> 1.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7871445Z     coderay (1.1.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7871897Z     colored2 (3.1.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7872146Z     commonmarker (2.10.1-aarch64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7872448Z     commonmarker (2.10.1-aarch64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7872770Z     commonmarker (2.10.1-arm64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7873048Z     commonmarker (2.10.1-x86_64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7873321Z     commonmarker (2.10.1-x86_64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7873604Z     commonmarker (2.10.1-x86_64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7873985Z     concurrent-ruby (1.3.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7874417Z     cork (0.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7874796Z       colored2 (~> 3.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7875172Z     csv (3.3.7)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7875486Z     danger (9.6.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7875807Z       base64 (~> 0.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7876175Z       claide (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7876538Z       claide-plugins (>= 0.9.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7876989Z       colored2 (>= 3.1, < 5)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7877415Z       cork (~> 0.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7877774Z       faraday (>= 0.9.0, < 3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7878660Z       faraday-http-cache (>= 2.0, < 4.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7879181Z       git (>= 1.13)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7879569Z       kramdown (>= 2.5.1, < 3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7880036Z       kramdown-parser-gfm (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7880513Z       octokit (>= 4.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7880910Z       pstore (~> 0.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7881320Z       terminal-table (>= 1, < 5)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7881804Z     danger-changelog (0.10.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7882298Z       danger-plugin-api (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7882774Z     danger-plugin-api (1.0.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7883193Z       danger (> 2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7883591Z     danger-pr-comment (0.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7884018Z       danger (~> 9)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7884364Z     danger-toc (0.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7884742Z       activesupport
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7885133Z       danger-plugin-api (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7885575Z       diff-lcs (~> 1.5)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7885961Z       kramdown
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7886349Z       kramdown-parser-gfm
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7886780Z     diff-lcs (1.6.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7887159Z     duel (0.3.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7887525Z       fiddle (~> 1.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7887917Z     erb (6.0.7)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7888518Z     faraday (2.15.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7888924Z       faraday-net_http (>= 2.0, < 3.6)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7889377Z       json
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7889683Z       logger
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7890026Z     faraday-http-cache (3.0.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7890458Z       faraday (>= 0.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7890844Z     faraday-net_http (3.5.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7891269Z       net-http (~> 0.5)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7891674Z     ffi (1.17.4-aarch64-linux-gnu)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7892220Z     ffi (1.17.4-aarch64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7892736Z     ffi (1.17.4-arm64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7893184Z     ffi (1.17.4-x86_64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7893628Z     ffi (1.17.4-x86_64-linux-gnu)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7894098Z     ffi (1.17.4-x86_64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7894549Z     fiddle (1.1.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7894924Z     formatador (1.2.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7895307Z       reline
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7895650Z     git (5.7.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7896016Z       activesupport (>= 5.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7896436Z       addressable (~> 2.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7896857Z       process_executer (~> 4.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7897311Z       rchardet (~> 1.9)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7897698Z     guard (2.6.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7898071Z       formatador (>= 0.2.4)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7898800Z       listen (~> 2.7)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7899199Z       lumberjack (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7899626Z       pry (>= 0.9.12)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7900006Z       thor (>= 0.18.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7900705Z     guard-compat (1.2.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7901135Z     guard-rspec (4.3.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7901531Z       guard (~> 2.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7901929Z       rspec (>= 2.14, < 4.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7902373Z     guard-yield (0.1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7903097Z       guard-compat (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7903570Z     hitimes (3.2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7903950Z     i18n (1.15.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7904382Z       concurrent-ruby (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7904817Z     io-console (0.9.5)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7905192Z     json (3.2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7905599Z     kotoshu (1.0.8-aarch64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7906068Z       lutaml-model (~> 0.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7906499Z       rubyzip (~> 2.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7906889Z       thor (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7907271Z     kotoshu (1.0.8-arm64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7907723Z       lutaml-model (~> 0.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7908083Z       rubyzip (~> 2.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7908556Z       thor (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7908771Z     kotoshu (1.0.8-x86_64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7909075Z       lutaml-model (~> 0.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7909367Z       rubyzip (~> 2.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7909577Z       thor (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7909786Z     kotoshu (1.0.8-x86_64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7910035Z       lutaml-model (~> 0.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7910258Z       rubyzip (~> 2.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7910519Z       thor (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7910850Z     kramdown (2.6.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7911243Z       rexml (>= 3.4.4)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7911657Z     kramdown-parser-gfm (1.1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7912148Z       kramdown (~> 2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7912596Z     language_server-protocol (3.17.0.6)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7913135Z     leptris (1.9.448.0-aarch64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7913602Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7914012Z     leptris (1.9.448.0-aarch64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7914537Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7914846Z     leptris (1.9.448.0-arm64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7915106Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7915316Z     leptris (1.9.448.0-x86_64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7915560Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7915761Z     leptris (1.9.448.0-x86_64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7915996Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7916207Z     leptris (1.9.448.0-x86_64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7916464Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7916661Z     lint_roller (1.1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7916930Z     liquid (5.14.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7917295Z       bigdecimal
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7917666Z       strscan (>= 3.1.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7918068Z     listen (2.10.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7918637Z       celluloid (~> 0.16.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7919072Z       rb-fsevent (>= 0.9.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7919517Z       rb-inotify (>= 0.9)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7919933Z     logger (1.7.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7920321Z     lumberjack (1.4.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7920729Z     lutaml-model (0.8.14)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7921152Z       base64
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7921496Z       bigdecimal
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7921863Z       canon
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7922217Z       concurrent-ruby
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7922625Z       liquid (>= 4.0, < 6.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7923047Z       moxml (>= 0.1.22)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7923442Z       ostruct
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7923807Z       rubyzip (~> 2.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7924210Z       thor
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7924559Z     memo_wise (1.13.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7924956Z     method_source (1.1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7925375Z     minitest (5.27.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7925767Z     moxml (0.6.20)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7926126Z     mutex_m (0.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7926486Z     nap (1.2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7926838Z     net-http (0.10.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7927230Z       net-protocol (>= 0.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7927662Z       uri (>= 0.11.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7928038Z     net-protocol (0.4.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7928652Z       timeout
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7929012Z     octokit (10.0.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7929398Z       faraday (>= 1, < 3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7930103Z       sawyer (~> 0.9)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7930486Z     open4 (1.3.4)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7930841Z     ostruct (0.6.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7931046Z     paint (2.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7931242Z     parallel (2.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7931608Z     parser (3.3.14.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7931818Z       ast (~> 2.4.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7932009Z       racc
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7932216Z     prism (2.1.0-aarch64-linux-gnu)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7932496Z     prism (2.1.0-aarch64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7932767Z     prism (2.1.0-arm64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7933003Z     prism (2.1.0-x86_64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7933244Z     prism (2.1.0-x86_64-linux-gnu)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7933497Z     prism (2.1.0-x86_64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7934012Z     process_executer (4.1.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7934480Z       track_open_instances (~> 0.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7934958Z     pry (0.16.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7935329Z       coderay (~> 1.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7935732Z       method_source (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7936170Z       reline (>= 0.6.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7936551Z     pstore (0.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7936914Z     public_suffix (7.0.5)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7937314Z     racc (1.8.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7937684Z     rainbow (3.1.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7938069Z     rake (13.4.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7938654Z     rb-fsevent (0.11.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7939043Z     rb-inotify (0.11.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7939392Z       ffi (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7939737Z     rbs (4.2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7940073Z       logger
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7940398Z       prism (>= 1.6.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7940766Z       tsort
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7941110Z     rchardet (1.10.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7941505Z     rdoc (8.1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7941844Z       erb
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7942165Z       prism (>= 1.6.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7942502Z       rbs (>= 4.0.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7942840Z       tsort
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7943189Z     regexp_parser (2.13.4)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7943587Z     reline (0.7.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7943989Z       io-console (~> 0.5)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7944407Z     rexml (3.4.4)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7944771Z     rspec (3.13.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7945150Z       rspec-core (~> 3.13.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7945606Z       rspec-expectations (~> 3.13.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7946085Z       rspec-mocks (~> 3.13.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7946506Z     rspec-core (3.13.7)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7946878Z       rspec-support (~> 3.13.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7947285Z     rspec-expectations (3.13.6)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7947708Z       diff-lcs (>= 1.2.0, < 2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7948115Z       rspec-support (~> 3.13.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7948769Z     rspec-mocks (3.13.9)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7949186Z       diff-lcs (>= 1.2.0, < 2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7949654Z       rspec-support (~> 3.13.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7950116Z     rspec-pending_for (0.1.29)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7950577Z       rspec-core (~> 3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7950992Z       ruby_engine (~> 2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7951423Z       ruby_version (~> 1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7951865Z     rspec-support (3.13.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7952293Z     rubocop (1.91.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7952659Z       json (>= 2.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7953083Z       language_server-protocol (~> 3.17.0.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7953638Z       lint_roller (~> 1.1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7954090Z       parallel (>= 1.10)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7954497Z       parser (>= 3.3.0.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7954909Z       rainbow (>= 2.2.2, < 4.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7955369Z       regexp_parser (>= 2.9.3, < 3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7955873Z       rubocop-ast (>= 1.49.0, < 2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7956382Z       ruby-progressbar (~> 1.7)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7956884Z       unicode-display_width (>= 2.4.0, < 4.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7957435Z     rubocop-ast (1.54.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7957858Z       ast (~> 2.4)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7958414Z       parser (>= 3.3.7.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7958851Z       prism (>= 1.7)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7959229Z       racc
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7959617Z     rubocop-exception_messages (0.2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7960438Z       lint_roller (~> 1.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7960893Z       rubocop (~> 1.72)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7961326Z     rubocop-rake (0.7.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7961762Z       lint_roller (~> 1.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7962411Z       rubocop (>= 1.72.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7962919Z     rubocop-rspec (3.10.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7963366Z       lint_roller (~> 1.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7963810Z       regexp_parser (>= 2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7964311Z       rubocop (~> 1.86, >= 1.86.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7964809Z     rubocop-spellcheck (0.2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7965341Z       asciidoctor (~> 2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7965787Z       commonmarker (~> 2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7966228Z       kotoshu (~> 1.0.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7966656Z       lint_roller (~> 1.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7967073Z       rdoc (~> 8.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7967461Z       rubocop (~> 1.72, >= 1.72.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7967930Z     ruby-gem-release (0.6.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7968574Z       commonmarker (~> 2.10)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7968978Z       rake (>= 13)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7969349Z     ruby-progressbar (1.13.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7969758Z     ruby_engine (2.0.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7970143Z     ruby_version (1.0.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7970526Z     rubyzip (2.4.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7970872Z     sawyer (0.9.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7971228Z       addressable (>= 2.3.5)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7971624Z       faraday (>= 0.17.3, < 3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7972031Z     simplecov (1.3.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7972409Z     simplecov-lcov (0.9.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7972807Z     stackprof (0.2.28)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7973170Z     strscan (3.1.8)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7973534Z     table_tennis (1.0.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7973903Z       csv (~> 3.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7974217Z       ffi (~> 1.17)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7974546Z       memo_wise (~> 1.13)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7974899Z       paint (~> 2.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7975263Z       unicode-display_width (~> 3.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7975692Z     terminal-table (4.0.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7976094Z       unicode-display_width (>= 1.1.1, < 4)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7976515Z     thor (1.5.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7976846Z     thread_safe (0.3.6)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7977209Z     timeout (0.6.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7977545Z     timers (4.0.4)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7977873Z       hitimes
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7978407Z     track_open_instances (0.1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7978830Z     tsort (0.2.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7979153Z     tzinfo (1.2.11)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7979475Z       thread_safe (~> 0.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7979864Z     unicode-display_width (3.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7980277Z       unicode-emoji (~> 4.3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7980676Z     unicode-emoji (4.3.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7981058Z     unicode-name (1.15.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7981447Z       unicode-types (~> 1.12)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7981839Z     unicode-types (1.12.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7982203Z     uri (1.1.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7982615Z     yard (0.9.46)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7983137Z     yeptris (0.6.91.0-aarch64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7983568Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7983793Z     yeptris (0.6.91.0-aarch64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7984060Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7984274Z     yeptris (0.6.91.0-arm64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7984518Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7984715Z     yeptris (0.6.91.0-x86_64-darwin)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7984951Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7985167Z     yeptris (0.6.91.0-x86_64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7985402Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7985606Z     yeptris (0.6.91.0-x86_64-linux-musl)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7985855Z       ffi (~> 1.15)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7985969Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7986059Z PLATFORMS
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7986240Z   aarch64-linux
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7986430Z   aarch64-linux-gnu
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7986627Z   aarch64-linux-musl
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7986828Z   arm64-darwin
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7987013Z   x86_64-darwin
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7987212Z   x86_64-linux-gnu
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7987627Z   x86_64-linux-musl
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7987747Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7987831Z DEPENDENCIES
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7988032Z   activesupport (~> 5.x)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7988530Z   bundler
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7988719Z   danger-changelog
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7989064Z   danger-pr-comment
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7989271Z   danger-toc
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7989453Z   duel (= 0.3.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7989645Z   guard (~> 2.6.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7989844Z   guard-rspec (~> 4.3.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7990064Z   guard-yield (~> 0.1.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7990273Z   hashie!
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7990455Z   mutex_m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7990627Z   pry
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7990798Z   rake
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7990974Z   rspec (~> 3)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7991190Z   rspec-pending_for (~> 0.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7991642Z   rubocop (= 1.91.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7992025Z   rubocop-exception_messages
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7992443Z   rubocop-rake
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7992807Z   rubocop-rspec
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7993206Z   rubocop-spellcheck (~> 0.2)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7993692Z   ruby-gem-release (= 0.6.0)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7994115Z   simplecov
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7994431Z   simplecov-lcov
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7994637Z   stackprof
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7994817Z   yard (~> 0.9.45)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7994944Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7995027Z CHECKSUMS
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7995414Z   activesupport (5.2.8.1) sha256=f0498c616e1b243c7b56d67920c389f959c186ad7031569e80335b42e1d22564
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7996056Z   addressable (2.10.0) sha256=5e13b9c001adf01dd65ad6e0d2a91d2bc07885c0ff2b83f48cbcd95e08d9de62
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7996694Z   asciidoctor (2.0.26) sha256=16e3accf1fc206bbd6335848649d7fd65f31d2daa60d85af13d47a8ee4b071c1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7997284Z   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7997956Z   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7999244Z   bigdecimal (4.1.3) sha256=61ebe1e5e559bdc3cc6f2c0ee7f427321fc838f59611c294356eb04d6e21cf66
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.7999948Z   canon (0.3.130) sha256=2faf405e2a567b78f480102eb8628d1e8d7a700e85a4155c938b810043372db6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8000520Z   celluloid (0.16.0) sha256=63779982ab200d9a67562998f52dcaff685372919faeb3bf53b287783c989d10
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8001096Z   claide (1.1.0) sha256=6d3c5c089dde904d96aa30e73306d0d4bd444b1accb9b3125ce14a3c0183f82e
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8001700Z   claide-plugins (0.9.2) sha256=c7ea78bc067ab23bce8515497cdcdcb8f01c86dadfbe13c44644e382922c1c2e
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8002601Z   coderay (1.1.3) sha256=dc530018a4684512f8f38143cd2a096c9f02a1fc2459edcfe534787a7fc77d4b
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8003180Z   colored2 (3.1.2) sha256=b13c2bd7eeae2cf7356a62501d398e72fde78780bd26aec6a979578293c28b4a
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8003857Z   commonmarker (2.10.1-aarch64-linux) sha256=3ab9e7027d2350364bdc541680cc28e21011b2950abf7d08ac29093fa691bdc3
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8004614Z   commonmarker (2.10.1-aarch64-linux-musl) sha256=98e6d1a03ba708438d804702e3c25f3423bff21a1e9975280eb265d889677dfc
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8005613Z   commonmarker (2.10.1-arm64-darwin) sha256=f8d9842699c0b2e52d5447ed9cc426bd2803ddaa0460b0a1e1cab9371926c012
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8006326Z   commonmarker (2.10.1-x86_64-darwin) sha256=22ac1e26059ebf970d6029c9810d5062869b3742c1e827088f38bdb34b75812e
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8007017Z   commonmarker (2.10.1-x86_64-linux) sha256=4b2c4b9084baca131146c92dde02bcb40ef3d2768a6772648c1970bb51842734
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8007731Z   commonmarker (2.10.1-x86_64-linux-musl) sha256=afa9e0dc1fef554b7779d815a574d1cb602a9ff9b548dd8be80d66ac69f83866
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8009206Z   concurrent-ruby (1.3.8) sha256=b2f1be836e968ccc78ccfce277ea79c72a88633f22306782c16ff23fb415d1e1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8010386Z   cork (0.3.0) sha256=a0a0ac50e262f8514d1abe0a14e95e71c98b24e3378690e5d044daf0013ad4bc
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8011447Z   csv (3.3.7) sha256=15a3f16f6628da8664d455eb634e7f22031bcf53044923caf56975109e71b9f8
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8012511Z   danger (9.6.2) sha256=6c5529f23346ca0c5a24d34c6a9d7705c8bd71ab5cf697f931789792031a6685
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8013994Z   danger-changelog (0.10.1) sha256=e5b00329a6c88f549a1b06959ae8e2654459b1a7ab9cd157cb40dd0112df887a
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8015500Z   danger-plugin-api (1.0.0) sha256=a0f3f4f2c19fbdfb41db6015fe8ed5eeb2588dc71f2f78d580294c2b10f83bd3
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8016806Z   danger-pr-comment (0.3.0) sha256=506bda2e1418bd6981655edd087fb5ca64a267ad1152ad6d225d08f91944d079
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8017994Z   danger-toc (0.3.0) sha256=996477e25f0131a5aa018a83bd12a4d1cee73092d100fd9bfe3847b3f74ddb39
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8019393Z   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8020484Z   duel (0.3.1) sha256=6a5363b2ce2dd6c2eaaff99740c5b88ef14cb6dadec06ac71a8dd98563e53355
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8021505Z   erb (6.0.7) sha256=c5ca6dc25b0ef974a44dc8f59fe847577122483b1968a38dec305c60bf91ee92
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8022570Z   faraday (2.15.1) sha256=8708154deda739c5e86cc42b74960e23e8491fce0eba9e11639a6a34b1ac288f
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8023777Z   faraday-http-cache (3.0.0) sha256=44e0b5441825b80aa59446fdb0ceb5a1cf83e9f58fc89752b336d87a991c7994
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8025398Z   faraday-net_http (3.5.0) sha256=2e7094c34e38754ee048cc3df47376f8657005d9375f8473bce1c3b526a22e36
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8026694Z   ffi (1.17.4-aarch64-linux-gnu) sha256=b208f06f91ffd8f5e1193da3cae3d2ccfc27fc36fba577baf698d26d91c080df
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8028055Z   ffi (1.17.4-aarch64-linux-musl) sha256=9286b7a615f2676245283aef0a0a3b475ae3aae2bb5448baace630bb77b91f39
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8029507Z   ffi (1.17.4-arm64-darwin) sha256=19071aaf1419251b0a46852abf960e77330a3b334d13a4ab51d58b31a937001b
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8030754Z   ffi (1.17.4-x86_64-darwin) sha256=aa70390523cf3235096cf64962b709b4cfbd5c082a2cb2ae714eb0fe2ccda496
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8032019Z   ffi (1.17.4-x86_64-linux-gnu) sha256=9d3db14c2eae074b382fa9c083fe95aec6e0a1451da249eab096c34002bc752d
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8033286Z   ffi (1.17.4-x86_64-linux-musl) sha256=3fdf9888483de005f8ef8d1cf2d3b20d86626af206cbf780f6a6a12439a9c49e
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8034493Z   fiddle (1.1.8) sha256=7fa8ee3627271497f3add5503acdbc3f40b32f610fc1cf49634f083ef3f32eee
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8035622Z   formatador (1.2.3) sha256=19fa898133c2c26cdbb5d09f6998c1e137ad9427a046663e55adfe18b950d894
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8036774Z   git (5.7.1) sha256=fd122920cd611325e8309dd939f2ebb89f5c9d4d83ab423ace04545db136e7f1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8037805Z   guard (2.6.1) sha256=dd1947799cc513d25e69d3640aa39ede67e0e429a2099875d640e73a7a726476
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8039193Z   guard-compat (1.2.1) sha256=3ad21ab0070107f92edfd82610b5cdc2fb8e368851e72362ada9703443d646fe
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8040353Z   guard-rspec (4.3.1) sha256=fd5aceb4a111538cb3a27bb3c6bbb6b31ccd869233853a08c4df9b52f919c803
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8041408Z   guard-yield (0.1.0) sha256=1e5621f73634e0392443eda61b626014eb1767ff7eed64a9f58a08c546bf4dbf
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8042207Z   hashie (6.0.1)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8042861Z   hitimes (3.2.0) sha256=949c2b5b60921b648a47a2c373b7b0d01f26c43b588194c9de1f6b73bc7e03e0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8043919Z   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8044979Z   io-console (0.9.5) sha256=83dd9bbf4c4680416629245b39cd4212eb5f4d9a4ea91804870c1f6b846414d5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8046081Z   json (3.2.0) sha256=4a4e222a9ee6ffb296ab3171b6b39d85fec83afc4e7b57eee17edf68c74aec87
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8047285Z   kotoshu (1.0.8-aarch64-linux) sha256=0d8d542edec8e9fc5fa0e7089d82bac5c144a6235477e6d64b4858b366e73744
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8048874Z   kotoshu (1.0.8-arm64-darwin) sha256=4373d75d5ff62f95290dedd6d71cb222d2010a04ab7a061d085ed915442f9928
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8050187Z   kotoshu (1.0.8-x86_64-darwin) sha256=907a829efe5bd98a80ee3730731c67c667d751b761cd75828b4b299998e83246
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8051450Z   kotoshu (1.0.8-x86_64-linux) sha256=6ccc1850a98a53bb74a763630e4603546cabf183ad76d1a8bc0692ada1f7465a
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8052655Z   kramdown (2.6.1) sha256=fbef3479b69c875aacb118dde77a40d6cc3a91e2c1d505a4c3f3f9e92d142641
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8053882Z   kramdown-parser-gfm (1.1.0) sha256=fb39745516427d2988543bf01fc4cf0ab1149476382393e0e9c48592f6581729
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8055429Z   language_server-protocol (3.17.0.6) sha256=5ef2c0c138f8267e1bc631d3328347d354f96724b0af22f2c79516120443b7f0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8056905Z   leptris (1.9.448.0-aarch64-linux) sha256=32c532cf2d75ad878264b0798d904efc9fad3f08207afff81c0b60a20f3eb406
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8058513Z   leptris (1.9.448.0-aarch64-linux-musl) sha256=299f42b160c26895af4ab1224d9e517beb9c412a415a1e603d6d51ddf566788f
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8059876Z   leptris (1.9.448.0-arm64-darwin) sha256=6f72f4e95de6ad331ea00db6aca57bcb39e0a0b7e43b37322c00ee8ea3df5b9f
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8061160Z   leptris (1.9.448.0-x86_64-darwin) sha256=78e06f1683e61dd785eb5dcbe7b0277d869962c0d3919ab2f5e99e69fa876c40
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8062407Z   leptris (1.9.448.0-x86_64-linux) sha256=726d2f1cc0b2991781463f90edfacc8fb1e75ef12a65fcc6b6e1ea4d0b357ee0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8063703Z   leptris (1.9.448.0-x86_64-linux-musl) sha256=ada923c0604280cfcc1f22618e0712f73d50cae33ab22eb5d6775c6135e35c48
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8064906Z   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8066068Z   liquid (5.14.0) sha256=e1020c2b2ee58c7a4d3bfdc7a331537bd27a783353748bff0bf27c6ac0c17065
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8067083Z   listen (2.10.1) sha256=0fc7366e034515b24713cbc529dddf3d5a53a3ec7aae36553fd106d1978deac6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8068096Z   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8069300Z   lumberjack (1.4.2) sha256=40de5ae46321380c835031bcc1370f13bba304d29f2b5f5bb152061a5a191b95
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8070374Z   lutaml-model (0.8.14) sha256=3304a55737b7381b724d6308736f7f50c4ebe68ec092dd20ffaa4e99d110bda4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8071403Z   memo_wise (1.13.0) sha256=30220c38c4cef410849bc73553c58664dc2c91c6379e4a1df22aea02358b716b
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8072461Z   method_source (1.1.0) sha256=181301c9c45b731b4769bc81e8860e72f9161ad7d66dd99103c9ab84f560f5c5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8073540Z   minitest (5.27.0) sha256=2d3b17f8a36fe7801c1adcffdbc38233b938eb0b4966e97a6739055a45fa77d5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8074568Z   moxml (0.6.20) sha256=00d7dee00e9eb04a5756ee7d53634e5ebd8ade2737acc951980242c92c92bf46
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8075573Z   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8076564Z   nap (1.2.0) sha256=fdb4fd0de5509edca600b471570d00ce90745c9c06dc7d877efb513401953051
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8077559Z   net-http (0.10.0) sha256=1a2ff6e37a05724973c43f2bf7bf105f59c36a4cd0a7e9b1c021a0a566987c27
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8078773Z   net-protocol (0.4.0) sha256=f9f90c8c6f64794a45160bf422177a336db12809de3beeeaa26b88fcd2e8c853
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8079830Z   octokit (10.0.0) sha256=82e99a539b7637b7e905e6d277bb0c1a4bed56735935cc33db6da7eae49a24e8
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8080830Z   open4 (1.3.4) sha256=a1df037310624ecc1ea1d81264b11c83e96d0c3c1c6043108d37d396dcd0f4b1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8081821Z   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8082816Z   paint (2.3.0) sha256=327d623e4038619d5bd99ae5db07973859cd78400c7f0329eea283cef8e83be5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8083827Z   parallel (2.3.0) sha256=f75a3e904101ce6a1ccb6b8dc800cbafd42166d83330192438dcf29395167a6f
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8084861Z   parser (3.3.14.0) sha256=62f8f76af7b919425ee2d811880e9dcb8011ab40bfd59970dfb583141697e58f
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8085997Z   prism (2.1.0-aarch64-linux-gnu) sha256=808dddc72def68e1a0463689414c97e0ba211938eddbab05387a4844aa2b3ec2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8087248Z   prism (2.1.0-aarch64-linux-musl) sha256=dd1a0732620c1e575dabb07a297a62911fabd72f8e20ce850b522a866f877930
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8088617Z   prism (2.1.0-arm64-darwin) sha256=2d0c2e3e011cfd89c041940907d3ff3def379d7b0f2ba158d1d42238e8ad8afc
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8089760Z   prism (2.1.0-x86_64-darwin) sha256=6c645d8e6afc742956c7518220ce5106367727c4d9980ac9ab386d55004ddab4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8090919Z   prism (2.1.0-x86_64-linux-gnu) sha256=b2b647afce09551e650b8bb3e2fc91d7d73d392a09534ca307ec0d619c33bfd4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8092363Z   prism (2.1.0-x86_64-linux-musl) sha256=249f45981726923e259b927902246219fa25ad10a76f43849c9aee1a3d3ec5b8
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8093700Z   process_executer (4.1.3) sha256=57f4b179fbb6e947676e179187ea6ec64a35d7125eaa31e2b9a1fe91ff18abf0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8094843Z   pry (0.16.1) sha256=d92d82c86e7f2dc34beec6d2892d5cf5ea517eea22eed3ceabb38ee62a98accc
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8095922Z   pstore (0.3.0) sha256=97888d57cdc8b99b3587dde5e1d01fc5ca4a9124dfeb2afb84e3dd982e78f829
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8097088Z   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8098435Z   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8099519Z   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8100624Z   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8101737Z   rb-fsevent (0.11.2) sha256=43900b972e7301d6570f64b850a5aa67833ee7d87b458ee92805d56b7318aefe
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8102812Z   rb-inotify (0.11.1) sha256=a0a700441239b0ff18eb65e3866236cd78613d6b9f78fea1f9ac47a85e47be6e
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8103942Z   rbs (4.2.0) sha256=51f7b886dcc05bc09e10b901daa6a81829f6adc03101d6ca9ea4aac6103e0674
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8105042Z   rchardet (1.10.2) sha256=e041cb195f464dc10e49ab130f78c8b5956cd9a4f4f6df84e0c183b87c135f33
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8105952Z   rdoc (8.1.0) sha256=befc37880a5cfd36dcb176c748b5fd5ee39dd3536a75e81824e4972ce230f60a
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8106578Z   regexp_parser (2.13.4) sha256=1d0547814f57e6f00946957bd0ca201bc42f42cfb08eee89df60998aedcd8a3b
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8107188Z   reline (0.7.0) sha256=5b012d8e55dbf9d450f12bde2cf7d15ff546ae80b3f8f3b30e570d431815583d
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8107748Z   rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8108619Z   rspec (3.13.2) sha256=206284a08ad798e61f86d7ca3e376718d52c0bc944626b2349266f239f820587
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8109524Z   rspec-core (3.13.7) sha256=c64ff16d9788119805cbc6a3f4b6d87cc22417c2d25976a3330de136896b5469
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8110567Z   rspec-expectations (3.13.6) sha256=bf538ca6d367ff5b0d85a87fdb5c0c6038f2cd1308a0eeba07476caa02d22f35
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8111219Z   rspec-mocks (3.13.9) sha256=ea5c7ff3054a6098ca6039aacef80aec69d5a8a3ef80be8fc88337359b672a30
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8111863Z   rspec-pending_for (0.1.29) sha256=11f7b21c87f22ac9a7d1e17ee1dbcdc1b43a0717d733efb0862f3deb39c97a7f
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8112644Z   rspec-support (3.13.8) sha256=e4160030309b7e3e9d9863dfe720a35dfcc577162f5402cd68fc8c5258a0ffd6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8113627Z   rubocop (1.91.0) sha256=9c82b7bf391c5d7e3798c5b9996e22a1fe3bd7468e351dfdeb96140c058296d0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8114646Z   rubocop-ast (1.54.0) sha256=11f7cadec54e593e905b1bb78f2b28bdd4b8e13b34cb82fe49c876e3dd5008c1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8115777Z   rubocop-exception_messages (0.2.0) sha256=67bf465f442ccea99839875f9d43e40303c8751dcd8e42be199b0ccc1cb605dc
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8116934Z   rubocop-rake (0.7.1) sha256=3797f2b6810c3e9df7376c26d5f44f3475eda59eb1adc38e6f62ecf027cbae4d
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8117998Z   rubocop-rspec (3.10.2) sha256=0b3e2ecc592cd10ecbf0095bb58d1e357905276e069643523cc19eb7495f65e2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8119150Z   rubocop-spellcheck (0.2.0) sha256=01db98c55c29fa7bb78bfcd7877bb8e533e9f7675578294b6d7bae9e6dc28c68
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8119811Z   ruby-gem-release (0.6.0) sha256=db9ce8d668a807976c9ba00e51eed97688f67713e8f5eab1576e7dbb905480ed
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8120463Z   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8121477Z   ruby_engine (2.0.3) sha256=ca2ae7def8cfcdc2bfb6a186d36d5d59c8b403245dc0256c3802b767fa278aaa
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8122605Z   ruby_version (1.0.3) sha256=5930f9950746b7e6c973184398ee364ee7440b170fef7922b9f5cdf317f1ccb5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8123673Z   rubyzip (2.4.1) sha256=8577c88edc1fde8935eb91064c5cb1aef9ad5494b940cf19c775ee833e075615
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8125001Z   sawyer (0.9.3) sha256=0d0f19298408047037638639fe62f4794483fb04320269169bd41af2bdcf5e41
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8126100Z   simplecov (1.3.2) sha256=2a22ec1759f1b8db60881a2e038758956fc69ef93ed669be0bde0678de6d0e85
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8127453Z   simplecov-lcov (0.9.0) sha256=7a77a31e200a595ed4b0249493056efd0c920601f53d2ef135ca34ee796346cd
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8128735Z   stackprof (0.2.28) sha256=4ec2ace02f386012b40ca20ef80c030ad711831f59511da12e83b34efb0f9a04
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8129768Z   strscan (3.1.8) sha256=aae2db611a225559f21ffbb71765c9a4e60fd262534a9ea84f4f11c7f32f679e
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8130913Z   table_tennis (1.0.0) sha256=955f76ca4debd42ee88682af8d4554a74d533c89de4f1581bc37855b15faa956
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8132046Z   terminal-table (4.0.0) sha256=f504793203f8251b2ea7c7068333053f0beeea26093ec9962e62ea79f94301d2
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8133155Z   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8134225Z   thread_safe (0.3.6) sha256=9ed7072821b51c57e8d6b7011a8e282e25aeea3a4065eab326e43f66f063b05a
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8135218Z   timeout (0.6.1) sha256=78f57368a7e7bbadec56971f78a3f5ecbcfb59b7fcbb0a3ed6ddc08a5094accb
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8135809Z   timers (4.0.4) sha256=3f6fe726999e59776f2c3cd15b43740a5def3e077f83a4d9aa4fa0d0c1e2a4cb
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8136433Z   track_open_instances (0.1.15) sha256=7f0e48821e6b4c881daaa40fb1583e308937c22a9c84883c150b399c3b5c3029
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8137033Z   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8137772Z   tzinfo (1.2.11) sha256=6501f6a12175ca0243118b83f7c7c2b7978aaec7a0980550a124d007ad6361b6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8138807Z   unicode-display_width (3.3.0) sha256=4b7aa66a4b11db50f6f7e98411215cd0dd10eaecb665d36eec5bcacb3fa0b613
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8139481Z   unicode-emoji (4.3.0) sha256=11c02fa73290378c066bb0562cd4c87d8e1b706fbbe0059ca12746a4244de8ce
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8140458Z   unicode-name (1.15.1) sha256=b8f2e3ca14bc24799f84a4f74d43a3612d02a051700d88bc6ca8e3bd53cda3f6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8141670Z   unicode-types (1.12.0) sha256=7e26a4352cecc2a50325a3793df834b732581ca9f25c5e29f46f3378934363f6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8142763Z   uri (1.1.2) sha256=89292e98eabbef6248b0a0ed5e7e398e152f83f17560023a6d94a7f492b169fb
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8143799Z   yard (0.9.46) sha256=9b1ee37b5da942811dc584d8bb2dfd0efca0a72c44be30bf8282c34955902855
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8144962Z   yeptris (0.6.91.0-aarch64-linux) sha256=11e805c5a9d0ca4124b18ff4f7c7253c4b1a26e99810ce1edc00e473a1e09bdb
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8146361Z   yeptris (0.6.91.0-aarch64-linux-musl) sha256=7fd9bd3bdb583a97332e79746e8f170666d27cea2b7046f2c2a50d6395993d6c
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8147731Z   yeptris (0.6.91.0-arm64-darwin) sha256=91b48beca7ee540da080a8f3b3b21ea6d5207302e8e23d1abfa80ab8cd043f37
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8149285Z   yeptris (0.6.91.0-x86_64-darwin) sha256=3add961661c8d385884350e3206811df0f417288a526261075e624d88ec73802
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8150551Z   yeptris (0.6.91.0-x86_64-linux) sha256=3f93b13ef95bd2cb12cb733169366dc7202416a1dcfb759109682563bd107705
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8151885Z   yeptris (0.6.91.0-x86_64-linux-musl) sha256=36f58b7109f2db3dce013795a5415deb9fcc6b7be2d11e27fbcc1f0d3c0a36c8
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8152675Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8152831Z BUNDLED WITH
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8153164Z   4.0.20
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8153920Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:16.8155869Z Cache key: setup-ruby-bundler-cache-v6-ubuntu-26.04-x64-ruby-4.0.10-wd-/home/runner/work/hashie/hashie-with--without--only--/home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock-bdb590b03a93d99d61e50a5f0a202d79644d52fc53ef63e3ce1aa00be232f574
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:17.0640318Z Cache hit for restore-key: setup-ruby-bundler-cache-v6-ubuntu-26.04-x64-ruby-4.0.10-wd-/home/runner/work/hashie/hashie-with--without--only--/home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock-24c8e8fd80e07928c93fdfe7a88992f1007d10ccf1ed84003c18c90531122d40
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:18.3636374Z Received 12582912 of 78644316 (16.0%), 12.0 MBs/sec
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:19.0167870Z Received 78644316 of 78644316 (100.0%), 45.3 MBs/sec
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:19.0168991Z Cache Size: ~75 MB (78644316 B)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:19.0194112Z [command]/usr/bin/tar -xf /home/runner/work/_temp/9368cb8c-fcd2-4c8a-a0e6-ea9b91f6bf07/cache.tzst -P -C /home/runner/work/hashie/hashie --use-compress-program unzstd
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:19.9692230Z Cache restored successfully
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:19.9727155Z Found cache for key: setup-ruby-bundler-cache-v6-ubuntu-26.04-x64-ruby-4.0.10-wd-/home/runner/work/hashie/hashie-with--without--only--/home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock-24c8e8fd80e07928c93fdfe7a88992f1007d10ccf1ed84003c18c90531122d40
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:19.9740248Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/bundle install --jobs 4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:21.6935969Z Fetching gem metadata from http://rubygems.org/........
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:21.7990476Z Fetching moxml 0.6.20
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:21.8073859Z Fetching yeptris 0.6.91.0 (x86_64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:21.8074448Z Fetching yard 0.9.46
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:22.0638599Z Installing yard 0.9.46
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:22.1272107Z Installing yeptris 0.6.91.0 (x86_64-linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:22.2945748Z Installing moxml 0.6.20
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:22.4932132Z Bundle complete! 25 Gemfile dependencies, 119 gems now installed.
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:22.4932783Z Bundled gems are installed into `./vendor/bundle`
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:22.4948101Z 1 installed gem you directly depend on is looking for funding.
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:22.4949334Z   Run `bundle fund` for details
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:22.5660541Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/bundle clean
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:23.0430167Z Removing moxml (0.6.19)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:23.0749078Z Removing yard (0.9.45)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:23.0886280Z Removing yeptris-0.6.87.0-x86_64 (linux)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:23.1049486Z Saving cache
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:23.1220481Z [command]/usr/bin/tar --posix -cf cache.tzst --exclude cache.tzst -P -C /home/runner/work/hashie/hashie --files-from manifest.txt --use-compress-program zstdmt
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:25.1616065Z Sent 23003136 of 78476323 (29.3%), 21.9 MBs/sec
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.1626803Z Sent 78476323 of 78476323 (100.0%), 37.4 MBs/sec
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5170502Z Took  14.01 seconds
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5360934Z ##[group]Run bundle exec duel --markdown "$RUNNER_TEMP/duel/duel.md"
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5361451Z ^[[36;1mbundle exec duel --markdown "$RUNNER_TEMP/duel/duel.md"^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5397310Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5397664Z env:
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5397979Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5398648Z   RUBY_YJIT_ENABLE: 1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5398871Z   DUEL_FORCE: 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5399075Z   DUEL_LABELS: []
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5399281Z   GH_TOKEN: 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:55:26.5399471Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6941068Z Comparing 27 benchmarks, 1 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 24 worker processes of each version)
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6943066Z   Dash.new: required properties and defaults         4.3s n=573    cpu 1.019 [1.013, 1.024] unsettled  allocations 3
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6944270Z   Dash: read and write properties                    4.1s n=2253   cpu 1.009 [0.992, 1.018] same  allocations 0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6945350Z   Trash.new: renamed and transformed properties      4.0s n=517    cpu 1.000 [0.992, 1.009] same  allocations 4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6946055Z   Dash.new: coerced properties                       4.1s n=355    cpu 1.002 [0.997, 1.008] same  allocations 7
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6946802Z   Dash.new: String keys with IndifferentAccess       4.0s n=181    cpu 0.998 [0.989, 1.005] same  allocations 32
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6947657Z   Dash.new: coerced nested Dashes                    4.0s n=146    cpu 0.993 [0.988, 0.997] same  allocations 16
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6949322Z ! Mash: read keys given as Symbols as methods        3.8s n=785    cpu 1.385 [1.374, 1.397] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6951151Z ! KeepOriginalKeys: read Symbol keys as methods      3.9s n=1121   cpu 1.029 [1.024, 1.042] slower  allocations 5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6952012Z   KeepOriginalKeys: read String keys as methods      3.8s n=685    cpu 0.991 [0.987, 0.998] same  allocations 5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6952816Z   PermissiveRespondTo: include in a Mash subclass    3.9s n=62     cpu 0.999 [0.997, 1.002] same  allocations 15
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6953761Z ! Mash.new: a flat Hash                              3.8s n=993    cpu 1.139 [1.137, 1.141] slower  allocations 3→5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6954965Z ! PermissiveRespondTo: Mash.new                      3.9s n=590    cpu 1.071 [1.070, 1.073] slower  allocations 3→4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6955839Z ! PermissiveRespondTo: write a new key as a method   4.1s n=514    cpu 1.005 [1.004, 1.007] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6956719Z ! PermissiveRespondTo: overwrite a key as a method   3.9s n=508    cpu 1.009 [1.007, 1.011] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6957540Z   IndifferentAccess: new from a nested JSON response   5.1s n=26     cpu 1.006 [1.001, 1.010] same  allocations 252
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6958640Z   IndifferentAccess: read String and Symbol keys     3.9s n=993    cpu 1.008 [1.001, 1.013] same  allocations 1
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6959479Z   IndifferentAccess: write String and Symbol keys    4.2s n=1156   cpu 1.014 [1.004, 1.023] unsettled  allocations 0
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6960169Z   DeepFind and DeepFetch: nested keys                4.1s n=75     cpu 1.000 [0.997, 1.002] same  allocations 105
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6960954Z ! Mash.new: a nested JSON response                   4.4s n=46     cpu 1.086 [1.081, 1.090] slower  allocations 25.39→63.39
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6961683Z ! Mash: read keys as methods                         3.8s n=734    cpu 1.233 [1.225, 1.241] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6962420Z ! Mash: read keys with suffixes                      4.0s n=393    cpu 1.057 [1.054, 1.060] slower  allocations 16→21
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6963152Z ! Mash: read keys with [] and dig                    4.0s n=1559   cpu 1.155 [1.133, 1.178] slower  allocations 4→7
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6964081Z ! Mash: write new keys as methods                    4.0s n=791    cpu 1.042 [1.040, 1.045] slower  allocations 5→7
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6964790Z ! Mash: overwrite a key as a method                  3.9s n=689    cpu 1.033 [1.029, 1.036] slower  allocations 6→8
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6965539Z ! Mash: respond_to? a key, a suffix and a missing name   3.8s n=1223   cpu 1.125 [1.122, 1.129] slower  allocations 1→4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6966505Z ! Mash#deep_merge: a nested update                   4.2s n=40     cpu 1.073 [1.068, 1.076] slower  allocations 31.6→72.6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6967136Z   Mash#to_hash: a nested Mash                        4.3s n=170    cpu 0.963 [0.957, 0.968] faster  allocations 10
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6967608Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:21.6968111Z Measuring 14 benchmarks that looked worse again, in fresh processes, up to 3 times each (4 if what's slower differs, and once more for each too close to call):
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:30.4553013Z ! Mash: read keys given as Symbols as methods        3.8s n=748    cpu 1.353 [1.349, 1.356] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:40.0777669Z ! Mash: read keys given as Symbols as methods        4.7s n=1284   cpu 1.357 [1.353, 1.362] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:48.8294834Z ! Mash: read keys given as Symbols as methods        3.9s n=750    cpu 1.357 [1.351, 1.364] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T10:57:57.5930963Z ! KeepOriginalKeys: read Symbol keys as methods      3.9s n=1109   cpu 1.054 [1.042, 1.067] slower  allocations 5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:58:06.6609039Z ! KeepOriginalKeys: read Symbol keys as methods      3.9s n=1082   cpu 1.050 [1.039, 1.066] slower  allocations 5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:58:15.4953929Z ! KeepOriginalKeys: read Symbol keys as methods      3.9s n=1096   cpu 1.034 [1.026, 1.049] slower  allocations 5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:58:24.1687864Z ! Mash.new: a flat Hash                              3.9s n=914    cpu 1.137 [1.135, 1.140] slower  allocations 3→5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:58:32.8932138Z ! Mash.new: a flat Hash                              3.9s n=909    cpu 1.138 [1.136, 1.140] slower  allocations 3→5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:58:41.5983895Z ! Mash.new: a flat Hash                              3.8s n=905    cpu 1.135 [1.132, 1.137] slower  allocations 3→5
+duel / Duel	UNKNOWN STEP	2026-11-27T10:58:50.3576664Z ! PermissiveRespondTo: Mash.new                      3.9s n=542    cpu 1.065 [1.061, 1.066] slower  allocations 3→4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:58:59.3599103Z ! PermissiveRespondTo: Mash.new                      3.9s n=567    cpu 1.064 [1.063, 1.066] slower  allocations 3→4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:59:08.4910954Z ! PermissiveRespondTo: Mash.new                      3.9s n=566    cpu 1.065 [1.063, 1.066] slower  allocations 3→4
+duel / Duel	UNKNOWN STEP	2026-11-27T10:59:17.5429995Z ! PermissiveRespondTo: write a new key as a method   4.1s n=537    cpu 1.018 [1.017, 1.020] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:59:26.4914399Z ! PermissiveRespondTo: write a new key as a method   4.1s n=531    cpu 1.017 [1.015, 1.018] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:59:35.4785365Z ! PermissiveRespondTo: write a new key as a method   4.1s n=539    cpu 1.017 [1.016, 1.019] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:59:44.3432650Z ! PermissiveRespondTo: overwrite a key as a method   4.0s n=526    cpu 1.009 [1.008, 1.010] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T10:59:53.1947813Z ! PermissiveRespondTo: overwrite a key as a method   4.0s n=525    cpu 1.008 [1.007, 1.009] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T11:00:02.2101111Z ! PermissiveRespondTo: overwrite a key as a method   4.0s n=519    cpu 1.010 [1.008, 1.012] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T11:00:11.9261944Z ! Mash.new: a nested JSON response                   4.7s n=46     cpu 1.078 [1.074, 1.082] slower  allocations 25.52→63.52
+duel / Duel	UNKNOWN STEP	2026-11-27T11:00:21.7316821Z ! Mash.new: a nested JSON response                   4.8s n=46     cpu 1.079 [1.073, 1.085] slower  allocations 25.52→63.52
+duel / Duel	UNKNOWN STEP	2026-11-27T11:00:31.4507878Z ! Mash.new: a nested JSON response                   4.4s n=38     cpu 1.072 [1.068, 1.075] slower  allocations 25.63→63.63
+duel / Duel	UNKNOWN STEP	2026-11-27T11:00:40.6984215Z ! Mash: read keys as methods                         4.1s n=615    cpu 1.287 [1.277, 1.298] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T11:00:49.9413964Z ! Mash: read keys as methods                         4.1s n=617    cpu 1.287 [1.278, 1.295] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T11:00:59.3618514Z ! Mash: read keys as methods                         4.3s n=673    cpu 1.284 [1.273, 1.292] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T11:01:09.3368678Z ! Mash: read keys with suffixes                      4.4s n=426    cpu 1.062 [1.058, 1.066] slower  allocations 16→21
+duel / Duel	UNKNOWN STEP	2026-11-27T11:01:18.9160093Z ! Mash: read keys with suffixes                      4.4s n=424    cpu 1.060 [1.057, 1.064] slower  allocations 16→21
+duel / Duel	UNKNOWN STEP	2026-11-27T11:01:28.4037290Z ! Mash: read keys with suffixes                      4.4s n=436    cpu 1.060 [1.057, 1.064] slower  allocations 16→21
+duel / Duel	UNKNOWN STEP	2026-11-27T11:01:37.6028567Z ! Mash: read keys with [] and dig                    4.2s n=1348   cpu 1.155 [1.148, 1.162] slower  allocations 4→7
+duel / Duel	UNKNOWN STEP	2026-11-27T11:01:47.9369986Z ! Mash: read keys with [] and dig                    5.3s n=2666   cpu 1.155 [1.149, 1.161] slower  allocations 4→7
+duel / Duel	UNKNOWN STEP	2026-11-27T11:01:58.2213588Z ! Mash: read keys with [] and dig                    5.3s n=2616   cpu 1.154 [1.147, 1.162] slower  allocations 4→7
+duel / Duel	UNKNOWN STEP	2026-11-27T11:02:09.2746596Z ! Mash: write new keys as methods                    5.5s n=1600   cpu 1.036 [1.034, 1.039] slower  allocations 5→7
+duel / Duel	UNKNOWN STEP	2026-11-27T11:02:18.6277693Z ! Mash: write new keys as methods                    4.2s n=814    cpu 1.035 [1.033, 1.037] slower  allocations 5→7
+duel / Duel	UNKNOWN STEP	2026-11-27T11:02:28.0157952Z ! Mash: write new keys as methods                    4.2s n=826    cpu 1.034 [1.032, 1.036] slower  allocations 5→7
+duel / Duel	UNKNOWN STEP	2026-11-27T11:02:37.9499926Z ! Mash: overwrite a key as a method                  4.8s n=726    cpu 1.021 [1.017, 1.025] unsettled  allocations 6→8
+duel / Duel	UNKNOWN STEP	2026-11-27T11:02:47.8003915Z ! Mash: overwrite a key as a method                  4.6s n=680    cpu 1.020 [1.016, 1.024] unsettled  allocations 6→8
+duel / Duel	UNKNOWN STEP	2026-11-27T11:02:57.7036570Z ! Mash: overwrite a key as a method                  4.7s n=730    cpu 1.021 [1.018, 1.026] unsettled  allocations 6→8
+duel / Duel	UNKNOWN STEP	2026-11-27T11:03:07.4433468Z ! Mash: respond_to? a key, a suffix and a missing name   4.2s n=1124   cpu 1.139 [1.136, 1.143] slower  allocations 1→4
+duel / Duel	UNKNOWN STEP	2026-11-27T11:03:16.7839259Z ! Mash: respond_to? a key, a suffix and a missing name   4.2s n=1119   cpu 1.140 [1.137, 1.144] slower  allocations 1→4
+duel / Duel	UNKNOWN STEP	2026-11-27T11:03:27.4398869Z ! Mash: respond_to? a key, a suffix and a missing name   5.5s n=1906   cpu 1.140 [1.134, 1.145] slower  allocations 1→4
+duel / Duel	UNKNOWN STEP	2026-11-27T11:03:36.9916014Z ! Mash#deep_merge: a nested update                   4.4s n=31     cpu 1.068 [1.064, 1.071] slower  allocations 31.77→72.77
+duel / Duel	UNKNOWN STEP	2026-11-27T11:03:46.5267896Z ! Mash#deep_merge: a nested update                   4.4s n=30     cpu 1.071 [1.065, 1.075] slower  allocations 31.8→72.8
+duel / Duel	UNKNOWN STEP	2026-11-27T11:03:56.2206760Z ! Mash#deep_merge: a nested update                   4.5s n=32     cpu 1.068 [1.063, 1.074] slower  allocations 31.75→72.75
+duel / Duel	UNKNOWN STEP	2026-11-27T11:03:56.2207449Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T11:03:56.2207825Z Measuring every benchmark again, in fresh processes: slower across the board in cpu?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8288091Z   Dash.new: required properties and defaults         5.7s n=1012   cpu 1.023 [1.018, 1.030] unsettled  allocations 3
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8289129Z   Dash: read and write properties                    4.5s n=2302   cpu 1.014 [1.006, 1.033] unsettled  allocations 0
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8289851Z   Trash.new: renamed and transformed properties      4.1s n=511    cpu 1.002 [0.990, 1.013] same  allocations 4
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8290548Z   Dash.new: coerced properties                       4.1s n=345    cpu 1.003 [0.996, 1.009] same  allocations 7
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8291341Z   Dash.new: String keys with IndifferentAccess       4.2s n=183    cpu 1.005 [1.000, 1.017] same  allocations 32
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8292010Z   Dash.new: coerced nested Dashes                    4.2s n=154    cpu 0.994 [0.989, 0.999] same  allocations 16
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8293335Z ! Mash: read keys given as Symbols as methods        3.8s n=786    cpu 1.384 [1.379, 1.389] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8294047Z ! KeepOriginalKeys: read Symbol keys as methods      4.0s n=1143   cpu 1.030 [1.023, 1.041] slower  allocations 5
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8294751Z   KeepOriginalKeys: read String keys as methods      3.9s n=708    cpu 0.996 [0.990, 1.004] same  allocations 5
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8295442Z   PermissiveRespondTo: include in a Mash subclass    4.1s n=64     cpu 1.001 [0.998, 1.004] same  allocations 15
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8296204Z ! Mash.new: a flat Hash                              3.9s n=965    cpu 1.137 [1.135, 1.140] slower  allocations 3→5
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8296905Z ! PermissiveRespondTo: Mash.new                      4.0s n=592    cpu 1.071 [1.070, 1.073] slower  allocations 3→4
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8297648Z ! PermissiveRespondTo: write a new key as a method   4.2s n=507    cpu 1.006 [1.003, 1.008] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8298652Z ! PermissiveRespondTo: overwrite a key as a method   4.0s n=507    cpu 1.010 [1.008, 1.013] same  allocations 5→6
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8299358Z   IndifferentAccess: new from a nested JSON response   5.1s n=24     cpu 1.001 [0.996, 1.006] same  allocations 252
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8300061Z   IndifferentAccess: read String and Symbol keys     4.0s n=994    cpu 1.003 [0.996, 1.010] same  allocations 1
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8300755Z   IndifferentAccess: write String and Symbol keys    4.2s n=1155   cpu 1.016 [1.009, 1.024] unsettled  allocations 0
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8301429Z   DeepFind and DeepFetch: nested keys                4.5s n=90     cpu 1.002 [0.998, 1.007] same  allocations 105
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8302183Z ! Mash.new: a nested JSON response                   4.7s n=50     cpu 1.086 [1.083, 1.089] slower  allocations 25.36→63.36
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8302932Z ! Mash: read keys as methods                         3.9s n=730    cpu 1.239 [1.230, 1.248] slower  allocations 5→15
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8303820Z ! Mash: read keys with suffixes                      4.0s n=384    cpu 1.057 [1.054, 1.061] slower  allocations 16→21
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8304510Z ! Mash: read keys with [] and dig                    3.9s n=1559   cpu 1.164 [1.158, 1.170] slower  allocations 4→7
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8305207Z ! Mash: write new keys as methods                    4.1s n=792    cpu 1.041 [1.037, 1.044] slower  allocations 5→7
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8305890Z ! Mash: overwrite a key as a method                  4.0s n=687    cpu 1.031 [1.029, 1.034] slower  allocations 6→8
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8306644Z ! Mash: respond_to? a key, a suffix and a missing name   3.9s n=1231   cpu 1.127 [1.123, 1.131] slower  allocations 1→4
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8307420Z ! Mash#deep_merge: a nested update                   4.5s n=44     cpu 1.075 [1.072, 1.079] slower  allocations 31.55→72.55
+duel / Duel	UNKNOWN STEP	2026-11-27T11:05:55.8308071Z   Mash#to_hash: a nested Mash                        4.3s n=162    cpu 0.961 [0.957, 0.968] faster  allocations 10
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0663708Z 
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0664545Z across the board: cpu 1.019 [1.016, 1.024] slower (limit 1.0050, 27 benchmarks)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0665396Z REGRESSION across the board: cpu slower in both measurements
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0666321Z REGRESSION Mash: read keys given as Symbols as methods: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0667727Z   cpu: 1.108µs → 1.53µs an iteration (1.38x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0668805Z   allocations: 5 → 15 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0669788Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0678596Z      +18.8%  +18.8%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0679177Z       +3.2%  +23.7%  block in <top (required)>
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0679695Z       +1.7%   +1.7%  Hash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0680118Z       +1.7%   +1.7%  Hash#[]
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0680649Z       +0.9%   +0.9%  Hash#default_proc
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0681187Z       +0.7%  +24.4%  Method#call
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0681683Z       +0.3%   +0.3%  Duel::Harness#once
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0682188Z       +0.2%  +11.3%  Hashie::Mash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0683081Z      +10.6%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0684019Z REGRESSION KeepOriginalKeys: read Symbol keys as methods: worse cpu in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0685090Z   cpu: 1.026µs → 1.054µs an iteration (1.03x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0685915Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0686723Z       +1.3%   +1.3%  Hash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0687142Z       +0.7%   +0.7%  Hash#default_proc
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0687635Z       +0.6%   -0.1%  Hashie::Mash#custom_reader
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0688148Z       +0.6%   +1.0%  Hashie::Mash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0688818Z       +0.3%   -1.4%  Method#call
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0689288Z       +0.1%   +0.3%  Duel::Context#once
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0689788Z       +0.1%   +0.1%  Duel::Harness#once
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0690282Z       +6.8%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0691043Z REGRESSION Mash.new: a flat Hash: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0691920Z   cpu: 1.05µs → 1.197µs an iteration (1.14x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0692282Z   allocations: 3 → 5 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0692745Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0693238Z       +6.8%   +6.8%  Hash#[]=
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0693517Z       +5.8%   +5.8%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0693809Z       +1.1%   +1.1%  String#end_with?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0694069Z       +1.1%   +1.1%  Hash#initialize
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0694552Z       +1.0%   +2.1%  Hashie::Mash#_method_suffix
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0695158Z       +0.7%   +6.5%  Duel::Harness#iterate
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0695705Z       +0.7%   +6.5%  Hashie::Mash#initialize
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0696858Z       +0.3%   +6.8%  block in <top (required)>
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0697406Z       -0.4%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0697990Z REGRESSION PermissiveRespondTo: Mash.new: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0698809Z   cpu: 1.905µs → 2.041µs an iteration (1.07x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0699160Z   allocations: 3 → 4 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0699622Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0700083Z       +2.5%   +2.5%  Hash#[]=
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0700338Z       +1.9%   +7.1%  Hash#each_pair
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0700620Z       +1.6%   +1.6%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0700898Z       +1.1%   +1.1%  Array#include?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0701144Z       +0.6%   +0.6%  String#to_sym
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0701404Z       +0.3%   +4.2%  Duel::Harness#iterate
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0701698Z       +0.3%   +7.2%  Hashie::Mash#_deep_update
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0702011Z       +0.3%   +3.9%  Hashie::Mash#custom_writer
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0702349Z       +3.9%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0702880Z REGRESSION PermissiveRespondTo: write a new key as a method: worse allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0703402Z   allocations: 5 → 6 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0703855Z REGRESSION PermissiveRespondTo: overwrite a key as a method: worse allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0704362Z   allocations: 5 → 6 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0704766Z REGRESSION Mash.new: a nested JSON response: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0705267Z   cpu: 29.26µs → 31.79µs an iteration (1.09x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0705596Z   allocations: 25.39 → 63.39 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0706068Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0706546Z       +2.9%   +2.9%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0706841Z       +2.5%   +9.0%  Kernel#respond_to?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0707117Z       +1.9%   +1.9%  String#end_with?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0707593Z       +1.3%   +1.3%  Hash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0707891Z       +0.9%   +0.8%  Hashie::Mash#_log_built_in_message
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0708429Z       +0.5%   +6.6%  Hash#each_pair
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0708703Z       +0.5%   -2.1%  Array.new
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0708969Z       +0.5%   +4.9%  Hashie::Mash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0709367Z       +1.3%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0710124Z REGRESSION Mash: read keys as methods: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0711003Z   cpu: 1.321µs → 1.632µs an iteration (1.23x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0711572Z   allocations: 5 → 15 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0712367Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0712905Z      +14.3%  +14.3%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0713236Z       +3.0%  +19.7%  block in <top (required)>
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0713519Z       +1.2%   +1.2%  Hash#[]
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0713835Z       +0.8%  +16.8%  Hashie::Mash#method_missing
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0714124Z       +0.3%   +0.3%  Hash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0714370Z       +0.2%   +9.4%  Hashie::Mash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0714691Z      +10.4%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0715560Z REGRESSION Mash: read keys with suffixes: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0716534Z   cpu: 2.889µs → 3.055µs an iteration (1.06x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0717101Z   allocations: 16 → 21 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0717578Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0718095Z       +4.2%   +4.2%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0718606Z       +2.4%   +2.4%  String#end_with?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0718877Z       +2.1%   +2.1%  Hash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0719472Z       +0.7%   +3.3%  Hashie::Mash#_method_name_and_suffix
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0719792Z       +0.4%   +5.5%  Hashie::Mash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0720089Z       +0.3%   +0.3%  Duel::Context#once
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0720443Z       +0.1%   +0.1%  String#[]
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0720941Z       +0.1%   -0.3%  Hashie::Mash#underbang_reader
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0721433Z       +4.0%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0722160Z REGRESSION Mash: read keys with [] and dig: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0740393Z   cpu: 667.6ns → 771.9ns an iteration (1.16x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0740979Z   allocations: 4 → 7 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0741488Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0742020Z      +11.3%  +11.3%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0742329Z       +0.8%  +10.0%  Hashie::Mash#dig
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0742616Z       +0.8%   -1.9%  Hash#dig
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0742918Z       +0.4%  +12.4%  Duel::Harness#iterate
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0743214Z       +0.1%  +12.0%  Method#call
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0743500Z       +0.1%   -0.3%  Duel::Context#once
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0743834Z       +2.5%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0744338Z REGRESSION Mash: write new keys as methods: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0744867Z   cpu: 1.372µs → 1.429µs an iteration (1.04x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0745354Z   allocations: 5 → 7 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0746103Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0746774Z       +3.9%   +3.9%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0747073Z       +2.8%   +2.8%  String#[]
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0747350Z       +1.0%   +1.0%  Hashie::Mash#convert_value
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0747638Z       +1.0%   +1.0%  Hash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0747919Z       +0.7%   +4.0%  Hashie::Mash#respond_to_missing?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0748572Z       +0.7%   +0.8%  Hashie::Mash#_method_suffix
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0748933Z       +0.2%   +3.7%  Array#each
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0749548Z       +0.2%   +2.7%  Hashie::Mash#assign_property
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0749908Z       +1.5%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0750386Z REGRESSION Mash: overwrite a key as a method: worse allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0750890Z   allocations: 6 → 8 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0751377Z REGRESSION Mash: respond_to? a key, a suffix and a missing name: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0751962Z   cpu: 852.7ns → 958.9ns an iteration (1.12x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0752300Z   allocations: 1 → 4 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0752758Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0753252Z      +10.7%  +10.7%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0753591Z       +2.4%  +11.0%  Hashie::Mash#respond_to_missing?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0753899Z       +2.1%  +13.1%  Kernel#respond_to?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0754206Z       +1.0%  +13.9%  block in <top (required)>
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0754496Z       +0.6%  +10.7%  Hashie::Mash#key?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0754779Z       +0.3%   +0.3%  Kernel#respond_to_missing?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0755263Z       +1.3%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0756085Z REGRESSION Mash#deep_merge: a nested update: worse cpu, allocations in every measurement
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0756780Z   cpu: 33.41µs → 35.85µs an iteration (1.07x)
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0757120Z   allocations: 31.6 → 72.6 an iteration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0757586Z   where the extra CPU went (as a share of the baseline's: in each frame itself, and with what it called):
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0758090Z       +4.7%   +4.7%  Hashie::Mash#convert_key
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0758602Z       +1.8%   +4.9%  Hashie::Mash#initialize
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0759189Z       +1.6%   +1.6%  String#end_with?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0759455Z       +1.4%   +5.4%  Class#new
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0759702Z       +1.1%   +4.4%  Hash#each_pair
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0759981Z       +0.4%   +0.4%  Hash#initialize
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0760354Z       +0.4%   +0.4%  Hashie::Extensions::KeyConflictWarning#disable_warnings?
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0760768Z       +0.4%   +0.0%  Hashie::Mash#_log_built_in_message
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0761126Z       +3.6%          in garbage collection, apart from the code
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.0761608Z 27 benchmarks in 648s: 14 regressed, 0 errors, 2 with a timing too close to the limit to settle
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1071787Z ##[error]Process completed with exit code 1.
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1183723Z ##[group]Run mkdir -p "$RUNNER_TEMP/duel"
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1184125Z ^[[36;1mmkdir -p "$RUNNER_TEMP/duel"^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1184622Z ^[[36;1mprintf 'pr=%s\ncomment=%s\nstatus=%s\n' "$PR" "$COMMENT" "$STATUS" > "$RUNNER_TEMP/duel/comment.env"^[[0m
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1219181Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1219570Z env:
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1219908Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1220301Z   RUBY_YJIT_ENABLE: 1
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1220524Z   PR: 6
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1220726Z   COMMENT: post
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1220930Z   STATUS: failed
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1221145Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1418844Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1419344Z with:
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1419562Z   name: duel-report
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1419818Z   path: /home/runner/work/_temp/duel/
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1420114Z   if-no-files-found: ignore
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1420357Z   retention-days: 1
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1420578Z   compression-level: 6
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1420816Z   overwrite: false
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1421044Z   include-hidden-files: false
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1421290Z   archive: true
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1421496Z env:
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1421828Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1422226Z   RUBY_YJIT_ENABLE: 1
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.1422448Z ##[endgroup]
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.3078384Z With the provided path, there will be 2 files uploaded
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.3084297Z Artifact name is valid!
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.3084954Z Root directory input is valid!
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.7019203Z Uploading artifact: duel-report.zip
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:15.7062214Z Beginning upload of artifact content to blob storage
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.0257123Z Uploaded bytes 3069
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.1030054Z Finished uploading artifact content to blob storage!
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.1031107Z SHA256 digest of uploaded artifact is 2032597941ec92a10232cd56de1f24083ddfdb945c6c50e8af8b378e892c0ecf
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.1032285Z Finalizing artifact upload
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.6351800Z Artifact duel-report successfully finalized. Artifact ID 15192490673
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.6352853Z Artifact duel-report has been successfully uploaded! Final size is 3069 bytes. Artifact ID is 15192490673
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.6356193Z Artifact download URL: https://github.com/thomasklemm/hashie/actions/runs/45985950306/artifacts/15192490673
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.6604041Z Post job cleanup.
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.7511356Z [command]/usr/bin/git version
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.7560264Z git version 2.56.1
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.7598134Z Temporarily overriding HOME='/home/runner/work/_temp/47e4bde4-7e05-468c-aec6-67831f81a4f8' before making global git config changes
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.7599943Z Adding repository directory to the temporary git global config as a safe directory
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.7604546Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/hashie/hashie
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.7647603Z Removing SSH command configuration
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.7655420Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.7722010Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8028863Z Removing HTTP extra header
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8035067Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8077720Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8372589Z Removing includeIf entries pointing to credentials config files
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8379226Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8420528Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8878844Z Evaluate and set job outputs
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8884758Z Set output 'comment'
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8886484Z Set output 'status'
+duel / Duel	UNKNOWN STEP	2026-11-27T11:06:16.8887551Z Cleaning up orphan processes
