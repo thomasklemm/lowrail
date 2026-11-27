@@ -378,7 +378,7 @@ benchmark-driver's table, and the older release in one sentence when it shows a 
 short benchmark-ips (or benchmark-driver) script with its before/after output. One pinned core, best of N; the record
 keeps raw output and an A/A. Callgrind finds and attributes; in a body it is one supporting line or a small table only
 when it shows what wall time can't (objects, a JIT-only path). Wall time is measured on orbs.
-Timing that goes into a body or a record runs on an a1.xxlarge orb (Thomas, 2026-11-27): on the 2-vCPU a1.large
+Timing that goes into a body or a record runs on an a1.xxlarge orb (Thomas, 2026-11-27): on a1.large
 BT1's `make benchmark` A/A varied too much to show a result, on a1.xxlarge it stayed 1.00x–1.06x. Hand the
 measurement to such an orb when the working orb is smaller.
 
