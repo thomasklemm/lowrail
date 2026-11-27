@@ -72,3 +72,26 @@ the body below the review guideline. The independent original benchmark above su
 The coordinator's later larger-orb measurement hold is a publication hold; those results were not part of this review.
 Read current upstream PR title, body, head, comments and reviews after the audit: still e75b1f0109, no comments/reviews.
 No upstream post or Ruby fork push. Not run here: full test-all, JIT builds, sanitizers, other architectures or hosted CI.
+
+Final-paragraph delta confirm, 2026-11-27
+Reviewer thermos-sol, orb T-01a21dd5-050e-70b3-9097-842e5d974661
+Head remains 5fc1871eec45270a068d2ecba6654eef979c5f6e; reviewed at Lowrail 2c6180122af46bcbc8135dfb5af19d2b0443f9c4
+PrQueue.parse outgoing body SHA-256 b1ab8a6ba7c9d2860daa0139dc47630c37e5d8a8b0befc39fe687c78a8fb898b
+Verdict approve, no must-fixes. This supersedes the preceding body's policy objection, not its historical evidence.
+Verified that body-proposed.md is byte-identical to the parsed body and only the final paragraph differs from fc207bc118.
+Read DECISIONS b8bb21a0: fixes closing a performance regression show numbers, with one Callgrind line and its A/A
+when a clean project-format comparison is unavailable, plus the older release in a separate sentence.
+The revised body matches that rule and no longer gives a wall-time point estimate or the selected five-of-seven range.
+Recomputed (maximum minus minimum) / minimum for each pair in callgrind-body-line.txt:
+  caller release 861004/861212 -> 0.86M, spread 0.024158%
+  caller base 1090474/1090297 -> 1.09M, spread 0.016234%
+  caller head 851150/851094 -> 0.85M, spread 0.006580%
+  backtrace release 872652/872691 -> 0.87M, spread 0.004469%
+  backtrace base 1103356/1103301 -> 1.10M, spread 0.004985%
+  backtrace head 862437/862421 -> 0.86M, spread 0.001855%
+All roundings and the stated 0.03% repeat bound check out. The release sentence keeps caller/backtrace order;
+bringing cost back to 4.0 is supported as an instruction-count statement, not an elapsed-time claim.
+Re-read body-bench-2026-11-27/SUMMARY.txt: A/A spans 1.00x to 1.16x, supporting the final sentence about the
+comparison on that VM. Its 'try to add' language asserts neither a new measurement nor a delivery deadline.
+The exact local Ruby checkout is still 5fc1871eec and clean. Prior source/parser/differential/benchmark approval applies.
+No new measurement, rebuild or test rerun for this text-only confirm; no upstream post or Ruby fork push.

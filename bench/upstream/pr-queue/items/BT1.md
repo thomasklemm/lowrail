@@ -182,6 +182,26 @@ passes:
       wall-time claim. No further text changes required. Prior exact-head parser suites, btest, oracle and
       GC.stress evidence applies unchanged; no rebuild, test rerun or new measurement for this text delta.
       Details: evidence/backtrace-format/astra/review.md, Final paragraph delta confirm. No upstream action.
+  - reviewer: thermos-sol
+    orb: T-01a21dd5-050e-70b3-9097-842e5d974661
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      No must-fixes. Text-only delta confirm at Lowrail 2c618012, exact parsed and copied body SHA-256
+      b1ab8a6ba7c9d2860daa0139dc47630c37e5d8a8b0befc39fe687c78a8fb898b. Verified that only the final paragraph
+      changed from the previously reviewed fc207bc118 body. DECISIONS b8bb21a0 explicitly permits and requires
+      numbers for fixes closing a performance regression, settling the previous policy blocker. The body
+      follows that rule: master/head Callgrind figures with A/A, the older release in a separate sentence,
+      and no wall-time point estimate. Recomputed every rounded figure from callgrind-body-line.txt: caller
+      1.09M/0.85M and backtrace 1.10M/0.86M on master/head; release 0.86M/0.87M in the same caller/backtrace
+      order. The largest repeat spread is 0.024158%, below the stated 0.03%. Restoring 4.0's cost is supported
+      as an instruction-count comparison, not an elapsed-time percentage. The 5-of-7 sentence is removed;
+      the kept make-benchmark A/A record supports the final sentence about this VM's unstable comparison,
+      and 'try to add' makes no new result or deadline promise. The unchanged earlier text and exact Ruby
+      head retain the prior code, parser, differential and benchmark approval. No rebuild or suite rerun
+      was needed for this text-only confirm. Evidence and arithmetic are indexed in
+      evidence/backtrace-format/thermos-sol/results.txt. No upstream post or Ruby fork push.
 ---
 
 # Append backtrace location strings by length
