@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# JIT counters and ZJIT fallback/exit traces for docs/upstream/zjit-gap-census-3.md, ruby-bench on Rails main.
+# JIT counters and ZJIT fallback/exit traces for bench/upstream/zjit_gap_bet/HANDOFF.md, ruby-bench on Rails main.
 #   stats_queue.sh OUT JOB...   JOB = build:kind:bench
 #   build: a prefix under ~/rubies; kind: zjit (--zjit-stats-quiet), yjit (--yjit-stats=quiet),
-#   trace (ZJIT, --zjit-trace-exits and --zjit-trace-fallbacks sampled 1 in 20, whole process).
+#   trace (ZJIT, --zjit-trace-exits and --zjit-trace-fallbacks sampled 1 in TRACE_RATE, default 20, whole process).
 # 100 warmup and 10 counted iterations (zjit_yjit_gap_harness.rb, GAP_MODE=stats), fixed heap, own ruby-bench copy.
 set -uo pipefail
 out=$1; shift
@@ -19,7 +19,7 @@ for job in "$@"; do
   case $kind in
     zjit) flags=("${Z[@]}" --zjit-stats-quiet) ;;
     yjit) flags=(--yjit --yjit-stats=quiet) ;;
-    trace) flags=("${Z[@]}" --zjit-stats-quiet --zjit-trace-exits --zjit-trace-exits-sample-rate=20 --zjit-trace-fallbacks-sample-rate=20) ;;
+    trace) flags=("${Z[@]}" --zjit-stats-quiet --zjit-trace-exits --zjit-trace-exits-sample-rate=${TRACE_RATE:-20} --zjit-trace-fallbacks-sample-rate=${TRACE_RATE:-20}) ;;
   esac
   s=$(date +%s)
   (cd "$copy" && GAP_JSON=$out/$name.json BUNDLE_GEMFILE=$copy/benchmarks/$bench/Gemfile.main \

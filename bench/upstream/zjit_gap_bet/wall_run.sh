@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One timed ruby-bench process for docs/upstream/zjit-gap-census-3.md.
+# One timed ruby-bench process for bench/upstream/zjit_gap_bet/HANDOFF.md.
 #   wall_run.sh BENCH RUBY_PREFIX OUT_JSON CPU RUBY_FLAGS...
 # Runs in the lane's own ruby-bench copy (~/w/rbc/wall-CPU), on Rails main (Gemfile.main), pinned to CPU, with the
 # benchmark's file cache cleared first. Env: WARMUP_ITRS, MEASURE_ITRS, HARNESS (default gapwall).

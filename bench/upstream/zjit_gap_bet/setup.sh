@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Sets up one orb for docs/upstream/zjit-gap-census-3.md: Ruby master at the pin (YJIT + ZJIT, release),
+# Sets up one orb for bench/upstream/zjit_gap_bet/HANDOFF.md: Ruby master at the pin (YJIT + ZJIT, release),
 # ruby-bench with railsbench and lobsters on Rails main, and the census copies of Campfire and Writebook.
-#   bench/upstream/zjit-gap-3/setup.sh [ruby|headline|bench|census]...   (default: all four)
+#   bench/upstream/zjit_gap_bet/setup.sh [ruby|headline|bench|census]...   (default: all four)
 # headline builds k0kubun/ruby zjit-headline6 at its pin; bench and census also bundle for it when it is built.
 set -euo pipefail
 RUBY_SHA=0d399335b733776187e43a783e5f950c18ad881c
@@ -51,7 +51,7 @@ for step in "${steps[@]}"; do
     fetch ~/w/rails-main https://github.com/rails/rails $RAILS_SHA
     fetch ~/w/ruby-bench https://github.com/ruby/ruby-bench $BENCH_SHA
     cd ~/w/ruby-bench
-    cp "$root/bench/upstream/zjit-gap-3/wall_harness.rb" harness/gapwall.rb
+    cp "$root/bench/upstream/zjit_gap_bet/wall_harness.rb" harness/gapwall.rb
     cp "$root/bench/upstream/zjit_yjit_gap_harness.rb" harness/gap.rb
     # What Rails 8.2 defaults need in these apps (combined-effect round 3's patch, without its Gemfiles).
     git apply --include='benchmarks/*/config/*' "$root/bench/upstream/combined_r3/ruby-bench.patch" 2>/dev/null ||

@@ -1,0 +1,6 @@
+railsbench m: compile_error_out_of_memory [0, 0], code region 7 MiB, ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +ZJIT +PRISM [x86_64-linux]
+railsbench h: compile_error_out_of_memory [0, 0], code region 8 MiB, ruby 4.1.0dev (2026-11-27T17:53:19Z HEAD 5c4239a16d) +ZJIT +PRISM [x86_64-linux]
+lobsters m: compile_error_out_of_memory [0, 0], code region 25 MiB, ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +ZJIT +PRISM [x86_64-linux]
+lobsters h: compile_error_out_of_memory [0, 0], code region 29 MiB, ruby 4.1.0dev (2026-11-27T17:53:19Z HEAD 5c4239a16d) +ZJIT +PRISM [x86_64-linux]
+shipit m: compile_error_out_of_memory [0, 0], code region 21 MiB, ruby 4.1.0dev (2026-11-27T16:40:23Z master 0d399335b7) +ZJIT +PRISM [x86_64-linux]
+shipit h: compile_error_out_of_memory [0, 0], code region 24 MiB, ruby 4.1.0dev (2026-11-27T17:53:19Z HEAD 5c4239a16d) +ZJIT +PRISM [x86_64-linux]

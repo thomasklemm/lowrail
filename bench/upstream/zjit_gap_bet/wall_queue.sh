@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# One timing lane for docs/upstream/zjit-gap-census-3.md.
+# One timing lane for bench/upstream/zjit_gap_bet/HANDOFF.md.
 #   wall_queue.sh OUT CPU TARGET FIRST_ROUND LAST_ROUND
 # TARGET: railsbench, lobsters, shipit (ruby-bench on Rails main) or campfire, writebook (census copies, corpus
 # censusz3). A round is five fresh processes pinned to CPU: master YJIT and ZJIT twice each (the twins are the A/A)
@@ -33,8 +33,8 @@ one() { # NAME PREFIX MODE
     [ -f "$out/$target/census/$name/$target-$mode.json" ] && cp "$out/$target/census/$name/$target-$mode.json" "$json"
     ;;
   *)
-    if [ "$mode" = zjit ]; then "$root/bench/upstream/zjit-gap-3/wall_run.sh" "$target" "$prefix" "$json" "$cpu" --zjit $Z
-    else "$root/bench/upstream/zjit-gap-3/wall_run.sh" "$target" "$prefix" "$json" "$cpu" --yjit; fi
+    if [ "$mode" = zjit ]; then "$root/bench/upstream/zjit_gap_bet/wall_run.sh" "$target" "$prefix" "$json" "$cpu" --zjit $Z
+    else "$root/bench/upstream/zjit_gap_bet/wall_run.sh" "$target" "$prefix" "$json" "$cpu" --yjit; fi
     local rc=$?
     ;;
   esac

@@ -1,6 +1,6 @@
 require_relative "../lib/harness"
 
-# ruby-bench harness for docs/upstream/zjit-gap-census-3.md: wall time per iteration in one fresh process, with the
+# ruby-bench harness for bench/upstream/zjit_gap_bet/HANDOFF.md: wall time per iteration in one fresh process, with the
 # JIT-flat gate. WARMUP_ITRS iterations, then MEASURE_ITRS timed iterations; the JIT's compile and invalidation
 # counters are read around every timed iteration and over the last FLAT_ITRS warmup iterations. GC stays on, as in
 # ruby-bench's default harness, and its time per iteration is recorded next to the wall time. Writes JSON to WALL_JSON.

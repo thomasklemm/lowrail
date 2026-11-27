@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Tables for docs/upstream/zjit-gap-census-3.md from wall_queue.sh's output.
+# Tables for bench/upstream/zjit_gap_bet/HANDOFF.md from wall_queue.sh's output.
 #   ruby wall_table.rb OUT [--json FILE]
 # Per process: the mean wall time of its JIT-flat timed iterations (ruby-bench) or windows (census apps); a timed
 # iteration in which the JIT compiled or invalidated something is rejected and counted. Per round: ZJIT/YJIT is the
