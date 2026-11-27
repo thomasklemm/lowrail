@@ -41,6 +41,23 @@ passes:
       with equal bytes/encoding/valid_encoding?/rescanned coderange elsewhere. Callgrind A/A supports the
       instruction win; pinned benchmark-driver confirms the throughput direction. Full findings, smallest
       fixes, commands, limitations and raw archive: bench/upstream/ruby-differential/evidence/backtrace-format/astra/review.md.
+  - reviewer: astra
+    orb: T-01a21dcc-1fab-7104-9ca4-c62537a6cf82
+    head: "e75b1f0109959b3df53738e68c273f812b8283d1"
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      Confirm pass against Lowrail 61879acc: verified equal Git trees and parents for e75b1f0109 and
+      afb18cccd9; prior code/test/oracle evidence applies without rebuilding. Revised commit message is
+      acceptable, and rerunning the exact revised example gives the annotated results on release/base/head.
+      The corrected coverage note and risky:true are accepted. Remaining body blocker: DECISIONS explicitly
+      says 'a correctness PR has no numbers' (PR descriptions) and 'no numbers in the body' (Correctness fixes).
+      Its general benchmark-format paragraph specifies how to present performance evidence, not an exception
+      for this correctness fix. Remove the table and closing version-speed sentence; keep both in the record.
+      Also correct stale impact wording ('25% slower' should describe instructions; NUL output is deliberately
+      different from 4.0.9), and restore the preceding historical Astra pass to afb18cccd9: 61879acc rewrote
+      its head to e75b1f0109, although that pass reviewed afb18cccd9. No source-code change or repeat build is
+      requested. Details: bench/upstream/ruby-differential/evidence/backtrace-format/astra/review.md, confirm section.
 ---
 
 # Append backtrace location strings by length

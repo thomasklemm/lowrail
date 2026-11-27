@@ -126,3 +126,43 @@ unarchived (API read: 23,871 stars, last push 2026-11-27); RubyGems download cou
 
 Not run: full test-all, sanitizers, JIT builds, hosted Ruby CI, Rails-app corpus, or other architectures.
 The review archive contains scripts, raw outputs, configure/build/test logs, and search/attribution captures.
+
+## Confirm pass on e75b1f0109, 2026-11-27
+
+Verdict: **changes**, limited to the body and queue record. Reviewed Lowrail `61879acc` and fetched the
+fork branch at `e75b1f0109959b3df53738e68c273f812b8283d1`. Both this head and `afb18cccd9` have tree
+`6318b8b90f9a0a8fd8d4648f627eca84f5dbf3f3` and parent `274cfe719ad275bcd66bd8c7201ff871e217c9a2`;
+`git diff afb18cccd9 e75b1f0109 --exit-code` exits 0. The revised commit message is acceptable. The
+previous runtime evidence applies to the identical source tree; this confirm did not rebuild or rerun suites.
+
+Extracted the revised body's Ruby code block verbatim and ran it with `ruby --disable-gems` on the installed
+4.0.9, the independently built base, and the unchanged previously reviewed head binary. Results:
+
+```text
+4.0.9, exit 0, stdout: "a:1:in '<main>'"
+master, exit 1, stderr: body-example.rb:4:in 'Exception#backtrace': string contains null byte (ArgumentError)
+head, exit 0, stdout: "a\u0000b.rb:1:in '<main>'"
+```
+
+The master diagnostic above shortens only the scratch directory and omits the following main-frame line.
+The new example is accurate. The corrected `btdiff.rb` coverage note, citation of the real-frame oracle,
+and `risky: true` satisfy those findings.
+
+The benchmark table remains a body blocker because two explicit rules apply to this correctness fix:
+
+* DECISIONS, **PR descriptions**, Numbers: “a correctness PR has no numbers” (2026-11-15).
+* DECISIONS, **Correctness fixes: readable first**: “Measure only to rule out a clear slowdown on a common
+  path, never to choose between correct shapes; no numbers in the body.”
+
+The **Benchmark tables in the project's own format** paragraph (2026-11-14) describes the format when
+performance numbers belong in a body; it does not explicitly exempt ruby/ruby correctness fixes from the
+more specific restrictions. This is not a finding that the table is false: its measurement and approximate
+benefit were independently confirmed above. Smallest fix: keep the table and closing version-speed sentence
+in the evidence record, not the proposed body. No C change, benchmark deletion, or new runtime pass is needed.
+
+Two record corrections also remain: `impact` still calls instruction counts “25% slower” and says the output
+returns to 4.0.9, although NUL paths deliberately retain bytes that 4.0.9 truncated. Describe the instruction
+increase and the intended NUL difference instead. Also, `git show 61879acc -- BT1.md` (with the full queue
+path) shows that the original Astra pass's `head` was rewritten from `afb18cccd9` to `e75b1f0109`; restore
+that historical attribution and keep this confirm as a separate new-head pass. The confirm appends its
+findings without overwriting the coordinator's edits.
