@@ -1,0 +1,14 @@
+BT1 thermos-sol review, 2026-11-27
+Head e75b1f0109959b3df53738e68c273f812b8283d1; base 274cfe719ad275bcd66bd8c7201ff871e217c9a2
+afb18cccd9 and e75b1f0109 share tree 6318b8b90f9a0a8fd8d4648f627eca84f5dbf3f3
+Reviewed body SHA-256 0043078758ad9a6b3833a484273efa9c4c321634de3a2b7b21a6bab4f4feb601
+probe cases 12668 {'same': 9540, 'NUL error becomes output': 3128}
+cfunc cases 5922 {'same': 3964, 'NUL error becomes output': 1958}
+Ir/call = (whole-process Ir at N=300 - Ir at N=100) / 200; GC disabled, fixed initial heap
+caller {'release': [883081.22, 883094.415], 'base': [1093072.43, 1093115.895], 'head': [849712.765, 849741.0]}
+bt {'release': [894795.31, 894715.14], 'base': [1105866.895, 1105931.195], 'head': [860942.345, 860985.345]}
+raise {'release': [44263.565, 44278.84], 'base': [44934.835, 44944.32], 'head': [44899.395, 44972.105]}
+Large-input benchmark: 16,128,1048576 bytes; ASCII, early/late non-ASCII and early/late invalid UTF-8; to_s alone and to_s.valid_encoding?
+Benchmark-driver best-of-ten figures, not confidence intervals. Compare head with faster of two base A/A results.
+Worst throughput ratio (1.0475173518419647, 'n1048576_broken_early_valid', [1873.0, 1789.0, 1962.0])
+No measured slowdown in sweep; noisy rows retained, not discarded

@@ -23,6 +23,7 @@ ownership: {date: 2026-11-27, checked: ["open PRs cross-referencing #17882","ope
 evidence:
   - bench/upstream/ruby-differential/evidence/backtrace-format
   - bench/upstream/ruby-differential/evidence/backtrace-format/astra
+  - bench/upstream/ruby-differential/evidence/backtrace-format/thermos-sol
 passes:
   - reviewer: astra
     orb: T-01a21dcc-1fab-7104-9ca4-c62537a6cf82
@@ -73,6 +74,47 @@ passes:
       suites, oracle, GC.stress and corrected-example evidence apply. No further code/text findings and no
       rebuild or test rerun for this text-only confirm. Approval is for this exact head and body, not permission
       to open upstream outside the queue's remaining gates.
+  - reviewer: thermos-sol
+    orb: T-01a21dd5-050e-70b3-9097-842e5d974661
+    head: "e75b1f0109959b3df53738e68c273f812b8283d1"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      No must-fixes. Reviewed the number-free body at Lowrail 8d9d6857, SHA-256
+      0043078758ad9a6b3833a484273efa9c4c321634de3a2b7b21a6bab4f4feb601, and the revised commit message;
+      ran its exact rescued-backtrace example on release, base and head and confirmed all annotated results.
+      Applied both Thermos correctness/security and maintainability rubrics personally, without extra reviewers
+      as requested. Verified that afb18cccd9 and e75b1f0109 have identical trees and the same parent. Built base
+      274cfe719a and the change with GCC 14.2.0, -O3, JITs disabled; reran both requested test files after the
+      message-only head update: 132 tests, 4633 assertions, no failures/errors/skips. Base has 131 tests and
+      4630 assertions, also clean. Both builds pass all 2148 btests, with the same fiber-count skip. The added
+      test fails once on base with ArgumentError and passes once on head; it checks the complete public caller
+      string, not implementation counts. The benchmark measures formatting captured locations, not stack capture.
+      No added code comments. Independent real-frame probes cover 12668 Ruby-method/eval/conversion cases and
+      5922 C-method cases: 13504 identical public results and 5086 NUL errors replaced by output, no other
+      differences in bytes, encoding, validity, ascii_only?, result class or frozen state where checked. Cases
+      include encoded and invalid paths, real encoded Ruby names, arbitrary C-method symbol bytes, cfunc frames,
+      full_message in both orders, zero/negative/large line numbers, frozen String subclasses, once-only duck
+      conversion and independent mutable outputs. NUL in an anonymous C-method name is accepted too, as intended
+      by appending both inputs by length. Eight selected GC.stress cases also preserve the six non-NUL results
+      and fix two NUL cases without crashing. Inputs remain ISEQ-owned; no Ruby callbacks or loading/configuration
+      boundary is added, and the converted temporary and method name retain GC guards. The helper keeps the same
+      compatible-encoding selection and replacement fallback as ruby__sfvextra. Cold read: make the same encoded
+      accumulator; use a compatible ASCII-compatible encoding, otherwise convert with replacement; copy by
+      length; add the existing punctuation. L1, no unjustified abstraction: rb_str_dup changes encoding behavior,
+      rb_str_buf_append rejects incompatible encodings, and changing ruby__sfvextra would broaden the fix to all
+      PRIsVALUE callers. No smaller equally scoped equivalent found; Flog/RuboCop method metrics do not apply to C.
+      Fixed-heap Callgrind A/A confirms caller 1093072/1093116 to 849713/849741 Ir/call and raise-plus-backtrace
+      1105867/1105931 to 860942/860985; raise-only remains within A/A. Installed 4.0.9 gives about 883088 and
+      894755 respectively, historical context rather than an identically configured release build. The required
+      pinned make benchmark, ten repeats, gives 30.594k to 36.931k i/s. Four-way driver control gives release
+      34.888k, base 30.247k, base again 30.492k, head 36.064k. A 16/128/1048576-byte sweep with non-ASCII or invalid
+      UTF-8 absent/early/late, also consuming valid_encoding?, found no slowdown; the smallest head-to-faster-base
+      ratio is 1.048 on the large invalid-early validity-consumer row, with noisy rows retained. Numbers are not
+      claimed as elapsed-time gains for caller/backtrace. Raw profiles, differential output, build/test/stress and
+      benchmark logs are retained under evidence/backtrace-format/thermos-sol, with results.txt as the index;
+      probe scripts stay in this orb backup. Not run: full test-all, JIT builds, sanitizers, other architectures,
+      app corpus or hosted Ruby CI. No upstream post or fork push.
 ---
 
 # Append backtrace location strings by length
