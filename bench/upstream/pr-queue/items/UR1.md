@@ -12,7 +12,7 @@ built_on: "48cda77031"
 depends_on: []
 stacked_on:
 alternative_of:
-evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz]
+evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz]
 impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
@@ -98,7 +98,13 @@ note: >-
   7da6979 with this sentence.
   2026-11-27 (Astra confirm on 7da6979: boundary and body accepted; commit text only): the commit message now says
   the result has the same bytes and encoding, and the same class except on JRuby 9.4. Amended to c43954f, same
-  tree as cecaed1 and 7da6979, and the fork branch moved with a lease. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  tree as cecaed1 and 7da6979, and the fork branch moved with a lease.
+  2026-11-27 timing (a1.xxlarge, T-01a21e8f-2651-73ed-9ab5-9406bb545fe2, Lowrail 23a938b5) on cecaed1's tree:
+  interpreter ips +40% / +233% / +321% / +118% (A/A <= 3.1%); YJIT wall -35.1% / -72.7% / -80.4% / -57.3%; ZJIT
+  master wall -25.0% / -69.6% / -78.7% / -54.1%. Every A/A interval contains 0, and the runs
+  are JIT-flat in 90 processes per cell. On a3b201f05b, YJIT cookie failed its A/A (no claim, recorded). Body now
+  leads with the ips table; the JIT sentence covers the 25-80% range of both wall cohorts; the instruction table
+  stays in the record. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes:
   - reviewer: astra
@@ -236,9 +242,11 @@ passes:
 
 This replaces only the `gsub` with `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C. The check for an invalid `%`, the `b` copy and the final `force_encoding` stay, so the result has the same class, bytes and encoding as before. The one exception is JRuby 9.4, whose `String#b` keeps a String subclass: there, a subclass with nothing to decode comes back as that subclass.
 
-| Objects and instructions per call, Ruby 4.0.10 | Before | After |
+| benchmark-ips, Ruby 4.0.10 | Before | After |
 | --- | ---: | ---: |
-| `"hello"` | 4 objects, 4,486 | 3 objects, 3,553 |
-| `"article%5Btitle%5D"` | 7, 13,101 | 2, 4,973 |
-| `"Hello+world+from+Rack"` | 8, 15,320 | 2, 4,548 |
-| a 248-byte cookie value | 7, 18,059 | 2, 9,283 |
+| `"hello"` | 2.65M i/s | 3.72M i/s |
+| `"article%5Btitle%5D"` | 816.4k i/s | 2.72M i/s |
+| `"Hello+world+from+Rack"` | 685.7k i/s | 2.89M i/s |
+| a 248-byte cookie value | 509.0k i/s | 1.11M i/s |
+
+With YJIT, and with ZJIT on Ruby master, time per call drops by 25% to 80%. Each call allocates 2 or 3 objects instead of 4 to 8.

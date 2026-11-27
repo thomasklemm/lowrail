@@ -5,3 +5,8 @@ blog GET article yjit none.rb Ir/op 4668101 objs/op 1951.0 jit 0/0 settle 1
 blog GET article yjit ur1_cgib.rb Ir/op 4625145 objs/op 1912.0 jit 0/0 settle 1
 blog GET article yjit none.rb Ir/op 4670590 objs/op 1948.0 jit 0/0 settle 1
 pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 4003566 objs/op 1820.6 jit 0/0 settle 1
+pingcrm PUT contact (Inertia redirect) yjit none.rb Ir/op 3998006 objs/op 1820.2 jit 0/0 settle 1
+blog GET articles.json yjit none.rb Ir/op 2184753 objs/op 1134.6 jit 0/0 settle 1
+blog GET articles.json yjit ur1_cgib.rb Ir/op 2186274 objs/op 1134.6 jit 0/0 settle 1
+blog GET articles.json yjit none.rb Ir/op 2181709 objs/op 1134.6 jit 0/0 settle 1
+DONE
