@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.summary = "Exact object allocation counts per request, job, mail and Cable action of a Rails app, by source line"
   spec.description = "Runs your test suite (or a replayed request mix) with allocation counting on and reports the " \
     "objects each request, job, mail and Action Cable action allocates, by line in your app, Rails, Ruby and gems, " \
-    "with a CI gate for regressions. Counts objects, not time. Never changes or lowers your app."
+    "and compares two captures to list what grew. Counts objects, not time. Never changes or lowers your app."
   spec.authors = ["Thomas Klemm"]
   spec.license = "MIT"
   spec.homepage = "https://github.com/thomasklemm/lowrail"

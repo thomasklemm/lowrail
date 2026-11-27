@@ -43,7 +43,9 @@
 * compare refuses the base passed as its own A/A report (exit 2) and warns when the A/A report has exactly the
   base's counts.
 * `--timeout` also stops the processes a run started in a group of their own (selenium-webdriver's driver and
-  browser), which outlived exit 124 before.
+  browser), which outlived exit 124 before, as long as they are still found from the run: a daemon whose parent
+  exited before the deadline is not.
+* The gem's description no longer says "CI gate": compare is a report and exits 0 when it lists a regression.
 * README: installing from GitHub (`github:` with `glob:`), and its size; captures taken at different times differ
   more than 1% when the app's work depends on the clock, so profile the base twice and pass `--aa`.
 * Tests: `QUIT` reaches the command under `--timeout`, a signal that comes before the command is started reaches it

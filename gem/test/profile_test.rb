@@ -179,8 +179,10 @@ class ProfileTest < Minitest::Test
           require "active_job/railtie"
           require_relative "config/environment"
           require "rack/mock"
-          # A server that is not running, as ViteRuby's dev server is in a suite, and one that is.
-          Refused = -> { Socket.tcp("127.0.0.1", 1, connect_timeout: 1).close rescue nil }
+          # A server that is not running, as ViteRuby's dev server is in a suite, and one that is. A bound port
+          # nobody listens on refuses; port 1 may be open (it was on a macOS CI runner).
+          CLOSED = Socket.new(:INET, :STREAM).tap { _1.bind(Addrinfo.tcp("127.0.0.1", 0)) }
+          Refused = -> { Socket.tcp("127.0.0.1", CLOSED.local_address.ip_port, connect_timeout: 1).close rescue nil }
           SERVER = TCPServer.new("127.0.0.1", 0)
           PORT = SERVER.addr[1]
           Connect = -> { Socket.tcp("127.0.0.1", PORT, connect_timeout: 1).close }
@@ -266,14 +268,16 @@ class ProfileTest < Minitest::Test
         autoload :Socket, "socket"
         2.times { Lowrail::Profile.close(Lowrail::Profile.open(0)) }
         puts "autoload: #{Object.autoload?(:Socket).inspect}, loaded: #{$LOADED_FEATURES.any? { _1.end_with?("/socket.rb") }}"
-        Socket.tcp("127.0.0.1", 1, connect_timeout: 1) rescue nil
+        # Bound and not listening, so it refuses; port 1 may be open (it was on a macOS CI runner).
+        closed = Socket.new(:INET, :STREAM).tap { _1.bind(Addrinfo.tcp("127.0.0.1", 0)) }
+        Socket.tcp("127.0.0.1", closed.local_address.ip_port, connect_timeout: 1) rescue nil
         Lowrail::Profile.close(Lowrail::Profile.open(0))
         puts "hooked: #{Socket.singleton_class.ancestors.first == Lowrail::Profile::Connect}"
         # Outside the main Ractor the hook stays out of the way (the counter is the main Ractor's).
         server = TCPServer.new("127.0.0.1", 0)
         Warning[:experimental] = false
-        ractor = Ractor.new(server.addr[1]) do |port|
-          [port, 1].map { |p| (Socket.tcp("127.0.0.1", p, connect_timeout: 1).close; "connected") rescue $!.class.name }
+        ractor = Ractor.new(server.addr[1], closed.local_address.ip_port) do |port, refused|
+          [port, refused].map { |p| (Socket.tcp("127.0.0.1", p, connect_timeout: 1).close; "connected") rescue $!.class.name }
         end
         puts "ractor: #{(ractor.respond_to?(:value) ? ractor.value : ractor.take).join(", ")}"
       RUBY
