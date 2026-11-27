@@ -4,3 +4,4 @@ ruby=4.1.0 0d399335b7 repo=antiwork/gumroad sha=2606df2dec bundled_with=2.5.10 e
 ruby=4.1.0 0d399335b7 repo=sharetribe/sharetribe sha=d4c8c3a048 bundled_with=4.0.6 exit=1 switch='Installing Bundler 4.0.6' result='NameError: uninitialized constant Pathname::SEPARATOR_PAT'
 ruby=4.0.9 3e93b23afc repo=sharetribe/sharetribe sha=d4c8c3a048 bundled_with=4.0.6 exit=0 switch='Installing Bundler 4.0.6' result='Bundle complete!'
 ruby=4.0.9 3e93b23afc repo=otwcode/otwarchive sha=452391b648 bundled_with=2.6.9 exit=0 switch='Installing Bundler 2.6.9' result='Bundle complete!'
+ruby=4.0.9 3e93b23afc repo=antiwork/gumroad sha=2606df2dec bundled_with=2.5.10 exit=0 switch='Installing Bundler 2.5.10' result='Bundle complete!'

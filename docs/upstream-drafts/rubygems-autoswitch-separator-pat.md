@@ -102,7 +102,7 @@ Raw outputs, scripts and samples are in
 * **Apps** (`repos-apps-2026-11-27.txt`, `RUBY_UPGRADE=1`: `.ruby-version` set to the running Ruby and the Gemfile
   `ruby` line dropped, as an app moving to that Ruby would). Gumroad (antiwork/gumroad, 10.2k stars, BUNDLED WITH
   2.5.10, 2 GIT), otwarchive (2.5k stars, 2.6.9, 4 GIT) and sharetribe (2.4k stars, 4.0.6, 4 GIT) raise the
-  NameError on master; otwarchive and sharetribe complete on 4.0.9 (Gumroad's control: see the file).
+  NameError on master; all three complete on 4.0.9 with the same edit.
   **forem dropped:** its main (BUNDLED WITH 2.4.17) switches on master but fails earlier in resolution, because
   cld3 caps Ruby below 3.5; it can't move to 4.1 regardless. Sharetribe left out of the issue for length.
 * **Code search** (`codesearch_sample.rb`, `codesearch-sample-2026-11-27.json`): GitHub reports about 35,100
