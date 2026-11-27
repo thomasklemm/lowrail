@@ -339,3 +339,43 @@ Head remains `5fc1871eec45270a068d2ecba6654eef979c5f6e`; prior exact-head runtim
 No rebuild, test rerun or new measurements for this caption-only confirm. No ZJIT sentence is present or
 approved in advance; a later addition needs its own evidence/text confirm. The earlier internal README
 rounding nit is not a finding against this body. No upstream post or Ruby-fork push.
+
+## ZJIT/YJIT sentence confirm, 2026-11-27
+
+Verdict: **approve**, no open findings on the added sentence. Verified outgoing body SHA-256
+`a692d5851fda15e4eb9b1249146198a95a6b9ef1f27c5dce087d0d83922bb879` at Lowrail `4a889cf6`, identical
+to `body-proposed.md`. The only delta from posted `05fff894a6` is the supplied JIT sentence. Ruby head
+remains `5fc1871eec45270a068d2ecba6654eef979c5f6e` against base `274cfe719a`.
+
+Read the fixture, saved commands, results, raw logs and `script/upstream-bench`'s timing/statistical gates.
+For each JIT, parsed all 90 measured process logs and verified their CPU/monotonic arrays match every
+stored round in results.json. Each process has 30 windows for each of three cases. Independently recomputed
+the log-ratio median estimates in Python from the raw CPU samples (fourth-smallest of 30 per process,
+divided by calibrated call count), then reproduced the exact seeded 5,000-resample bootstrap intervals
+with the inspected Ruby analysis functions. All six estimates, intervals and gate decisions match:
+
+| Mode/case | Change | 95% change interval | 95% A/A interval |
+| --- | ---: | --- | --- |
+| ZJIT caller | −18.3909% | −19.4634% to −17.7212% | −7.9887% to +0.3294% |
+| ZJIT backtrace | −17.8319% | −19.6437% to −17.3651% | −8.7176% to +0.4158% |
+| ZJIT locations | −18.5857% | −19.7582% to −18.0708% | −6.6339% to +0.2980% |
+| YJIT caller | −19.3371% | −19.7828% to −18.8709% | −0.3698% to +3.6332% |
+| YJIT backtrace | −18.4845% | −19.4490% to −17.8510% | −0.4384% to +3.3146% |
+| YJIT locations | −18.5220% | −18.9897% to −18.0440% | −0.5488% to +1.7645% |
+
+All A/A intervals include zero, all change intervals exclude zero, and none overlaps its A/A interval.
+Every raw JIT line has all required counters and zero accumulated absolute movement across the measured
+windows: 90 processes and 8,100 case-windows per JIT. The printed `0>0` records accumulated movement,
+not a claim that nothing compiled during warmup. All 90 timed commands per mode use the named JIT flag
+and core 1. Saved Ruby descriptions identify the expected base/head; copied fixtures are identical.
+
+The fixture recurses 50 levels inside caller and raise-plus-backtrace operations; the location case formats
+the already-captured collection with `locations.each(&:to_s)`. Thus the sentence describes these stack
+benchmarks, not isolated single-frame formatter latency or an application speedup. The estimator measures
+thread CPU time with GC disabled, not end-to-end request latency. The six point estimates round to about
+18–19% less time; this is not an 18–19% confidence interval. ZJIT's noisier control still passes the stated
+gate. The current DECISIONS rule allows a one-sentence JIT result showing that the improvement holds.
+
+Evidence: `jit-wall-2026-11-27/{zjit,yjit}/{results.json,commands.sh,raw/}`. This was an audit/recalculation
+of retained measurements, not a fresh JIT build or benchmark run. Prior exact-head correctness validation
+remains applicable. No code change requested, no upstream post and no Ruby-fork push.

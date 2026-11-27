@@ -269,6 +269,25 @@ passes:
       unchanged, so the prior evidence review applies without remeasurement. Ruby head remains 5fc1871eec;
       prior source/parser/differential approval is unchanged. No rebuild or test rerun for this text-only
       confirm. Approval covers this body, not the later separate ZJIT sentence. No upstream post or Ruby fork push.
+  - reviewer: astra
+    orb: T-01a21dcc-1fab-7104-9ca4-c62537a6cf82
+    head: "5fc1871eec45270a068d2ecba6654eef979c5f6e"
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      None. JIT-sentence delta at Lowrail 4a889cf6, exact outgoing/copied body SHA-256
+      a692d5851fda15e4eb9b1249146198a95a6b9ef1f27c5dce087d0d83922bb879. Parsed all 180 measured process
+      logs across ZJIT/YJIT, checked raw arrays against results.json, independently recalculated the six
+      log-ratio point estimates, and reproduced the exact seeded bootstrap intervals and gate decisions.
+      ZJIT reductions are 18.3909/17.8319/18.5857%; YJIT 19.3371/18.4845/18.5220%, supporting about 18-19%.
+      All A/A intervals include zero, all change intervals exclude zero, and their intervals do not overlap.
+      Every required JIT counter records zero accumulated movement over 90 processes per mode; timed
+      commands use core 1 and the correct JIT flag. Expected base/head version descriptions and identical
+      copied 50-deep fixtures checked. The location case formats captured locations; these are benchmark
+      thread-CPU-time estimates, not single-frame latency or app speedup. Current DECISIONS permits the
+      short JIT sentence. Raw-evidence audit only, not a fresh JIT run; prior exact-head correctness evidence
+      remains applicable. Details: evidence/backtrace-format/astra/review.md, ZJIT/YJIT sentence confirm.
+      No upstream action or Ruby-fork push.
 ---
 
 # Append backtrace location strings by length
