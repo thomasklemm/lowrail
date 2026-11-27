@@ -1,0 +1,24 @@
+{
+  "boot": {
+    "ok": false,
+    "class": "RuntimeError",
+    "message": "Unknown version \"8.2\"",
+    "first_app_frame": "/home/user/workspace/repo/.corpus/boot-campfire/config/application.rb:10:in '<class:Application>'",
+    "first_rails_frame": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/application/configuration.rb:369:in 'Rails::Application::Configuration#load_defaults'",
+    "first_gem_frame": null,
+    "backtrace": [
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties/lib/rails/application/configuration.rb:369:in 'Rails::Application::Configuration#load_defaults'",
+      "/home/user/workspace/repo/.corpus/boot-campfire/config/application.rb:10:in '<class:Application>'",
+      "/home/user/workspace/repo/.corpus/boot-campfire/config/application.rb:8:in '<module:Campfire>'",
+      "/home/user/workspace/repo/.corpus/boot-campfire/config/application.rb:7:in '<top (required)>'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'Kernel.require'",
+      "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/4.0.0/bundled_gems.rb:60:in 'block (2 levels) in Kernel#replace_require'",
+      "/home/user/workspace/repo/bench/upstream/rails_main_boot/probe.rb:29:in '<main>'"
+    ],
+    "cause": null
+  },
+  "rails": {
+    "version": "8.1.4.1",
+    "railties": "/home/user/.local/share/mise/installs/ruby/4.0.9/lib/ruby/gems/4.0.0/bundler/gems/rails-3f290b759c8e/railties"
+  }
+}
