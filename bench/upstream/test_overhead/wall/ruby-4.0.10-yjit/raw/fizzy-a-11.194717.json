@@ -1,0 +1,16 @@
+{
+  "ruby": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]",
+  "yjit": true,
+  "zjit": false,
+  "pwd": "/home/user/rdiff/pt2work/1f7c50bc10",
+  "tests": 1787,
+  "stackprof": null,
+  "boot_wall": 7.8122814540001855,
+  "window": {
+    "wall": 77.66686040499917,
+    "cpu": 77.72377688899999,
+    "allocs": 50140149,
+    "gc_count": 243
+  },
+  "counters": {}
+}
