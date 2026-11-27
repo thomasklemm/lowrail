@@ -11,7 +11,8 @@ measured. This round measures them, per operation, on Rails main.
 * **The idle loops are the frequent ones.** A Solid Cable listener polls every 0.1 s per process forever, a Solid
   Queue worker every 0.1 s (Fizzy) to 1 s (default, Loomio), the dispatcher every second. An idle poll costs
   0.6–1.0 M instructions (worker `*`, dispatcher, cable listener), 2.7–3.3 M for a worker with seven queues.
-* **The cable listener spends half of an idle poll in Active Record's query cache**, which can never answer it
+* **The cable listener runs every poll through Active Record's query cache** (about half of an idle poll inclusive of
+  the query itself), which can never answer it
   (one query per executor run, cleared when the run completes). **SCB1** removes that: −14.5% instructions per
   idle poll in the body benchmark, −25% in the census app with 20 streams.
 * **Enqueue** (2.1 M instructions, 690 objects on SQLite) is mostly Active Record insert work; the one stack-owned
@@ -87,7 +88,7 @@ and body run it through `listen` itself, which adds the executor's own callbacks
 
 | # | Loop | Runs | Where the instructions go | Lead |
 | ---: | --- | --- | --- | --- |
-| 1 | Solid Cable listener poll | every 0.1 s per process (Puma worker, job process), idle or not | 51% in `QueryCache#cache_sql` → `Store#compute_if_absent`, `Attribute#hash`, `Type::Value#hash`: the key over the SQL and every stream's hash | **SCB1**, built |
+| 1 | Solid Cable listener poll | every 0.1 s per process (Puma worker, job process), idle or not | 51% inclusive (the query included) in `QueryCache#cache_sql` → `Store#compute_if_absent`, `Attribute#hash`, `Type::Value#hash`: the key over the SQL and every stream's hash | **SCB1**, built |
 | 2 | Solid Queue worker poll | every 0.1–1 s per worker | `QueueSelector`: `Pause.all.pluck` every poll (22% of a `*` poll), and for a list with prefixes one `DISTINCT … LIKE` query plus one transaction and `SELECT … FOR UPDATE` per queue (7 queues: 4.2× a `*` poll) | SSQ2, held |
 | 3 | Solid Queue dispatcher poll | every 1 s | one `pluck` under a transaction; `Time#change` Rationals from `Time.current` binds | none |
 | 4 | Solid Cache read / fetch | per cached fragment, per request | `LazyEntry#value`: Zlib inflate and Marshal (native, 27–36%); `BoundSqlLiteral` placeholder scan (7%); SHA-256 key hash (native) | none |
@@ -123,7 +124,9 @@ enables the query cache on every pool for the run (`query_cache_enabled` is true
 poll on main, false on the branch; probe `.amp/in/orb-backup/sc1_mechanism.rb`, both on the census app). The poll
 runs one `SELECT` per run and the run's `complete!` clears the cache, so a lookup never hits, but each poll builds
 the key `[sql, binds]` with one bind per subscribed stream, hashes it (`Attribute#hash`, `Type::Value#hash`) and
-stores the result. With 20 streams that is about half of an idle poll; the cost grows with the number of streams.
+stores the result. With 20 streams removing it saves 14.5% of an idle poll (interpreter). It is not monotone in the
+number of streams: past SQLite's bind limit (999 channels) the query has no binds and the saving falls to 0.3%
+(thermos-sol record below).
 
 **Exactness.** Described out loud: \"while polling, the listener does not use the query cache for the Solid Cable
 connection.\"
