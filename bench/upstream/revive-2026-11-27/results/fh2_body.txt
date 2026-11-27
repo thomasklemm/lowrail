@@ -1,0 +1,3 @@
+main: text_field: 17 objects text_area: 18 objects radio_button: 21 objects label: 90 objects 
+main2: text_field: 17 objects text_area: 18 objects radio_button: 21 objects label: 90 objects 
+fh2: text_field: 15 objects text_area: 16 objects radio_button: 19 objects label: 86 objects 

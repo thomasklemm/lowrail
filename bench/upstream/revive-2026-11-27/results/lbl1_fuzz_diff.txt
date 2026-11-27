@@ -1,0 +1,1200 @@
+9151c9151
+< f.label persisted :post "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label persisted :post "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+9153c9153
+< f.label block persisted :post "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label block persisted :post "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+9162c9162
+< f.label o persisted :post "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+9170c9170
+< f.label o persisted :post "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+9178c9178
+< f.label o persisted :post "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+9186c9186
+< f.label o persisted :post "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+9194c9194
+< f.label o persisted :post "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+9202c9202
+< f.label o persisted :post "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+9210c9210
+< f.label o persisted :post "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+9218c9218
+< f.label o persisted :post "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+9226c9226
+< f.label o persisted :post "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+9234c9234
+< f.label o persisted :post "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+9242c9242
+< f.label o persisted :post "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+9250,9253c9250,9253
+< f.label o persisted :post "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field persisted :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_area persisted :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.hidden_field persisted :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field persisted :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area persisted :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field persisted :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+9258c9258
+< f.label o persisted :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+9266,9269c9266,9269
+< f.label o persisted :post "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field persisted :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.text_area persisted :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.hidden_field persisted :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+---
+> f.label o persisted :post "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field persisted :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area persisted :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field persisted :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+9274c9274
+< f.label o persisted :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+9282c9282
+< f.label o persisted :post "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+9290c9290
+< f.label o persisted :post "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+9298c9298
+< f.label o persisted :post "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+9306c9306
+< f.label o persisted :post "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+9314c9314
+< f.label o persisted :post "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+9322c9322
+< f.label o persisted :post "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+9338c9338
+< f.label o persisted :post "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+9346c9346
+< f.label o persisted :post "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+9354c9354
+< f.label o persisted :post "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+9362c9362
+< f.label o persisted :post "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted :post "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
+10636c10636
+< f.label persisted "post" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label persisted "post" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+10638c10638
+< f.label block persisted "post" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label block persisted "post" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+10647c10647
+< f.label o persisted "post" "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+10655c10655
+< f.label o persisted "post" "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+10663c10663
+< f.label o persisted "post" "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+10671c10671
+< f.label o persisted "post" "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+10679c10679
+< f.label o persisted "post" "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+10687c10687
+< f.label o persisted "post" "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+10695c10695
+< f.label o persisted "post" "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+10703c10703
+< f.label o persisted "post" "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+10711c10711
+< f.label o persisted "post" "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+10719c10719
+< f.label o persisted "post" "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+10727c10727
+< f.label o persisted "post" "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+10735,10738c10735,10738
+< f.label o persisted "post" "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field persisted "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_area persisted "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.hidden_field persisted "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field persisted "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area persisted "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field persisted "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+10743c10743
+< f.label o persisted "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+10751,10754c10751,10754
+< f.label o persisted "post" "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field persisted "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.text_area persisted "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.hidden_field persisted "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+---
+> f.label o persisted "post" "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field persisted "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area persisted "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field persisted "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+10759c10759
+< f.label o persisted "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+10767c10767
+< f.label o persisted "post" "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+10775c10775
+< f.label o persisted "post" "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+10783c10783
+< f.label o persisted "post" "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+10791c10791
+< f.label o persisted "post" "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+10799c10799
+< f.label o persisted "post" "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+10807c10807
+< f.label o persisted "post" "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+10823c10823
+< f.label o persisted "post" "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+10831c10831
+< f.label o persisted "post" "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+10839c10839
+< f.label o persisted "post" "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+10847c10847
+< f.label o persisted "post" "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post" "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
+16576c16576
+< f.label persisted "post[]" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label persisted "post[]" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+16578c16578
+< f.label block persisted "post[]" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label block persisted "post[]" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+16587c16587
+< f.label o persisted "post[]" "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+16595c16595
+< f.label o persisted "post[]" "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+16603c16603
+< f.label o persisted "post[]" "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+16611c16611
+< f.label o persisted "post[]" "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+16619c16619
+< f.label o persisted "post[]" "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+16627c16627
+< f.label o persisted "post[]" "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+16635c16635
+< f.label o persisted "post[]" "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+16643c16643
+< f.label o persisted "post[]" "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+16651c16651
+< f.label o persisted "post[]" "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+16659c16659
+< f.label o persisted "post[]" "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+16667c16667
+< f.label o persisted "post[]" "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+16675,16678c16675,16678
+< f.label o persisted "post[]" "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field persisted "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_area persisted "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.hidden_field persisted "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field persisted "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area persisted "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field persisted "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+16683c16683
+< f.label o persisted "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+16691,16694c16691,16694
+< f.label o persisted "post[]" "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field persisted "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.text_area persisted "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.hidden_field persisted "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+---
+> f.label o persisted "post[]" "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field persisted "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area persisted "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field persisted "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+16699c16699
+< f.label o persisted "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+16707c16707
+< f.label o persisted "post[]" "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+16715c16715
+< f.label o persisted "post[]" "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+16723c16723
+< f.label o persisted "post[]" "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+16731c16731
+< f.label o persisted "post[]" "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+16739c16739
+< f.label o persisted "post[]" "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+16747c16747
+< f.label o persisted "post[]" "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+16763c16763
+< f.label o persisted "post[]" "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+16771c16771
+< f.label o persisted "post[]" "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+16779c16779
+< f.label o persisted "post[]" "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+16787c16787
+< f.label o persisted "post[]" "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o persisted "post[]" "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
+22516c22516
+< f.label fresh :post "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label fresh :post "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+22518c22518
+< f.label block fresh :post "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label block fresh :post "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+22527c22527
+< f.label o fresh :post "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+22535c22535
+< f.label o fresh :post "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+22543c22543
+< f.label o fresh :post "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+22551c22551
+< f.label o fresh :post "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+22559c22559
+< f.label o fresh :post "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+22567c22567
+< f.label o fresh :post "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+22575c22575
+< f.label o fresh :post "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+22583c22583
+< f.label o fresh :post "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+22591c22591
+< f.label o fresh :post "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+22599c22599
+< f.label o fresh :post "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+22607c22607
+< f.label o fresh :post "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+22615,22618c22615,22618
+< f.label o fresh :post "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field fresh :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_area fresh :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.hidden_field fresh :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field fresh :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area fresh :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field fresh :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+22623c22623
+< f.label o fresh :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+22631,22634c22631,22634
+< f.label o fresh :post "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field fresh :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.text_area fresh :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.hidden_field fresh :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+---
+> f.label o fresh :post "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field fresh :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area fresh :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field fresh :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+22639c22639
+< f.label o fresh :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+22647c22647
+< f.label o fresh :post "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+22655c22655
+< f.label o fresh :post "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+22663c22663
+< f.label o fresh :post "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+22671c22671
+< f.label o fresh :post "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+22679c22679
+< f.label o fresh :post "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+22687c22687
+< f.label o fresh :post "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+22703c22703
+< f.label o fresh :post "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+22711c22711
+< f.label o fresh :post "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+22719c22719
+< f.label o fresh :post "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+22727c22727
+< f.label o fresh :post "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh :post "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
+24001c24001
+< f.label fresh "post" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label fresh "post" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+24003c24003
+< f.label block fresh "post" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label block fresh "post" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+24012c24012
+< f.label o fresh "post" "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+24020c24020
+< f.label o fresh "post" "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+24028c24028
+< f.label o fresh "post" "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+24036c24036
+< f.label o fresh "post" "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+24044c24044
+< f.label o fresh "post" "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+24052c24052
+< f.label o fresh "post" "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+24060c24060
+< f.label o fresh "post" "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+24068c24068
+< f.label o fresh "post" "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+24076c24076
+< f.label o fresh "post" "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+24084c24084
+< f.label o fresh "post" "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+24092c24092
+< f.label o fresh "post" "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+24100,24103c24100,24103
+< f.label o fresh "post" "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field fresh "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_area fresh "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.hidden_field fresh "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field fresh "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area fresh "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field fresh "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+24108c24108
+< f.label o fresh "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+24116,24119c24116,24119
+< f.label o fresh "post" "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field fresh "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.text_area fresh "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.hidden_field fresh "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+---
+> f.label o fresh "post" "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field fresh "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area fresh "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field fresh "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+24124c24124
+< f.label o fresh "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+24132c24132
+< f.label o fresh "post" "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+24140c24140
+< f.label o fresh "post" "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+24148c24148
+< f.label o fresh "post" "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+24156c24156
+< f.label o fresh "post" "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+24164c24164
+< f.label o fresh "post" "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+24172c24172
+< f.label o fresh "post" "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+24188c24188
+< f.label o fresh "post" "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+24196c24196
+< f.label o fresh "post" "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+24204c24204
+< f.label o fresh "post" "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+24212c24212
+< f.label o fresh "post" "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post" "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
+29941c29941
+< f.label fresh "post[]" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label fresh "post[]" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+29943c29943
+< f.label block fresh "post[]" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label block fresh "post[]" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+29952c29952
+< f.label o fresh "post[]" "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+29960c29960
+< f.label o fresh "post[]" "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+29968c29968
+< f.label o fresh "post[]" "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+29976c29976
+< f.label o fresh "post[]" "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+29984c29984
+< f.label o fresh "post[]" "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+29992c29992
+< f.label o fresh "post[]" "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+30000c30000
+< f.label o fresh "post[]" "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+30008c30008
+< f.label o fresh "post[]" "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+30016c30016
+< f.label o fresh "post[]" "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+30024c30024
+< f.label o fresh "post[]" "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+30032c30032
+< f.label o fresh "post[]" "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+30040,30043c30040,30043
+< f.label o fresh "post[]" "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field fresh "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_area fresh "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.hidden_field fresh "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field fresh "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area fresh "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field fresh "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+30048c30048
+< f.label o fresh "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+30056,30059c30056,30059
+< f.label o fresh "post[]" "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field fresh "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.text_area fresh "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.hidden_field fresh "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+---
+> f.label o fresh "post[]" "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field fresh "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area fresh "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field fresh "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+30064c30064
+< f.label o fresh "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+30072c30072
+< f.label o fresh "post[]" "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+30080c30080
+< f.label o fresh "post[]" "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+30088c30088
+< f.label o fresh "post[]" "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+30096c30096
+< f.label o fresh "post[]" "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+30104c30104
+< f.label o fresh "post[]" "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+30112c30112
+< f.label o fresh "post[]" "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+30128c30128
+< f.label o fresh "post[]" "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+30136c30136
+< f.label o fresh "post[]" "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+30144c30144
+< f.label o fresh "post[]" "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+30152c30152
+< f.label o fresh "post[]" "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o fresh "post[]" "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
+35881c35881
+< f.label invalid :post "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label invalid :post "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+35883c35883
+< f.label block invalid :post "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label block invalid :post "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+35892c35892
+< f.label o invalid :post "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+35900c35900
+< f.label o invalid :post "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+35908c35908
+< f.label o invalid :post "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+35916c35916
+< f.label o invalid :post "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+35924c35924
+< f.label o invalid :post "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+35932c35932
+< f.label o invalid :post "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+35940c35940
+< f.label o invalid :post "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+35948c35948
+< f.label o invalid :post "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+35956c35956
+< f.label o invalid :post "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+35964c35964
+< f.label o invalid :post "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+35972c35972
+< f.label o invalid :post "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+35980,35983c35980,35983
+< f.label o invalid :post "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field invalid :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_area invalid :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.hidden_field invalid :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field invalid :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area invalid :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field invalid :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+35988c35988
+< f.label o invalid :post "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+35996,35999c35996,35999
+< f.label o invalid :post "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field invalid :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.text_area invalid :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.hidden_field invalid :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+---
+> f.label o invalid :post "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field invalid :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area invalid :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field invalid :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+36004c36004
+< f.label o invalid :post "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+36012c36012
+< f.label o invalid :post "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+36020c36020
+< f.label o invalid :post "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+36028c36028
+< f.label o invalid :post "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+36036c36036
+< f.label o invalid :post "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+36044c36044
+< f.label o invalid :post "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+36052c36052
+< f.label o invalid :post "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+36068c36068
+< f.label o invalid :post "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+36076c36076
+< f.label o invalid :post "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+36084c36084
+< f.label o invalid :post "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+36092c36092
+< f.label o invalid :post "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid :post "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
+37366c37366
+< f.label invalid "post" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label invalid "post" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+37368c37368
+< f.label block invalid "post" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label block invalid "post" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+37377c37377
+< f.label o invalid "post" "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+37385c37385
+< f.label o invalid "post" "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+37393c37393
+< f.label o invalid "post" "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+37401c37401
+< f.label o invalid "post" "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+37409c37409
+< f.label o invalid "post" "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+37417c37417
+< f.label o invalid "post" "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+37425c37425
+< f.label o invalid "post" "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+37433c37433
+< f.label o invalid "post" "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+37441c37441
+< f.label o invalid "post" "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+37449c37449
+< f.label o invalid "post" "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+37457c37457
+< f.label o invalid "post" "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+37465,37468c37465,37468
+< f.label o invalid "post" "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field invalid "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_area invalid "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.hidden_field invalid "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field invalid "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area invalid "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field invalid "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+37473c37473
+< f.label o invalid "post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+37481,37484c37481,37484
+< f.label o invalid "post" "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field invalid "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.text_area invalid "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.hidden_field invalid "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+---
+> f.label o invalid "post" "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field invalid "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area invalid "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field invalid "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+37489c37489
+< f.label o invalid "post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+37497c37497
+< f.label o invalid "post" "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+37505c37505
+< f.label o invalid "post" "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+37513c37513
+< f.label o invalid "post" "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+37521c37521
+< f.label o invalid "post" "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+37529c37529
+< f.label o invalid "post" "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+37537c37537
+< f.label o invalid "post" "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+37553c37553
+< f.label o invalid "post" "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+37561c37561
+< f.label o invalid "post" "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+37569c37569
+< f.label o invalid "post" "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+37577c37577
+< f.label o invalid "post" "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post" "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
+43306c43306
+< f.label invalid "post[]" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label invalid "post[]" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+43308c43308
+< f.label block invalid "post[]" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label block invalid "post[]" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+43317c43317
+< f.label o invalid "post[]" "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+43325c43325
+< f.label o invalid "post[]" "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+43333c43333
+< f.label o invalid "post[]" "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+43341c43341
+< f.label o invalid "post[]" "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+43349c43349
+< f.label o invalid "post[]" "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+43357c43357
+< f.label o invalid "post[]" "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+43365c43365
+< f.label o invalid "post[]" "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+43373c43373
+< f.label o invalid "post[]" "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+43381c43381
+< f.label o invalid "post[]" "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+43389c43389
+< f.label o invalid "post[]" "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+43397c43397
+< f.label o invalid "post[]" "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+43405,43408c43405,43408
+< f.label o invalid "post[]" "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field invalid "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_area invalid "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.hidden_field invalid "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field invalid "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area invalid "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field invalid "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+43413c43413
+< f.label o invalid "post[]" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+43421,43424c43421,43424
+< f.label o invalid "post[]" "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+< f.text_field invalid "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.text_area invalid "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+< f.hidden_field invalid "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF.short"
+---
+> f.label o invalid "post[]" "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field invalid "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area invalid "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field invalid "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+43429c43429
+< f.label o invalid "post[]" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+43437c43437
+< f.label o invalid "post[]" "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+43445c43445
+< f.label o invalid "post[]" "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+43453c43453
+< f.label o invalid "post[]" "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+43461c43461
+< f.label o invalid "post[]" "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+43469c43469
+< f.label o invalid "post[]" "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+43477c43477
+< f.label o invalid "post[]" "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+43493c43493
+< f.label o invalid "post[]" "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+43501c43501
+< f.label o invalid "post[]" "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+43509c43509
+< f.label o invalid "post[]" "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+43517c43517
+< f.label o invalid "post[]" "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"post.bad\xFF"
+---
+> f.label o invalid "post[]" "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
+80432c80432
+< f.label admin "admin/post" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label admin "admin/post" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+80434c80434
+< f.label block admin "admin/post" "bad\xFF"	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label block admin "admin/post" "bad\xFF"	ArgumentError: invalid byte sequence in UTF-8
+80443c80443
+< f.label o admin "admin/post" "bad\xFF" 0	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 0	ArgumentError: invalid byte sequence in UTF-8
+80451c80451
+< f.label o admin "admin/post" "bad\xFF" 1	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 1	ArgumentError: invalid byte sequence in UTF-8
+80459c80459
+< f.label o admin "admin/post" "bad\xFF" 2	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 2	ArgumentError: invalid byte sequence in UTF-8
+80467c80467
+< f.label o admin "admin/post" "bad\xFF" 3	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 3	ArgumentError: invalid byte sequence in UTF-8
+80475c80475
+< f.label o admin "admin/post" "bad\xFF" 4	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 4	ArgumentError: invalid byte sequence in UTF-8
+80483c80483
+< f.label o admin "admin/post" "bad\xFF" 5	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 5	ArgumentError: invalid byte sequence in UTF-8
+80491c80491
+< f.label o admin "admin/post" "bad\xFF" 6	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 6	ArgumentError: invalid byte sequence in UTF-8
+80499c80499
+< f.label o admin "admin/post" "bad\xFF" 7	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 7	ArgumentError: invalid byte sequence in UTF-8
+80507c80507
+< f.label o admin "admin/post" "bad\xFF" 8	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 8	ArgumentError: invalid byte sequence in UTF-8
+80515c80515
+< f.label o admin "admin/post" "bad\xFF" 9	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 9	ArgumentError: invalid byte sequence in UTF-8
+80523c80523
+< f.label o admin "admin/post" "bad\xFF" 10	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 10	ArgumentError: invalid byte sequence in UTF-8
+80531,80534c80531,80534
+< f.label o admin "admin/post" "bad\xFF" 11	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+< f.text_field admin "admin/post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+< f.text_area admin "admin/post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+< f.hidden_field admin "admin/post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 11	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field admin "admin/post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area admin "admin/post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field admin "admin/post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+80539c80539
+< f.label o admin "admin/post" "bad\xFF" 12	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 12	ArgumentError: invalid byte sequence in UTF-8
+80547,80550c80547,80550
+< f.label o admin "admin/post" "bad\xFF" 13	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+< f.text_field admin "admin/post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF.short"
+< f.text_area admin "admin/post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF.short"
+< f.hidden_field admin "admin/post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF.short"
+---
+> f.label o admin "admin/post" "bad\xFF" 13	ArgumentError: invalid byte sequence in UTF-8
+> f.text_field admin "admin/post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.text_area admin "admin/post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+> f.hidden_field admin "admin/post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+80555c80555
+< f.label o admin "admin/post" "bad\xFF" 14	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 14	ArgumentError: invalid byte sequence in UTF-8
+80563c80563
+< f.label o admin "admin/post" "bad\xFF" 15	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 15	ArgumentError: invalid byte sequence in UTF-8
+80571c80571
+< f.label o admin "admin/post" "bad\xFF" 16	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 16	ArgumentError: invalid byte sequence in UTF-8
+80579c80579
+< f.label o admin "admin/post" "bad\xFF" 17	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 17	ArgumentError: invalid byte sequence in UTF-8
+80587c80587
+< f.label o admin "admin/post" "bad\xFF" 18	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 18	ArgumentError: invalid byte sequence in UTF-8
+80595c80595
+< f.label o admin "admin/post" "bad\xFF" 19	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 19	ArgumentError: invalid byte sequence in UTF-8
+80603c80603
+< f.label o admin "admin/post" "bad\xFF" 20	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 20	ArgumentError: invalid byte sequence in UTF-8
+80619c80619
+< f.label o admin "admin/post" "bad\xFF" 22	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 22	ArgumentError: invalid byte sequence in UTF-8
+80627c80627
+< f.label o admin "admin/post" "bad\xFF" 23	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 23	ArgumentError: invalid byte sequence in UTF-8
+80635c80635
+< f.label o admin "admin/post" "bad\xFF" 24	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 24	ArgumentError: invalid byte sequence in UTF-8
+80643c80643
+< f.label o admin "admin/post" "bad\xFF" 25	EncodingError: invalid symbol in encoding UTF-8 :"admin/post.bad\xFF"
+---
+> f.label o admin "admin/post" "bad\xFF" 25	ArgumentError: invalid byte sequence in UTF-8
