@@ -6,6 +6,7 @@ area: Action Dispatch parameter parsers
 reviewer: "byroot (merged #57952)"
 branch: thomasklemm/parameter-parsers-register-in-place
 head: "d1e2cdbcc2fe0a8e664eb57a7fee937e04c5a23f"
+merged_head: "d1e2cdbcc2fe0a8e664eb57a7fee937e04c5a23f"
 base: main
 built_on: "8e097e9d81f65fe8701c77352f5758be4f75f957"
 depends_on: []

@@ -7,6 +7,7 @@ area: Mash#respond_to_missing?, method_suffix, log_collision?
 reviewer: dblock
 branch: thomasklemm/respond-to-missing-allocations
 head: "d874851d79db3a35b4cde8d2d6c567833ebb73f7"
+merged_head: "d874851d79db3a35b4cde8d2d6c567833ebb73f7"
 base: master
 built_on: "37454e149e"
 depends_on: []

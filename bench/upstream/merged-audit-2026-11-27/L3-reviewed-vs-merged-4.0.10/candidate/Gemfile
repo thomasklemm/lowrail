@@ -1,0 +1,6 @@
+source "https://rubygems.org"
+gem "activesupport", path: "/home/user/w/l3-merged/activesupport"
+gem "activemodel", path: "/home/user/w/l3-merged/activemodel"
+gem "activerecord", path: "/home/user/w/l3-merged/activerecord"
+gem "sqlite3"
+gem "msgpack"

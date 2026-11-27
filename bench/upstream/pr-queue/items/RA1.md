@@ -6,6 +6,7 @@ area: Correlated subquery SQL rendering
 reviewer: scarroll32
 branch: thomasklemm/correlated-subquery-arel-table
 head: "1290b01fcb9a78717365968c791e75fa28a1016d"
+merged_head: "1290b01fcb9a78717365968c791e75fa28a1016d"
 base: main
 built_on: "9bbadf13fc165ee5f195cd5b210e61ca37ffceed"
 depends_on: []

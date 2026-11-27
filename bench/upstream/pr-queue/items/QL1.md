@@ -6,6 +6,7 @@ area: Active Record, request log line (ControllerRuntime)
 reviewer: "fatkodima (added the query count to the line), jhawthorn (sped up pluralize in #59651)"
 branch: thomasklemm/controller-runtime-query-literal
 head: "ce6d06884094c58baec9b6cf66eb4cc2df0ad51f"
+merged_head: "ce6d06884094c58baec9b6cf66eb4cc2df0ad51f"
 base: main
 built_on: "50c54eed06"
 depends_on: []

@@ -6,6 +6,7 @@ area: CI, Vary header specs
 reviewer: "skryukov (wrote the Precognition Vary spec in #427 and maintains the suite)"
 branch: thomasklemm/vary-negotiation-headers
 head: "dc24da9980e790d06bc8c541c522c9f603d6d945"
+merged_head: "dc24da9980e790d06bc8c541c522c9f603d6d945"
 base: master
 built_on: "3e1330a33d9e4ae3a7ec52800d4d18d4179d5401"
 depends_on: []

@@ -1,0 +1,4 @@
+# rails/rails#59611 (R1): changed lines of reviewed 4a837183ea (left) vs merged head d1bc6836bc (right), each against its own base; empty = identical
+2,3d1
+< a/Gemfile.lock +      prism
+< a/actionview/actionview.gemspec +  s.add_dependency "prism"

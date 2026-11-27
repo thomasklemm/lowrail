@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+gem "activesupport", path: "/home/user/w/k6-merged/activesupport"
+gem "activemodel", path: "/home/user/w/k6-merged/activemodel"
+gem "actionview", path: "/home/user/w/k6-merged/actionview"
+gem "actionpack", path: "/home/user/w/k6-merged/actionpack"

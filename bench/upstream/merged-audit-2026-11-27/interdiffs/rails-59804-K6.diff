@@ -1,0 +1,6 @@
+# rails/rails#59804 (K6): changed lines of reviewed bd93c422bf (left) vs merged head 6efbc06a5e (right), each against its own base; empty = identical
+3c3,4
+< a/actionview/lib/action_view/helpers/form_tag_helper.rb +        tag :input, { "type" => "text", "name" => name, "id" => (sanitize_to_id(name) unless options.key?("id")), "value" => value }.update(options)
+---
+> a/actionview/lib/action_view/helpers/form_tag_helper.rb +        id = sanitize_to_id(name) unless options.key?("id")
+> a/actionview/lib/action_view/helpers/form_tag_helper.rb +        tag :input, { "type" => "text", "name" => name, "id" => id, "value" => value }.update(options)

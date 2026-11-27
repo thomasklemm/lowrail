@@ -1,0 +1,109 @@
+rails/rails 60020 2026-11-27T17:21:59Z 8a0d3a4c37 9c28399099 Build attribute Hashes without copying the lazy row
+rails/rails 60013 2026-11-27T15:26:56Z afb10d01ac b66e2349a7 Let the Action Mailer test helper load without Active Job
+rails/rails 60008 2026-11-27T15:07:14Z e7a17ff01b 28a848a06b Bump the minimum supported SQLite version to 3.37.0
+rails/rails 60007 2026-11-27T15:34:13Z d41b93d147 0609fa47b5 Note in the upgrade guide that default_url_options is frozen by default
+rails/rails 60006 2026-11-27T15:59:10Z 9c1378eab6 f63b1f8933 Let Attachment.from_node pick attachables the bulk lookup didn't locate
+rails/rails 59987 2026-11-26T22:28:18Z 1862f0ba89 28a86e1d2e Stop setting the Action Mailer delivery job in `load_defaults`
+rails/rails 59986 2026-11-26T22:38:11Z 4f3c6aa98a 8dc1ec6683 Note in the upgrade guide that Action Mailer no longer loads Active Job
+rails/rails 59985 2026-11-26T22:07:11Z 2422669c94 58893983f3 Note in the upgrade guide that Rack::Sendfile is omitted when x_sendfile_header is unset
+rails/rails 59984 2026-11-26T22:06:25Z f526d29c50 a946944748 Note in the upgrade guide that Sidekiq 8.0.3 or later is required
+rails/rails 59983 2026-11-26T16:02:21Z 7e342de11f ecbd6042af Look up an existing connection lease without the registry mutex
+rails/rails 59976 2026-11-26T22:50:35Z 30368145ec e1e3937797 Keep adapter-specific index readers on every `IndexDefinition`
+rails/rails 59851 2026-11-26T22:59:44Z 73f8c7bea2 de4a71a2ca Don't compare owner conditions when joining an association without a scope
+rails/rails 59832 2026-11-26T22:40:22Z 5c4c7dbcac 53f224023d Return no messages for an attribute when a model has no errors
+rails/rails 59824 2026-11-26T22:33:54Z a2a13fc793 0e531ca769 Skip copying form field names that need no changes
+rails/rails 59817 2026-11-26T22:12:24Z 7181059af1 99fa0fb673 Unpin the main pool the Ractor proxy pinned
+rails/rails 59812 2026-11-26T22:09:33Z fd0e61b728 31f27a6b37 Compare Server-Timing durations with the events they come from
+rails/rails 59810 2026-11-26T23:02:44Z 60147d2f28 9ed75f692f Skip merging a blank relation into a relation without conditions
+rails/rails 59809 2026-11-15T16:49:56Z ce6d068840 e9c26763e2 Spell out "query" and "queries" in the request log line
+rails/rails 59804 2026-11-26T22:16:50Z 6efbc06a5e 271b595e9e Allocate less per field in `text_field_tag` and `tag`
+rails/rails 59800 2026-11-26T21:53:09Z af84ab1445 6f81bf3f08 Avoid rebuilding attribute names in `LazyIndexedAttributeSet#keys`
+rails/rails 59735 2026-11-26T21:51:01Z 7ddc0d8abb 2c211fbf50 Note in the upgrade guide that PostgreSQL 18.4+ fixture loading acquires more locks
+rails/rails 59676 2026-11-07T11:01:53Z ad06e3ec07 9ba8b1edee Fix Active Support test loading with older minitest
+rails/rails 59671 2026-11-27T15:57:50Z d29055285a b79cd26169 Find SQLite tables by any ASCII case of their name in the schema readers
+rails/rails 59668 2026-11-26T23:10:26Z 90c9862850 33efc59003 Let a temporary SQLite table or view hide a permanent one in the schema readers
+rails/rails 59662 2026-11-27T15:27:50Z 424441d986 15a91fed06 Don't freeze serialized column defaults
+rails/rails 59661 2026-11-26T22:32:16Z d1e2cdbcc2 ab840dcb3b Allow registering parameter parsers in place during boot
+rails/rails 59642 2026-11-13T04:55:30Z 8d6b63b0cd 0e655babbc Group bound SQL literals in `WhereClause` like other SQL literals
+rails/rails 59640 2026-11-05T08:20:51Z 2b02aad60c f9c9402721 Allow anonymous subclasses of cache stores with LocalCache
+rails/rails 59634 2026-11-05T03:25:10Z c8490688d7 06eae38e6e Accept bind values in `where!` and `having!` again
+rails/rails 59629 2026-11-09T11:14:41Z c814745459 e39506b600 Restore ActionView::LookupContext#find_template
+rails/rails 59627 2026-11-26T21:49:48Z 08be5191db 86c23bed6c Restore ActiveModel::SecurePassword::MAX_PASSWORD_LENGTH_ALLOWED
+rails/rails 59626 2026-11-04T16:36:57Z 2750d65efd d7875e3fb1 Skip nested values that serialize to an empty query in to_query
+rails/rails 59625 2026-11-04T16:30:42Z 2b4a97089a c9fc37095f Generate URLs for empty arguments with default URL options as before
+rails/rails 59624 2026-11-04T16:21:38Z a712a0a9bc d09361d7cf Load author addresses with authors in FieldOrderedValuesTest
+rails/rails 59620 2026-11-04T15:57:48Z 495c3a6405 fa03095c6f Don't build a Set of renderers on every render
+rails/rails 59619 2026-11-04T15:50:06Z b86b5887b3 32c132d134 Join adjacent literals when building a route's path format
+rails/rails 59618 2026-11-04T15:41:03Z c4f465b7b2 088a9ad445 Append the default star projection without a rest Array
+rails/rails 59617 2026-11-26T23:15:39Z 850be11e99 621ad9a25b Keep the UTC offset in Time#change for times with a zone object
+rails/rails 59616 2026-11-04T14:58:25Z ef0266d0d6 8b06b0eb98 Read the update timestamp only when it is written
+rails/rails 59615 2026-11-04T14:31:29Z fa58e6094c 6c23cb8f2a Read the blob filename's extension once when choosing a variant format
+rails/rails 59614 2026-11-04T15:42:56Z 1bc5b64704 e64f5a4258 Iterate Hash#extract! keys with each instead of each_with_object
+rails/rails 59613 2026-11-04T14:16:35Z d6b71f057d 8fbab49e46 Build notification handle groups with each instead of Hash#map
+rails/rails 59611 2026-11-26T21:50:52Z d1bc6836bc 4ab078fad6 Declare Prism dependencies in Action View and Railties
+rails/rails 59608 2026-11-04T14:09:22Z ce95f14b9f 98f3793369 Skip the format union in prepend_formats when the format already leads
+rails/rails 59607 2026-11-04T13:57:13Z be7ab87287 4e76f138b8 Resolve attribute aliases with a fetch default instead of a block
+rails/rails 59606 2026-11-04T13:49:27Z 5b24d5490e d2ab41e65a Restore three ActionView::Template handler methods removed in #57874
+rails/rails 59605 2026-11-04T13:29:02Z 501bf5cc67 9cf3693a0a Look up the SQLite3 type map once per result
+rails/rails 59603 2026-11-04T13:14:47Z f02e21ddbb 1ca7528bac Check for String tag attribute values first
+rails/rails 59598 2026-11-04T07:43:32Z 8d9d843428 f2dfd1ace1 Anchor URI_REGEXP once instead of per alternative
+rails/rails 59597 2026-11-04T07:37:34Z e78c7e93d3 03ccff57a7 Build `allow_browser`'s named version sets once
+rails/rails 59596 2026-11-04T07:33:14Z aabbcd09e9 6b95940a24 Freeze a cached statement's SQL once instead of copying it per execution
+rails/rails 59585 2026-11-04T01:04:49Z 2236cd5626 2cbfd2decb Freeze TimeZoneConverter and EnumType when what they wrap is frozen
+rails/rails 59584 2026-11-05T01:41:19Z 256dd9ee83 3b2702adea Skip the HTML entity gsub! in JSON::Coder output with nothing to escape
+rails/rails 59583 2026-11-04T00:25:37Z 44048a385c 4881cd9b2c Read the through foreign key without wrapping it in an Array
+rails/rails 59576 2026-11-03T14:19:34Z f903005e49 1597d576bd Compile a single-predicate where clause without a nodes Array
+rails/rails 59574 2026-11-25T16:22:55Z 62321f21d0 4c3694f3a5 Deprecate a positional table name in Arel::Table.new
+rails/rails 59571 2026-11-03T13:59:13Z 8e4bb3afce 2915abbf91 Define parameterless scope methods for lambda bodies without parameters
+rails/rails 59570 2026-11-05T09:34:25Z 043143393b bdb3d96012 Escape unsafe OutputBuffer appends without the super dispatch
+rails/rails 59569 2026-11-26T22:31:00Z fcfadc0ee8 828f4bef46 Build the association alias tracker only for through chains
+rails/rails 59568 2026-11-03T08:58:28Z 2fd04c4ade ee0d58f5c3 Read attribute_types once when loading records
+rails/rails 59563 2026-11-03T08:49:31Z b05ca528f6 107b889051 Serialize Active Job Hash arguments without pair Arrays
+rails/rails 59562 2026-11-03T15:24:58Z 7b23c4ed23 d47dc59e65 Don't slice the event name on every ActiveSupport::Subscriber#call
+rails/rails 59561 2026-11-03T04:54:04Z e367362490 e13604faa0 Don't build the key String on every thread_mattr_accessor call
+rails/rails 59560 2026-11-03T04:38:59Z 408e6a3e29 98353c4ba2 Reuse type map cache keys for PostgreSQL result columns
+rails/rails 59558 2026-11-03T04:27:07Z 0afbc4b871 25e5dd34e7 Avoid scratch Arrays when casting PostgreSQL results
+rails/rails 59556 2026-11-03T03:29:32Z 6f0caf3920 e2e002be27 Read the other relation's values without a copy when merging
+rails/rails 59555 2026-11-03T02:37:01Z 6235de2236 3bdc579090 Index what `each` yields in Enumerable#index_with again
+rails/rails 59554 2026-11-03T02:25:36Z 40be14ce8d c9a34da167 Don't build bang method names when merging relation values
+rails/rails 59553 2026-11-03T01:56:24Z e8c30f991d f21e7f42b5 Return a frozen empty Array from `default_extensions`
+rails/rails 59552 2026-11-03T02:43:34Z 58ecb375e7 e64b660612 Use the scopes as constraints of a direct association reflection
+rails/rails 59551 2026-11-03T02:28:52Z 2c301c33bf bd77235be5 Skip `extending!` in `Relation#merge` when there are no extensions
+rails/rails 59544 2026-11-02T19:50:13Z 38a06fd8fa 5810776eec Only extract Ranges in ArrayHandler when there are any
+rails/rails 59543 2026-11-02T19:46:36Z 0945b590f1 f861e1e0ce Avoid copying relation values in except and only
+rails/rails 59542 2026-11-02T19:32:01Z 2e89cf912f ee16712354 Skip finalizing intents on checkin when none are pending
+rails/rails 59541 2026-11-02T19:28:15Z ae7f1c190e 1c4feea25b Skip unneeded Arrays when merging into an empty WhereClause
+rails/rails 59539 2026-11-02T19:06:51Z a70709e899 d9ed22eef0 Use drop instead of an endless Range for the join chain tail
+rails/rails 59538 2026-11-02T18:55:52Z c11df3143f f4a40dc8a1 Pass frozen empty defaults when loading a relation
+rails/rails 59537 2026-11-02T18:42:16Z df8bb7f451 45de402637 Take tag_string options before the optional content
+rails/rails 59536 2026-11-02T18:35:23Z 73986ba835 4740314734 Share an empty warnings Array when a query has none
+rails/rails 59535 2026-11-02T18:26:52Z fee8edf3ac c0cacea4cd Avoid a rest Array in HashWithIndifferentAccess#fetch
+rails/rails 59534 2026-11-02T19:15:55Z 0eef4cbb83 090f5408f4 Map Arel project and order arguments in place
+rails/rails 59533 2026-11-02T16:14:27Z 54c9eeb510 b5be03636e Build WhereClause#ast predicates in one pass
+rails/rails 59329 2026-10-24T02:42:03Z 4ef89f6e58 843fa132cb Reduce allocations when filtering route parameters
+rails/rails 59316 2026-10-24T02:34:22Z 761680c190 10eee71222 Reduce allocations when building HTTP URLs
+rails/rails 59278 2026-10-22T21:49:47Z 220c4f2387 fb7501ad2d Reuse PostgreSQL result fields when casting
+rails/rails 59274 2026-10-22T20:35:57Z 351e4c0599 e4fd6cb967 Reuse the unique sources array in asset tag helpers
+rails/rails 59270 2026-10-22T15:33:36Z 51986225a3 ab5a78a7c2 Reuse delegated type helper method names instead of rebuilding them per call
+rails/rails 59252 2026-10-21T19:45:41Z 2c5a8fa641 0213cf5f41 Avoid pair arrays when generating error translations
+rails/rails 59244 2026-10-21T16:46:28Z 7ec6645560 9998e98857 Avoid copying nested Symbol attribute keys
+rails/rails 59236 2026-10-21T12:46:29Z 2de881564a 596da00373 Avoid pair allocations when resolving CurrentAttributes defaults
+rails/rails 59235 2026-10-21T12:33:51Z 161b37229d 206f2c927a Skip empty group mapping when building notification handles
+rails/rails 7260 2012-08-04T09:12:01Z 4c1db8a93c 85bc29e80c Update Migration Docs: Defaults for Boolean Fields
+ruby/ruby 20172 2026-11-26T13:29:27Z ec3f27cd36 34af03e0d4 Fix Time.new with a zone object that converts to "UTC"
+ruby/ruby 19982 2026-11-25T03:00:18Z f431e8a74c a17b9f22fd ZJIT: Recompile when an objtostring String guard fails
+ruby/ruby 19976 2026-11-25T02:24:25Z a5ac62d1a2 62be8d2df9 ZJIT: Don't specialize super from a refined method
+ruby/ruby 19909 2026-11-16T17:20:12Z 49fd710dd3 67814cf9b0 ZJIT: Specialize polymorphic opt_neq
+ruby/ruby 19699 2026-11-05T00:07:40Z a6189df0cb a47dd64f76 ZJIT: Snapshot after both runs in test_send_proc_block_arg_to_block_param_callee
+ruby/ruby 19682 2026-11-05T01:51:13Z 0442275697 8b9dc082e7 ZJIT: Don't side-exit on every super from a method that got a block
+ruby/ruby 19680 2026-11-19T18:00:53Z 3e63efefe6 a5e8234f6d ZJIT: Cache iseq_may_write_block_code() on the ISEQ payload
+ruby/ruby 19678 2026-11-05T01:31:26Z 4944f1a29e 8161a1f6c2 ZJIT: Interpolate Integers and Modules without calling to_s
+ruby/ruby 19660 2026-11-03T16:41:27Z 87a8ffc168 a8b095a07e Don't ignore redefinition of Hash.new
+ruby/ruby 19648 2026-11-06T00:24:12Z a9b63e5264 f0de939f61 YJIT: Check singleton attached-object identity in C
+ruby/ruby 19620 2026-11-06T13:16:54Z 9d9133e5b8 9350473ec8 [3.4] YJIT: Fall back for explicit keywords in IFUNC block calls
+ruby/ruby 19619 2026-10-30T16:11:26Z af3e926680 9bebcb455f [4.0] YJIT: Fall back for explicit keywords in IFUNC block calls
+ruby/ruby 19586 2026-10-29T20:49:53Z 79be325425 1654a6a0fd ZJIT: Guard lookup entries when resolving aliases
+ruby/ruby 19554 2026-10-29T20:52:27Z c8d80d153f 54d0988167 YJIT: Fall back for explicit keywords in IFUNC block calls
+ruby/ruby 19538 2026-10-29T20:53:38Z 9bd5636ede 461085c2c7 ZJIT: Exit with the original send's stack on stack overflow
+ruby/ruby 19485 2026-10-29T21:47:34Z 865efbf290 8258233785 ZJIT: Avoid accumulating send counters during specialization
+ruby/ruby 19484 2026-11-03T01:08:02Z 13b1bc4aa8 13c3f56bb8 ZJIT: Allow Proc block arguments for explicit block parameters

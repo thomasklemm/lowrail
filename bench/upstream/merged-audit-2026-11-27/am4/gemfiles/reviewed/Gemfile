@@ -1,0 +1,3 @@
+source "https://rubygems.org"
+gem "rails", path: "/home/user/w/am4-reviewed"
+gem "sqlite3"

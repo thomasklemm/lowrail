@@ -6,6 +6,7 @@ area: "Guides: Rails 8.2 upgrade guide, PostgreSQL"
 reviewer: "yahonda (#57378)"
 branch: thomasklemm/upgrade-guide-pg-fixture-locks
 head: "7ddc0d8abbc9a368a37bf37edfa6e0a96be9df5d"
+merged_head: "7ddc0d8abbc9a368a37bf37edfa6e0a96be9df5d"
 base: main
 built_on: "224f5b1563"
 depends_on: []

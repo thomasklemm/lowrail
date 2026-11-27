@@ -1,0 +1,2 @@
+objects post.comments.where(approved: true)	26.999
+objects where.merge(order)	10.0

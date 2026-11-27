@@ -6,6 +6,7 @@ area: Active Record queries
 reviewer: ankane
 branch: thomasklemm/frozen-table-metadata
 head: "b7d3502ea98aee5b8f1d9153828df88728d5b6fe"
+merged_head: "b7d3502ea98aee5b8f1d9153828df88728d5b6fe"
 base: master
 built_on: "ddbf0240fe600b589ce1cacdc4a2277533b20c66"
 depends_on: []
@@ -14,7 +15,7 @@ rank: 14
 risky: true
 state: merged
 pr: 62
-note: "merged 2026-11-05 22:52 UTC as ankane's ac61e54cf4 (our change verbatim, Co-authored-by Thomas, plus an Active Record 8.2 CI gemfile); the push closed #62"
+note: "2026-11-27 (merged audit): ac61e54cf4 is our code change verbatim, but ankane kept the memoize comment we removed, dropped both our tests and their table, and added an Active Record 8.2 CI gemfile. merged 2026-11-05 22:52 UTC as ankane's ac61e54cf4 (our change verbatim, Co-authored-by Thomas, plus an Active Record 8.2 CI gemfile); the push closed #62"
 passes:
   - {reviewer: skeptic, head: "e296933106ce3619b26af46f936aea95b087c0ec", date: 2026-11-05, verdict: approve, open: "L0; live capability-check boundary disclosed; no speed claim"}
   - {reviewer: sol, head: "e296933106ce3619b26af46f936aea95b087c0ec", date: 2026-11-05, verdict: changes, open: "P2; preserve cached false across late blind_index declarations on mutable metadata"}

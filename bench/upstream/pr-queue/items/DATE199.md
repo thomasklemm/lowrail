@@ -6,6 +6,7 @@ area: Date#<=>
 reviewer:
 branch: thomasklemm/cmp-nan
 head: "1c273d40ccfea71f8a9db0fc3fe9b4111cd8fb73"
+merged_head: "1c273d40ccfea71f8a9db0fc3fe9b4111cd8fb73"
 base: master
 built_on: "6f788dda79b4de7cad2c0e03e7f2c7ed74bbbfbb"
 depends_on: []

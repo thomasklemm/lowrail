@@ -6,6 +6,7 @@ area: "Guides: Rails 8.2 upgrade guide, middleware"
 reviewer: "byroot (#56915)"
 branch: thomasklemm/upgrade-guide-sendfile-unset
 head: "2422669c945eef9679da2c9e1bb33266700e24e9"
+merged_head: "2422669c945eef9679da2c9e1bb33266700e24e9"
 base: main
 built_on: "224f5b1563"
 depends_on: []

@@ -96,6 +96,7 @@ area: Action View, form helpers
 reviewer: seanpdoyle          # likely reviewer: usually the author of the change it fixes or touches
 branch: thomasklemm/form-tag-helper-token-tag
 head: "ab0a99e41a"            # the commit the passes reviewed; quoted, 7–40 hex digits
+merged_head: "c0ffee1234"     # merged items: the PR head that landed, which a maintainer may have amended
 base: main                    # the branch the PR targets
 built_on: "bdb3d96012"        # upstream commit it was built and tested on
 introduced_by: 58211          # optional: the upstream PR number or quoted commit SHA that introduced the problem

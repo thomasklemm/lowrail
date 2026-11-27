@@ -6,6 +6,7 @@ area: ZJIT, opt_neq
 reviewer: "tekknolagi (polymorphic dispatch, #15949) or nozomemein (BasicObject#!= builtin, #19162)"
 branch: zjit-opt-neq-polymorphic
 head: "49fd710dd3"
+merged_head: "49fd710dd3b09c673c5e4713251b7b21c4cdf8b8"
 base: master
 built_on: "fc4cd8872b"
 depends_on: []

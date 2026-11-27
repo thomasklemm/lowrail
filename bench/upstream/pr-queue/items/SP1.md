@@ -6,6 +6,7 @@ area: "Guides: Rails 8.2 upgrade guide"
 reviewer: "Edouard-chin (author of #58483), gmcgibbon (merged it)"
 branch: thomasklemm/upgrade-guide-frozen-default-url-options
 head: "d41b93d147"
+merged_head: "d41b93d147626bf04e73408d60d79bc86d76d6e9"
 base: main
 built_on: "088fc0cf61"
 introduced_by: 58483

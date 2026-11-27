@@ -7,6 +7,7 @@ area: ZJIT, super from a refined method
 reviewer: "nirvdrum (original invokesuper specialization)"
 branch: zjit-super-from-refinement-2
 head: "a5ac62d1a22e8ffa9a2cc8e5ac4720ea5b191482"
+merged_head: "a5ac62d1a22e8ffa9a2cc8e5ac4720ea5b191482"
 base: master
 built_on: "7db0202722a286011518bd291f51a15fb652dc02"
 depends_on: []

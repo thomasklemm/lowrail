@@ -1,0 +1,483 @@
+# rails/rails#60013 (AM4): changed lines of reviewed 35b7671119 (left) vs merged head afb10d01ac (right), each against its own base; empty = identical
+0a1,10
+> a/actionmailer/CHANGELOG.md +*   Fix `ActionMailer::TestCase` and synchronous email assertions in apps that
+> a/actionmailer/CHANGELOG.md +    do not use Active Job.
+> a/actionmailer/CHANGELOG.md +
+> a/actionmailer/CHANGELOG.md +    The Active Job railtie still adds the helpers for enqueued emails automatically.
+> a/actionmailer/CHANGELOG.md +    To use these helpers outside a Rails application, require `active_job`.
+> a/actionmailer/CHANGELOG.md +    Then call `ActionMailer::TestHelper.prepend(ActiveJob::ActionMailerTestHelper)`.
+> a/actionmailer/CHANGELOG.md +
+> a/actionmailer/CHANGELOG.md +    *Thomas Klemm*
+> a/actionmailer/CHANGELOG.md +
+> a/actionmailer/lib/action_mailer/test_helper.rb -require "active_support/core_ext/array/extract_options"
+2,6c12,15
+< a/actionmailer/lib/action_mailer/test_helper.rb +begin
+< a/actionmailer/lib/action_mailer/test_helper.rb +  require "active_job"
+< a/actionmailer/lib/action_mailer/test_helper.rb +rescue LoadError => error
+< a/actionmailer/lib/action_mailer/test_helper.rb +  raise unless error.path == "active_job"
+< a/actionmailer/lib/action_mailer/test_helper.rb +end
+---
+> a/actionmailer/lib/action_mailer/test_helper.rb +require "active_support/lazy_load_hooks"
+> a/actionmailer/lib/action_mailer/test_helper.rb -  # and #assert_no_emails.
+> a/actionmailer/lib/action_mailer/test_helper.rb +  # and #assert_no_emails. See ActiveJob::ActionMailerTestHelper for assertions
+> a/actionmailer/lib/action_mailer/test_helper.rb +  # about enqueued emails.
+8c17,195
+< a/actionmailer/lib/action_mailer/test_helper.rb +    include ActiveJob::TestHelper if defined?(ActiveJob)
+---
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # Asserts that the number of emails enqueued for later delivery matches
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # the given number.
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_emails
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_emails 0
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_emails 1
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_emails 2
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # If a block is passed, that block should cause the specified number of
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # emails to be enqueued.
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_emails_again
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_emails 1 do
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_emails 2 do
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    def assert_enqueued_emails(number, &block)
+> a/actionmailer/lib/action_mailer/test_helper.rb -      assert_enqueued_jobs(number, only: ->(job) { delivery_job_filter(job) }, &block)
+> a/actionmailer/lib/action_mailer/test_helper.rb -    end
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # Asserts that a specific email has been enqueued, optionally
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # matching arguments and/or params.
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_email
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_email_with ContactMailer, :welcome
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_email_with_parameters
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.with(greeting: "Hello").welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_email_with ContactMailer, :welcome, params: { greeting: "Hello" }
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_email_with_arguments
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.welcome("Hello", "Goodbye").deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_email_with ContactMailer, :welcome, args: ["Hello", "Goodbye"]
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_email_with_named_arguments
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.welcome(greeting: "Hello", farewell: "Goodbye").deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_email_with ContactMailer, :welcome, args: [{ greeting: "Hello", farewell: "Goodbye" }]
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_email_with_parameters_and_arguments
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.with(greeting: "Hello").welcome("Cheers", "Goodbye").deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_email_with ContactMailer, :welcome, params: { greeting: "Hello" }, args: ["Cheers", "Goodbye"]
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_email_with_parameters_and_named_arguments
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.with(greeting: "Hello").welcome(farewell: "Goodbye").deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_email_with ContactMailer, :welcome, params: { greeting: "Hello" }, args: [{farewell: "Goodbye"}]
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_email_with_parameterized_mailer
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.with(greeting: "Hello").welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_email_with ContactMailer.with(greeting: "Hello"), :welcome
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_email_with_matchers
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.with(greeting: "Hello").welcome("Cheers", "Goodbye").deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_email_with ContactMailer, :welcome,
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     params: ->(params) { /hello/i.match?(params[:greeting]) },
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     args: ->(args) { /cheers/i.match?(args[0]) }
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # If a block is passed, that block should cause the specified email
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # to be enqueued.
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_email_in_block
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_email_with ContactMailer, :welcome do
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    def assert_enqueued_email_with(mailer, method, params: nil, args: nil, queue: nil, &block)
+> a/actionmailer/lib/action_mailer/test_helper.rb -      if mailer.is_a? ActionMailer::Parameterized::Mailer
+> a/actionmailer/lib/action_mailer/test_helper.rb -        params = mailer.instance_variable_get(:@params)
+> a/actionmailer/lib/action_mailer/test_helper.rb -        mailer = mailer.instance_variable_get(:@mailer)
+> a/actionmailer/lib/action_mailer/test_helper.rb -      end
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -      args = Array(args) unless args.is_a?(Proc)
+> a/actionmailer/lib/action_mailer/test_helper.rb -      queue ||= mailer.delivery_job.new(mailer.name).queue_name
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -      expected = ->(job_args) do
+> a/actionmailer/lib/action_mailer/test_helper.rb -        job_kwargs = job_args.extract_options!
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -        [mailer.to_s, method.to_s, "deliver_now"] == job_args &&
+> a/actionmailer/lib/action_mailer/test_helper.rb -          params === job_kwargs[:params] && args === job_kwargs[:args]
+> a/actionmailer/lib/action_mailer/test_helper.rb -      end
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -      assert_enqueued_with(job: mailer.delivery_job, args: expected, queue: queue.to_s, &block)
+> a/actionmailer/lib/action_mailer/test_helper.rb -    end
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # Asserts that no emails are enqueued for later delivery.
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_no_emails
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_no_enqueued_emails
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_enqueued_emails 1
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # If a block is provided, it should not cause any emails to be enqueued.
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_no_emails
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_no_enqueued_emails do
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     # No emails should be enqueued from this block
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    def assert_no_enqueued_emails(&block)
+> a/actionmailer/lib/action_mailer/test_helper.rb -      assert_enqueued_emails 0, &block
+> a/actionmailer/lib/action_mailer/test_helper.rb -    end
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # Delivers all enqueued emails. If a block is given, delivers all of the emails
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # that were enqueued throughout the duration of the block. If a block is
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # not given, delivers all the enqueued emails up to this point in the test.
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_deliver_enqueued_emails
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   deliver_enqueued_emails do
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_emails 1
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_deliver_enqueued_emails_without_block
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   ContactMailer.welcome.deliver_later
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   deliver_enqueued_emails
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_emails 1
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # If the `:queue` option is specified,
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # then only the email(s) enqueued to a specific queue will be performed.
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # def test_deliver_enqueued_emails_with_queue
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   deliver_enqueued_emails queue: :external_mailers do
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     CustomerMailer.deliver_later_queue_name = :external_mailers
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     CustomerMailer.welcome.deliver_later # will be performed
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     EmployeeMailer.deliver_later_queue_name = :internal_mailers
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #     EmployeeMailer.welcome.deliver_later # will not be performed
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #   assert_emails 1
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # end
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # ```
+> a/actionmailer/lib/action_mailer/test_helper.rb -    #
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # If the `:at` option is specified, then only delivers emails enqueued to deliver
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # immediately or before the given time.
+> a/actionmailer/lib/action_mailer/test_helper.rb -    def deliver_enqueued_emails(queue: nil, at: nil, &block)
+> a/actionmailer/lib/action_mailer/test_helper.rb -      perform_enqueued_jobs(only: ->(job) { delivery_job_filter(job) }, queue: queue, at: at, &block)
+> a/actionmailer/lib/action_mailer/test_helper.rb -    end
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -    # Returns any emails that are sent in the block.
+> a/actionmailer/lib/action_mailer/test_helper.rb +    # Returns any emails that are sent in the block. With the Active Job
+> a/actionmailer/lib/action_mailer/test_helper.rb +    # integration, this also delivers any emails enqueued in the block.
+10,14c197,456
+< a/actionmailer/lib/action_mailer/test_helper.rb +      if defined?(ActiveJob)
+< a/actionmailer/lib/action_mailer/test_helper.rb +        deliver_enqueued_emails(&block)
+< a/actionmailer/lib/action_mailer/test_helper.rb +      else
+< a/actionmailer/lib/action_mailer/test_helper.rb +        block&.call
+< a/actionmailer/lib/action_mailer/test_helper.rb +      end
+---
+> a/actionmailer/lib/action_mailer/test_helper.rb +      block&.call
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -    private
+> a/actionmailer/lib/action_mailer/test_helper.rb -      def delivery_job_filter(job)
+> a/actionmailer/lib/action_mailer/test_helper.rb -        job_class = job.is_a?(Hash) ? job.fetch(:job) : job.class
+> a/actionmailer/lib/action_mailer/test_helper.rb -
+> a/actionmailer/lib/action_mailer/test_helper.rb -        Base.descendants.map(&:delivery_job).include?(job_class)
+> a/actionmailer/lib/action_mailer/test_helper.rb -      end
+> a/actionmailer/lib/action_mailer/test_helper.rb +
+> a/actionmailer/lib/action_mailer/test_helper.rb +ActiveSupport.run_load_hooks(:action_mailer_test_helper, ActionMailer::TestHelper)
+> a/actionmailer/test/abstract_unit.rb +# Emulate the Active Job railtie
+> a/actionmailer/test/abstract_unit.rb +require "active_job"
+> a/actionmailer/test/abstract_unit.rb +ActionMailer::TestHelper.prepend(ActiveJob::ActionMailerTestHelper)
+> a/actionmailer/test/abstract_unit.rb +
+> a/activejob/lib/active_job.rb +  autoload :ActionMailerTestHelper
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +# frozen_string_literal: true
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +require "active_support/core_ext/array/extract_options"
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +module ActiveJob
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  # Provides test helpers for emails enqueued through Active Job.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  # The Active Job railtie adds these methods to ActionMailer::TestHelper.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  # If you use both libraries outside a Rails application, opt in explicitly:
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  # ```ruby
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  # require "action_mailer"
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  # require "active_job"
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  # ActionMailer::TestHelper.prepend(ActiveJob::ActionMailerTestHelper)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  module ActionMailerTestHelper
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    def self.prepended(base) # :nodoc:
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      base.include ActiveJob::TestHelper
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    def capture_emails(&block) # :nodoc:
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      super { deliver_enqueued_emails(&block) }
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # Asserts that the number of emails enqueued for later delivery matches
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # the given number.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_emails
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_emails 0
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_emails 1
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_emails 2
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # If a block is passed, that block should cause the specified number of
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # emails to be enqueued.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_emails_again
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_emails 1 do
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_emails 2 do
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    def assert_enqueued_emails(number, &block)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      assert_enqueued_jobs(number, only: ->(job) { delivery_job_filter(job) }, &block)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # Asserts that a specific email has been enqueued, optionally
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # matching arguments and/or params.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_email
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_email_with ContactMailer, :welcome
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_email_with_parameters
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.with(greeting: "Hello").welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_email_with ContactMailer, :welcome, params: { greeting: "Hello" }
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_email_with_arguments
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.welcome("Hello", "Goodbye").deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_email_with ContactMailer, :welcome, args: ["Hello", "Goodbye"]
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_email_with_named_arguments
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.welcome(greeting: "Hello", farewell: "Goodbye").deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_email_with ContactMailer, :welcome, args: [{ greeting: "Hello", farewell: "Goodbye" }]
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_email_with_parameters_and_arguments
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.with(greeting: "Hello").welcome("Cheers", "Goodbye").deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_email_with ContactMailer, :welcome, params: { greeting: "Hello" }, args: ["Cheers", "Goodbye"]
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_email_with_parameters_and_named_arguments
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.with(greeting: "Hello").welcome(farewell: "Goodbye").deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_email_with ContactMailer, :welcome, params: { greeting: "Hello" }, args: [{farewell: "Goodbye"}]
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_email_with_parameterized_mailer
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.with(greeting: "Hello").welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_email_with ContactMailer.with(greeting: "Hello"), :welcome
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_email_with_matchers
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.with(greeting: "Hello").welcome("Cheers", "Goodbye").deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_email_with ContactMailer, :welcome,
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     params: ->(params) { /hello/i.match?(params[:greeting]) },
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     args: ->(args) { /cheers/i.match?(args[0]) }
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # If a block is passed, that block should cause the specified email
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # to be enqueued.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_email_in_block
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_email_with ContactMailer, :welcome do
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    def assert_enqueued_email_with(mailer, method, params: nil, args: nil, queue: nil, &block)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      if mailer.is_a? ::ActionMailer::Parameterized::Mailer
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +        params = mailer.instance_variable_get(:@params)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +        mailer = mailer.instance_variable_get(:@mailer)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      args = Array(args) unless args.is_a?(Proc)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      queue ||= mailer.delivery_job.new(mailer.name).queue_name
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      expected = ->(job_args) do
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +        job_kwargs = job_args.extract_options!
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +        [mailer.to_s, method.to_s, "deliver_now"] == job_args &&
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +          params === job_kwargs[:params] && args === job_kwargs[:args]
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      assert_enqueued_with(job: mailer.delivery_job, args: expected, queue: queue.to_s, &block)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # Asserts that no emails are enqueued for later delivery.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_no_emails
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_no_enqueued_emails
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_enqueued_emails 1
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # If a block is provided, it should not cause any emails to be enqueued.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_no_emails
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_no_enqueued_emails do
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     # No emails should be enqueued from this block
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    def assert_no_enqueued_emails(&block)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      assert_enqueued_emails 0, &block
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # Delivers all enqueued emails. If a block is given, delivers all of the emails
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # that were enqueued throughout the duration of the block. If a block is
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # not given, delivers all the enqueued emails up to this point in the test.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_deliver_enqueued_emails
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   deliver_enqueued_emails do
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_emails 1
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_deliver_enqueued_emails_without_block
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   ContactMailer.welcome.deliver_later
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   deliver_enqueued_emails
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_emails 1
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # If the `:queue` option is specified,
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # then only the email(s) enqueued to a specific queue will be performed.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # def test_deliver_enqueued_emails_with_queue
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   deliver_enqueued_emails queue: :external_mailers do
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     CustomerMailer.deliver_later_queue_name = :external_mailers
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     CustomerMailer.welcome.deliver_later # will be performed
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     EmployeeMailer.deliver_later_queue_name = :internal_mailers
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #     EmployeeMailer.welcome.deliver_later # will not be performed
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #   assert_emails 1
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # ```
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    #
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # If the `:at` option is specified, then only delivers emails enqueued to deliver
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    # immediately or before the given time.
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    def deliver_enqueued_emails(queue: nil, at: nil, &block)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      perform_enqueued_jobs(only: ->(job) { delivery_job_filter(job) }, queue: queue, at: at, &block)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +    private
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      def delivery_job_filter(job)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +        job_class = job.is_a?(Hash) ? job.fetch(:job) : job.class
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +        ::ActionMailer::Base.descendants.map(&:delivery_job).include?(job_class)
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +      end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +  end
+> a/activejob/lib/active_job/action_mailer_test_helper.rb +end
+> a/activejob/lib/active_job/railtie.rb +    initializer "active_job.action_mailer_test_helper" do
+> a/activejob/lib/active_job/railtie.rb +      ActiveSupport.on_load(:action_mailer_test_helper) do
+> a/activejob/lib/active_job/railtie.rb +        prepend ActiveJob::ActionMailerTestHelper
+> a/activejob/lib/active_job/railtie.rb +      end
+> a/activejob/lib/active_job/railtie.rb +    end
+> a/activejob/lib/active_job/railtie.rb +
+> a/guides/source/configuring.md -These are the load hooks you can use in your own code. To hook into the initialization process of one of the following classes use the available hook.
+> a/guides/source/configuring.md +These are the load hooks you can use in your own code. To run code when a class or module loads, use its hook.
+> a/guides/source/configuring.md -| Class                                | Hook                                 |
+> a/guides/source/configuring.md +| Class or Module                      | Hook                                 |
+> a/guides/source/configuring.md +| `ActionMailer::TestHelper`           | `action_mailer_test_helper`          |
+> a/guides/source/testing.md +The Active Job railtie adds the assertions for enqueued emails to
+> a/guides/source/testing.md +`ActionMailer::TestHelper`.
+> a/guides/source/testing.md +
+> a/railties/test/application/integration_test_case_test.rb +
+> a/railties/test/application/integration_test_case_test.rb +    test "asserts enqueued Action Mailer deliveries with Active Job" do
+> a/railties/test/application/integration_test_case_test.rb +      rails "generate", "mailer", "BaseMailer", "welcome"
+> a/railties/test/application/integration_test_case_test.rb +
+> a/railties/test/application/integration_test_case_test.rb +      app_file "test/integration/mailer_integration_test.rb", <<-RUBY
+> a/railties/test/application/integration_test_case_test.rb +        require "test_helper"
+> a/railties/test/application/integration_test_case_test.rb +
+> a/railties/test/application/integration_test_case_test.rb +        class MailerIntegrationTest < ActionDispatch::IntegrationTest
+> a/railties/test/application/integration_test_case_test.rb +          def test_delivers_enqueued_email
+> a/railties/test/application/integration_test_case_test.rb +            assert_emails(1) { BaseMailer.welcome.deliver_later }
+> a/railties/test/application/integration_test_case_test.rb +          end
+> a/railties/test/application/integration_test_case_test.rb +        end
+> a/railties/test/application/integration_test_case_test.rb +
+> a/railties/test/application/integration_test_case_test.rb +        class BaseMailerTest < ActionMailer::TestCase
+> a/railties/test/application/integration_test_case_test.rb +          def test_delivers_enqueued_email
+> a/railties/test/application/integration_test_case_test.rb +            assert_enqueued_emails(1) { BaseMailer.welcome.deliver_later }
+> a/railties/test/application/integration_test_case_test.rb +            assert_emails(1) { BaseMailer.welcome.deliver_later }
+> a/railties/test/application/integration_test_case_test.rb +          end
+> a/railties/test/application/integration_test_case_test.rb +        end
+> a/railties/test/application/integration_test_case_test.rb +      RUBY
+> a/railties/test/application/integration_test_case_test.rb +
+> a/railties/test/application/integration_test_case_test.rb +      output = rails("test", "test/integration/mailer_integration_test.rb")
+> a/railties/test/application/integration_test_case_test.rb +      assert_match(/2 runs, \d+ assertions, 0 failures, 0 errors/, output)
+> a/railties/test/application/integration_test_case_test.rb +    end
+38a481,486
+> a/railties/test/application/integration_test_case_test.rb +
+> a/railties/test/application/integration_test_case_test.rb +        class BaseMailerTest < ActionMailer::TestCase
+> a/railties/test/application/integration_test_case_test.rb +          def test_sends_welcome_email
+> a/railties/test/application/integration_test_case_test.rb +            assert_emails(1) { BaseMailer.welcome.deliver_now }
+> a/railties/test/application/integration_test_case_test.rb +          end
+> a/railties/test/application/integration_test_case_test.rb +        end
+42c490
+< a/railties/test/application/integration_test_case_test.rb +      assert_match(/1 runs, 2 assertions, 0 failures, 0 errors/, output)
+---
+> a/railties/test/application/integration_test_case_test.rb +      assert_match(/2 runs, \d+ assertions, 0 failures, 0 errors/, output)

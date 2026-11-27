@@ -7,6 +7,7 @@ area: CI, Duel performance regression guards (.duel.rb, benchmarks/, perf.yml, p
 reviewer: dblock
 branch: thomasklemm/duel
 head: "ef3b274bdaebd031ca5e3002a65d3818b5e63a7b"
+merged_head: "ef3b274bdaebd031ca5e3002a65d3818b5e63a7b"
 base: master
 built_on: "812c48ca7b"
 tracker: [hashie/hashie#658]

@@ -6,6 +6,7 @@ area: time.c, Time.new with a zone object that converts with to_str
 reviewer: "nobu (time.c, 337b4b6344)"
 branch: thomasklemm/time-new-to-str-utc-4
 head: "ec3f27cd36988b0b6a170a038d0537200f1bb9a3"
+merged_head: "ec3f27cd36988b0b6a170a038d0537200f1bb9a3"
 base: master
 built_on: "e8167b0ddd"
 depends_on: []

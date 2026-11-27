@@ -1,0 +1,17 @@
+Waiting for another process to let go of lock: /home/user/.local/share/mise/installs/ruby/4.0.10/lib/ruby/gems/4.0.0/bundler.lock
+Resolving dependencies...
+Fetching gem metadata from https://rubygems.org/........
+Fetching rack-session 2.1.2
+Fetching rack-test 2.3.0
+Fetching herb 0.11.2 (x86_64-linux-gnu)
+Fetching nokogiri 1.19.7 (x86_64-linux-gnu)
+Fetching crass 1.0.8
+Fetching rack 3.2.9
+Installing rack-session 2.1.2
+Installing rack-test 2.3.0
+Installing crass 1.0.8
+Installing rack 3.2.9
+Installing herb 0.11.2 (x86_64-linux-gnu)
+Installing nokogiri 1.19.7 (x86_64-linux-gnu)
+Bundle complete! 4 Gemfile dependencies, 33 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.

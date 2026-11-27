@@ -6,6 +6,7 @@ area: ZJIT, objtostring guards
 reviewer: "thermos-sol and thermos-opus approve -3; precedent k0kubun's #19603 (coerce_to guards recompile)"
 branch: thomasklemm/zjit-objtostring-recompile-2
 head: "f431e8a74c"
+merged_head: "f431e8a74c0a2d9910115a485b42d8651a81c405"
 base: master
 built_on: "21ee43fb1e"
 depends_on: []

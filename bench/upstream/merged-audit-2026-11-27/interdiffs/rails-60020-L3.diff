@@ -1,0 +1,8 @@
+# rails/rails#60020 (L3): changed lines of reviewed 319e55a661 (left) vs merged head 8a0d3a4c37 (right), each against its own base; empty = identical
+15a16,17
+> a/activemodel/lib/active_model/attribute_set.rb +        return hash unless snapshot
+> a/activemodel/lib/active_model/attribute_set.rb +
+17c19
+< a/activemodel/lib/active_model/attribute_set.rb +          if attribute = snapshot&.[](index_for_name(name))
+---
+> a/activemodel/lib/active_model/attribute_set.rb +          if attribute = snapshot[index_for_name(name)]

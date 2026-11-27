@@ -1,0 +1,614 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/merged-audit-2026-11-27/l3_body.rb",
+  "at": "2026-11-27T20:24:17Z",
+  "n": 2000,
+  "warmup": 3000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/l3-reviewed",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "b113448052a39806fb32ce7f618b998b49c2f6be",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/l3-merged",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "9c28399099762f3c716b158e3e97f6a0b0dcfab2",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "interp Marshal.dump": {
+      "base": 13.999,
+      "base1": 13.999,
+      "base2": 13.999,
+      "candidate": 13.999,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp attributes_for_database": {
+      "base": 2.0,
+      "base1": 2.0,
+      "base2": 2.0,
+      "candidate": 2.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp attributes_before_type_cast": {
+      "base": 2.0,
+      "base1": 2.0,
+      "base2": 2.0,
+      "candidate": 2.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "interp MessagePack dump": {
+      "base": 17.0,
+      "base1": 17.0,
+      "base2": 17.0,
+      "candidate": 17.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit Marshal.dump": {
+      "base": 13.999,
+      "base1": 13.999,
+      "base2": 13.999,
+      "candidate": 13.999,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit attributes_for_database": {
+      "base": 2.0,
+      "base1": 2.0,
+      "base2": 2.0,
+      "candidate": 2.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit attributes_before_type_cast": {
+      "base": 2.0,
+      "base1": 2.0,
+      "base2": 2.0,
+      "candidate": 2.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "yjit MessagePack dump": {
+      "base": 17.0,
+      "base1": 17.0,
+      "base2": 17.0,
+      "candidate": 17.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "interp Marshal.dump": {
+      "base": 269104.35675000004,
+      "base1": 269349.276,
+      "base2": 268859.4375,
+      "candidate": 267981.605,
+      "change": -0.004172179757918615,
+      "aa": 0.0018202548108690645,
+      "claim": true
+    },
+    "interp attributes_for_database": {
+      "base": 111019.24625,
+      "base1": 110969.243,
+      "base2": 111069.2495,
+      "candidate": 110193.8675,
+      "change": -0.0074345555196921875,
+      "aa": 0.000900803269505202,
+      "claim": true
+    },
+    "interp attributes_before_type_cast": {
+      "base": 74209.51000000001,
+      "base1": 74287.8665,
+      "base2": 74131.1535,
+      "candidate": 73557.434,
+      "change": -0.008786960054041781,
+      "aa": 0.0021117643816810456,
+      "claim": true
+    },
+    "interp MessagePack dump": {
+      "base": 139372.12900000002,
+      "base1": 139535.7615,
+      "base2": 139208.4965,
+      "candidate": 139001.707,
+      "change": -0.002657791070982518,
+      "aa": 0.0023481380556365384,
+      "claim": true
+    },
+    "yjit Marshal.dump": {
+      "base": 216092.6605,
+      "base1": 216141.202,
+      "base2": 216044.119,
+      "candidate": 216216.932,
+      "change": 0.0005750843166651975,
+      "aa": 0.00044926560566819514,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                816,
+                816
+              ],
+              "compiled_block_count": [
+                12168,
+                12168
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                816,
+                816
+              ],
+              "compiled_block_count": [
+                12168,
+                12168
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                816,
+                816
+              ],
+              "compiled_block_count": [
+                12167,
+                12167
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                816,
+                816
+              ],
+              "compiled_block_count": [
+                12169,
+                12169
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                816,
+                816
+              ],
+              "compiled_block_count": [
+                12168,
+                12168
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                816,
+                816
+              ],
+              "compiled_block_count": [
+                12168,
+                12168
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit attributes_for_database": {
+      "base": 61900.42425,
+      "base1": 61722.2205,
+      "base2": 62078.628,
+      "candidate": 61617.324,
+      "change": -0.0045734783473636575,
+      "aa": 0.005757755367888192,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                810,
+                810
+              ],
+              "compiled_block_count": [
+                12100,
+                12100
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                810,
+                810
+              ],
+              "compiled_block_count": [
+                12100,
+                12100
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                810,
+                810
+              ],
+              "compiled_block_count": [
+                12080,
+                12080
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                810,
+                810
+              ],
+              "compiled_block_count": [
+                12101,
+                12101
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                810,
+                810
+              ],
+              "compiled_block_count": [
+                12100,
+                12100
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                810,
+                810
+              ],
+              "compiled_block_count": [
+                12100,
+                12100
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit attributes_before_type_cast": {
+      "base": 51183.619000000006,
+      "base1": 51272.923,
+      "base2": 51094.315,
+      "candidate": 51235.6265,
+      "change": 0.001016096575742198,
+      "aa": 0.0034895539527988466,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                805,
+                805
+              ],
+              "compiled_block_count": [
+                11985,
+                11985
+              ],
+              "invalidation_count": [
+                304,
+                304
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                805,
+                805
+              ],
+              "compiled_block_count": [
+                11985,
+                11985
+              ],
+              "invalidation_count": [
+                304,
+                304
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                805,
+                805
+              ],
+              "compiled_block_count": [
+                11986,
+                11986
+              ],
+              "invalidation_count": [
+                304,
+                304
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                805,
+                805
+              ],
+              "compiled_block_count": [
+                11979,
+                11979
+              ],
+              "invalidation_count": [
+                304,
+                304
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                805,
+                805
+              ],
+              "compiled_block_count": [
+                11985,
+                11985
+              ],
+              "invalidation_count": [
+                304,
+                304
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                791,
+                791
+              ],
+              "compiled_block_count": [
+                11856,
+                11856
+              ],
+              "invalidation_count": [
+                301,
+                301
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit MessagePack dump": {
+      "base": 84902.45775,
+      "base1": 84949.793,
+      "base2": 84855.1225,
+      "candidate": 84787.343,
+      "change": -0.0013558470867707229,
+      "aa": 0.001115050170617793,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                822,
+                822
+              ],
+              "compiled_block_count": [
+                12236,
+                12236
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "base n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                822,
+                822
+              ],
+              "compiled_block_count": [
+                12236,
+                12236
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                822,
+                822
+              ],
+              "compiled_block_count": [
+                12237,
+                12237
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "candidate n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                822,
+                822
+              ],
+              "compiled_block_count": [
+                12235,
+                12235
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                822,
+                822
+              ],
+              "compiled_block_count": [
+                12236,
+                12236
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          },
+          {
+            "window": "base2 n2000",
+            "counters": {
+              "compiled_iseq_count": [
+                822,
+                822
+              ],
+              "compiled_block_count": [
+                12236,
+                12236
+              ],
+              "invalidation_count": [
+                308,
+                308
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

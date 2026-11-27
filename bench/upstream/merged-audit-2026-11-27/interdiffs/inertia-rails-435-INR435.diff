@@ -1,0 +1,37 @@
+# inertiajs/inertia-rails#435 (INR435): our head bf76e9a598 (left) vs merged head 2ee1fc5186 (right)
+1,3c1,2
+< a/CHANGELOG.md +* Redact URL fragments containing sensitive parameters before DevTools stores URL headers or redirect locations. Harmless fragments and live redirect responses are unchanged.
+< a/CHANGELOG.md +
+< a/docs/guide/devtools.md +For URL headers and redirect locations, a fragment containing sensitive parameters (including hash-router query parameters) is replaced in full with `[REDACTED]`. Fragment syntax is application-defined, so DevTools does not try to reconstruct a fragment after removing a secret. Harmless fragments stay byte-for-byte unchanged, and redaction never changes the live redirect sent to the browser.
+---
+> a/CHANGELOG.md +* Redact URL fragments containing sensitive parameters before DevTools stores URL headers or redirect locations. Harmless fragments and live redirect responses are unchanged (@thomasklemm)
+> a/docs/guide/devtools.md +A URL fragment that carries a sensitive parameter, such as `#access_token=…` or a hash-router query, is replaced whole with `[REDACTED]`: fragment syntax is up to the app, so there is no safe way to cut out one value. Other fragments are stored as they are.
+6c5
+< a/docs/guide/devtools.md +A URL inside a prop or a body is stored as is, query string included. DevTools does not parse URLs inside arbitrary values: put sensitive URLs under a redacted key rather than relying on their contents being filtered.
+---
+> a/docs/guide/devtools.md +A URL inside a prop or a body is stored as is, query string and fragment included. To hide one, put it under a redacted key.
+16a16,18
+> a/lib/inertia_rails/devtools/redaction.rb -            key, value = pair.split('=', 2)
+> a/lib/inertia_rails/devtools/redaction.rb -            sensitive = value && sensitive_query_key?(URI.decode_www_form_component(key), filter)
+> a/lib/inertia_rails/devtools/redaction.rb -            sensitive ? "#{key}=#{ENCODED_REDACTED}" : pair
+17a20,21
+> a/lib/inertia_rails/devtools/redaction.rb +            sensitive_pair?(pair, filter) ? pair.sub(/=.*/m) { "=#{ENCODED_REDACTED}" } : pair
+> a/lib/inertia_rails/devtools/redaction.rb -
+19c23,24
+< a/lib/inertia_rails/devtools/redaction.rb +          fragment = redact_fragment(fragment, filter) if fragment
+---
+> a/lib/inertia_rails/devtools/redaction.rb +          # Fragment syntax is up to the app, so a fragment with a secret is hidden whole.
+> a/lib/inertia_rails/devtools/redaction.rb +          fragment = REDACTED if fragment&.split(/[?&;]/)&.any? { |pair| sensitive_pair?(pair, filter) }
+26,33c31,33
+< a/lib/inertia_rails/devtools/redaction.rb +        def redact_fragment(fragment, filter)
+< a/lib/inertia_rails/devtools/redaction.rb +          sensitive = fragment.split(/[?&;]/).any? do |pair|
+< a/lib/inertia_rails/devtools/redaction.rb +            key, value = pair.split('=', 2)
+< a/lib/inertia_rails/devtools/redaction.rb +            value && sensitive_query_key?(URI.decode_www_form_component(key), filter)
+< a/lib/inertia_rails/devtools/redaction.rb +          end
+< a/lib/inertia_rails/devtools/redaction.rb +
+< a/lib/inertia_rails/devtools/redaction.rb +          # Fragment syntax is app-defined, so hide the whole fragment if it contains a secret.
+< a/lib/inertia_rails/devtools/redaction.rb +          sensitive ? REDACTED : fragment
+---
+> a/lib/inertia_rails/devtools/redaction.rb +        def sensitive_pair?(pair, filter)
+> a/lib/inertia_rails/devtools/redaction.rb +          key, value = pair.split('=', 2)
+> a/lib/inertia_rails/devtools/redaction.rb +          value && sensitive_query_key?(URI.decode_www_form_component(key), filter)

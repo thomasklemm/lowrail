@@ -6,6 +6,7 @@ area: Active Model, Errors#messages_for
 reviewer: "Active Model maintainers"
 branch: thomasklemm/errors-messages-for-no-errors
 head: "5c4c7dbcac"
+merged_head: "5c4c7dbcac47f8a1f76992bec340a6ccc65b490d"
 base: main
 built_on: "4f00fbc946"
 depends_on: []

@@ -7,6 +7,7 @@ area: CI flakiness (Active Record Ractor proxy pinning)
 reviewer: yahonda
 branch: thomasklemm/fix-ractor-proxy-unpin
 head: "7181059af13136c1ee640707146d23068a5713e2"
+merged_head: "7181059af13136c1ee640707146d23068a5713e2"
 base: main
 built_on: "8e097e9d81f65fe8701c77352f5758be4f75f957"
 depends_on: []

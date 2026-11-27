@@ -6,6 +6,7 @@ area: "Guides: Rails 8.2 upgrade guide, Active Job"
 reviewer: "guilleiguaran (merged #56518)"
 branch: thomasklemm/upgrade-guide-sidekiq-8-0-3
 head: "f526d29c5025178a57b10a2270492949406259d4"
+merged_head: "f526d29c5025178a57b10a2270492949406259d4"
 base: main
 built_on: "224f5b1563"
 depends_on: []

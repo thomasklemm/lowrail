@@ -7,6 +7,7 @@ area: CI, three intermittent or broken jobs on main
 reviewer: flavorjones
 branch: thomasklemm/fix-intermittent-ci
 head: "cfd14a42c755ee6e218811916ba8adc68b2230d3"
+merged_head: "cfd14a42c755ee6e218811916ba8adc68b2230d3"
 base: main
 built_on: "48091f4694f4f1d6b6cf7b92991aac4be3ce3ec0"
 depends_on: []

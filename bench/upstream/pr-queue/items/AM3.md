@@ -6,6 +6,7 @@ area: "Railties, framework defaults (Action Mailer delivery job)"
 reviewer: "byroot (#59820)"
 branch: thomasklemm/mailer-delivery-job-without-active-job
 head: "1862f0ba893f45791f034cb500f4ccab1f52765f"
+merged_head: "1862f0ba893f45791f034cb500f4ccab1f52765f"
 base: main
 built_on: "f785381cca"
 introduced_by: 59820

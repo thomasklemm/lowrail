@@ -6,6 +6,7 @@ area: Active Record, schema statements (index definitions)
 reviewer: "kamipo (#59850)"
 branch: thomasklemm/index-definition-adapter-readers-2
 head: "30368145ecb76500e10ae487c4ffff219b1403d7"
+merged_head: "30368145ecb76500e10ae487c4ffff219b1403d7"
 base: main
 built_on: "cf0325a832"
 depends_on: []

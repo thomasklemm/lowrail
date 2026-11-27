@@ -6,6 +6,7 @@ area: Active Record, connection pool
 reviewer: "byroot (merged #59844)"
 branch: thomasklemm/lease-registry-lockless-hit
 head: "7e342de11f12e6ee056e6c7ff5df713b2518e03c"
+merged_head: "7e342de11f12e6ee056e6c7ff5df713b2518e03c"
 base: main
 built_on: "cf0325a832"
 depends_on: []

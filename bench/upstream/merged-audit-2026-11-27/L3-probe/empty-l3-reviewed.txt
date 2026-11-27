@@ -1,0 +1,7 @@
+Plain.new ActiveModel::AttributeSet: [{}, {}]
+One.new ActiveModel::AttributeSet: [{"x" => nil}, {"x" => nil}]
+Post.new ActiveModel::LazyIndexedAttributeSet: [{"id" => nil, "title" => nil}, {"id" => nil, "title" => nil}]
+Post.first ActiveModel::LazyIndexedAttributeSet: [{"id" => 1, "title" => "a"}, {"id" => 1, "title" => "a"}]
+select 1 AS one ActiveModel::LazyIndexedAttributeSet: [{"id" => nil, "title" => nil, "one" => 1}, {"id" => nil, "title" => nil, "one" => 1}]
+select id ActiveModel::LazyIndexedAttributeSet: [{"id" => 1, "title" => nil}, {"id" => 1, "title" => nil}]
+loaded from ~/w/l3-reviewed/activemodel/lib/active_model/attribute_set.rb

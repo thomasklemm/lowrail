@@ -6,6 +6,7 @@ area: Active Record / Active Model attributes
 reviewer: "tenderlove (author of #59083)"
 branch: thomasklemm/frozen-default-attribute-unread
 head: "424441d986"
+merged_head: "424441d98683697154e5a3b85de8fc86fefec508"
 base: main
 built_on: "9e82904f18"
 depends_on: []

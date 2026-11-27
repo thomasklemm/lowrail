@@ -1,0 +1,90 @@
+commit f5e35938a26fffce5bf3c0d04514b83322fc1564
+Author: Rafael Mendonça França <rafael@rubyonrails.org>
+Date:   Fri Nov 27 12:50:32 2026 -0500
+
+    Replace redundant Symbol conversions with to_s
+    
+    Active Support makes Symbol#to_s return the same frozen string as
+    Symbol#name. Use to_s where both branches convert a value to a string.
+    
+    Keep type checks where callers must preserve non-Symbol values.
+    Keep Symbol#to_param for callers that require that extension alone.
+    
+    References #59369.
+
+diff --git a/actionview/lib/action_view/helpers/tag_helper.rb b/actionview/lib/action_view/helpers/tag_helper.rb
+index 8783b8b664d7..ec6b95ee45ef 100644
+--- a/actionview/lib/action_view/helpers/tag_helper.rb
++++ b/actionview/lib/action_view/helpers/tag_helper.rb
+@@ -1547,7 +1547,7 @@ def tag_options(options, escape = true) # :nodoc:
+           options.each_pair do |key, value|
+             next if key.blank?
+ 
+-            name = Symbol === key ? key.name : key.to_s
++            name = key.to_s
+             next if name.blank?
+ 
+             type = TAG_TYPES[key]
+@@ -1555,7 +1555,7 @@ def tag_options(options, escape = true) # :nodoc:
+               value.each_pair do |k, v|
+                 next if k.blank? || v.nil?
+ 
+-                nested_name = Symbol === k ? k.name : k.to_s
++                nested_name = k.to_s
+                 next if nested_name.blank?
+ 
+                 output << sep
+@@ -1565,7 +1565,7 @@ def tag_options(options, escape = true) # :nodoc:
+               value.each_pair do |k, v|
+                 next if k.blank? || v.nil?
+ 
+-                nested_name = Symbol === k ? k.name : k.to_s
++                nested_name = k.to_s
+                 next if nested_name.blank?
+ 
+                 case v
+@@ -1575,7 +1575,7 @@ def tag_options(options, escape = true) # :nodoc:
+ 
+                   v = @view_context.safe_join(tokens, " ")
+                 else
+-                  v = v.is_a?(Symbol) ? v.name : v.to_s
++                  v = v.to_s
+                 end
+ 
+                 output << sep
+@@ -1621,7 +1621,7 @@ def boolean_tag_option(key)
+           end
+ 
+           def append_boolean_tag_option(output, key)
+-            key = Symbol === key ? key.name : key.to_s
++            key = key.to_s
+             output << key
+             output << "=\""
+             output << key
+@@ -1637,7 +1637,7 @@ def tag_option(key, value, escape)
+           # Appends a single attribute to +output+ without allocating an
+           # intermediate string per attribute.
+           def append_tag_option(output, key, value, escape)
+-            key = Symbol === key ? key.name : key.to_s
++            key = key.to_s
+             key = ERB::Util.xml_name_escape(key) if escape
+ 
+             case value
+@@ -1648,8 +1648,6 @@ def append_tag_option(output, key, value, escape)
+               value = escape ? @view_context.safe_join(value, " ") : value.join(" ")
+             when Regexp
+               value = escape ? ERB::Util.unwrapped_html_escape(value.source) : value.source
+-            when Symbol
+-              value = escape ? ERB::Util.unwrapped_html_escape(value.name) : value.name
+             else
+               value = escape ? ERB::Util.unwrapped_html_escape(value) : value.to_s
+             end
+@@ -1668,7 +1666,7 @@ def prefix_tag_option(prefix, key, value, escape)
+           end
+ 
+           def append_prefix_tag_option(output, prefix, key, value, escape)
+-            key = "#{prefix}-#{(Symbol === key ? key.name : key.to_s).dasherize}"
++            key = "#{prefix}-#{key.to_s.dasherize}"
+             unless value.is_a?(String) || value.is_a?(Symbol) || value.is_a?(BigDecimal)
+               value = value.to_json
+             end

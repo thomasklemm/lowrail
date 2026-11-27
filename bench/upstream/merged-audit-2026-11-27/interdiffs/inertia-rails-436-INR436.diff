@@ -1,0 +1,959 @@
+# inertiajs/inertia-rails#436 (INR436): our last push e666cde2da (left) vs merged head ecc9646060 (right)
+1a2,50
+> a/CHANGELOG.md +* Keep dot-notation prop keys that come before a closure or `to_inertia` object they extend, so `{ 'user.name' => 'J', user: -> { { id: 1 } } }` resolves the same in either order (@skryukov)
+> a/CHANGELOG.md +* Apply the `only` and `except` paths of partial reloads inside closures and prop types too, and send always props whole (@skryukov)
+> a/CHANGELOG.md +* Fix crashes with dot-notation prop keys over non-hash or String-keyed values, and with a defer group named as both a Symbol and a String (@skryukov)
+> a/CHANGELOG.md +* Resolve plain props faster (@skryukov)
+> a/lib/inertia_rails.rb +require_relative 'inertia_rails/props_resolver/dotted_keys'
+> a/lib/inertia_rails/props_resolver.rb +    SKIP = Object.new.freeze
+> a/lib/inertia_rails/props_resolver.rb +    private_constant :SKIP
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    # Known by class, and so not asked whether they have `to_inertia`.
+> a/lib/inertia_rails/props_resolver.rb +    PLAIN_CLASSES = [String, Symbol, Integer, Float, NilClass, TrueClass, FalseClass]
+> a/lib/inertia_rails/props_resolver.rb +                    .to_h { |plain_class| [plain_class, true] }.compare_by_identity.freeze
+> a/lib/inertia_rails/props_resolver.rb +    private_constant :PLAIN_CLASSES
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb -      props = expand_dot_notation(@props)
+> a/lib/inertia_rails/props_resolver.rb -      resolved = deep_transform_props(props)
+> a/lib/inertia_rails/props_resolver.rb -      [resolved, build_metadata]
+> a/lib/inertia_rails/props_resolver.rb +      @keys = []
+> a/lib/inertia_rails/props_resolver.rb +      @whole = false
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +      props = DottedKeys.new(@props).expand
+> a/lib/inertia_rails/props_resolver.rb +      [resolve_hash(props), build_metadata]
+> a/lib/inertia_rails/props_resolver.rb -    def expand_dot_notation(props)
+> a/lib/inertia_rails/props_resolver.rb -      result = {}
+> a/lib/inertia_rails/props_resolver.rb -      props.each do |key, value|
+> a/lib/inertia_rails/props_resolver.rb -        path = key.to_s
+> a/lib/inertia_rails/props_resolver.rb -        if path.include?('.')
+> a/lib/inertia_rails/props_resolver.rb -          parts = path.split('.')
+> a/lib/inertia_rails/props_resolver.rb -          current = result
+> a/lib/inertia_rails/props_resolver.rb -          parts[0..-2].each { |part| current = resolve_value(current, part.to_sym) }
+> a/lib/inertia_rails/props_resolver.rb -          current[parts.last.to_sym] = value
+> a/lib/inertia_rails/props_resolver.rb -        else
+> a/lib/inertia_rails/props_resolver.rb -          key = key.to_sym
+> a/lib/inertia_rails/props_resolver.rb -          if value.is_a?(Hash) && result[key].is_a?(Hash)
+> a/lib/inertia_rails/props_resolver.rb -            result[key].merge!(value)
+> a/lib/inertia_rails/props_resolver.rb -          else
+> a/lib/inertia_rails/props_resolver.rb -            result[key] = value
+> a/lib/inertia_rails/props_resolver.rb -          end
+> a/lib/inertia_rails/props_resolver.rb -        end
+> a/lib/inertia_rails/props_resolver.rb -      end
+> a/lib/inertia_rails/props_resolver.rb -      result
+> a/lib/inertia_rails/props_resolver.rb -    end
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -    def resolve_value(current, key)
+> a/lib/inertia_rails/props_resolver.rb -      value = current[key]
+> a/lib/inertia_rails/props_resolver.rb -      value = value.to_inertia if self.class.serializer?(value)
+> a/lib/inertia_rails/props_resolver.rb -      value = @evaluator.call(value) if value.is_a?(Proc)
+> a/lib/inertia_rails/props_resolver.rb -      current[key] = value.is_a?(Hash) ? value.dup : value || {}
+> a/lib/inertia_rails/props_resolver.rb -    end
+> a/lib/inertia_rails/props_resolver.rb -
+3c52,73
+< a/lib/inertia_rails/props_resolver.rb +    def deep_transform_props(props, prefix = '', parent_was_resolved: false, filter_nested_props: false)
+---
+> a/lib/inertia_rails/props_resolver.rb -      plain_leaves = @recorder.nil? && (parent_was_resolved || !filtering_partial_request?)
+> a/lib/inertia_rails/props_resolver.rb -      transformed_props = {}
+> a/lib/inertia_rails/props_resolver.rb -      # `each` yields key and value without the pair Array `each_with_object` builds per entry.
+> a/lib/inertia_rails/props_resolver.rb -      props.each do |key, prop|
+> a/lib/inertia_rails/props_resolver.rb -        # Plain data needs no path, metadata or evaluation unless a partial reload or DevTools looks at it.
+> a/lib/inertia_rails/props_resolver.rb -        if plain_leaves && plain_leaf?(prop)
+> a/lib/inertia_rails/props_resolver.rb -          transformed_props[key] = prop
+> a/lib/inertia_rails/props_resolver.rb -          next
+> a/lib/inertia_rails/props_resolver.rb -        end
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -        path = prefix.empty? ? key.to_s : "#{prefix}.#{key}"
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -        if self.class.serializer?(prop)
+> a/lib/inertia_rails/props_resolver.rb -          next if !parent_was_resolved && excluded_by_partial_request?(path)
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -          prop = serialize(prop, path)
+> a/lib/inertia_rails/props_resolver.rb -        end
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -        if prop.is_a?(Hash) && prop.any?
+> a/lib/inertia_rails/props_resolver.rb -          next if !parent_was_resolved && excluded_by_partial_request?(path)
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -          record_prop(prop, path)
+5,6c75,82
+< a/lib/inertia_rails/props_resolver.rb +          nested = deep_transform_props(prop, path, parent_was_resolved: parent_was_resolved,
+< a/lib/inertia_rails/props_resolver.rb +                                                    filter_nested_props: filter_nested_props)
+---
+> a/lib/inertia_rails/props_resolver.rb -          transformed_props[key] = nested unless nested.empty?
+> a/lib/inertia_rails/props_resolver.rb -          next
+> a/lib/inertia_rails/props_resolver.rb -        end
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -        if prop.is_a?(Array)
+> a/lib/inertia_rails/props_resolver.rb -          next if !parent_was_resolved && excluded_by_partial_request?(path)
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -          record_prop(prop, path)
+8,9c84,88
+< a/lib/inertia_rails/props_resolver.rb +          transformed_props[key] = transform_array(prop, path, parent_was_resolved: parent_was_resolved,
+< a/lib/inertia_rails/props_resolver.rb +                                                               filter_nested_props: filter_nested_props)
+---
+> a/lib/inertia_rails/props_resolver.rb -          next
+> a/lib/inertia_rails/props_resolver.rb -        end
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -        prop = prop.with_merge_intent(@scroll_intent) if prop.is_a?(ScrollProp)
+> a/lib/inertia_rails/props_resolver.rb -        collect_metadata(prop, path)
+11,12c90,100
+< a/lib/inertia_rails/props_resolver.rb +        resolved_child = parent_was_resolved && !(filter_nested_props && (prop.is_a?(BaseProp) || prop.is_a?(Proc)))
+< a/lib/inertia_rails/props_resolver.rb +        next unless keep_prop?(prop, path, parent_was_resolved: resolved_child)
+---
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -        record_prop(prop, path)
+> a/lib/inertia_rails/props_resolver.rb -        rescue_enabled = prop.is_a?(BaseProp) && prop.try(:rescue?)
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -        begin
+> a/lib/inertia_rails/props_resolver.rb -          value = @evaluator.call(prop)
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -          # A closure may return a prop type — unwrap one level
+> a/lib/inertia_rails/props_resolver.rb -          if value.is_a?(BaseProp) && !prop.is_a?(BaseProp)
+> a/lib/inertia_rails/props_resolver.rb -            value = value.with_merge_intent(@scroll_intent) if value.is_a?(ScrollProp)
+> a/lib/inertia_rails/props_resolver.rb -            collect_metadata(value, path)
+14c102,110
+< a/lib/inertia_rails/props_resolver.rb +            next unless keep_prop?(value, path, parent_was_resolved: resolved_child)
+---
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -            record_prop(value, path)
+> a/lib/inertia_rails/props_resolver.rb -            value = @evaluator.call(value)
+> a/lib/inertia_rails/props_resolver.rb -          end
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -          serialized = self.class.serializer?(value)
+> a/lib/inertia_rails/props_resolver.rb -          value = serialize(value, path) if serialized
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -          # A closure or a serializer may return a Hash or Array containing prop types — recurse into it
+16,19c112
+< a/lib/inertia_rails/props_resolver.rb +          if prop.is_a?(Proc) || serialized || needs_transform?(value)
+< a/lib/inertia_rails/props_resolver.rb +            resolved_parent = parent_was_resolved || serialized || !prop.is_a?(BaseProp) ||
+< a/lib/inertia_rails/props_resolver.rb +                              (prop.is_a?(AlwaysProp) && excluded_by_partial_request?(path))
+< a/lib/inertia_rails/props_resolver.rb +            filter_children = filter_nested_props || (prop.is_a?(BaseProp) && !serialized)
+---
+> a/lib/inertia_rails/props_resolver.rb -            if value.is_a?(Hash) && value.any?
+23,25c116
+< a/lib/inertia_rails/props_resolver.rb +              value = deep_transform_props(value, path, parent_was_resolved: resolved_parent,
+< a/lib/inertia_rails/props_resolver.rb +                                                        filter_nested_props: filter_children)
+< a/lib/inertia_rails/props_resolver.rb +              next if value.empty? && !prop.is_a?(AlwaysProp)
+---
+> a/lib/inertia_rails/props_resolver.rb -            elsif value.is_a?(Array)
+28,35c119,141
+< a/lib/inertia_rails/props_resolver.rb +              value = transform_array(value, path, parent_was_resolved: resolved_parent,
+< a/lib/inertia_rails/props_resolver.rb +                                                   filter_nested_props: filter_children)
+< a/lib/inertia_rails/props_resolver.rb -    def transform_array(array, path, parent_was_resolved:)
+< a/lib/inertia_rails/props_resolver.rb +    def transform_array(array, path, parent_was_resolved:, filter_nested_props: false)
+< a/lib/inertia_rails/props_resolver.rb +        if filter_nested_props && (item.is_a?(BaseProp) || item.is_a?(Proc))
+< a/lib/inertia_rails/props_resolver.rb +          next deep_transform_props({ index => item }, path, parent_was_resolved: parent_was_resolved,
+< a/lib/inertia_rails/props_resolver.rb +                                                             filter_nested_props: true)[index]
+< a/lib/inertia_rails/props_resolver.rb +        end
+---
+> a/lib/inertia_rails/props_resolver.rb -            end
+> a/lib/inertia_rails/props_resolver.rb -          end
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -          transformed_props[key] = rescue_enabled ? value.as_json : value
+> a/lib/inertia_rails/props_resolver.rb -        rescue StandardError => e
+> a/lib/inertia_rails/props_resolver.rb -          raise unless rescue_enabled
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -          report_rescued_error(e)
+> a/lib/inertia_rails/props_resolver.rb -          @_rescued << path
+> a/lib/inertia_rails/props_resolver.rb -          next
+> a/lib/inertia_rails/props_resolver.rb -        end
+> a/lib/inertia_rails/props_resolver.rb +    # A hash leaves out what is not sent.
+> a/lib/inertia_rails/props_resolver.rb +    # Speed: where nothing is skipped, a plain value is sent as it is, without a step to its key.
+> a/lib/inertia_rails/props_resolver.rb +    def resolve_hash(hash)
+> a/lib/inertia_rails/props_resolver.rb +      plain_leaves = nothing_to_check_on_plain_leaves?
+> a/lib/inertia_rails/props_resolver.rb +      props = {}
+> a/lib/inertia_rails/props_resolver.rb +      hash.each do |key, value|
+> a/lib/inertia_rails/props_resolver.rb +        next props[key] = value if plain_leaves && plain_leaf?(value)
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +        prop = at(key) { resolve_prop(value) }
+> a/lib/inertia_rails/props_resolver.rb +        props[key] = prop unless prop.equal?(SKIP)
+> a/lib/inertia_rails/props_resolver.rb +      props
+> a/lib/inertia_rails/props_resolver.rb +    end
+36a143,159
+> a/lib/inertia_rails/props_resolver.rb +    def resolve_prop(value)
+> a/lib/inertia_rails/props_resolver.rb +      return SKIP if skipped? && !value.is_a?(AlwaysProp)
+> a/lib/inertia_rails/props_resolver.rb -      transformed_props
+> a/lib/inertia_rails/props_resolver.rb +      record(value) unless value.is_a?(BaseProp)
+> a/lib/inertia_rails/props_resolver.rb +      resolve_value(value)
+> a/lib/inertia_rails/props_resolver.rb -    # Partial reloads refer to array elements by position, so an unrequested element stays in
+> a/lib/inertia_rails/props_resolver.rb -    # place as `{}` (a hash) or `nil`, and is not evaluated.
+> a/lib/inertia_rails/props_resolver.rb -    def transform_array(array, path, parent_was_resolved:)
+> a/lib/inertia_rails/props_resolver.rb -      return array unless needs_transform?(array) || (!parent_was_resolved && partial_request_reaches_below?(path))
+> a/lib/inertia_rails/props_resolver.rb +    # An array keeps every place, since partial reloads refer to elements by position.
+> a/lib/inertia_rails/props_resolver.rb +    def resolve_array(array)
+> a/lib/inertia_rails/props_resolver.rb +      return array unless needs_transform?(array) || partial_request_reaches_below?
+> a/lib/inertia_rails/props_resolver.rb -      array.each_with_index.map do |item, index|
+> a/lib/inertia_rails/props_resolver.rb -        item_path = "#{path}.#{index}"
+> a/lib/inertia_rails/props_resolver.rb +      array.each_with_index.map { |item, index| at(index) { resolve_element(item) } }
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb -        case item
+39,42c162,167
+< a/lib/inertia_rails/props_resolver.rb +        when Hash then deep_transform_props(item, item_path, parent_was_resolved: parent_was_resolved,
+< a/lib/inertia_rails/props_resolver.rb +                                                             filter_nested_props: filter_nested_props)
+< a/lib/inertia_rails/props_resolver.rb +        when Array then transform_array(item, item_path, parent_was_resolved: parent_was_resolved,
+< a/lib/inertia_rails/props_resolver.rb +                                                         filter_nested_props: filter_nested_props)
+---
+> a/lib/inertia_rails/props_resolver.rb -        else
+> a/lib/inertia_rails/props_resolver.rb -          next if !parent_was_resolved && excluded_by_partial_request?(item_path)
+> a/lib/inertia_rails/props_resolver.rb +    # A hash stays a hash, with what is left of it. Anything else that is not sent leaves `nil`.
+> a/lib/inertia_rails/props_resolver.rb +    def resolve_element(item)
+> a/lib/inertia_rails/props_resolver.rb +      return resolve_hash(item) if item.is_a?(Hash)
+> a/lib/inertia_rails/props_resolver.rb +      return if skipped?
+44,45c169,172
+< a/lib/inertia_rails/props_resolver.rb +          transform_element(item, item_path, parent_was_resolved: parent_was_resolved,
+< a/lib/inertia_rails/props_resolver.rb +                                             filter_nested_props: filter_nested_props)
+---
+> a/lib/inertia_rails/props_resolver.rb -        end
+> a/lib/inertia_rails/props_resolver.rb -      end
+> a/lib/inertia_rails/props_resolver.rb +      element = resolve_value(item)
+> a/lib/inertia_rails/props_resolver.rb +      element unless element.equal?(SKIP)
+47c174,181
+< a/lib/inertia_rails/props_resolver.rb +    def transform_element(item, path, parent_was_resolved:, filter_nested_props: false)
+---
+> a/lib/inertia_rails/props_resolver.rb -      value = @evaluator.call(item)
+> a/lib/inertia_rails/props_resolver.rb -      return value unless self.class.serializer?(value)
+> a/lib/inertia_rails/props_resolver.rb +    # Any value, wherever it sits: a serializer, closure or prop type is asked for what it holds,
+> a/lib/inertia_rails/props_resolver.rb +    # until plain data is left to walk.
+> a/lib/inertia_rails/props_resolver.rb +    def resolve_value(value)
+> a/lib/inertia_rails/props_resolver.rb +      return value if PLAIN_CLASSES[value.class]
+> a/lib/inertia_rails/props_resolver.rb +      return resolve_returned(value, to_inertia(value)) if self.class.serializer?(value)
+> a/lib/inertia_rails/props_resolver.rb -      value = serialize(value, path)
+50,53c184,407
+< a/lib/inertia_rails/props_resolver.rb +      when Hash then deep_transform_props(value, path, parent_was_resolved: parent_was_resolved,
+< a/lib/inertia_rails/props_resolver.rb +                                                       filter_nested_props: filter_nested_props)
+< a/lib/inertia_rails/props_resolver.rb +      when Array then transform_array(value, path, parent_was_resolved: parent_was_resolved,
+< a/lib/inertia_rails/props_resolver.rb +                                                   filter_nested_props: filter_nested_props)
+---
+> a/lib/inertia_rails/props_resolver.rb +      when BaseProp then resolve_prop_type(value)
+> a/lib/inertia_rails/props_resolver.rb +      when Proc then resolve_returned(value, @evaluator.call(value))
+> a/lib/inertia_rails/props_resolver.rb +      when Hash then skip_if_emptied(value, resolve_hash(value))
+> a/lib/inertia_rails/props_resolver.rb +      when Array then resolve_array(value)
+> a/lib/inertia_rails/props_resolver.rb -    def serialize(serializer, path)
+> a/lib/inertia_rails/props_resolver.rb -      @recorder&.serializer_found(serializer, path)
+> a/lib/inertia_rails/props_resolver.rb -      serializer.to_inertia
+> a/lib/inertia_rails/props_resolver.rb +    # What returns itself has nothing more to give.
+> a/lib/inertia_rails/props_resolver.rb +    def resolve_returned(from, returned)
+> a/lib/inertia_rails/props_resolver.rb +      returned.equal?(from) ? returned : resolve_value(returned)
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    def resolve_prop_type(prop)
+> a/lib/inertia_rails/props_resolver.rb +      prop = prop.with_merge_intent(@scroll_intent) if prop.is_a?(ScrollProp)
+> a/lib/inertia_rails/props_resolver.rb +      collect_metadata(prop, path)
+> a/lib/inertia_rails/props_resolver.rb +      return SKIP if waits_for_partial_reload?(prop) || excluded_by_once_cache?(prop, path)
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +      record(prop)
+> a/lib/inertia_rails/props_resolver.rb +      prop.try(:rescue?) ? evaluate_rescued(prop) : evaluate(prop)
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    # An always prop ignores `only` and `except`, and so does everything it returns.
+> a/lib/inertia_rails/props_resolver.rb +    def evaluate(prop)
+> a/lib/inertia_rails/props_resolver.rb +      returned = @evaluator.call(prop)
+> a/lib/inertia_rails/props_resolver.rb +      prop.is_a?(AlwaysProp) ? whole { resolve_value(returned) } : resolve_value(returned)
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    # `as_json` runs here so that an error raised while serializing the prop is rescued too.
+> a/lib/inertia_rails/props_resolver.rb +    def evaluate_rescued(prop)
+> a/lib/inertia_rails/props_resolver.rb +      resolved = evaluate(prop)
+> a/lib/inertia_rails/props_resolver.rb +      return SKIP if resolved.equal?(SKIP)
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +      resolved.as_json
+> a/lib/inertia_rails/props_resolver.rb +    rescue StandardError => e
+> a/lib/inertia_rails/props_resolver.rb +      report_rescued_error(e)
+> a/lib/inertia_rails/props_resolver.rb +      @_rescued << path
+> a/lib/inertia_rails/props_resolver.rb +      SKIP
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    # A hash the walk emptied is not sent. One given empty is sent as it is.
+> a/lib/inertia_rails/props_resolver.rb +    def skip_if_emptied(hash, props)
+> a/lib/inertia_rails/props_resolver.rb +      props.empty? && !hash.empty? ? SKIP : props
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    # Steps down to `key` for the length of the block.
+> a/lib/inertia_rails/props_resolver.rb +    def at(key)
+> a/lib/inertia_rails/props_resolver.rb +      outer = @path
+> a/lib/inertia_rails/props_resolver.rb +      @keys << key
+> a/lib/inertia_rails/props_resolver.rb +      @path = outer && "#{outer}.#{key}"
+> a/lib/inertia_rails/props_resolver.rb +      yield
+> a/lib/inertia_rails/props_resolver.rb +    ensure
+> a/lib/inertia_rails/props_resolver.rb +      @keys.pop
+> a/lib/inertia_rails/props_resolver.rb +      @path = outer
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    # The name the client knows the prop by. Built only when asked for.
+> a/lib/inertia_rails/props_resolver.rb +    # `join` alone would flatten a key that is an Array.
+> a/lib/inertia_rails/props_resolver.rb +    def path
+> a/lib/inertia_rails/props_resolver.rb +      @path ||= @keys.reduce { |path, key| "#{path}.#{key}" }.to_s
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    def whole
+> a/lib/inertia_rails/props_resolver.rb +      outer = @whole
+> a/lib/inertia_rails/props_resolver.rb +      @whole = true
+> a/lib/inertia_rails/props_resolver.rb +      yield
+> a/lib/inertia_rails/props_resolver.rb +    ensure
+> a/lib/inertia_rails/props_resolver.rb +      @whole = outer
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    def skipped?
+> a/lib/inertia_rails/props_resolver.rb +      !@whole && filtering_partial_request? && excluded_by_partial_request?(path)
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    def to_inertia(value)
+> a/lib/inertia_rails/props_resolver.rb +      return value unless self.class.serializer?(value)
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +      @recorder&.serializer_found(value, path)
+> a/lib/inertia_rails/props_resolver.rb +      value.to_inertia
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    def record(value)
+> a/lib/inertia_rails/props_resolver.rb +      @recorder&.prop_resolved(path, value, reset: reset_keys.include?(path))
+> a/lib/inertia_rails/props_resolver.rb +    end
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +    # DevTools records every prop, plain values too.
+> a/lib/inertia_rails/props_resolver.rb +    def nothing_to_check_on_plain_leaves?
+> a/lib/inertia_rails/props_resolver.rb +      @recorder.nil? && (@whole || !filtering_partial_request?)
+> a/lib/inertia_rails/props_resolver.rb +      return true if PLAIN_CLASSES[value.class]
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb +      return false if PLAIN_CLASSES[value.class]
+> a/lib/inertia_rails/props_resolver.rb +
+> a/lib/inertia_rails/props_resolver.rb -    def record_prop(prop, path)
+> a/lib/inertia_rails/props_resolver.rb -      @recorder&.prop_resolved(path, prop, reset: reset_keys.include?(path))
+> a/lib/inertia_rails/props_resolver.rb -    end
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -      return unless prop.is_a?(BaseProp)
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -      (@_deferred[prop.group] ||= []) << path
+> a/lib/inertia_rails/props_resolver.rb +      (@_deferred[prop.group.to_s] ||= []) << path
+> a/lib/inertia_rails/props_resolver.rb -    # Only prop types answer the deferred and once predicates; plain values are data,
+> a/lib/inertia_rails/props_resolver.rb -    # even when they respond to `deferred?` or `once?` themselves.
+> a/lib/inertia_rails/props_resolver.rb -    def keep_prop?(prop, path, parent_was_resolved: false)
+> a/lib/inertia_rails/props_resolver.rb -      return true if prop.is_a?(AlwaysProp)
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -      prop_type = prop.is_a?(BaseProp)
+> a/lib/inertia_rails/props_resolver.rb -      return false if prop_type && excluded_by_once_cache?(prop, path)
+> a/lib/inertia_rails/props_resolver.rb -      return false if !parent_was_resolved && excluded_by_partial_request?(path)
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -      # Precedence: Evaluate IgnoreOnFirstLoadProp only after partial keys have been checked
+> a/lib/inertia_rails/props_resolver.rb -      return false if prop_type && (prop.is_a?(IgnoreOnFirstLoadProp) || prop.try(:deferred?)) &&
+> a/lib/inertia_rails/props_resolver.rb -                      !rendering_partial_component?
+> a/lib/inertia_rails/props_resolver.rb -
+> a/lib/inertia_rails/props_resolver.rb -      true
+> a/lib/inertia_rails/props_resolver.rb +    # Optional and deferred props wait for a partial reload.
+> a/lib/inertia_rails/props_resolver.rb +    def waits_for_partial_reload?(prop)
+> a/lib/inertia_rails/props_resolver.rb +      (prop.is_a?(IgnoreOnFirstLoadProp) || prop.try(:deferred?)) && !rendering_partial_component?
+> a/lib/inertia_rails/props_resolver.rb -    def partial_request_reaches_below?(path)
+> a/lib/inertia_rails/props_resolver.rb +    def partial_request_reaches_below?
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +# frozen_string_literal: true
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +module InertiaRails
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +  class PropsResolver
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +    # Expands dot-notation keys: 'auth.user.name' => 'J' sets `name` in the hash at `auth.user`.
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +    class DottedKeys
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      def initialize(props)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        @props = props
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      def expand
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        dotted, plain = @props.partition { |key, _| key.to_s.include?('.') }
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        result = plain.to_h { |key, value| [key.to_sym, value] }
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        dotted.each do |key, value|
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          path = key.to_s.split('.').map(&:to_sym)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          Key.new(path, value, overwrite: given_after?(key, path.first)).write_to(result)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        result
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      private
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      # Of 'auth.name' and `auth`, the one given last wins.
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      def given_after?(key, other_key)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        positions[key.to_s] > positions.fetch(other_key.to_s, -1)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      def positions
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        @positions ||= @props.each_key.with_index.to_h { |key, index| [key.to_s, index] }
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      class Key
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        def initialize(path, value, overwrite:)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          @key, *@nested_path = path
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          @value = value
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          @overwrite = overwrite
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        def write_to(hash)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          key = key_in(hash)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          if @nested_path.any?
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +            hash[key] = written_into(hash.fetch(key) { {} })
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          elsif @overwrite || !hash.key?(key)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +            hash[key] = @value
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          hash
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        def written_into(current)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          return current.add(self) if current.is_a?(Wrapper)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          return Wrapper.new(current).add(self) if current.is_a?(Proc) || PropsResolver.serializer?(current)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          if current.is_a?(Hash)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +            nested_key.write_to(current.dup)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          elsif @overwrite
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +            nested_key.write_to({})
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          else
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +            current
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        private
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        def key_in(hash)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          hash.key?(@key.to_s) ? @key.to_s : @key
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        def nested_key
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          Key.new(@nested_path, @value, overwrite: @overwrite)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      # A closure or serializer, with the dotted keys to write into what it returns.
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      # A prop type, so the walk calls it as the controller, and a partial reload can skip it.
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      class Wrapper < BaseProp
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        def initialize(value)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          super(&(value.is_a?(Proc) ? value : -> { value.to_inertia }))
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          @keys = []
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        def add(key)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          @keys << key
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          self
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        def call(controller, **)
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          returned = super
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +          @keys.reduce(returned) { |props, key| key.written_into(props) }
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +        end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +      private_constant :Key, :Wrapper
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +    end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +  end
+> a/lib/inertia_rails/props_resolver/dotted_keys.rb +end
+> a/lib/inertia_rails/testing.rb -      def keep_prop?(prop, path, parent_was_resolved: false)
+> a/lib/inertia_rails/testing.rb -        return true if InertiaRails::Testing.evaluate_optional_props &&
+> a/lib/inertia_rails/testing.rb -                       (prop.is_a?(IgnoreOnFirstLoadProp) || prop.try(:deferred?)) &&
+> a/lib/inertia_rails/testing.rb -                       !rendering_partial_component?
+> a/lib/inertia_rails/testing.rb -
+> a/lib/inertia_rails/testing.rb -        super
+> a/lib/inertia_rails/testing.rb +      def waits_for_partial_reload?(prop)
+> a/lib/inertia_rails/testing.rb +        !InertiaRails::Testing.evaluate_optional_props && super
+> a/spec/dummy/app/controllers/inertia_render_test_controller.rb +  def dotted_first_props
+> a/spec/dummy/app/controllers/inertia_render_test_controller.rb +    render inertia: 'TestComponent', props: { 'auth.role' => 'admin', auth: -> { AUTH } }
+> a/spec/dummy/app/controllers/inertia_render_test_controller.rb +  end
+> a/spec/dummy/app/controllers/inertia_render_test_controller.rb +
+89a444,701
+> a/spec/dummy/config/routes.rb +  get 'dotted_first_props' => 'inertia_render_test#dotted_first_props'
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +# frozen_string_literal: true
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +require 'rails_helper'
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +RSpec.describe InertiaRails::PropsResolver::DottedKeys do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  def expand(props)
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    described_class.new(props).expand
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  # Runs a closure or prop type the way the resolver does: as the controller.
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  def evaluate(value, controller = Object.new)
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    InertiaRails::PropEvaluator.new(controller).call(value)
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  describe 'props without dotted keys' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'turns top-level keys into Symbols and leaves nested keys as they are' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ 'user' => { 'name' => 'Jonathan' }, id: 1 })).to eq({ user: { 'name' => 'Jonathan' }, id: 1 })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'keeps the later of a key given as a Symbol and as a String' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ auth: { id: 1 }, 'auth' => { role: 'admin' } })).to eq({ auth: { role: 'admin' } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  describe 'a dotted key' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'becomes nested hashes' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ 'auth.user.name' => 'Jonathan' })).to eq({ auth: { user: { name: 'Jonathan' } } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'is written next to the dotted keys that start the same way' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = { 'auth.user.name' => 'Jonathan', 'auth.user.id' => 1, 'auth.role' => 'admin' }
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand(props)).to eq({ auth: { user: { name: 'Jonathan', id: 1 }, role: 'admin' } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'is written into copies of the hashes it extends' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      user = { id: 1 }.freeze
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      auth = { user: user }.freeze
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ auth: auth, 'auth.user.name' => 'Jonathan' }))
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +        .to eq({ auth: { user: { id: 1, name: 'Jonathan' } } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(auth).to eq({ user: { id: 1 } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'replaces what the hash it extends holds at the same key' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ auth: { name: 'old' }, 'auth.name' => 'new' })).to eq({ auth: { name: 'new' } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'replaces a key the hash holds as a String' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ auth: { 'name' => 'old' }, 'auth.name' => 'new' })).to eq({ auth: { 'name' => 'new' } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'replaces what an earlier, longer dotted key set under it' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ 'a.b.c' => 1, 'a.b' => { d: 2 } })).to eq({ a: { b: { d: 2 } } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'is set in the hash an earlier, shorter dotted key set' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ 'a.b' => { d: 2 }, 'a.b.c' => 1 })).to eq({ a: { b: { d: 2, c: 1 } } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  describe 'a dotted key given after a value that is not a hash' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'replaces it' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ auth: 'guest', 'auth.name' => 'Jonathan' })).to eq({ auth: { name: 'Jonathan' } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ auth: nil, 'auth.name' => 'Jonathan' })).to eq({ auth: { name: 'Jonathan' } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ auth: { user: 1 }, 'auth.user.name' => 'Jonathan' }))
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +        .to eq({ auth: { user: { name: 'Jonathan' } } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'replaces a prop type' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = { auth: InertiaRails.optional { 1 }, 'auth.name' => 'Jonathan' }
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand(props)).to eq({ auth: { name: 'Jonathan' } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  describe 'a dotted key given before the key it extends' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'adds what that key does not set, after the keys it does set' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      auth = expand({ 'auth.name' => 'Jonathan', auth: { id: 1 } })[:auth]
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(auth).to eq({ id: 1, name: 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(auth.keys).to eq(%i[id name])
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'adds a hash that key does not hold' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = { 'auth.user.name' => 'Jonathan', auth: { id: 1 } }
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand(props)).to eq({ auth: { id: 1, user: { name: 'Jonathan' } } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'does not overwrite what that key sets itself' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ 'auth.name' => 'shared', auth: { name: 'page' } })).to eq({ auth: { name: 'page' } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ 'auth.name' => 'shared', auth: { name: nil } })).to eq({ auth: { name: nil } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'does not replace a value that is not a hash' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ 'auth.name' => 'Jonathan', auth: 'guest' })).to eq({ auth: 'guest' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ 'auth.name' => 'Jonathan', auth: nil })).to eq({ auth: nil })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand({ 'auth.user.name' => 'Jonathan', auth: { user: nil } })).to eq({ auth: { user: nil } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'counts the last time the key it extends is given' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = { auth: { name: 'first' }, 'auth.name' => 'dotted', 'auth' => { name: 'last' } }
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(expand(props)).to eq({ auth: { name: 'last' } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  describe 'a dotted key that extends a closure' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'does not call the closure' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      called = false
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expand({ auth: -> { called = true }, 'auth.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(called).to be false
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'is written into a copy of what the closure returns, once that is asked for' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      returned = { id: 1 }.freeze
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = expand({ auth: -> { returned }, 'auth.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(props[:auth])).to eq({ id: 1, name: 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'runs the closure as the controller' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      controller = Struct.new(:current_user).new('Jonathan')
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = expand({ auth: -> { { user: current_user } }, 'auth.role' => 'admin' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(props[:auth], controller)).to eq({ user: 'Jonathan', role: 'admin' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'calls the closure once for several dotted keys' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      calls = 0
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = expand({ auth: -> { { id: (calls += 1) } }, 'auth.name' => 'Jonathan', 'auth.role' => 'admin' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(props[:auth])).to eq({ id: 1, name: 'Jonathan', role: 'admin' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(calls).to eq(1)
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'is written into what a closure returned by the closure returns' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = expand({ auth: -> { -> { { id: 1 } } }, 'auth.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(evaluate(props[:auth]))).to eq({ id: 1, name: 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'reaches a closure that a hash holds' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = expand({ auth: { user: -> { { id: 1 } } }, 'auth.user.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(props[:auth][:user])).to eq({ id: 1, name: 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'replaces what the closure returns when that is not a hash' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = expand({ auth: -> { 'guest' }, 'auth.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(props[:auth])).to eq({ name: 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'does not overwrite what the closure returns when it was given before the closure' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = expand({ 'auth.name' => 'shared', 'auth.role' => 'admin', auth: -> { { name: 'page' } } })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(props[:auth])).to eq({ name: 'page', role: 'admin' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(expand({ 'auth.name' => 'shared', auth: -> { 'guest' } })[:auth])).to eq('guest')
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  describe 'a dotted key that extends an object with `to_inertia`' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    let(:serializer) do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      Class.new do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +        attr_reader :calls
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +        def to_inertia
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +          @calls = calls.to_i + 1
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +          { id: 1 }
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +        end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      end.new
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'does not ask the object for its props' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expand({ auth: serializer, 'auth.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(serializer.calls).to be_nil
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'is written into what the object returns, once that is asked for' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = expand({ auth: serializer, 'auth.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(props[:auth])).to eq({ id: 1, name: 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    it 'treats a hash with `to_inertia` as such an object' do
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      hash = Class.new(Hash) { def to_inertia = { id: 1 } }.new
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      props = expand({ auth: hash, 'auth.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +      expect(evaluate(props[:auth])).to eq({ id: 1, name: 'Jonathan' })
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +    end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +  end
+> a/spec/inertia/props_resolver/dotted_keys_spec.rb +end
+> a/spec/inertia/props_resolver_spec.rb +  describe 'the same value in different places' do
+> a/spec/inertia/props_resolver_spec.rb +    it 'calls a closure that a closure returned' do
+> a/spec/inertia/props_resolver_spec.rb +      expect(resolve({ a: -> { -> { 1 } } })[:props]).to eq({ a: 1 })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'treats a prop type in an array as a prop' do
+> a/spec/inertia/props_resolver_spec.rb +      page = resolve({ a: [InertiaRails.optional { 1 }, InertiaRails.defer { 2 }, 3] })
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      expect(page[:props]).to eq({ a: [nil, nil, 3] })
+> a/spec/inertia/props_resolver_spec.rb +      expect(page[:deferredProps]).to eq({ 'default' => ['a.1'] })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'leaves nil where an array element resolves to nothing' do
+> a/spec/inertia/props_resolver_spec.rb +      expect(resolve({ a: [-> { InertiaRails.optional { 1 } }] })[:props]).to eq({ a: [nil] })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'leaves nil for a nested array the partial reload skips' do
+> a/spec/inertia/props_resolver_spec.rb +      expect(resolve_partial({ a: [[1, 2], [3]] }, 'a.0')[:props]).to eq({ a: [[1, 2], nil] })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'sends a serializer that returns itself as it is' do
+> a/spec/inertia/props_resolver_spec.rb +      itself_serializer = Object.new
+> a/spec/inertia/props_resolver_spec.rb +      def itself_serializer.to_inertia = self
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      expect(resolve({ a: itself_serializer })[:props][:a]).to equal(itself_serializer)
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'serializes a Hash or an Array with `to_inertia` that a closure returns' do
+> a/spec/inertia/props_resolver_spec.rb +      user = Class.new(Hash) { def to_inertia = { name: 'Jonathan' } }.new
+> a/spec/inertia/props_resolver_spec.rb +      users = Class.new(Array) { def to_inertia = ['Jonathan'] }.new([1])
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      expect(resolve({ user: -> { user }, users: -> { users } })[:props])
+> a/spec/inertia/props_resolver_spec.rb +        .to eq({ user: { name: 'Jonathan' }, users: ['Jonathan'] })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +  end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'lists a deferred group once when it is named as a Symbol and as a String' do
+> a/spec/inertia/props_resolver_spec.rb +      page = resolve({ a: InertiaRails.defer(group: :side) { 1 }, b: InertiaRails.defer(group: 'side') { 2 } })
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      expect(page[:deferredProps]).to eq({ 'side' => %w[a b] })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'records a rescued prop by its own name after the walk went into it' do
+> a/spec/inertia/props_resolver_spec.rb +      unserializable = Object.new
+> a/spec/inertia/props_resolver_spec.rb +      def unserializable.as_json(*) = raise('boom')
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      page = resolve_partial(
+> a/spec/inertia/props_resolver_spec.rb +        { feed: InertiaRails.defer(rescue: true) { { posts: InertiaRails.merge { [1] }, broken: unserializable } } },
+> a/spec/inertia/props_resolver_spec.rb +        'feed'
+> a/spec/inertia/props_resolver_spec.rb +      )
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      expect(page[:rescuedProps]).to eq(['feed'])
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'leaves out a rescued prop when the partial reload asks for none of its keys' do
+> a/spec/inertia/props_resolver_spec.rb +      page = resolve_partial({ feed: InertiaRails.defer(rescue: true) { { posts: [1] } } }, 'feed.missing')
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      expect(page[:props]).to eq({})
+> a/spec/inertia/props_resolver_spec.rb +      expect(page).not_to have_key(:rescuedProps)
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+99,102c711,713
+< a/spec/inertia/props_resolver_spec.rb +      [{ only: ['other'] }, { except: %w[auth empty] }].each do |selection|
+< a/spec/inertia/props_resolver_spec.rb +        it "projects unrequested always data without evaluating children for #{selection}" do
+< a/spec/inertia/props_resolver_spec.rb +          calls = []
+< a/spec/inertia/props_resolver_spec.rb +          serializer_class = serializer
+---
+> a/spec/inertia/props_resolver_spec.rb +      [{ only: ['other'] }, { except: ['auth'] }].each do |selection|
+> a/spec/inertia/props_resolver_spec.rb +        it "sends an always prop whole when the partial reload skips it for #{selection}" do
+> a/spec/inertia/props_resolver_spec.rb +          user = serializer.new('Jonathan')
+106,112c717
+< a/spec/inertia/props_resolver_spec.rb +              {
+< a/spec/inertia/props_resolver_spec.rb +                user: serializer_class.new('Jonathan'),
+< a/spec/inertia/props_resolver_spec.rb +                extra: InertiaRails.optional { calls << :optional },
+< a/spec/inertia/props_resolver_spec.rb +                later: InertiaRails.defer { calls << :deferred },
+< a/spec/inertia/props_resolver_spec.rb +                posts: InertiaRails.merge { calls << :merge },
+< a/spec/inertia/props_resolver_spec.rb +                count: -> { calls << :closure },
+< a/spec/inertia/props_resolver_spec.rb +              }
+---
+> a/spec/inertia/props_resolver_spec.rb +              { user: user, extra: InertiaRails.optional { 1 }, posts: InertiaRails.merge { [2] }, count: -> { 3 } }
+114d718
+< a/spec/inertia/props_resolver_spec.rb +            empty: InertiaRails.always { { extra: InertiaRails.optional { calls << :empty } } },
+119,120c723
+< a/spec/inertia/props_resolver_spec.rb +          expect(page[:props]).to eq({ other: 'public', auth: { user: { name: 'Jonathan' } }, empty: {} })
+< a/spec/inertia/props_resolver_spec.rb +          expect(calls).to eq([])
+---
+> a/spec/inertia/props_resolver_spec.rb +          expect(page[:props][:auth]).to eq({ user: { name: 'Jonathan' }, extra: 1, posts: [2], count: 3 })
+125,127c728,730
+< a/spec/inertia/props_resolver_spec.rb +      it 'keeps array positions without evaluating unrequested executable children of always data' do
+< a/spec/inertia/props_resolver_spec.rb +        calls = []
+< a/spec/inertia/props_resolver_spec.rb +        serializer_class = serializer
+---
+> a/spec/inertia/props_resolver_spec.rb +      it 'sends every element of an always prop the partial reload skips' do
+> a/spec/inertia/props_resolver_spec.rb +        jonathan = serializer.new('Jonathan')
+> a/spec/inertia/props_resolver_spec.rb +        brandon = serializer.new('Brandon')
+132,139c735,736
+< a/spec/inertia/props_resolver_spec.rb +              [
+< a/spec/inertia/props_resolver_spec.rb +                serializer_class.new('Jonathan'),
+< a/spec/inertia/props_resolver_spec.rb +                InertiaRails.optional { calls << :optional },
+< a/spec/inertia/props_resolver_spec.rb +                InertiaRails.defer { calls << :deferred },
+< a/spec/inertia/props_resolver_spec.rb +                InertiaRails.merge { calls << :merge },
+< a/spec/inertia/props_resolver_spec.rb +                -> { calls << :closure },
+< a/spec/inertia/props_resolver_spec.rb +                InertiaRails.always { serializer_class.new('Brandon') }
+< a/spec/inertia/props_resolver_spec.rb +              ]
+---
+> a/spec/inertia/props_resolver_spec.rb +              [jonathan, InertiaRails.optional { 1 }, InertiaRails.merge { [2] }, -> { 3 },
+> a/spec/inertia/props_resolver_spec.rb +               InertiaRails.always { brandon }]
+145,146c742
+< a/spec/inertia/props_resolver_spec.rb +        expect(page[:props][:users]).to eq([{ name: 'Jonathan' }, nil, nil, nil, nil, { name: 'Brandon' }])
+< a/spec/inertia/props_resolver_spec.rb +        expect(calls).to eq([])
+---
+> a/spec/inertia/props_resolver_spec.rb +        expect(page[:props][:users]).to eq([{ name: 'Jonathan' }, 1, [2], 3, { name: 'Brandon' }])
+150,152c746,747
+< a/spec/inertia/props_resolver_spec.rb +      it 'evaluates selected children once and preserves their merge metadata and array positions' do
+< a/spec/inertia/props_resolver_spec.rb +        calls = []
+< a/spec/inertia/props_resolver_spec.rb +        serializer_class = serializer
+---
+> a/spec/inertia/props_resolver_spec.rb +      it 'sends an always prop whole when the partial reload names keys inside it' do
+> a/spec/inertia/props_resolver_spec.rb +        user = serializer.new('Jonathan')
+156,169c751
+< a/spec/inertia/props_resolver_spec.rb +              {
+< a/spec/inertia/props_resolver_spec.rb +                user: serializer_class.new('Jonathan'),
+< a/spec/inertia/props_resolver_spec.rb +                posts: InertiaRails.merge do
+< a/spec/inertia/props_resolver_spec.rb +                  calls << :posts
+< a/spec/inertia/props_resolver_spec.rb +                  [serializer_class.new('Brandon')]
+< a/spec/inertia/props_resolver_spec.rb +                end,
+< a/spec/inertia/props_resolver_spec.rb +                rows: [
+< a/spec/inertia/props_resolver_spec.rb +                  InertiaRails.optional do
+< a/spec/inertia/props_resolver_spec.rb +                    calls << :row
+< a/spec/inertia/props_resolver_spec.rb +                    serializer_class.new('Taylor')
+< a/spec/inertia/props_resolver_spec.rb +                  end,
+< a/spec/inertia/props_resolver_spec.rb +                  InertiaRails.defer { calls << :deferred }
+< a/spec/inertia/props_resolver_spec.rb +                ],
+< a/spec/inertia/props_resolver_spec.rb +              }
+---
+> a/spec/inertia/props_resolver_spec.rb +              { user: user, posts: InertiaRails.merge { [1] }, tags: InertiaRails.merge { [2] } }
+172c754
+< a/spec/inertia/props_resolver_spec.rb +          'auth.posts', 'auth.rows.0'
+---
+> a/spec/inertia/props_resolver_spec.rb +          'auth.posts'
+175c757
+< a/spec/inertia/props_resolver_spec.rb +        expect(page[:props]).to eq({ auth: { posts: [{ name: 'Brandon' }], rows: [{ name: 'Taylor' }, nil] } })
+---
+> a/spec/inertia/props_resolver_spec.rb +        expect(page[:props]).to eq({ auth: { user: { name: 'Jonathan' }, posts: [1], tags: [2] } })
+177d758
+< a/spec/inertia/props_resolver_spec.rb +        expect(calls).to eq(%i[posts row])
+179a761,904
+> a/spec/inertia/props_resolver_spec.rb +    it 'does not call a closure that a dot-notation key extends when the partial reload skips it' do
+> a/spec/inertia/props_resolver_spec.rb +      called = false
+> a/spec/inertia/props_resolver_spec.rb +      props = { auth: -> { called = true }, 'auth.user' => 'Jonathan', other: 1 }
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      expect(resolve_partial(props, 'other')[:props]).to eq({ other: 1 })
+> a/spec/inertia/props_resolver_spec.rb +      expect(called).to be false
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'merges a dot-notation key into what a closure returned by a closure holds' do
+> a/spec/inertia/props_resolver_spec.rb +      page = resolve({ auth: -> { -> { { id: 1 } } }, 'auth.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      expect(page[:props]).to eq({ auth: { id: 1, name: 'Jonathan' } })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'lets a dot-notation key replace an earlier parent that is not a hash' do
+> a/spec/inertia/props_resolver_spec.rb +      expect(resolve({ auth: 'guest', 'auth.user' => 'Jonathan' })[:props]).to eq({ auth: { user: 'Jonathan' } })
+> a/spec/inertia/props_resolver_spec.rb +      expect(resolve({ auth: InertiaRails.optional { 1 }, 'auth.user' => 'Jonathan' })[:props])
+> a/spec/inertia/props_resolver_spec.rb +        .to eq({ auth: { user: 'Jonathan' } })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'keeps a later parent that is not a hash over an earlier dot-notation key' do
+> a/spec/inertia/props_resolver_spec.rb +      expect(resolve({ 'auth.user' => 'Jonathan', auth: 'guest' })[:props]).to eq({ auth: 'guest' })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    it 'writes a dot-notation key over the same key given as a String' do
+> a/spec/inertia/props_resolver_spec.rb +      page = resolve({ user: { 'name' => 'old', 'id' => 1 }, 'user.name' => 'Jonathan' })
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      expect(page[:props]).to eq({ user: { 'name' => 'Jonathan', 'id' => 1 } })
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    describe 'that comes before its parent key' do
+> a/spec/inertia/props_resolver_spec.rb +      it 'is written into what a parent closure returns, as when it comes after' do
+> a/spec/inertia/props_resolver_spec.rb +        user = -> { { id: 1 } }
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ 'user.name' => 'Jonathan', user: user })[:props]).to eq(user: { id: 1, name: 'Jonathan' })
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ user: user, 'user.name' => 'Jonathan' })[:props]).to eq(user: { id: 1, name: 'Jonathan' })
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      it 'gives the same props in the same key order as when it comes after' do
+> a/spec/inertia/props_resolver_spec.rb +        serializer = Object.new
+> a/spec/inertia/props_resolver_spec.rb +        def serializer.to_inertia = { id: 3 }
+> a/spec/inertia/props_resolver_spec.rb +        dotted = {
+> a/spec/inertia/props_resolver_spec.rb +          'auth.user.name' => 'Jonathan',
+> a/spec/inertia/props_resolver_spec.rb +          'auth.can' => -> { true },
+> a/spec/inertia/props_resolver_spec.rb +          'auth.secret' => InertiaRails.optional { 'hidden' },
+> a/spec/inertia/props_resolver_spec.rb +          'team.name' => 'Core',
+> a/spec/inertia/props_resolver_spec.rb +          'owner.name' => 'Brandon',
+> a/spec/inertia/props_resolver_spec.rb +          'settings.theme': 'dark',
+> a/spec/inertia/props_resolver_spec.rb +        }
+> a/spec/inertia/props_resolver_spec.rb +        parents = {
+> a/spec/inertia/props_resolver_spec.rb +          auth: -> { { user: -> { { id: 1 } } } },
+> a/spec/inertia/props_resolver_spec.rb +          team: { id: 2 },
+> a/spec/inertia/props_resolver_spec.rb +          owner: serializer,
+> a/spec/inertia/props_resolver_spec.rb +          settings: -> { { locale: 'en' } },
+> a/spec/inertia/props_resolver_spec.rb +        }
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        before = resolve(dotted.merge(parents))
+> a/spec/inertia/props_resolver_spec.rb +        after = resolve(parents.merge(dotted))
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(after[:props]).to eq(
+> a/spec/inertia/props_resolver_spec.rb +          auth: { user: { id: 1, name: 'Jonathan' }, can: true },
+> a/spec/inertia/props_resolver_spec.rb +          team: { id: 2, name: 'Core' },
+> a/spec/inertia/props_resolver_spec.rb +          owner: { id: 3, name: 'Brandon' },
+> a/spec/inertia/props_resolver_spec.rb +          settings: { locale: 'en', theme: 'dark' }
+> a/spec/inertia/props_resolver_spec.rb +        )
+> a/spec/inertia/props_resolver_spec.rb +        expect(before[:props].to_json).to eq(after[:props].to_json)
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      it 'is kept below a nested hash of its parent' do
+> a/spec/inertia/props_resolver_spec.rb +        page = resolve({ 'auth.user.name' => 'Jonathan', auth: { user: { id: 1 } } })
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(page[:props]).to eq(auth: { user: { id: 1, name: 'Jonathan' } })
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      it 'resolves on a partial reload' do
+> a/spec/inertia/props_resolver_spec.rb +        props = { 'user.name' => 'Jon', 'user.email' => InertiaRails.optional { 'jon@x.io' }, user: -> { { id: 1 } } }
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve_partial(props, 'user.email')[:props]).to eq(user: { email: 'jon@x.io' })
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve_partial(props, 'user')[:props]).to eq(user: { id: 1, name: 'Jon', email: 'jon@x.io' })
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      it 'evaluates a parent closure once' do
+> a/spec/inertia/props_resolver_spec.rb +        calls = 0
+> a/spec/inertia/props_resolver_spec.rb +        page = resolve({ 'user.name' => 'Jonathan', 'user.admin' => true, user: -> { { id: (calls += 1) } } })
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(page[:props]).to eq(user: { id: 1, name: 'Jonathan', admin: true })
+> a/spec/inertia/props_resolver_spec.rb +        expect(calls).to eq(1)
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      it 'leaves the parent value itself untouched' do
+> a/spec/inertia/props_resolver_spec.rb +        user = { id: 1 }.freeze
+> a/spec/inertia/props_resolver_spec.rb +        returned = { id: 2 }
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        page = resolve({ 'user.name' => 'Jonathan', 'owner.name' => 'Brandon', user: user, owner: -> { returned } })
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(page[:props]).to eq(user: { id: 1, name: 'Jonathan' }, owner: { id: 2, name: 'Brandon' })
+> a/spec/inertia/props_resolver_spec.rb +        expect(returned).to eq(id: 2)
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    describe 'that sets the same key as its parent' do
+> a/spec/inertia/props_resolver_spec.rb +      it 'lets the one that comes last win, so page props win over shared dot-notation keys' do
+> a/spec/inertia/props_resolver_spec.rb +        page = { auth: { user: 'page' } }
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ 'auth.user' => 'shared', auth: { user: 'page' } })[:props]).to eq(page)
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ 'auth.user' => 'shared', auth: -> { { user: 'page' } } })[:props]).to eq(page)
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ auth: { user: 'shared' }, 'auth.user' => 'page' })[:props]).to eq(page)
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ auth: -> { { user: 'shared' } }, 'auth.user' => 'page' })[:props]).to eq(page)
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      it 'lets a nil value the parent sets last win' do
+> a/spec/inertia/props_resolver_spec.rb +        page = resolve({ 'auth.user' => 'shared', 'auth.team.name' => 'shared', auth: { user: nil, team: nil } })
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(page[:props]).to eq(auth: { user: nil, team: nil })
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      it 'keeps the later of a parent given as a Symbol and as a String, with a dot-notation key between them' do
+> a/spec/inertia/props_resolver_spec.rb +        page = resolve({ auth: { id: 1 }, 'auth.name' => 'Jonathan', 'auth' => { role: 'admin' } })
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(page[:props]).to eq(auth: { role: 'admin', name: 'Jonathan' })
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +    end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +    describe 'with a parent that is not a hash' do
+> a/spec/inertia/props_resolver_spec.rb +      it 'is replaced by a parent that comes last' do
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ 'auth.user' => 'shared', auth: nil })[:props]).to eq(auth: nil)
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ 'auth.user' => 'shared', auth: -> {} })[:props]).to eq(auth: nil)
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ 'auth.user' => 'shared', auth: 'page' })[:props]).to eq(auth: 'page')
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      it 'is replaced by a prop type that comes last' do
+> a/spec/inertia/props_resolver_spec.rb +        props = { 'auth.user' => 'shared', auth: InertiaRails.optional { 'page' } }
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve(props)[:props]).to eq({})
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve_partial(props, :auth)[:props]).to eq(auth: 'page')
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +
+> a/spec/inertia/props_resolver_spec.rb +      it 'builds a hash over a nil or false parent that comes first' do
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ auth: nil, 'auth.can' => true })[:props]).to eq(auth: { can: true })
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ auth: false, 'auth.can' => true })[:props]).to eq(auth: { can: true })
+> a/spec/inertia/props_resolver_spec.rb +        expect(resolve({ auth: -> {}, 'auth.can' => true })[:props]).to eq(auth: { can: true })
+> a/spec/inertia/props_resolver_spec.rb +      end
+> a/spec/inertia/props_resolver_spec.rb +    end
+286a1012,1031
+> a/spec/inertia/rendering_spec.rb -      it 'resolves the closure and includes all children' do
+> a/spec/inertia/rendering_spec.rb +      it 'resolves the closure and includes only the requested child' do
+> a/spec/inertia/rendering_spec.rb -              'second' => 'second evaluated nested param',
+> a/spec/inertia/rendering_spec.rb -      it 'renders the entire evaluated prop' do
+> a/spec/inertia/rendering_spec.rb +      it 'renders the evaluated prop without the excluded child' do
+> a/spec/inertia/rendering_spec.rb -              'first' => 'first evaluated nested param',
+> a/spec/inertia/rendering_spec.rb -      it 'works with dot notation only with simple props' do
+> a/spec/inertia/rendering_spec.rb +      it 'works with dot notation inside what a prop type returns too' do
+> a/spec/inertia/rendering_spec.rb -          'nested' => { 'second' => 'second nested param' },
+> a/spec/inertia/rendering_spec.rb -          'nested_optional' => { 'first' => 'first nested optional param' }
+> a/spec/inertia/rendering_spec.rb +          'nested' => { 'second' => 'second nested param' }
+> a/spec/inertia/rendering_spec.rb +
+> a/spec/inertia/rendering_spec.rb +    it 'expands them the same when they come before a closure they extend' do
+> a/spec/inertia/rendering_spec.rb +      expected = response.body
+> a/spec/inertia/rendering_spec.rb +
+> a/spec/inertia/rendering_spec.rb +      get dotted_first_props_path, headers: { 'X-Inertia' => true }
+> a/spec/inertia/rendering_spec.rb +
+> a/spec/inertia/rendering_spec.rb +      expect(response.parsed_body['props']).to eq('auth' => { 'user' => 'Brandon', 'role' => 'admin' })
+> a/spec/inertia/rendering_spec.rb +      expect(response.body).to eq(expected.sub('/dotted_props', '/dotted_first_props'))
+> a/spec/inertia/rendering_spec.rb +    end

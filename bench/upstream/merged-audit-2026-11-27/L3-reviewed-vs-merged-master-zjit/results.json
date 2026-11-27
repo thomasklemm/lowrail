@@ -1,0 +1,638 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/merged-audit-2026-11-27/l3_body.rb",
+  "at": "2026-11-27T20:19:59Z",
+  "n": 500,
+  "warmup": 1000,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/w/ruby-master/bin/ruby",
+      "tree": "/home/user/w/l3-reviewed",
+      "description": "ruby 4.1.0dev (2026-11-27T09:42:55Z HEAD f3e180b5eb) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "b113448052a39806fb32ce7f618b998b49c2f6be",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/w/ruby-master/bin/ruby",
+      "tree": "/home/user/w/l3-merged",
+      "description": "ruby 4.1.0dev (2026-11-27T09:42:55Z HEAD f3e180b5eb) +PRISM [x86_64-linux]",
+      "zjit": true,
+      "head": "9c28399099762f3c716b158e3e97f6a0b0dcfab2",
+      "dirty": false
+    }
+  },
+  "objects": {
+    "zjit Marshal.dump": {
+      "base": 13.999,
+      "base1": 13.999,
+      "base2": 13.999,
+      "candidate": 13.999,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "zjit attributes_for_database": {
+      "base": 2.0,
+      "base1": 2.0,
+      "base2": 2.0,
+      "candidate": 2.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "zjit attributes_before_type_cast": {
+      "base": 2.0,
+      "base1": 2.0,
+      "base2": 2.0,
+      "candidate": 2.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    },
+    "zjit MessagePack dump": {
+      "base": 17.0,
+      "base1": 17.0,
+      "base2": 17.0,
+      "candidate": 17.0,
+      "change": 0.0,
+      "aa": 0.0,
+      "claim": false
+    }
+  },
+  "instructions": {
+    "zjit Marshal.dump": {
+      "base": 215728.758,
+      "base1": 215775.034,
+      "base2": 215682.482,
+      "candidate": 215524.038,
+      "change": -0.000948969446159853,
+      "aa": 0.000429020223627418,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                571,
+                571
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10074,
+                10074
+              ],
+              "invalidation_time_ns": [
+                77502366,
+                77502366
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                571,
+                571
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10074,
+                10074
+              ],
+              "invalidation_time_ns": [
+                78924154,
+                78924154
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                572,
+                572
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10080,
+                10080
+              ],
+              "invalidation_time_ns": [
+                80484456,
+                80484456
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                572,
+                572
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10080,
+                10080
+              ],
+              "invalidation_time_ns": [
+                81089956,
+                81089956
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                571,
+                571
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10074,
+                10074
+              ],
+              "invalidation_time_ns": [
+                80170397,
+                80170397
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                571,
+                571
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10074,
+                10074
+              ],
+              "invalidation_time_ns": [
+                80695740,
+                80695740
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit attributes_for_database": {
+      "base": 57711.607,
+      "base1": 57771.336,
+      "base2": 57651.878,
+      "candidate": 57750.494,
+      "change": 0.0006738159275307964,
+      "aa": 0.002069912903309138,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                563,
+                563
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9928,
+                9928
+              ],
+              "invalidation_time_ns": [
+                83080559,
+                83080559
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                563,
+                563
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9928,
+                9928
+              ],
+              "invalidation_time_ns": [
+                81794106,
+                81794106
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                564,
+                564
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9935,
+                9935
+              ],
+              "invalidation_time_ns": [
+                79611760,
+                79611760
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                564,
+                564
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9935,
+                9935
+              ],
+              "invalidation_time_ns": [
+                79412653,
+                79412653
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                563,
+                563
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9928,
+                9928
+              ],
+              "invalidation_time_ns": [
+                84473043,
+                84473043
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                563,
+                563
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9928,
+                9928
+              ],
+              "invalidation_time_ns": [
+                79450933,
+                79450933
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit attributes_before_type_cast": {
+      "base": 49819.350000000006,
+      "base1": 49729.194,
+      "base2": 49909.506,
+      "candidate": 49655.102,
+      "change": -0.003296871597080364,
+      "aa": 0.0036193165908426756,
+      "claim": false,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                556,
+                556
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9812,
+                9812
+              ],
+              "invalidation_time_ns": [
+                80997064,
+                80997064
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                556,
+                556
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9812,
+                9812
+              ],
+              "invalidation_time_ns": [
+                80113328,
+                80113328
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                557,
+                557
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9819,
+                9819
+              ],
+              "invalidation_time_ns": [
+                78272600,
+                78272600
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                557,
+                557
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9819,
+                9819
+              ],
+              "invalidation_time_ns": [
+                81313232,
+                81313232
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                556,
+                556
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9812,
+                9812
+              ],
+              "invalidation_time_ns": [
+                82191496,
+                82191496
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                556,
+                556
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                9812,
+                9812
+              ],
+              "invalidation_time_ns": [
+                81245370,
+                81245370
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "zjit MessagePack dump": {
+      "base": 79583.49799999999,
+      "base1": 79579.362,
+      "base2": 79587.634,
+      "candidate": 79397.446,
+      "change": -0.0023378213408010717,
+      "aa": 0.00010394114619103271,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                571,
+                571
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10058,
+                10058
+              ],
+              "invalidation_time_ns": [
+                79034318,
+                79034318
+              ]
+            }
+          },
+          {
+            "window": "base n500",
+            "counters": {
+              "compiled_iseq_count": [
+                571,
+                571
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10058,
+                10058
+              ],
+              "invalidation_time_ns": [
+                79571055,
+                79571055
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                572,
+                572
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10065,
+                10065
+              ],
+              "invalidation_time_ns": [
+                78711225,
+                78711225
+              ]
+            }
+          },
+          {
+            "window": "candidate n500",
+            "counters": {
+              "compiled_iseq_count": [
+                572,
+                572
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10065,
+                10065
+              ],
+              "invalidation_time_ns": [
+                79291519,
+                79291519
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                571,
+                571
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10058,
+                10058
+              ],
+              "invalidation_time_ns": [
+                82126534,
+                82126534
+              ]
+            }
+          },
+          {
+            "window": "base2 n500",
+            "counters": {
+              "compiled_iseq_count": [
+                571,
+                571
+              ],
+              "failed_iseq_count": [
+                0,
+                0
+              ],
+              "compiled_side_exit_count": [
+                10058,
+                10058
+              ],
+              "invalidation_time_ns": [
+                81314867,
+                81314867
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}

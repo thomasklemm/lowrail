@@ -6,6 +6,7 @@ area: "Action Text: Content rendering, bulk attachable lookup"
 reviewer: "flavorjones (#58173)"
 branch: thomasklemm/action-text-attachment-from-node-fallback
 head: "9c1378eab62cf1e45c28d30055418d522c9257ef"
+merged_head: "9c1378eab62cf1e45c28d30055418d522c9257ef"
 base: main
 built_on: "088fc0cf61"
 introduced_by: 58173

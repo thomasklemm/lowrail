@@ -1,0 +1,48 @@
+commit 518784d2e3ef97fbcbb6486bdb3b9285e68acbdb
+Author: Andrew K. Fader <fader@yagni.co>
+Date:   Mon Nov 16 23:21:29 2026 -0500
+
+    Fix bind values with Arel.sql in where
+    
+    `Post.where(Arel.sql("id = ?"), 1)` raises
+    `ActiveRecord::PreparedStatementInvalid` ("wrong number of bind
+    variables") since 8d6b63b0cd. `Arel::Nodes::BoundSqlLiteral` counts
+    placeholders with `sql_with_placeholders.count("?")`, and
+    `Arel::Nodes::SqlLiteral` includes `Arel::Expressions`, whose `#count`
+    builds an `Arel::Nodes::Count` instead of counting characters.
+    
+    Until 8d6b63b0cd, `where` interpolated the statement into a new
+    String. Convert it with `to_s` instead.
+
+diff --git a/activerecord/lib/active_record/relation/query_methods.rb b/activerecord/lib/active_record/relation/query_methods.rb
+index dab62bac66c0..74cc41ab7980 100644
+--- a/activerecord/lib/active_record/relation/query_methods.rb
++++ b/activerecord/lib/active_record/relation/query_methods.rb
+@@ -2005,7 +2005,7 @@ def build_where_clause(opts, rest = FROZEN_EMPTY_ARRAY) # :nodoc:
+           if rest.empty?
+             parts = [Arel.sql(opts)]
+           else
+-            parts = [model.bound_sql_literal_for(opts, rest)]
++            parts = [model.bound_sql_literal_for(opts.to_s, rest)]
+           end
+         when Hash
+           attribute_aliases = model.attribute_aliases
+diff --git a/activerecord/test/cases/relation/where_test.rb b/activerecord/test/cases/relation/where_test.rb
+index f53763bfbad0..1b4da2b2476b 100644
+--- a/activerecord/test/cases/relation/where_test.rb
++++ b/activerecord/test/cases/relation/where_test.rb
+@@ -534,6 +534,14 @@ def test_where_with_bound_sql_literal_is_grouped
+       assert_equal [4], Edge.where(condition).merge(edges).pluck(:sink_id)
+     end
+ 
++    def test_where_with_sql_literal_and_bind_values
++      condition = Arel.sql("sink_id = ? OR sink_id = ?")
++      edges = Edge.where(sink_id: [3, 4])
++
++      assert_equal edges.where("sink_id = ? OR sink_id = ?", 2, 4).to_sql, edges.where(condition, 2, 4).to_sql
++      assert_equal [4], edges.where(condition, 2, 4).pluck(:sink_id)
++    end
++
+     def test_where_with_integer_for_string_column
+       count = Post.where(title: 0).count
+       assert_equal 0, count

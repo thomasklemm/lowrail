@@ -6,6 +6,7 @@ area: ZJIT, compile time (iseq_may_write_block_code)
 reviewer: "k0kubun (asked for IseqPayload on #19962 and for a per-compile cache on #19680), tekknolagi (asked on #19962 to reopen #19680)"
 branch: thomasklemm/zjit-cache-may-write-block-code
 head: "3e63efefe6"
+merged_head: "3e63efefe665b81d0eaaa850fd8090fb310175d6"
 base: master
 built_on: "3a19e2efcf"
 depends_on: []

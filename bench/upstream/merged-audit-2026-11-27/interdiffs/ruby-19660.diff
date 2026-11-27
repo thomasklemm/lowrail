@@ -1,0 +1,9 @@
+# ruby/ruby#19660: our head 8ac6f1fb19 (left) vs byroot's amended head 87a8ffc168 (right)
+20,21c20,21
+< a/vm.c +        // BOP_NEW is registered on the singleton class of Hash
+< a/vm.c +        return RCLASS_ATTACHED_OBJECT(klass) == rb_cHash ? HASH_REDEFINED_OP_FLAG : 0;
+---
+> a/vm.c +        // BOP_NEW is registered on the singleton class
+> a/vm.c +        klass = RCLASS_ATTACHED_OBJECT(klass);
+22a23
+> a/vm.c +

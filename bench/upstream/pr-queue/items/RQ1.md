@@ -7,6 +7,7 @@ area: QRUtil.rszf (right shift zero fill)
 reviewer: whomwah
 branch: thomasklemm/rszf-without-bignums
 head: "16d8339f455d3a1e15fb5b6860f22ef5cf6b82da"
+merged_head: "16d8339f455d3a1e15fb5b6860f22ef5cf6b82da"
 base: main
 built_on: "ca75f7a55a"
 introduced_by: "5f6de842aa88085ce764f960316ef365bfeff72a"

@@ -1,0 +1,75 @@
+59642 activerecord/lib/active_record/relation/query_methods.rb added=1 surviving=0
+    2e299253f942 2026-11-27 Rafael Mendonça França: Merge pull request #59416 from kehra/fix/reorder-and-unscope-default-order
+    8cd2639971a7 2026-11-02 kehra: Clear default_order when calling reorder
+    f5e35938a26f 2026-11-27 Rafael Mendonça França: Replace redundant Symbol conversions with to_s
+    71812a394b78 2026-11-27 Rafael Mendonça França: Rename default_order to fallback_order
+    20f84a72aad3 2026-11-26 Abdul Wadood: Don't run a query when checking `or` compatibility
+    5f98db3562d5 2026-11-26 Ryuta Kamizono: Merge pull request #59906 from 55728/fix-order-sql-literal-ordering-references
+    7926a0c5fafb 2026-11-26 Ryuta Kamizono: Don't extract a table name starting with a digit from an SQL literal
+    c47a04327302 2026-11-24 Bruno Costanzo: Keep the unaliased table name for left_joins when eager loading
+59640 activesupport/lib/active_support/cache/strategy/local_cache.rb added=1 surviving=0
+    f9e5aec6b4e1 2026-11-22 Kenta Ishizaki: Honor `force: true` in `fetch_multi` with a local cache
+    15110dfcbb78 2026-11-09 Jean Boussier: Further simplify LocalCache#local_cache_key
+59634 activerecord/lib/active_record/associations/preloader/association.rb added=1 surviving=0
+    71812a394b78 2026-11-27 Rafael Mendonça França: Rename default_order to fallback_order
+    ebf746c795a1 2026-11-17 Ryuta Kamizono: Add `association_scope_keeps_owner_conditions` to keep the owner conditions of associations
+    68e24e3ee7fa 2026-10-20 Aaron Patterson: Update activerecord/lib/active_record/associations/preloader/association.rb
+    f547f565e4d6 2026-10-16 Aaron Patterson: Change attribute set's internals to only use array indexes
+59634 activerecord/lib/active_record/persistence.rb added=1 surviving=0
+    f5e35938a26f 2026-11-27 Rafael Mendonça França: Replace redundant Symbol conversions with to_s
+    937ad292170f 2026-11-12 Jean Boussier: Merge pull request #59692 from kehra/cursor/fix-increment-bang-stale-lock-version-da2f
+    8276bb63aa85 2026-10-26 Aaron Patterson: Add types and make callers homogeneous
+    4e68df70611f 2026-10-19 Aaron Patterson: Additional types hash isn't necessary anymore
+    f547f565e4d6 2026-10-16 Aaron Patterson: Change attribute set's internals to only use array indexes
+    2687564f8497 2026-10-16 Aaron Patterson: Make attribute layouts arrays
+    03eb82e9fc9f 2026-10-15 Aaron Patterson: LazyAttributeSet always gets a IndexedRow
+    7023f4942686 2026-11-09 Matthew Draper: Merge pull request #59530 from matthewd/schema-context-pk
+59634 activerecord/lib/active_record/reflection.rb added=3 surviving=2
+    9e82904f18da 2026-11-27 Ryuta Kamizono: Merge pull request #59884 from smyk-git/fix-sti-type-condition-in-join-scope
+    73f8c7bea288 2026-11-18 Thomas Klemm: Don't compare owner conditions when joining an association without a scope
+    20bc43e023dc 2026-11-20 Michał Smykowski: Don't drop the STI type condition when joining
+    ebf746c795a1 2026-11-17 Ryuta Kamizono: Add `association_scope_keeps_owner_conditions` to keep the owner conditions of associations
+    3adff4f63686 2026-11-17 Ryuta Kamizono: Add the STI type condition in `klass_join_scope`
+59584 activesupport/lib/active_support/json/encoding.rb added=1 surviving=0
+    f5e35938a26f 2026-11-27 Rafael Mendonça França: Replace redundant Symbol conversions with to_s
+    ebfaed3969b2 2026-11-09 Jean Boussier: Revert "Skip the HTML entity gsub! in JSON::Coder output with nothing to escape"
+59584 activesupport/test/json/encoding_test.rb added=15 surviving=0
+    f3cee99b8107 2026-11-20 Jean Boussier: Require Object#with in test helper
+    ebfaed3969b2 2026-11-09 Jean Boussier: Revert "Skip the HTML entity gsub! in JSON::Coder output with nothing to escape"
+59568 activerecord/lib/active_record/querying.rb added=1 surviving=0
+    71812a394b78 2026-11-27 Rafael Mendonça França: Rename default_order to fallback_order
+    8276bb63aa85 2026-10-26 Aaron Patterson: Add types and make callers homogeneous
+    4e68df70611f 2026-10-19 Aaron Patterson: Additional types hash isn't necessary anymore
+    f547f565e4d6 2026-10-16 Aaron Patterson: Change attribute set's internals to only use array indexes
+    2687564f8497 2026-10-16 Aaron Patterson: Make attribute layouts arrays
+    4433aa9cd507 2026-10-15 Aaron Patterson: Add an index (ord) method to each column object
+    ef429f4bcc9e 2026-11-05 Lawrence Lin: Look up only the types of unknown columns when loading records
+59556 activerecord/lib/active_record/relation/merger.rb added=3 surviving=1
+    8cd2639971a7 2026-11-02 kehra: Clear default_order when calling reorder
+    60147d2f2848 2026-11-15 Thomas Klemm: Skip merging a blank relation into a relation without conditions
+    db5fd36f8041 2026-11-10 Ryuta Kamizono: Resolve CTE joins merged from a relation of another model
+    b2a1d01a4d81 2026-11-09 Helmi Pradita: Fix #48227: Qualify unscope values when merging relations
+    cb2b09ab6f39 2026-11-05 kehra: Reference the merged order's tables in includes after merge
+    e4852e04bb22 2026-11-04 Thomas Klemm: Accept bind values in `where!` and `having!` again
+    873d897d42dc 2026-11-04 Ryuta Kamizono: Avoid reprocessing `with` values when merging relations
+    8f71c51c51b8 2026-11-04 Ryuta Kamizono: Avoid reprocessing order values when merging relations
+59555 activesupport/lib/active_support/core_ext/enumerable.rb added=18 surviving=16
+    f9fe866f496a 2026-11-05 Jean Boussier: Fix Array#index_with documentation
+59244 actionview/lib/action_view/helpers/tag_helper.rb added=1 surviving=0
+    f5e35938a26f 2026-11-27 Rafael Mendonça França: Replace redundant Symbol conversions with to_s
+    6efbc06a5ec0 2026-11-16 Thomas Klemm: Allocate less per field in text_field_tag and tag
+    43f969a353d8 2026-11-16 Alexander Senko: Support array-convertible tag values
+    f02e21ddbb65 2026-11-04 Thomas Klemm: Check for String tag attribute values first
+    99a3247ebc02 2026-11-02 Mike Dalessio: Skip tag attribute names that are blank once converted to a string
+    df8bb7f45159 2026-11-02 Thomas Klemm: Take tag_string options before the optional content
+    2954decb37e9 2026-10-30 Lawrence Lin: Freeze tag strings before marking them HTML safe
+    a407e8c3038b 2026-10-30 Xavier Noria: Remove Markdown directives in Action View
+59236 activesupport/lib/active_support/current_attributes.rb added=3 surviving=0
+    e20db55ab1cf 2026-11-02 Xavier Noria: Remove Markdown directives in Active Support
+    84048ad477a5 2026-10-25 Ryuta Kamizono: Don't store a sentinel in `CurrentAttributes.defaults`
+    f9c986edf2bc 2026-10-23 Sampo Kuokkanen: Skip copying the current attributes instances when there are none
+59235 activesupport/lib/active_support/notifications/fanout.rb added=5 surviving=3
+    d6b71f057de1 2026-11-04 Thomas Klemm: Build notification handle groups with each instead of Hash#map
+    58030897e40c 2026-11-03 Xavier Noria: Remove Markdown directives in Active Support
+    e3dd00a4bbdf 2026-10-21 Sampo Kuokkanen: Don't copy the payload when building an event for event object subscribers
+DONE

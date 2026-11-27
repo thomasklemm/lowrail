@@ -1,0 +1,1 @@
+jit post.comments.where(approved: true)	compiled_iseq_count=845>845 compiled_block_count=12076>12076 invalidation_count=298>298

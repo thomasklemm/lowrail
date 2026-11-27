@@ -6,6 +6,7 @@ area:
 reviewer:
 branch: thomasklemm/local-cache-anonymous-store
 head: "2b02aad60c"
+merged_head: "2b02aad60c4e2db83a9d7e950c540252ece23ee9"
 base: main
 built_on:
 depends_on: []

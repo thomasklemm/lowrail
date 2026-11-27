@@ -1,0 +1,61 @@
+# ankane/blind_index#62 (BI1): our PR head (left) vs ankane's commit ac61e54cf4 (right)
+1c1,12
+< a/lib/blind_index/extensions.rb -      # memoize for performance
+---
+> a/.github/workflows/build.yml +          - ruby: "4.0"
+> a/.github/workflows/build.yml +            gemfile: gemfiles/activerecord82.gemfile
+> a/gemfiles/activerecord82.gemfile +source "https://rubygems.org"
+> a/gemfiles/activerecord82.gemfile +
+> a/gemfiles/activerecord82.gemfile +gemspec path: ".."
+> a/gemfiles/activerecord82.gemfile +
+> a/gemfiles/activerecord82.gemfile +gem "rake"
+> a/gemfiles/activerecord82.gemfile +gem "minitest"
+> a/gemfiles/activerecord82.gemfile +gem "activerecord", "~> 8.2.0.alpha", github: "rails/rails"
+> a/gemfiles/activerecord82.gemfile +gem "attr_encrypted"
+> a/gemfiles/activerecord82.gemfile +gem "lockbox"
+> a/gemfiles/activerecord82.gemfile +gem "sqlite3"
+11,54d21
+< a/test/blind_index_test.rb +  def test_where_before_blind_index_declaration
+< a/test/blind_index_test.rb +    skip if mongoid?
+< a/test/blind_index_test.rb +
+< a/test/blind_index_test.rb +    [false, true].each do |subclass|
+< a/test/blind_index_test.rb +      parent = Class.new(ActiveRecord::Base) { self.table_name = "late_index_users" }
+< a/test/blind_index_test.rb +      model = subclass ? Class.new(parent) : parent
+< a/test/blind_index_test.rb +      metadata = model.predicate_builder.send(:table)
+< a/test/blind_index_test.rb +      skip "Table metadata is already frozen" if metadata.frozen?
+< a/test/blind_index_test.rb +
+< a/test/blind_index_test.rb +      model.delete_all
+< a/test/blind_index_test.rb +      model.create!(id: 7, email: "target")
+< a/test/blind_index_test.rb +      assert_equal [7], model.where(email: "target").pluck(:id)
+< a/test/blind_index_test.rb +
+< a/test/blind_index_test.rb +      parent.blind_index :email, algorithm: :pbkdf2_sha256, key: "11" * 32
+< a/test/blind_index_test.rb +      other = model.create!(id: 19, email: "target")
+< a/test/blind_index_test.rb +      other.update_columns(email: "other")
+< a/test/blind_index_test.rb +
+< a/test/blind_index_test.rb +      assert_equal [7], model.where(email: "target").pluck(:id)
+< a/test/blind_index_test.rb +      metadata.freeze
+< a/test/blind_index_test.rb +      assert_equal [7], model.where(email: "target").pluck(:id)
+< a/test/blind_index_test.rb +    end
+< a/test/blind_index_test.rb +  end
+< a/test/blind_index_test.rb +
+< a/test/blind_index_test.rb +  def test_where_with_frozen_table_metadata
+< a/test/blind_index_test.rb +    skip if mongoid?
+< a/test/blind_index_test.rb +
+< a/test/blind_index_test.rb +    model = Class.new(ActiveRecord::Base) { self.table_name = "late_index_users" }
+< a/test/blind_index_test.rb +    model.blind_index :email, algorithm: :pbkdf2_sha256, key: "22" * 32
+< a/test/blind_index_test.rb +    model.delete_all
+< a/test/blind_index_test.rb +    model.insert_all!([
+< a/test/blind_index_test.rb +      {id: 31, email: "other", email_bidx: model.generate_email_bidx("frozen")},
+< a/test/blind_index_test.rb +      {id: 47, email: "frozen", email_bidx: model.generate_email_bidx("different")}
+< a/test/blind_index_test.rb +    ])
+< a/test/blind_index_test.rb +    model.predicate_builder.send(:table).freeze
+< a/test/blind_index_test.rb +
+< a/test/blind_index_test.rb +    assert_equal [31], model.where(email: "frozen").pluck(:id)
+< a/test/blind_index_test.rb +    assert_empty model.where(email: "missing").pluck(:id)
+< a/test/blind_index_test.rb +  end
+< a/test/blind_index_test.rb +
+< a/test/support/active_record.rb +
+< a/test/support/active_record.rb +  create_table :late_index_users, force: true do |t|
+< a/test/support/active_record.rb +    t.string :email
+< a/test/support/active_record.rb +    t.string :email_bidx
+< a/test/support/active_record.rb +  end

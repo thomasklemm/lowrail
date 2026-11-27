@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+gem "activesupport", path: "/home/user/w/k6-reviewed/activesupport"
+gem "activemodel", path: "/home/user/w/k6-reviewed/activemodel"
+gem "actionview", path: "/home/user/w/k6-reviewed/actionview"
+gem "actionpack", path: "/home/user/w/k6-reviewed/actionpack"

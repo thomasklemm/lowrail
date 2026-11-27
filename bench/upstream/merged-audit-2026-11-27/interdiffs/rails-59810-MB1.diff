@@ -1,0 +1,17 @@
+# rails/rails#59810 (MB1): changed lines of reviewed ee000f1671 (left) vs merged head 60147d2f28 (right), each against its own base; empty = identical
+1c1,11
+< a/activerecord/lib/active_record/relation/merger.rb +        return relation if values.empty? && !other.null_relation? &&
+---
+> a/activerecord/lib/active_record/relation/merger.rb +        return relation if other_contributes_nothing? && where_and_having_clauses_empty?
+> a/activerecord/lib/active_record/relation/merger.rb +
+> a/activerecord/lib/active_record/relation/merger.rb +        # `Post.none.only(:order)` removes the WHERE clause from `Post.none`,
+> a/activerecord/lib/active_record/relation/merger.rb +        # but the merge must still make the receiver return no records.
+> a/activerecord/lib/active_record/relation/merger.rb +        def other_contributes_nothing?
+> a/activerecord/lib/active_record/relation/merger.rb +          values.empty? && !other.null_relation?
+> a/activerecord/lib/active_record/relation/merger.rb +        end
+> a/activerecord/lib/active_record/relation/merger.rb +
+> a/activerecord/lib/active_record/relation/merger.rb +        # Merging an empty WHERE or HAVING clause into a nonempty one can
+> a/activerecord/lib/active_record/relation/merger.rb +        # remove duplicate predicates from the receiver.
+> a/activerecord/lib/active_record/relation/merger.rb +        def where_and_having_clauses_empty?
+2a13
+> a/activerecord/lib/active_record/relation/merger.rb +        end
