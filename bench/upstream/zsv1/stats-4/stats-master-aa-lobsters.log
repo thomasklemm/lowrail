@@ -1,0 +1,5 @@
+Command: bundle check 2> /dev/null || bundle install
+The Gemfile's dependencies are satisfied
+/home/user/w/gems/gems/actionview-8.1.4.1/lib/action_view/render_parser.rb:30: warning: prism used to be loaded from the standard library, but is not part of the default gems since Ruby 4.1.0.
+You can add prism to your Gemfile or gemspec to fix this error.
+Also please contact the author of actionview-8.1.4.1 to request adding prism into its gemspec.
