@@ -1,0 +1,45 @@
+commit 424441d98683697154e5a3b85de8fc86fefec508
+Author: Thomas Klemm <github@tklemm.eu>
+Date:   Fri Nov 27 07:28:31 2026 +0000
+
+    Don't freeze serialized column defaults
+    
+    Since a model's default attributes are frozen when every one is
+    freezable, freezing casts each default once and every new record
+    deep-dups the cast value. For a serialized attribute the coder decides
+    that value, and it may not round-trip the column default: a coder that
+    loads a NOT NULL jsonb default '{}' as [] makes the attribute of a new
+    record read as changed before anything touched it, so it is saved, and
+    since that coder also loads nil as [], the serialized type writes [] as
+    NULL.
+    
+    Types now say whether their defaults can be frozen. Serialized types
+    can't, even with a NULL default, since the coder may load NULL as a
+    value that reads as changed; an encrypted type asks the type it
+    encrypts, and decorators such as normalized and time zone aware types
+    are delegators, so they answer for the type they wrap. A model with a
+    serialized attribute gets writable defaults again, so its defaults are
+    not cast at schema load and each record casts its own.
+
+diff --git a/activemodel/lib/active_model/attribute.rb b/activemodel/lib/active_model/attribute.rb
+index 96923c619b..970aff331a 100644
+--- a/activemodel/lib/active_model/attribute.rb
++++ b/activemodel/lib/active_model/attribute.rb
+@@ -40,7 +40,7 @@ def initialize(name, value_before_type_cast, type, original_attribute = nil, val
+     end
+ 
+     def freezable?
+-      true
++      type.freezable?
+     end
+ 
+     def freeze
+
+commit 6f81bf3f080da8a8893eafaa0e6216b2776ebf46
+Merge: 2c211fbf50 af84ab1445
+Author: Rafael Mendonça França <rafael@rubyonrails.org>
+Date:   Thu Nov 26 16:53:07 2026 -0500
+
+    Merge pull request #59800 from thomasklemm/thomasklemm/lazy-indexed-keys
+    
+    Avoid rebuilding attribute names in `LazyIndexedAttributeSet#keys`

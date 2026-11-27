@@ -1,0 +1,97 @@
+commit 41af869c787a33db4cb46149746cf3cabeb896f7
+Author:     Thomas Klemm <github@tklemm.eu>
+AuthorDate: Fri Nov 27 10:58:42 2026 +0000
+Commit:     Thomas Klemm <github@tklemm.eu>
+CommitDate: Fri Nov 27 12:53:19 2026 +0000
+
+    Build attribute Hashes without copying the lazy row
+    
+    LazyIndexedAttributeSet#attributes copies the set's attributes into a new
+    IndexedRow::Mutable on every call. AttributeSet#values_for_database and
+    #values_before_type_cast, which back attributes_for_database (used by
+    Marshal and the MessagePack coder) and attributes_before_type_cast, only
+    turn that row into a Hash.
+    
+    The two methods now materialize the attributes, then read them by name in
+    the order of the set's indexes, as IndexedRow#transform_values does. They
+    build the same attributes and call the same method on each, so the
+    Hashes and the record's state afterwards are unchanged. Both still read
+    from a copy of the set's Array, as they read the row before: serializing
+    a value or evaluating a callable default can run application code that
+    assigns another attribute, and the Hash keeps the attributes the record
+    had when it was called.
+    
+    Reading values from the row instead, as #to_hash does, would also skip
+    materialize, but wouldn't be the same: Attribute#value_for_database keeps
+    the value it returns, so an encrypted attribute dumps the same ciphertext
+    each time, and accessed_fields would leave out attributes read as nil.
+
+diff --git a/activemodel/lib/active_model/attribute_set.rb b/activemodel/lib/active_model/attribute_set.rb
+index 441e74635a..69b7716d13 100644
+--- a/activemodel/lib/active_model/attribute_set.rb
++++ b/activemodel/lib/active_model/attribute_set.rb
+@@ -373,6 +373,32 @@ def to_hash
+     end
+     alias :to_h :to_hash
+ 
++    #: () -> Hash[String, untyped]
++    def values_before_type_cast
++      materialize
++      attrs = @attributes&.dup
++      hash = {}
++      indexes.each_key do |name|
++        if attribute = attrs&.[](index_for_name(name))
++          hash[name] = attribute.value_before_type_cast
++        end
++      end
++      hash
++    end
++
++    #: () -> Hash[String, untyped]
++    def values_for_database
++      materialize
++      attrs = @attributes&.dup
++      hash = {}
++      indexes.each_key do |name|
++        if attribute = attrs&.[](index_for_name(name))
++          hash[name] = attribute.value_for_database
++        end
++      end
++      hash
++    end
++
+     #: (String) ?{ (String) -> untyped } -> untyped
+     def fetch_value(name, &block)
+       index = index_for_name(name)
+diff --git a/activerecord/test/cases/attribute_methods_test.rb b/activerecord/test/cases/attribute_methods_test.rb
+index 17f9de83d3..5bb9ce2669 100644
+--- a/activerecord/test/cases/attribute_methods_test.rb
++++ b/activerecord/test/cases/attribute_methods_test.rb
+@@ -388,6 +388,27 @@ def setup
+     assert_equal Topic.column_names, Topic.instantiate(topic.attributes_for_database).attributes.keys
+   end
+ 
++  test "attributes_for_database serializes the attributes the record had when it was called" do
++    topic = Topic.new(title: "title", author_name: "David")
++    title = Object.new
++    title.define_singleton_method(:to_s) { topic.author_name = "Mary"; "title" }
++    topic.title = title
++
++    assert_equal "David", topic.attributes_for_database["author_name"]
++    assert_equal "Mary", topic.author_name
++  end
++
++  test "attributes_before_type_cast returns the attributes the record had when it was called" do
++    topic = nil
++    klass = Class.new(Topic) do
++      attribute :title, default: -> { topic.author_name = "Mary"; "title" }
++    end
++    topic = klass.new(author_name: "David")
++
++    assert_equal "David", topic.attributes_before_type_cast["author_name"]
++    assert_equal "Mary", topic.author_name
++  end
++
+   test "read attributes after type cast on a date" do
+     tz = "Pacific Time (US & Canada)"
+ 

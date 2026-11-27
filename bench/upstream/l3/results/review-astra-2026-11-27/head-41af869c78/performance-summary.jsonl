@@ -1,0 +1,12 @@
+{"group": "body-ips", "operation": "Marshal.dump", "runs": {"base": [34443.0], "head": [37050.0], "base2": [33544.0]}, "head_percent": 7.57, "aa_percent": -2.61}
+{"group": "body-ips", "operation": "attributes_for_database", "runs": {"base": [82316.0], "head": [143272.0], "base2": [71647.0]}, "head_percent": 74.05, "aa_percent": -12.96}
+{"group": "6", "operation": "Marshal.dump", "runs": {"base": [120090.0], "head": [164514.0], "base2": [136927.0]}, "head_percent": 36.99, "aa_percent": 14.02}
+{"group": "6", "operation": "attributes_for_database", "runs": {"base": [330594.0], "head": [679146.0], "base2": [374856.0]}, "head_percent": 105.43, "aa_percent": 13.39}
+{"group": "6", "operation": "attributes_before_type_cast", "runs": {"base": [321632.0], "head": [863204.0], "base2": [391745.0]}, "head_percent": 168.38, "aa_percent": 21.8}
+{"group": "30", "operation": "Marshal.dump", "runs": {"base": [36733.0], "head": [49456.0], "base2": [33237.0]}, "head_percent": 34.64, "aa_percent": -9.52}
+{"group": "30", "operation": "attributes_for_database", "runs": {"base": [75090.0], "head": [144230.0], "base2": [78386.0]}, "head_percent": 92.08, "aa_percent": 4.39}
+{"group": "30", "operation": "attributes_before_type_cast", "runs": {"base": [99218.0], "head": [197498.0], "base2": [96524.0]}, "head_percent": 99.05, "aa_percent": -2.72}
+{"group": "100", "operation": "Marshal.dump", "runs": {"base": [10751.0], "head": [17059.0], "base2": [13144.0]}, "head_percent": 58.67, "aa_percent": 22.26}
+{"group": "100", "operation": "attributes_for_database", "runs": {"base": [20648.0], "head": [47225.0], "base2": [26320.0]}, "head_percent": 128.71, "aa_percent": 27.47}
+{"group": "100", "operation": "attributes_before_type_cast", "runs": {"base": [22124.0], "head": [66246.0], "base2": [29808.0]}, "head_percent": 199.43, "aa_percent": 34.73}
+{"group": "large", "operation": "attributes_for_database", "runs": {"base": [5.474, 6.675, 7.278], "head": [6.913, 7.355, 6.713], "base2": [7.413, 6.574, 6.898]}, "head_percent": 1.06, "aa_percent": 1.85}
