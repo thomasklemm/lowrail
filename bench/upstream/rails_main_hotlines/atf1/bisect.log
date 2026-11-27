@@ -1,0 +1,55 @@
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 82 assertions, 0 failures, 0 errors, 0 skips
+Bisecting: 182 revisions left to test after this (roughly 8 steps)
+[ad04193d6778f8b88311133e3a21846353da41fc] Merge pull request #59713 from rails/revert-59584-thomasklemm/json-escape-coder-only
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 82 assertions, 0 failures, 0 errors, 0 skips
+Bisecting: 91 revisions left to test after this (roughly 7 steps)
+[b35796ab1d867a997ab27d71c2658d6e92ccd60b] Merge pull request #59924 from 55728/fix-proxy-logger-ignore-incompatible-encoding
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 82 assertions, 0 failures, 0 errors, 0 skips
+Bisecting: 45 revisions left to test after this (roughly 6 steps)
+[2f573093f34147349fe8a1d0fa300ede77e8b7be] Merge pull request #59988 from yahonda/change-check-constraint-enforced
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 74 assertions, 6 failures, 0 errors, 0 skips
+Bisecting: 22 revisions left to test after this (roughly 5 steps)
+[58491fc6400cd0261137a598c6d58d5b0827d7e0] Merge pull request #59128 from bastin27/test-length-validator-combined-options
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 82 assertions, 0 failures, 0 errors, 0 skips
+Bisecting: 11 revisions left to test after this (roughly 4 steps)
+[59388990b10e9d0262b03663d911abf6e9b0ad89] Merge pull request #59965 from bruno-costanzo/redis-cache-store-rescue-command-errors
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 74 assertions, 6 failures, 0 errors, 0 skips
+Bisecting: 5 revisions left to test after this (roughly 3 steps)
+[9e8dbdee15380cab11a11a3b71920f7dc8fa793d] Merge pull request #58677 from navidemad/param-error-rack-bad-request
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 74 assertions, 6 failures, 0 errors, 0 skips
+Bisecting: 2 revisions left to test after this (roughly 1 step)
+[cf0325a832a1594f01d866da1e4ad23d962d886b] Merge pull request #59918 from yahonda/check-constraint-lookup-by-name
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 82 assertions, 0 failures, 0 errors, 0 skips
+Bisecting: 0 revisions left to test after this (roughly 1 step)
+[f59ea4a095b76606a1824d732c9cf8f2397cffe4] Document redirect settings for metal controllers (#59977)
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 74 assertions, 6 failures, 0 errors, 0 skips
+Bisecting: 0 revisions left to test after this (roughly 0 steps)
+[818edfd76a405b29f4695e051c07ea28a5476a4e] Merge pull request #58173 from lylo/action-text-batch-attachable-resolution
+running '/home/user/workspace/repo/.amp/in/orb-backup/bisect-cf.sh' 'HEAD'
+HEAD 19 runs, 74 assertions, 6 failures, 0 errors, 0 skips
+818edfd76a405b29f4695e051c07ea28a5476a4e is the first 'bad' commit
+commit 818edfd76a405b29f4695e051c07ea28a5476a4e
+Merge: cf0325a832 f266cba5f1
+Author: Mike Dalessio <mike.dalessio@gmail.com>
+Date:   Wed Nov 25 07:45:12 2026 -0500
+
+    Merge pull request #58173 from lylo/action-text-batch-attachable-resolution
+    
+    Locate Action Text attachables in bulk
+
+ actiontext/CHANGELOG.md                          | 11 ++++
+ actiontext/lib/action_text/attachable.rb         | 37 ++++++++++++
+ actiontext/lib/action_text/attachment_gallery.rb |  9 +--
+ actiontext/lib/action_text/content.rb            | 27 +++++++--
+ actiontext/test/unit/content_test.rb             | 71 ++++++++++++++++++++++++
+ 5 files changed, 147 insertions(+), 8 deletions(-)
+bisect found first 'bad' commit
