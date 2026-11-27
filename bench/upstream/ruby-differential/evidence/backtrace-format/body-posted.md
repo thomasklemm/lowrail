@@ -13,4 +13,19 @@ end
 
 This appends both strings by their length instead, choosing the encoding the same way `ruby__sfvextra` does, so it still doesn't depend on NUL termination. The output is unchanged for other paths and names.
 
-This makes backtraces faster again. Under Callgrind, one `caller` on a 150-frame stack takes 1.09M instructions on master and 0.85M with this change, and `Exception#backtrace` 1.10M and 0.86M; repeated runs agree within 0.03%. Ruby 4.0.9 takes 0.86M and 0.87M, so this brings backtraces back to 4.0's cost. I'll try to add a `make benchmark` comparison; on the VM used here, base against itself varied too much to show one.
+This makes backtraces faster again. Under Callgrind, one `caller` on a 150-frame stack takes 1.09M instructions on master and 0.85M with this change, and `Exception#backtrace` 1.10M and 0.86M; repeated runs agree within 0.03%.
+
+`make benchmark ITEM=vm_backtrace_to_s` with the included benchmark, one representative run:
+
+```
+compare-ruby: ruby 4.1.0dev (2026-11-27T13:11:57Z HEAD 274cfe719a) +PRISM [x86_64-linux]
+built-ruby: ruby 4.1.0dev (2026-11-27T17:45:37Z HEAD 5fc1871eec) +PRISM [x86_64-linux]
+# Iteration per second (i/s)
+
+|                   |compare-ruby|built-ruby|
+|:------------------|-----------:|---------:|
+|vm_backtrace_to_s  |     44.957k|   54.089k|
+|                   |           -|     1.20x|
+```
+
+Across 10 runs this change measured 1.18x–1.23x, while base against itself measured 1.00x–1.06x. Ruby 4.0.9 runs this benchmark at about the same speed as this change.

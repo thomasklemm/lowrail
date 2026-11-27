@@ -1,0 +1,3 @@
+objects caller	118.999
+objects Exception#backtrace	123.0
+objects locations.each(&:to_s)	106.0

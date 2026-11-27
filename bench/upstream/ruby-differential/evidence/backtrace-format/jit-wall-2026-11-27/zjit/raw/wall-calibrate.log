@@ -1,0 +1,3 @@
+calibrate caller	3.439060466666669e-05
+calibrate Exception#backtrace	3.547852633333334e-05
+calibrate locations.each(&:to_s)	3.1074046e-05
