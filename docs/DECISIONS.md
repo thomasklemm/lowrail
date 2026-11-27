@@ -389,14 +389,14 @@ pass on the current head. A candidate made moot upstream moves to `superseded` o
   Keep each PR small.
   Open PRs that fix older, already released bugs stay open: they aren't closed to free a slot
   (Thomas, 2026-11-25, keeping #59617 and #59611 open).
-* **rails/rails opens as draft** (Thomas, 2026-11-05), preferably in small batches grouped by theme and likely
-  reviewer. Drafts don't count toward GitHub's limit of 15 non-draft PRs.
-  **Since 2026-11-26 drafts count too:** rafaelfranca enabled draft counting on rails/rails ("it should not allow
-  any PR past 15 to be open. I just enabled that."), so 15 open PRs in total, drafts included; `script/pr-queue`
-  uses open: 15. He also asked us not to open PRs that aren't ready, because drafts notify him.
+* **rails/rails opens ready, not as draft** (Thomas, 2026-11-27, after rafaelfranca asked on 2026-11-26 not to open
+  PRs that aren't ready, since drafts notify him, and enabled draft counting under the 15 cap). A Rails PR opens only
+  when every review pass approves the exact head and there is room under 15 open, and it opens ready for review
+  (`script/pr-queue open ID` without `--draft`). The waiting line stays local in the queue, never as GitHub drafts.
+  (Replaces the 2026-11-05 rule that opened Rails PRs as drafts.)
 * **Every upstream PR opens as a draft, and only Thomas marks it ready** (Thomas, 2026-11-05 night; replaces the
   coordinator marking Rails drafts ready). Agents may open reviewed items as drafts in any repo with room, with every
-  pass on the exact head; neither the coordinator nor W1 runs `script/pr-queue ready`.
+  pass on the exact head; rails/rails is the exception above; neither the coordinator nor W1 runs `script/pr-queue ready`.
 * **ruby/ruby:** at most 10 of our PRs open, counting all of them (VM, ZJIT, YJIT, backports) (Thomas, 2026-11-04).
   We have to get better at ruby/ruby PRs first, so none open for now, not even under the cap. The ones
   already open stay open unless there is a reason to close one and report it as an issue instead; such a close is
