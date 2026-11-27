@@ -2,7 +2,8 @@
 
 A deeper look after dblock's four leads ([round 1](../README.md)): which hashie classes the popular dependents use,
 where a realistic API workload spends objects and time, and which exact changes follow. Three candidates were built:
-HM5 and HM4 went to review, HM3 is held after review (not exact); the rest are held with their numbers.
+HM4 is in review; HM3 and HM5 are held after review (not exact in cases their own differentials never recorded);
+the rest are held with their numbers.
 
 Setup: hashie master `9e313f3`. Rubies 4.0.10 `a704b7cd95` and master `0d399335b7`, both built with YJIT and ZJIT;
 suites also on 3.0.7 and 3.4.7. Duel ran on fork PRs (thomasklemm/hashie #27–#29, #32) against `perf-base-zjit`
@@ -75,7 +76,7 @@ built: it is a fix in another repository; lead for the coordinator.
 |---|---|---|---|---|
 | 1 | HM4: skip the conflict check when a subclass disabled warnings | omniauth, elasticsearch-model, zendesk_api now; restforce and chef-zero once they allow hashie 6 | quiet `Mash.new` CPU 0.46 (YJIT) and 0.66 (ZJIT) in Duel; `[]=`, `dup`, `merge` alike locally; plain Mash 1.01 | rebuilt as two lines in the shared check on `277e88e`, in review; see [HM4](#hm4-skip-the-conflict-check-when-warnings-are-disabled) |
 | 2 | HM3: `method_missing` without the arguments Array | every Mash, Ruby ≥ 4.0 | 1 object per method-style read; reads CPU 0.91–0.95 in Duel; setters 1.01–1.02 | **held after review**: a forwarded keyword Hash is stored with its keyword flag ([below](#hm3-method_missing-without-the-arguments-array)) |
-| 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.84 (YJIT) and 0.69 (ZJIT) in Duel | rebuilt on `277e88e`, in review |
+| 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.84 (YJIT) and 0.69 (ZJIT) in Duel | **held after review, needs Thomas**: a callback that changes the receiver during `to_hash` gets a different result ([below](#hm5-to_hash-reads-each-value-once)) |
 | 4 | `Hash#dup` before `self.class.new(val)` in `convert_value` | every nested hash in `Mash.new` | 101 of 774 objects; time not measured | held: a subclass `initialize` would receive the caller's Hash instead of a copy |
 | 5 | Literal suffixes instead of `end_with?(*ALLOWED_SUFFIXES)` | every key written, every suffixed call | helper alone 113 → 61 ns under YJIT, 134 → 121 ns interpreted (`out/suffix-micro.txt`) | held: the win is how JITs compile a splat call, and it duplicates the constant; ZJIT lead |
 | 6 | `initialize` → `deep_update`'s splat Array | every Mash | 131 of 774 objects | held: `deep_update` is public and subclasses call or override it; no exact form found |
@@ -154,6 +155,21 @@ a stored key is read, a setter assigns the value, and the other suffixes act as 
 `method_missing` (limits set to 0 to print them): ABC 12.25 → 11.36, cyclomatic 6 → 6, perceived 4 → 4. L0.
 
 ## HM5: `to_hash` reads each value once
+
+**Held after review, needs Thomas (2026-11-27).** Astra and thermos-sol both returned "changes" on `6b6f67b` (their
+sections at the end). Between master's two reads of a value, user code can run: the value's `is_a?`, and, for an
+Array, the output key's `hash`. If that code replaces or deletes the entry, master converts what the second read
+finds and the branch converts what it read. `probes/to_hash_reentrant.rb` (`out/to-hash-reentrant.txt`) repeats two
+of their repros on 4.0.10 and master: a value whose `is_a?` replaces its entry gives `{x: 29}` on master and
+`{x: {old: 13}}` on the branch; a key whose `hash` clears the receiver raises NoMethodError on master and returns
+`[[13]]` on the branch. A fiber or thread that replaces the entry while `to_hash` is suspended shows the same. No
+`[]` override is needed, so the body's one stated difference doesn't cover it, and the differential below never
+changed the receiver during the conversion. No dependent was found doing this; ordinary inputs agree in the
+reviewers' 33,000 and 35,280 independent rows per side. The only exact fix restores the two reads, and with them the
+cost. It is checklist item 6 (mutation during conversion), so it opens only if Thomas accepts reading each value
+once as outside the contract, and then the body says that a value changed by a callback during `to_hash` is
+converted as it was read. Both also asked to narrow the reach: IndifferentAccess, Dash and Trash have their own
+`to_hash` and don't gain (the item's impact now says so). Nothing was opened or posted.
 
 Branch `thomasklemm/to-hash-read-once`, head `e10dce0` on `9e313f3`: `value = self[k]` once in
 `Hashie::Hash#to_hash` instead of `self[k]` in the `is_a?(Array)` test and again for the conversion. In a Mash

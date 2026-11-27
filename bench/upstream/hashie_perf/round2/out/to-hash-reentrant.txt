@@ -1,0 +1,10 @@
+== master 277e88e
+ruby 4.0.10: value whose is_a? replaces its entry: {x: 29}
+ruby 4.0.10: key whose third hash call clears the receiver: NoMethodError: undefined method 'each' for nil
+ruby master: value whose is_a? replaces its entry: {x: 29}
+ruby master: key whose third hash call clears the receiver: NoMethodError: undefined method 'each' for nil
+== HM5 6b6f67b
+ruby 4.0.10: value whose is_a? replaces its entry: {x: {old: 13}}
+ruby 4.0.10: key whose third hash call clears the receiver: [[13]]
+ruby master: value whose is_a? replaces its entry: {x: {old: 13}}
+ruby master: key whose third hash call clears the receiver: [[13]]
