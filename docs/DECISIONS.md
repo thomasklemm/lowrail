@@ -363,7 +363,9 @@ which refuses unless the gates pass on the current head. A candidate made moot u
   body numbers come from `script/upstream-bench` ([body-numbers](upstream/body-numbers.md)). App pages find sites but
   can't price them (A/A up to ±7%). ZJIT speed claims come from ruby-bench with A/A.
 * **Every Rails candidate also reports its micro on master × ZJIT** (pinned build, A/A), or says its path doesn't run
-  on 4.1; in the record, not the body. A ZJIT loss blocks it until explained. Rails changes made only for ZJIT need a
+  on 4.1; in the record, not the body. A ZJIT or YJIT wall-time loss blocks it only when `script/upstream-bench --wall` (≥ 30 rounds) claims
+  it: an A/A interval containing 0 and a change interval excluding 0. A loss inside that cohort's intervals is noise, not
+  an unexplained cost; a claimed loss blocks until explained or accepted (2026-11-27, wall_noise study). Rails changes made only for ZJIT need a
   win of their own on the pin.
 
 ### Benchmark tables in the project's own format (Thomas, 2026-11-14)
