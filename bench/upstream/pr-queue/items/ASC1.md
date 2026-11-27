@@ -5,7 +5,7 @@ kind: perf
 area: Active Record, associations, connection lookup
 reviewer:
 branch: thomasklemm/association-load-one-connection-lookup
-head: "2b46f50bda446b9d84c3c86ac2f90bec4b7df6db"
+head: "703f89d6f6cc002b7f2169c95887d54b07482fbc"
 base: main
 built_on: "2e299253f9"
 introduced_by:
@@ -19,7 +19,7 @@ rank: 1
 risky: true
 state: built
 pr:
-note: "2026-11-27 (Rails 8.2 leads round, docs/upstream/rails-82-leads-2026-11-27.md): built and measured; risky because connection handling (critical per DECISIONS), so Astra runs adversarially after thermos-sol. Differential probe (bench/upstream/census13r/probe.rb, data/probe): identical records and SQL with prepared statements on and off, unleased and leased, async, through, polymorphic, strict_loading; only difference one checkout fewer per unleased load. Tests: associations/**, associations_test, reflection, statement_cache, finder, strict_loading on SQLite: 2336 runs, 8041 assertions, 0 failures. Wall time (benchmark-ips YJIT, --wall YJIT and master ZJIT) runs on an a1.xxlarge orb. Ownership hits: #59212 (bruno-costanzo, skip building the scope on the statement-cache path) changes find_target above these lines, a different concern; git merge-tree with its head is clean. #55002 and #58804 are strict-loading fixes elsewhere in the file. No open PR changes association_scope_cache."
+note: "2026-11-27 (thermos-sol finding on 2b46f50bda): association_route_test.rb called association_scope_cache with two arguments; fixed by wrapping both cache checks in with_connection and passing its connection (703f89d6f6, lib unchanged, so the body runs on 23fe1f4b6b still measure this head). The earlier suite run here had loaded main's activerecord through main's Gemfile and is void; rerun with the branch Gemfile: activerecord SQLite 10,485 runs, 37,491 assertions, 0 failures, 4 errors, 52 skips; the 4 errors are sqlite_rake_test needing the sqlite3 CLI, which fails the same on main. Earlier: 2026-11-27 (Rails 8.2 leads round, docs/upstream/rails-82-leads-2026-11-27.md): built and measured; risky because connection handling (critical per DECISIONS), so Astra runs adversarially after thermos-sol. Differential probe (bench/upstream/census13r/probe.rb, data/probe): identical records and SQL with prepared statements on and off, unleased and leased, async, through, polymorphic, strict_loading; only difference one checkout fewer per unleased load. Wall time (benchmark-ips YJIT, --wall YJIT and master ZJIT) runs on an a1.xxlarge orb. Ownership hits: #59212 (bruno-costanzo, skip building the scope on the statement-cache path) changes find_target above these lines, a different concern; git merge-tree with its head is clean. #55002 and #58804 are strict-loading fixes elsewhere in the file. No open PR changes association_scope_cache."
 ownership: {date: 2026-11-27, checked: ["open PRs naming find_target, association_scope_cache that change activerecord/lib/active_record/associations/association.rb, activerecord/lib/active_record/reflection.rb"], hits: ["names find_target, changes its file (6 open PRs name it): rails/rails#59212 (PR, open, bruno-costanzo): Don't build the association scope when the reader uses the statement cache","names find_target, changes its file (6 open PRs name it): rails/rails#55002 (PR, open, dewski): Enforce strict loading violations for associations where joins are disabled","names find_target, changes its file (6 open PRs name it): rails/rails#58804 (PR, open, drsharp): Fix has_one_attached/has_many_attached strict_loading raising on attach"]}
 passes: []
 ---
