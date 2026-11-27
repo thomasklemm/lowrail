@@ -42,7 +42,18 @@ note: >-
   a String); each fails on its mutant (CGI.unescape(str, enc); String === str). Suite 94 tests green on 4.0.10 and
   master; fork CI run 46058985448 green on 2.5-4.0, head, JRuby, TruffleRuby, ubuntu and macOS.
   Timing (benchmark-ips, wall cohort) delegated to an a1.xxlarge orb (T-01a21e8f-2651-73ed-9ab5-9406bb545fe2); the
-  body's ips table comes from it. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
+  body's ips table comes from it.
+  2026-11-27 (after Astra changes on a3b201f05b): every demonstrated difference needs Ruby code hooked onto the
+  input or onto CGI/URI: a singleton or private `encoding`, `b`, `instance_of?` or `tr` on the input String
+  (`tr` only in the pure-Ruby fallback), a subclass that spoofs `instance_of?(String)`, a BasicObject with
+  `to_str` and `b`, a prepend on `CGI.unescape` or on the private `URI._decode_uri_component`. For ordinary values,
+  47,653 cases per backend showed no difference. Decision (coordinator, DECISIONS Guards in the target repository's idiom):
+  accepted as boundaries outside the contract, no new guard. Request bytes cannot reach any of them; the
+  method documents decoding a String; cgi/escape's own C functions and rack#2557 (approved by its maintainer) skip
+  the same input methods; guarding against hooked `encoding` or `instance_of?` would take more calls on the
+  input, not fewer. Not named in the body, since users can't hit them through any caller. Body: Rack before Rails by
+  reach (1.40B vs 823M downloads), with Rack::QueryParser's own call (query_parser.rb:268) linked. Astra confirm
+  requested on the decision and body; code head unchanged. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
 passes:
   - reviewer: astra
@@ -70,7 +81,7 @@ passes:
 
 # Decode www-form components with cgi/escape
 
-`URI.decode_www_form_component` copies the string with `b` and then runs `gsub` with a hash table, so every `+` and `%XX` builds a MatchData and looks up the hash. Rails decodes every query string and form body key and value with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)), and Rack decodes query strings and cookies with it ([Rack 3.2.9](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59)).
+`URI.decode_www_form_component` copies the string with `b` and then runs `gsub` with a hash table, so every `+` and `%XX` builds a MatchData and looks up the hash. Rack decodes query strings and cookies with it ([Rack::QueryParser](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/query_parser.rb#L268) and [Rack::Utils.unescape](https://github.com/rack/rack/blob/52941a02842fd956e3c5532147116354a0240149/lib/rack/utils.rb#L59) in Rack 3.2.9), and Rails decodes every query string and form body key and value with it ([ActionDispatch::QueryParser, Rails 8.1.4.1](https://github.com/rails/rails/blob/3f290b759c8e2ffe7c257951b1255740751355e4/actionpack/lib/action_dispatch/http/query_parser.rb#L46-L47)).
 
 This uses `CGI.unescape` from cgi/escape, which decodes `+` and `%XX` the same way in one pass in C, for plain ASCII-compatible strings. The check for an invalid `%` still runs first, and the result is still forced to the requested encoding, also when its bytes are invalid there. String subclasses and other objects keep the current path.
 
