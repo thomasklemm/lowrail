@@ -12,7 +12,7 @@ built_on: "48cda77031"
 depends_on: []
 stacked_on:
 alternative_of:
-evidence: [bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz]
+evidence: [bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz]
 impact: "Every Rails request with a query string or urlencoded form body decodes each key and value through URI.decode_www_form_component (ActionDispatch::QueryParser.each_pair, Rails 8.0+ and main), and released Rack (3.2.9) decodes query and cookie components with it. Per call -9% to -66% instructions, 4-8 objects down to 1-2 (4.0.10 interpreter; YJIT -21% to -73%). Whole requests as a method overlay on Rails main 2e299253f9: interpreter -3.1% blog PATCH, -1.2% blog POST comment, -0.8% pingcrm PUT, -0.35% blog GET article and codetriage GET repo; YJIT 4.0.10 -5.7% / -1.9% / -1.0%; ZJIT master -5.2% / -0.6% (JIT-flat). Path runs on Ruby master and Rails main."
 rank: 2
 risky: true
@@ -104,6 +104,28 @@ passes:
       no additional defensive machinery is justified by this confirm. No new runtime or performance runs.
       Reviewed body SHA256 including title and boundary whitespace:
       eb6acef7c20379247214908e6b6c861512b30a731cc6edadee39ca460fab680c.
+  - reviewer: astra
+    head: "cecaed123f04e1704bccf4b1b3272c0b12e759c7"
+    orb: T-01a21e96-8207-76d7-8f64-404eb741d298
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      Code rerun passes; only the replacement body and measurements are pending. This verdict does not request
+      a code fix or another guard. The item at Lowrail cad5d6b3 still describes the superseded implementation;
+      final text/numbers need confirmation before this pass can approve the complete candidate.
+      Reran all original hook/value/concurrency probes on Ruby 4.0.9, native CGI and its shipped Ruby fallback.
+      All input-hook cases now match base, including encoding mutation, private methods, extended/prepended b,
+      frozen b results, subclass type spoofing and BasicObject; the retained str.b makes the base RDoc accurate.
+      Three original differences remain, not two: CGI prepend changes head's result, frozen singleton CGI result
+      raises FrozenError on head, and private URI _decode_uri_component prepend is bypassed on head.
+      These are the explicitly assessed CGI/private-URI override boundaries, not request-bytes-only failures;
+      no added guard is warranted. Public URI wrapping, threads, Ractors, fibers and reload pass.
+      Each backend has zero differences in 47,653 independent value cases and in builder diff.rb with
+      SINGLETON_B=1 (300,000 random plus 142 fixed). URI suite on each is 94 tests, 3,061 assertions, zero
+      failures/errors, including the new GB18030 assertion. Actual TruffleRuby 40 was not run here; MRI fallback
+      success does not reproduce that runtime-specific failure. No fresh benchmarks/master/ZJIT runs.
+      Full results in bench/upstream/outside_leads/ur1/astra-2026-11-27.md; raw reruns and sources in
+      bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz.
 ---
 
 # Decode www-form components with cgi/escape
