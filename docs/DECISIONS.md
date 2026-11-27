@@ -497,3 +497,6 @@ measurable ruby-bench effect or a correctness repro.
 No code golf: as readable and idiomatic as a maintainer would write it. Measure only to rule out a clear slowdown on a
 common path, never to choose between correct shapes; no numbers in the body. The L0–L3 performance bars don't apply;
 the cold read and shape checklist do. Correctness findings along the way get their own PRs.
+* **A fix that also closes a performance regression shows it with numbers** (Thomas, 2026-11-27, BT1): the body says
+  clearly that it is faster again, in the project's own format when a clean A/A allows it, otherwise one Callgrind line
+  with its A/A; the older release in one sentence. Wall-time numbers only with their full spread and A/A.
