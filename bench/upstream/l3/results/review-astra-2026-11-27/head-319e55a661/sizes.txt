@@ -1,0 +1,117 @@
+=== 6 base ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+width=6 large=false
+{"Marshal.dump":10.0001,"attributes_for_database":4.0,"attributes_before_type_cast":4.0}
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               Marshal.dump    14.609k i/100ms
+    attributes_for_database    40.245k i/100ms
+attributes_before_type_cast    43.055k i/100ms
+Calculating -------------------------------------
+               Marshal.dump    145.420k (± 4.8%) i/s    (6.88 μs/i) -    160.699k in   1.105070s
+    attributes_for_database    407.459k (± 2.4%) i/s    (2.45 μs/i) -    442.695k in   1.086478s
+attributes_before_type_cast    434.624k (± 1.4%) i/s    (2.30 μs/i) -    473.605k in   1.089688s
+=== 6 head ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+width=6 large=false
+{"Marshal.dump":8.0001,"attributes_for_database":2.0,"attributes_before_type_cast":2.0}
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               Marshal.dump    17.986k i/100ms
+    attributes_for_database    80.551k i/100ms
+attributes_before_type_cast    90.724k i/100ms
+Calculating -------------------------------------
+               Marshal.dump    177.541k (± 2.5%) i/s    (5.63 μs/i) -    179.860k in   1.013059s
+    attributes_for_database    804.250k (± 1.7%) i/s    (1.24 μs/i) -    805.510k in   1.001567s
+attributes_before_type_cast    884.041k (± 2.5%) i/s    (1.13 μs/i) -    907.240k in   1.026242s
+=== 6 base2 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+width=6 large=false
+{"Marshal.dump":10.0001,"attributes_for_database":4.0,"attributes_before_type_cast":4.0}
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               Marshal.dump    14.328k i/100ms
+    attributes_for_database    39.859k i/100ms
+attributes_before_type_cast    43.306k i/100ms
+Calculating -------------------------------------
+               Marshal.dump    142.328k (± 2.3%) i/s    (7.03 μs/i) -    143.280k in   1.006687s
+    attributes_for_database    404.471k (± 0.8%) i/s    (2.47 μs/i) -    438.449k in   1.084005s
+attributes_before_type_cast    421.158k (± 5.8%) i/s    (2.37 μs/i) -    433.060k in   1.028260s
+=== 30 base ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+width=30 large=false
+{"Marshal.dump":10.0001,"attributes_for_database":4.0,"attributes_before_type_cast":4.0}
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               Marshal.dump     4.056k i/100ms
+    attributes_for_database     9.131k i/100ms
+attributes_before_type_cast    10.885k i/100ms
+Calculating -------------------------------------
+               Marshal.dump     41.182k (± 6.9%) i/s   (24.28 μs/i) -     44.616k in   1.083375s
+    attributes_for_database     94.730k (± 3.2%) i/s   (10.56 μs/i) -    100.441k in   1.060292s
+attributes_before_type_cast    109.673k (± 3.2%) i/s    (9.12 μs/i) -    119.735k in   1.091749s
+=== 30 head ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+width=30 large=false
+{"Marshal.dump":8.0001,"attributes_for_database":2.0,"attributes_before_type_cast":2.0}
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               Marshal.dump     4.821k i/100ms
+    attributes_for_database    11.325k i/100ms
+attributes_before_type_cast    18.856k i/100ms
+Calculating -------------------------------------
+               Marshal.dump     50.192k (± 6.5%) i/s   (19.92 μs/i) -     53.031k in   1.056559s
+    attributes_for_database    150.208k (± 9.7%) i/s    (6.66 μs/i) -    158.550k in   1.055538s
+attributes_before_type_cast    199.003k (±10.6%) i/s    (5.03 μs/i) -    207.416k in   1.042274s
+=== 30 base2 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+width=30 large=false
+{"Marshal.dump":10.0001,"attributes_for_database":4.0,"attributes_before_type_cast":4.0}
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               Marshal.dump     3.852k i/100ms
+    attributes_for_database     7.027k i/100ms
+attributes_before_type_cast    10.868k i/100ms
+Calculating -------------------------------------
+               Marshal.dump     40.667k (± 6.3%) i/s   (24.59 μs/i) -     42.372k in   1.041927s
+    attributes_for_database     90.251k (± 3.3%) i/s   (11.08 μs/i) -     91.351k in   1.012188s
+attributes_before_type_cast    105.751k (± 4.4%) i/s    (9.46 μs/i) -    108.680k in   1.027699s
+=== 100 base ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+width=100 large=false
+{"Marshal.dump":10.0001,"attributes_for_database":4.0,"attributes_before_type_cast":4.0}
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               Marshal.dump     1.434k i/100ms
+    attributes_for_database     2.948k i/100ms
+attributes_before_type_cast     3.494k i/100ms
+Calculating -------------------------------------
+               Marshal.dump     13.931k (± 3.1%) i/s   (71.78 μs/i) -     14.340k in   1.029325s
+    attributes_for_database     28.795k (± 4.3%) i/s   (34.73 μs/i) -     29.480k in   1.023793s
+attributes_before_type_cast     33.833k (± 3.9%) i/s   (29.56 μs/i) -     34.940k in   1.032723s
+=== 100 head ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+width=100 large=false
+{"Marshal.dump":8.0001,"attributes_for_database":2.0,"attributes_before_type_cast":2.0}
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               Marshal.dump     1.752k i/100ms
+    attributes_for_database     5.185k i/100ms
+attributes_before_type_cast     6.953k i/100ms
+Calculating -------------------------------------
+               Marshal.dump     17.486k (± 3.4%) i/s   (57.19 μs/i) -     17.520k in   1.001937s
+    attributes_for_database     51.830k (± 2.0%) i/s   (19.29 μs/i) -     51.850k in   1.000393s
+attributes_before_type_cast     67.440k (± 6.2%) i/s   (14.83 μs/i) -     69.530k in   1.030995s
+=== 100 base2 ===
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+width=100 large=false
+{"Marshal.dump":10.0001,"attributes_for_database":4.0,"attributes_before_type_cast":4.0}
+ruby 4.0.9 (2026-10-23 revision 3e93b23afc) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+               Marshal.dump     1.429k i/100ms
+    attributes_for_database     2.950k i/100ms
+attributes_before_type_cast     3.428k i/100ms
+Calculating -------------------------------------
+               Marshal.dump     13.135k (±10.1%) i/s   (76.13 μs/i) -     14.290k in   1.087893s
+    attributes_for_database     28.711k (± 3.3%) i/s   (34.83 μs/i) -     29.500k in   1.027463s
+attributes_before_type_cast     34.427k (± 2.9%) i/s   (29.05 μs/i) -     37.708k in   1.095298s

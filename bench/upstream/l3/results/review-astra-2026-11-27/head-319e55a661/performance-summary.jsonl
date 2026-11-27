@@ -1,0 +1,12 @@
+{"group": "body-ips", "operation": "Marshal.dump", "runs": {"base": [36126.0], "head": [39861.0], "base2": [36279.0]}, "head_percent": 10.34, "aa_percent": 0.42}
+{"group": "body-ips", "operation": "attributes_for_database", "runs": {"base": [90535.0], "head": [130431.99999999999], "base2": [86993.0]}, "head_percent": 44.07, "aa_percent": -3.91}
+{"group": "6", "operation": "Marshal.dump", "runs": {"base": [145420.0], "head": [177541.0], "base2": [142328.0]}, "head_percent": 22.09, "aa_percent": -2.13}
+{"group": "6", "operation": "attributes_for_database", "runs": {"base": [407459.0], "head": [804250.0], "base2": [404471.0]}, "head_percent": 97.38, "aa_percent": -0.73}
+{"group": "6", "operation": "attributes_before_type_cast", "runs": {"base": [434624.0], "head": [884041.0], "base2": [421158.0]}, "head_percent": 103.4, "aa_percent": -3.1}
+{"group": "30", "operation": "Marshal.dump", "runs": {"base": [41182.0], "head": [50192.0], "base2": [40667.0]}, "head_percent": 21.88, "aa_percent": -1.25}
+{"group": "30", "operation": "attributes_for_database", "runs": {"base": [94730.0], "head": [150208.0], "base2": [90251.0]}, "head_percent": 58.56, "aa_percent": -4.73}
+{"group": "30", "operation": "attributes_before_type_cast", "runs": {"base": [109673.0], "head": [199003.0], "base2": [105751.0]}, "head_percent": 81.45, "aa_percent": -3.58}
+{"group": "100", "operation": "Marshal.dump", "runs": {"base": [13931.0], "head": [17486.0], "base2": [13135.0]}, "head_percent": 25.52, "aa_percent": -5.71}
+{"group": "100", "operation": "attributes_for_database", "runs": {"base": [28795.0], "head": [51830.0], "base2": [28711.0]}, "head_percent": 80.0, "aa_percent": -0.29}
+{"group": "100", "operation": "attributes_before_type_cast", "runs": {"base": [33833.0], "head": [67440.0], "base2": [34427.0]}, "head_percent": 99.33, "aa_percent": 1.76}
+{"group": "large", "operation": "attributes_for_database", "runs": {"base": [6.383, 6.474, 6.652], "head": [6.296, 5.944, 6.557], "base2": [6.98, 6.542, 6.519]}, "head_percent": -1.43, "aa_percent": 4.93}

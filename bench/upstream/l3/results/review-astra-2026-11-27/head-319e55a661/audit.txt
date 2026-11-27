@@ -1,0 +1,31 @@
+Body Ruby script matches l3_ips.rb byte for byte; 9 triples + id + timestamps = 30 columns
+Exact body output: main r5:            Marshal.dump     36.143k (± 6.7%) i/s   (27.67 μs/i) -    183.918k in   5.088614s
+Exact body output: main r6: attributes_for_database     92.570k (± 4.5%) i/s   (10.80 μs/i) -    466.760k in   5.042253s
+Exact body output: l3 r3:            Marshal.dump     43.776k (± 4.6%) i/s   (22.84 μs/i) -    220.904k in   5.046205s
+Exact body output: l3 r5: attributes_for_database    150.662k (± 9.0%) i/s    (6.64 μs/i) -    754.572k in   5.008384s
+Kept IPS rounds: main Marshal.dump 6 best 36.143
+Kept IPS rounds: main attributes_for_database 6 best 92.57
+Kept IPS rounds: l3 Marshal.dump 6 best 43.776
+Kept IPS rounds: l3 attributes_for_database 6 best 150.662
+Kept IPS rounds: main2 Marshal.dump 6 best 36.31
+Kept IPS rounds: main2 attributes_for_database 6 best 88.251
+Raw instructions verified: interp Marshal.dump 319622.12899999996 268058.392
+Raw instructions verified: interp attributes_for_database 161605.57 110738.786
+Raw instructions verified: interp attributes_before_type_cast 124088.814 74277.924
+Raw instructions verified: interp MessagePack dump 190789.078 139354.874
+Raw allocations verified: interp attributes_for_database 4 / 4 / 2
+Raw allocations verified: interp attributes_before_type_cast 4 / 4 / 2
+Raw instructions verified: yjit Marshal.dump 259697.99099999998 215644.614
+Raw instructions verified: yjit attributes_for_database 107005.98300000001 63173.672
+Raw instructions verified: yjit attributes_before_type_cast 95367.53899999999 52537.39
+Raw instructions verified: yjit MessagePack dump 130232.378 86190.996
+Raw allocations verified: yjit attributes_for_database 4 / 4 / 2
+Raw allocations verified: yjit attributes_before_type_cast 4 / 4 / 2
+Cache/default differential: 1540 cases identical
+Cases with callback reached during the first operation: 770
+Callback reached: default 200
+Callback reached: cast 180
+Callback reached: deserialize 150
+Callback reached: serialize 210
+Callback reached: changed_in_place? 30
+Negative control: no-snapshot 340 different cases

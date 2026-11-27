@@ -1,0 +1,8 @@
+1540 /home/user/workspace/repo/bench/upstream/l3/results/review-astra-2026-11-27/head-319e55a661/caches-head.jsonl
+718 /home/user/workspace/repo/bench/upstream/l3/results/review-astra-2026-11-27/head-319e55a661/extended-head.txt
+165 /home/user/workspace/repo/bench/upstream/l3/results/review-astra-2026-11-27/head-319e55a661/adversary-head.jsonl
+2 /home/user/workspace/repo/bench/upstream/l3/results/review-astra-2026-11-27/head-319e55a661/ciphertext-head.jsonl
+2 /home/user/workspace/repo/bench/upstream/l3/results/review-astra-2026-11-27/head-319e55a661/default-repro-head.txt
+5799 /home/user/workspace/repo/bench/upstream/l3/results/review-astra-2026-11-27/head-319e55a661/payload-head.txt
+9 /home/user/workspace/repo/bench/upstream/l3/results/review-astra-2026-11-27/head-319e55a661/legacy-head.jsonl
+All comparisons identical

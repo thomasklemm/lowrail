@@ -1,0 +1,22 @@
+259e41a8af Merge pull request #59876 from company-account-1/schema-cache-tolerate-undeserializable-dump
+eac00e1bc0 Merge pull request #60011 from 55728/fix-action-mailbox-receive-helpers-keyword-arguments
+be67fea42c Ignore a schema cache dump that can't be deserialized
+47b2586f56 Merge pull request #59916 from jonasporto/docs-skip-action-conditions
+5e2fb63f3b Merge pull request #60015 from 55728/fix-errors-messages-for-type-doc-examples
+ab9a254e3e Merge pull request #60014 from 55728/fix-collection-options-proc-value-method-with-proc-selected
+b80cda7c9b Merge pull request #60012 from 55728/fix-notes-invalid-byte-in-ruby-comment
+9bd40120eb Merge pull request #60003 from yahonda/fix-server-test-restart-mtime-race
+d9cc4d11b8 Merge pull request #60019 from rails/rafaelfranca/fallback-order
+f63b1f8933 Merge pull request #60006 from thomasklemm/thomasklemm/action-text-attachment-from-node-fallback
+b79cd26169 Merge pull request #59671 from thomasklemm/thomasklemm/sqlite-schema-readers-table-name-case-stacked
+6f85b545ff Merge pull request #60010 from 55728/fix-async-query-notification-payload
+71812a394b Rename default_order to fallback_order
+b803dd36ae Fix the error type examples in `full_messages_for` and `messages_for` docs [ci skip]
+d0a717a72b Fix collection options with a Proc for both `value_method` and `selected`
+15d133cd2d Fix `bin/rails notes` raising on invalid bytes in a Ruby file's comment
+fcc20f0966 Fix `receive_inbound_email_from_fixture` raising when given a `status`
+ce09bc5c56 Fix `row_count` and `exception` in `sql.active_record` for async queries
+9c1378eab6 Let Attachment.from_node pick attachables the bulk lookup didn't locate
+d29055285a Find SQLite tables by any ASCII case of their name in the schema readers
+30e9d7418a Fix flaky `test_restart_rails_server_with_custom_pid_file_path`
+456604de74 Correct how :only and :except combine with :if and :unless [ci skip]

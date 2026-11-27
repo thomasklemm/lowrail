@@ -1,0 +1,36 @@
+/home/user/workspace/repo/.amp/in/orb-backup/l3-review/head/activemodel/lib/active_model/attribute_set.rb:497: warning: method redefined; discarding old attributes_to_hash
+/home/user/workspace/repo/.amp/in/orb-backup/l3-review/head/activemodel/lib/active_model/attribute_set.rb:497: warning: previous definition of attributes_to_hash was here
+Please switch from -n/--name to -i/--include
+Using sqlite3
+Run options: --name=/attributes_.*the_record_had_when_it_was_called/ --seed 47444
+
+# Running:
+
+F
+
+Failure:
+AttributeMethodsTest#test_attributes_before_type_cast_returns_the_attributes_the_record_had_when_it_was_called [test/cases/attribute_methods_test.rb:408]:
+Expected: "David"
+  Actual: "Mary"
+
+bin/rails test test/cases/attribute_methods_test.rb:401
+
+F
+
+Failure:
+AttributeMethodsTest#test_attributes_for_database_serializes_the_attributes_the_record_had_when_it_was_called [test/cases/attribute_methods_test.rb:397]:
+Expected: "David"
+  Actual: "Mary"
+
+bin/rails test test/cases/attribute_methods_test.rb:391
+
+
+
+Finished in 0.034763s, 57.5328 runs/s, 57.5328 assertions/s.
+2 runs, 2 assertions, 2 failures, 0 errors, 0 skips
+rake aborted!
+Command failed with status (1)
+/home/user/workspace/repo/.lowrail/gate-gems/ruby/4.0.0/gems/rake-13.4.2/exe/rake:27:in '<top (required)>'
+/home/user/.local/share/mise/installs/ruby/4.0.9/bin/bundle:33:in '<main>'
+Tasks: TOP => test:sqlite3
+(See full trace by running task with --trace)
