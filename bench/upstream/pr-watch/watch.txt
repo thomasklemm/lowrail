@@ -13,3 +13,4 @@ https://github.com/freerange/mocha/pull/809
 https://github.com/sferik/duel-ruby/pull/9
 https://github.com/rails/rails/pull/60020
 https://github.com/ruby/ruby/pull/20261
+https://github.com/hashie/hashie/pull/660

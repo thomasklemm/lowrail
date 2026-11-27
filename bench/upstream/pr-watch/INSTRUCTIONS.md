@@ -99,7 +99,10 @@ Ours, open (watch CI, comments, state):
   d0f0dc2da5), #19912 (ZS1; Rafael França's ported commit is intended).
 - rack/rack#2557 (e3d53cfdb2; our reply to jeremyevans posted), hashie/hashie#659 (the hashie thread
   T-01a2179d-be22-73a3-8fe1-b196f9746e8c applies dblock's nits and replies; its head change is expected),
-  coorasse/cancancan#941, freerange/mocha#809, sferik/duel-ruby#9, rmosolgo/graphql-ruby#5908,
+  hashie/hashie#660 (our ZJIT Duel follow-up, opened 2026-11-27; the Amp GitHub App can't access hashie, so gh
+  polling is the only signal; also watch any further hashie PR that the hashie thread
+  T-01a21e85-395a-745d-91c1-87edf5e6c7a1 opens for dblock's candidates and add it to `watch.txt`; report new replies
+  by dblock in the #659 comment thread), coorasse/cancancan#941, freerange/mocha#809, sferik/duel-ruby#9, rmosolgo/graphql-ruby#5908,
   inertiajs/inertia-rails#449, PostHog/posthog-ruby#395, rails/importmap-rails#336, plus every other open PR of ours
   the search finds.
 
