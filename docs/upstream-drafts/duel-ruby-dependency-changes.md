@@ -15,15 +15,15 @@ BUNDLE_GEMFILE=gemfiles/duel.gemfile bundle exec duel --base HEAD~1
 # duel: lib, ext, benchmarks, .duel.rb unchanged since the baseline, so there's nothing to compare (--force to anyway)
 ```
 
-Calibration on GitHub's hosted runners, using [fork pull requests](https://github.com/thomasklemm/hashie/pulls?q=is%3Apr+%5Bcalibration%5D) with comment-only changes to `lib/`, gave:
+Calibration on GitHub's hosted runners used Ruby 4.0 with YJIT and `c.warm = 2`. [Fork pull requests](https://github.com/thomasklemm/hashie/pulls?q=is%3Apr+%5Bcalibration%5D) with comment-only changes to `lib/` gave:
 
 | Setup | Runs failed | Unsettled benchmark results |
 |---|---|---|
-| 13 benchmarks, default limit and workers | 0 of 25 | 79 of 325 |
-| 27 benchmarks, one at a time, 12 or 24 workers, CPU limit 1.02 | 6 of 10 | 46 of 270 |
-| 27 benchmarks, one at a time, 24 workers, CPU limit 1.05 | 0 of 20 | 6 of 540 |
+| 13 benchmarks, two at a time, 12 workers per version, CPU limit 1.02 | 0 of 25 | 79 of 325 |
+| 27 benchmarks, one at a time, 12 or 24 workers per version, CPU limit 1.02 | 6 of 10 | 46 of 270 |
+| 27 benchmarks, one at a time, 24 workers per version, CPU limit 1.05 | 0 of 20 | 6 of 540 |
 
-Some comment-only comparisons showed 3–7% timing differences, including differences that survived fresh-process confirmations. The cause wasn't isolated. The 1.05 setup still caught both planted regressions in every run, but trades sensitivity to small slowdowns for fewer false alarms.
+Some comment-only comparisons showed 3–7% timing differences, including differences that survived fresh-process confirmations. The cause wasn't isolated. The 1.05 setup caught both planted regressions in two runs of each plant, but trades sensitivity to small slowdowns for fewer false alarms.
 
 Hardware instruction counters were unavailable on the sampled Azure AMD runners even after relaxing perf permissions. AWS Xeon probes could open the counter but hit the read failure addressed by #9. A Callgrind fork had fewer unsettled results but no extra catches in the planted regressions, at higher job times. It ran without YJIT while the CPU-time job used YJIT; small CPU slowdowns weren't planted.
 
@@ -49,3 +49,13 @@ without delegates. Nothing posted upstream.
   redundant). HTML fetches failed in this environment. Hashie: active, 3,035 stars, ~507 million downloads, 6.0.0
   released November 11. Duel: active, 21 stars, 8,688 downloads, 0.3.1 released November 22. Body has no internal
   names, headings, bold or pings; 309 words, down from 395.
+
+## Thermos follow-up — 2026-11-27
+
+Verdict: changes to Astra's replacement at `3c1a25e3`; title approved. Applied both rubrics personally, without delegates. The body above includes the two clarifications below and goes back to Astra before Thomas; nothing was posted upstream.
+
+* Disclose `c.warm = 2`, common to the table's cohorts, and name the first row's two concurrent benchmarks, CPU limit and workers per version. "Default limit and workers" was literally true, but omitted the nondefault warm-up. The logs and Hashie configuration establish the explicit settings.
+* Replace "every run" with its observed denominator: two runs per plant, with 13 allocation and four CPU regressions each time (`calibration-8`). This does not establish sensitivity to smaller slowdowns.
+* Rechecked every other sentence against source and archived runs. Reran both tally scripts; the retained table cells match, as do the 3–7% observations, counter failures, tighter Callgrind intervals, differing JIT modes and absence of small-slowdown plants. All 108 summaries in the six requested CPU cohorts match their archived raw final reports.
+* Both Duel pins reproduced the Gemfile-only skip at Hashie `be311bbf4b`; a live worker probe confirmed separate library trees with the inherited Gemfile, then per-version Gemfiles through preparation. Code/docs support the combined-example request, not an unsupported-feature claim.
+* Unauthenticated API reads verified all link targets: the exact `a09111ec` docs file contains `Prepare each version`; the Hashie tree pin exists; fork PRs contain the controls/plants; the Hashie PR adds Duel; the open read-fix PR is #9. Direct HTML requests timed out, but the public API content was accessible. No additional body changes were needed.
