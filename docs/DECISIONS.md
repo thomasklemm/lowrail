@@ -196,9 +196,9 @@ column, row, link and sentence: would the reader miss it? If not, drop it. Bodie
 * **Restore and compatibility PRs name their callers** (2026-11-04) with line permalinks.
 * **Cite only relevant, current projects, most important first** (Thomas, 2026-11-27). Every gem, app or repo a
   PR, issue or comment names is checked first: stars, downloads (rubygems.org) and the last push or release. Drop
-  archived, abandoned or niche projects, and gem versions a current release has superseded; a permalink pins a
-  recent commit of the default branch, not an old tag. Order the remaining ones by reach, the most used first, and
-  name a few strong ones rather than a long list.
+  archived, abandoned or niche projects, and gem versions a current release has superseded; permalinks follow
+  [Line permalinks for callers](#line-permalinks-for-callers-thomas-2026-11-04). Order the remaining ones by reach,
+  the most used first, and name a few strong ones rather than a long list.
 * **Maintainers can edit our branches** (2026-11-06): "Allow edits by maintainers" on (`script/pr-queue open` sets
   it); our forks hold no Actions secrets.
 * **Few, clean commits; the reasoning goes in their messages** (2026-11-06).
