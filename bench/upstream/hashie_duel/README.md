@@ -93,3 +93,60 @@ Both false failures occurred with two benchmarks at a time. Cross-benchmark CPU 
 `bcf21e7` force-pushed to `thomasklemm/duel` (master still `812c48c`). Upstream checks ran without a maintainer's
 approval and all 15 passed. Perf run 45983825333: 21 benchmarks in 69 s, 0 regressed, 4 unsettled (Dash read/write,
 both KeepOriginalKeys reads, PermissiveRespondTo `Mash.new`), job 105 s.
+
+## Coverage and settled timings (candidate `a00b9ab`, one commit on `bcf21e7`)
+
+Thomas approved extending #659 with a second commit (the first, `bcf21e7`, is what dblock is reviewing). Candidate on
+fork branch `thomasklemm/duel-coverage`.
+
+**Coverage.** Six scenarios for paths no scenario reached (27 in all): IndifferentAccess `new` from the nested
+fixture (fresh `JSON.parse` copies in `untimed`, because IndifferentAccess converts nested hashes in place), reads
+with String and Symbol keys (`[]`, `fetch`, `key?`), writes (`[]=`, `store`); DeepFind and DeepFetch on nested keys;
+a Dash with `Dash::IndifferentAccess` from String keys; a Dash coercing nested Dashes (`IgnoreUndeclared` owners and
+licenses). Not added because a scenario already covers them: `Mash#to_hash`, `Mash#deep_merge`, Dash coercion,
+Trash translation, and `to_json` (`Hashie::Hash#to_json` is `to_hash.to_json`, so it only adds the JSON generator).
+Each new body was run once outside Duel (`.amp`-side check script): nested coercion yields `OwnerDash` and
+`LicenseDash` objects, IndifferentAccess reads both key types, and the shared fixture is unchanged afterwards.
+
+**Why timings were unsettled.** PR run 45983825333 on `bcf21e7`: Dash read/write `[0.981, 1.029]`, KeepOriginalKeys
+Symbol reads `[0.933, 1.031]`, KeepOriginalKeys String reads `[0.986, 1.026]`, PermissiveRespondTo `Mash.new`
+`[0.969, 1.027]`; rounds 5–6 had 96 of 735 A/A verdicts unsettled, nearly all on the sub-microsecond method-dispatch
+benchmarks. Duel judges over the 12 workers' medians (Mann-Whitney interval, at most 120 pairs), so the interval is
+as wide as the spread between processes; more iterations per sample don't narrow it (Duel sizes samples to 1 ms).
+
+Round 7 (`calibration-7`, `-7p12`) tested the obvious fix and found the real problem:
+
+| Head | Settings | A/A | Unsettled |
+|---|---|---|---|
+| `4b01c26` | 24 processes, CPU limit 1.02 | **3/5 failed** | 18 of 135 |
+| `2f59970` | 12 processes, CPU limit 1.02 | **3/5 failed** | 28 of 135 |
+
+Every failure held in four fresh-process measurements: `Mash: read keys given as Symbols as methods`
+at 1.027–1.041, `Mash: read keys as methods` at 1.037–1.046, KeepOriginalKeys Symbol reads at 1.030–1.052, on trees
+that differ by one comment. `Mash#to_hash` came out 0.96 (settled faster) in all five A/A runs and in the #656 run,
+which doesn't touch it; earlier rounds put the same `to_hash` between 0.946 and 1.027. So identical code shifts by
+3–7% for a whole run, in fresh processes too, which more samples cannot average away; more workers only make
+Duel surer of the shift. Code layout is the likely cause (a comment moves what follows it), but that is a hypothesis.
+The 0/35 at 1.02 of rounds 5–6 held for that set of benchmarks; adding six changed which ones the shifts hit.
+
+Across all 2,111 A/A and #656 measurements of rounds 1–7, an interval's lower bound passed 1.05 once (1.051).
+Round 8 therefore sets `c.measure('cpu', limit: 1.05)` and `c.processes = 24`; allocations still fail on any
+increase (`calibration-8`, `python3 -I tally.py calibration-8`):
+
+* **A/A: 0 of 20 runs failed, none measured again, 6 of 540 verdicts unsettled**, job 124–137 s (median 130 s),
+  Duel 109–118 s; the highest lower bound was 1.048. The six: KeepOriginalKeys Symbol reads three times (medians 1.030–1.036, upper bounds
+  1.051–1.057), Dash read/write twice (1.063 and 1.068, intervals `[1.043, 1.083]` and `[1.048, 1.085]`),
+  `Mash: read keys as methods` once (1.041 `[1.026, 1.054]`). Each is a shift of the kind above whose interval
+  straddles 1.05; unsettled doesn't fail. Dash read/write at 1.068 is the closest to a false alarm: the margin there is
+  thin, and `limit: 1.1` is the fallback if one shows up.
+* **#656 candidate** (fork PR #9: `duel-calibration-pre656` = the candidate with `lib/` of `812c48c^`, head adds
+  `lib/` back): 0 of 3 slower, 0 unsettled, faster on 5–6 (deep_merge 0.82, Mash.new 0.82, respond_to? 0.77,
+  overwrite 0.85, flat Mash.new 0.92), allocations down as before. #8 could not be reopened (branch recreated).
+* **CPU plant:** 4 regressed in both runs (method reads, plain and KeepOriginalKeys, Symbol and String), job
+  222–238 s. **Allocation plant:** 13 regressed on allocations, job 432 s: its CPU timings sat at 1.049–1.054,
+  so Duel measured them again up to seven times. Only a run that fails pays that.
+* Opening #9 with "hashie/hashie#656" in its body put a cross-reference event on upstream #656's timeline (as #8
+  did on 2026-11-26); the body was edited within a minute. It is not a comment, but it is visible upstream.
+
+Local: Ruby 4.0.9 `rake` 1,076 examples 0 failures, RuboCop 155 files clean (`cpu` added to `.spellcheck.txt`);
+Ruby 3.0.7 `rake spec` 1,072/0 (bundler 2.5.23, own lockfile).

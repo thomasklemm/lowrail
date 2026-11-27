@@ -1,0 +1,951 @@
+﻿2026-11-27T11:12:35.8732338Z Current runner version: '2.338.2'
+2026-11-27T11:12:35.8757677Z ##[group]Runner Image Provisioner
+2026-11-27T11:12:35.8758590Z Hosted Compute Agent
+2026-11-27T11:12:35.8759279Z Version: 20261111.635
+2026-11-27T11:12:35.8759994Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-27T11:12:35.8760739Z Build Date: 2026-11-11T01:49:01Z
+2026-11-27T11:12:35.8761497Z Worker ID: {8e57e381-141d-4ef9-84fa-889cf7c5016a}
+2026-11-27T11:12:35.8762224Z Region: westcentralus
+2026-11-27T11:12:35.8762897Z Cloud: Azure
+2026-11-27T11:12:35.8763507Z ##[endgroup]
+2026-11-27T11:12:35.8765362Z ##[group]Operating System
+2026-11-27T11:12:35.8766152Z Ubuntu
+2026-11-27T11:12:35.8766703Z 26.04.1
+2026-11-27T11:12:35.8767222Z LTS
+2026-11-27T11:12:35.8767871Z ##[endgroup]
+2026-11-27T11:12:35.8768449Z ##[group]Runner Image
+2026-11-27T11:12:35.8769089Z Image: ubuntu-26.04
+2026-11-27T11:12:35.8769722Z Version: 20261116.202.1
+2026-11-27T11:12:35.8771054Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.202/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-27T11:12:35.8772677Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.202
+2026-11-27T11:12:35.8773688Z ##[endgroup]
+2026-11-27T11:12:35.8775223Z ##[group]GITHUB_TOKEN Permissions
+2026-11-27T11:12:35.8777548Z Contents: read
+2026-11-27T11:12:35.8778172Z Metadata: read
+2026-11-27T11:12:35.8778958Z PullRequests: read
+2026-11-27T11:12:35.8779883Z ##[endgroup]
+2026-11-27T11:12:35.8783089Z Secret source: Actions
+2026-11-27T11:12:35.8784962Z Cache mode: write
+2026-11-27T11:12:35.8786683Z Prepare workflow directory
+2026-11-27T11:12:36.0941505Z Prepare all required actions
+2026-11-27T11:12:36.0988142Z Getting action download info
+2026-11-27T11:12:36.3911002Z Download action repository 'actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1' (SHA:3d3c42e5aac5ba805825da76410c181273ba90b1)
+2026-11-27T11:12:36.5683609Z Download action repository 'ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0' (SHA:f9c4492e86def3e644ab32a0ef185eda5b0c20d0)
+2026-11-27T11:12:37.0006703Z Download action repository 'actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9' (SHA:cf430e030ddbb5b0abf93d22962f4752f3646cd9)
+2026-11-27T11:12:37.4791482Z Uses: sferik/duel-ruby/.github/workflows/duel.yml@3c0c99d95dc2d5620f59e4bb298179422086adf7
+2026-11-27T11:12:37.4797698Z ##[group] Inputs
+2026-11-27T11:12:37.4798560Z   ruby-version: 4.0
+2026-11-27T11:12:37.4799623Z   version-file: false
+2026-11-27T11:12:37.4800368Z   jit: yjit
+2026-11-27T11:12:37.4801010Z   runs-on: ubuntu-latest
+2026-11-27T11:12:37.4802241Z   timeout-minutes: 60
+2026-11-27T11:12:37.4803126Z   working-directory: .
+2026-11-27T11:12:37.4804062Z   gemfile: gemfiles/duel.gemfile
+2026-11-27T11:12:37.4805144Z   submodules: false
+2026-11-27T11:12:37.4805847Z   setup: 
+2026-11-27T11:12:37.4806464Z   setup-after-ruby: 
+2026-11-27T11:12:37.4807177Z   report: 
+2026-11-27T11:12:37.4807782Z ##[endgroup]
+2026-11-27T11:12:37.4808417Z Complete job name: duel / Duel
+2026-11-27T11:12:38.0895358Z ##[group]Run actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+2026-11-27T11:12:38.0896529Z with:
+2026-11-27T11:12:38.0897003Z   fetch-depth: 0
+2026-11-27T11:12:38.0897506Z   persist-credentials: false
+2026-11-27T11:12:38.0898053Z   submodules: false
+2026-11-27T11:12:38.0898573Z   repository: thomasklemm/hashie
+2026-11-27T11:12:38.0902787Z   token: ***
+2026-11-27T11:12:38.0903271Z   ssh-strict: true
+2026-11-27T11:12:38.0903752Z   ssh-user: git
+2026-11-27T11:12:38.0904213Z   clean: true
+2026-11-27T11:12:38.0904873Z   sparse-checkout-cone-mode: true
+2026-11-27T11:12:38.0905440Z   fetch-tags: false
+2026-11-27T11:12:38.0905926Z   show-progress: true
+2026-11-27T11:12:38.0906408Z   lfs: false
+2026-11-27T11:12:38.0906886Z   set-safe-directory: true
+2026-11-27T11:12:38.0907448Z   allow-unsafe-pr-checkout: false
+2026-11-27T11:12:38.0908258Z ##[endgroup]
+2026-11-27T11:12:38.2972090Z Syncing repository: thomasklemm/hashie
+2026-11-27T11:12:38.2974029Z ##[group]Getting Git version info
+2026-11-27T11:12:38.2975152Z Working directory is '/home/runner/work/hashie/hashie'
+2026-11-27T11:12:38.2976577Z [command]/usr/bin/git version
+2026-11-27T11:12:38.2979461Z git version 2.56.1
+2026-11-27T11:12:38.3000503Z ##[endgroup]
+2026-11-27T11:12:38.3010768Z Temporarily overriding HOME='/home/runner/work/_temp/6e52f492-f80d-47b8-a180-6d672fd1fa5f' before making global git config changes
+2026-11-27T11:12:38.3012950Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-27T11:12:38.3015354Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/hashie/hashie
+2026-11-27T11:12:38.3069127Z Deleting the contents of '/home/runner/work/hashie/hashie'
+2026-11-27T11:12:38.3072126Z ##[group]Determining repository object format
+2026-11-27T11:12:38.3073663Z ##[endgroup]
+2026-11-27T11:12:38.3074745Z ##[group]Initializing the repository
+2026-11-27T11:12:38.3078014Z [command]/usr/bin/git init /home/runner/work/hashie/hashie
+2026-11-27T11:12:38.3154876Z hint: Using 'master' as the name for the initial branch. This default branch name
+2026-11-27T11:12:38.3156399Z hint: will change to "main" in Git 3.0. To configure the initial branch name
+2026-11-27T11:12:38.3157371Z hint: to use in all of your new repositories, which will suppress this warning,
+2026-11-27T11:12:38.3158262Z hint: call:
+2026-11-27T11:12:38.3158775Z hint:
+2026-11-27T11:12:38.3159456Z hint: 	git config --global init.defaultBranch <name>
+2026-11-27T11:12:38.3160198Z hint:
+2026-11-27T11:12:38.3161139Z hint: Names commonly chosen instead of 'master' are 'main', 'trunk' and
+2026-11-27T11:12:38.3162661Z hint: 'development'. The just-created branch can be renamed via this command:
+2026-11-27T11:12:38.3163851Z hint:
+2026-11-27T11:12:38.3164707Z hint: 	git branch -m <name>
+2026-11-27T11:12:38.3165239Z hint:
+2026-11-27T11:12:38.3166114Z hint: Disable this message with "git config set advice.defaultBranchName false"
+2026-11-27T11:12:38.3167802Z Initialized empty Git repository in /home/runner/work/hashie/hashie/.git/
+2026-11-27T11:12:38.3173187Z [command]/usr/bin/git remote add origin https://github.com/thomasklemm/hashie
+2026-11-27T11:12:38.3251562Z ##[endgroup]
+2026-11-27T11:12:38.3252411Z ##[group]Disabling automatic garbage collection
+2026-11-27T11:12:38.3254440Z [command]/usr/bin/git config --local gc.auto 0
+2026-11-27T11:12:38.3288507Z ##[endgroup]
+2026-11-27T11:12:38.3289924Z ##[group]Setting up auth
+2026-11-27T11:12:38.3290763Z Removing SSH command configuration
+2026-11-27T11:12:38.3293729Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-27T11:12:38.3328150Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-27T11:12:38.3698247Z Removing HTTP extra header
+2026-11-27T11:12:38.3704035Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-27T11:12:38.3741813Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-27T11:12:38.4028105Z Removing includeIf entries pointing to credentials config files
+2026-11-27T11:12:38.4031651Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-27T11:12:38.4065880Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-27T11:12:38.4352506Z [command]/usr/bin/git config --file /home/runner/work/_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config http.https://github.com/.extraheader AUTHORIZATION: basic ***
+2026-11-27T11:12:38.4392276Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/hashie/hashie/.git.path /home/runner/work/_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config
+2026-11-27T11:12:38.4425508Z [command]/usr/bin/git config --local includeIf.gitdir:/home/runner/work/hashie/hashie/.git/worktrees/*.path /home/runner/work/_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config
+2026-11-27T11:12:38.4462091Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git.path /github/runner_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config
+2026-11-27T11:12:38.4497102Z [command]/usr/bin/git config --local includeIf.gitdir:/github/workspace/.git/worktrees/*.path /github/runner_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config
+2026-11-27T11:12:38.4528689Z ##[endgroup]
+2026-11-27T11:12:38.4529900Z ##[group]Fetching the repository
+2026-11-27T11:12:38.4536709Z [command]/usr/bin/git -c protocol.version=2 fetch --no-tags --prune --no-recurse-submodules origin +refs/heads/*:refs/remotes/origin/* +refs/tags/*:refs/tags/* +c0626770924e3bfcce9f1a830d766188a12eb019:refs/remotes/pull/1/merge
+2026-11-27T11:12:39.3643166Z From https://github.com/thomasklemm/hashie
+2026-11-27T11:12:39.3645850Z  * [new branch]      1-1-stable                               -> origin/1-1-stable
+2026-11-27T11:12:39.3647821Z  * [new branch]      3-3-stable                               -> origin/3-3-stable
+2026-11-27T11:12:39.3649703Z  * [new branch]      calib/aa-1                               -> origin/calib/aa-1
+2026-11-27T11:12:39.3651506Z  * [new branch]      calib/aa-2                               -> origin/calib/aa-2
+2026-11-27T11:12:39.3653366Z  * [new branch]      calib/aa-3                               -> origin/calib/aa-3
+2026-11-27T11:12:39.3655488Z  * [new branch]      calib/aa-4                               -> origin/calib/aa-4
+2026-11-27T11:12:39.3657650Z  * [new branch]      calib/aa-5                               -> origin/calib/aa-5
+2026-11-27T11:12:39.3659908Z  * [new branch]      calib/hm1                                -> origin/calib/hm1
+2026-11-27T11:12:39.3662238Z  * [new branch]      calib/plant-alloc                        -> origin/calib/plant-alloc
+2026-11-27T11:12:39.3664897Z  * [new branch]      calib/plant-cpu                          -> origin/calib/plant-cpu
+2026-11-27T11:12:39.3667390Z  * [new branch]      create-github-action                     -> origin/create-github-action
+2026-11-27T11:12:39.3670102Z  * [new branch]      duel-calibration                         -> origin/duel-calibration
+2026-11-27T11:12:39.3672201Z  * [new branch]      duel-calibration-pre656                  -> origin/duel-calibration-pre656
+2026-11-27T11:12:39.3674424Z  * [new branch]      master                                   -> origin/master
+2026-11-27T11:12:39.3676397Z  * [new branch]      thomasklemm/duel                         -> origin/thomasklemm/duel
+2026-11-27T11:12:39.3679217Z  * [new branch]      thomasklemm/duel-benchmarks              -> origin/thomasklemm/duel-benchmarks
+2026-11-27T11:12:39.3681872Z  * [new branch]      thomasklemm/duel-coverage                -> origin/thomasklemm/duel-coverage
+2026-11-27T11:12:39.3685687Z  * [new branch]      thomasklemm/respond-to-missing-allocations -> origin/thomasklemm/respond-to-missing-allocations
+2026-11-27T11:12:39.3689630Z  * [new branch]      thomasklemm/respond-to-missing-allocations-2 -> origin/thomasklemm/respond-to-missing-allocations-2
+2026-11-27T11:12:39.3692648Z  * [new tag]         v0.1.0                                   -> v0.1.0
+2026-11-27T11:12:39.3694781Z  * [new tag]         v0.1.2                                   -> v0.1.2
+2026-11-27T11:12:39.3696619Z  * [new tag]         v0.1.3                                   -> v0.1.3
+2026-11-27T11:12:39.3698734Z  * [new tag]         v0.1.4                                   -> v0.1.4
+2026-11-27T11:12:39.3700548Z  * [new tag]         v0.1.5                                   -> v0.1.5
+2026-11-27T11:12:39.3702575Z  * [new tag]         v0.1.6                                   -> v0.1.6
+2026-11-27T11:12:39.3704781Z  * [new tag]         v0.1.8                                   -> v0.1.8
+2026-11-27T11:12:39.3707301Z  * [new tag]         v0.2.0                                   -> v0.2.0
+2026-11-27T11:12:39.3709936Z  * [new tag]         v0.2.1                                   -> v0.2.1
+2026-11-27T11:12:39.3712933Z  * [new tag]         v0.2.2                                   -> v0.2.2
+2026-11-27T11:12:39.3715945Z  * [new tag]         v0.3.0                                   -> v0.3.0
+2026-11-27T11:12:39.3718421Z  * [new tag]         v0.3.1                                   -> v0.3.1
+2026-11-27T11:12:39.3720846Z  * [new tag]         v0.4.0                                   -> v0.4.0
+2026-11-27T11:12:39.3723597Z  * [new tag]         v1.0.0                                   -> v1.0.0
+2026-11-27T11:12:39.3725651Z  * [new tag]         v1.1.0                                   -> v1.1.0
+2026-11-27T11:12:39.3727484Z  * [new tag]         v1.2.0                                   -> v1.2.0
+2026-11-27T11:12:39.3729329Z  * [new tag]         v2.0.0                                   -> v2.0.0
+2026-11-27T11:12:39.3731614Z  * [new tag]         v2.0.1                                   -> v2.0.1
+2026-11-27T11:12:39.3733812Z  * [new tag]         v2.0.2                                   -> v2.0.2
+2026-11-27T11:12:39.3735898Z  * [new tag]         v2.0.3                                   -> v2.0.3
+2026-11-27T11:12:39.3737740Z  * [new tag]         v2.0.4                                   -> v2.0.4
+2026-11-27T11:12:39.3739582Z  * [new tag]         v2.0.5                                   -> v2.0.5
+2026-11-27T11:12:39.3741433Z  * [new tag]         v2.1.0                                   -> v2.1.0
+2026-11-27T11:12:39.3743619Z  * [new tag]         v2.1.1                                   -> v2.1.1
+2026-11-27T11:12:39.3746210Z  * [new tag]         v2.1.2                                   -> v2.1.2
+2026-11-27T11:12:39.3748809Z  * [new tag]         v3.0.0                                   -> v3.0.0
+2026-11-27T11:12:39.3751351Z  * [new tag]         v3.1.0                                   -> v3.1.0
+2026-11-27T11:12:39.3753961Z  * [new tag]         v3.2.0                                   -> v3.2.0
+2026-11-27T11:12:39.3756762Z  * [new tag]         v3.3.0                                   -> v3.3.0
+2026-11-27T11:12:39.3759220Z  * [new tag]         v3.3.1                                   -> v3.3.1
+2026-11-27T11:12:39.3761688Z  * [new tag]         v3.3.2                                   -> v3.3.2
+2026-11-27T11:12:39.3763863Z  * [new tag]         v3.4.0                                   -> v3.4.0
+2026-11-27T11:12:39.3765857Z  * [new tag]         v3.4.1                                   -> v3.4.1
+2026-11-27T11:12:39.3767598Z  * [new tag]         v3.4.2                                   -> v3.4.2
+2026-11-27T11:12:39.3769502Z  * [new tag]         v3.4.3                                   -> v3.4.3
+2026-11-27T11:12:39.3771974Z  * [new tag]         v3.4.4                                   -> v3.4.4
+2026-11-27T11:12:39.3773844Z  * [new tag]         v3.4.5                                   -> v3.4.5
+2026-11-27T11:12:39.3775932Z  * [new tag]         v3.4.6                                   -> v3.4.6
+2026-11-27T11:12:39.3777936Z  * [new tag]         v3.5.0                                   -> v3.5.0
+2026-11-27T11:12:39.3779723Z  * [new tag]         v3.5.1                                   -> v3.5.1
+2026-11-27T11:12:39.3781474Z  * [new tag]         v3.5.2                                   -> v3.5.2
+2026-11-27T11:12:39.3783194Z  * [new tag]         v3.5.3                                   -> v3.5.3
+2026-11-27T11:12:39.3785286Z  * [new tag]         v3.5.4                                   -> v3.5.4
+2026-11-27T11:12:39.3787139Z  * [new tag]         v3.5.5                                   -> v3.5.5
+2026-11-27T11:12:39.3789036Z  * [new tag]         v3.5.6                                   -> v3.5.6
+2026-11-27T11:12:39.3790863Z  * [new tag]         v3.5.7                                   -> v3.5.7
+2026-11-27T11:12:39.3792689Z  * [new tag]         v3.6.0                                   -> v3.6.0
+2026-11-27T11:12:39.3794742Z  * [new tag]         v4.0.0                                   -> v4.0.0
+2026-11-27T11:12:39.3796594Z  * [new tag]         v4.1.0                                   -> v4.1.0
+2026-11-27T11:12:39.3798528Z  * [new tag]         v5.0.0                                   -> v5.0.0
+2026-11-27T11:12:39.3800297Z  * [new tag]         v5.1.0                                   -> v5.1.0
+2026-11-27T11:12:39.3802070Z  * [new tag]         v5.2.0                                   -> v5.2.0
+2026-11-27T11:12:39.3803829Z  * [new tag]         v6.0.0                                   -> v6.0.0
+2026-11-27T11:12:39.3805976Z  * [new ref]         c0626770924e3bfcce9f1a830d766188a12eb019 -> pull/1/merge
+2026-11-27T11:12:39.3809882Z ##[endgroup]
+2026-11-27T11:12:39.3811436Z ##[group]Determining the checkout info
+2026-11-27T11:12:39.3813221Z ##[endgroup]
+2026-11-27T11:12:39.3814420Z [command]/usr/bin/git sparse-checkout disable
+2026-11-27T11:12:39.3817594Z [command]/usr/bin/git config --local --unset-all extensions.worktreeConfig
+2026-11-27T11:12:39.3821257Z ##[group]Checking out the ref
+2026-11-27T11:12:39.3822927Z [command]/usr/bin/git checkout --progress --force refs/remotes/pull/1/merge
+2026-11-27T11:12:39.3902373Z Note: switching to 'refs/remotes/pull/1/merge'.
+2026-11-27T11:12:39.3903797Z 
+2026-11-27T11:12:39.3905214Z You are in 'detached HEAD' state. You can look around, make experimental
+2026-11-27T11:12:39.3908312Z changes and commit them, and you can discard any commits you make in this
+2026-11-27T11:12:39.3911077Z state without impacting any branches by switching back to a branch.
+2026-11-27T11:12:39.3912371Z 
+2026-11-27T11:12:39.3913521Z If you want to create a new branch to retain commits you create, you may
+2026-11-27T11:12:39.3915914Z do so (now or later) by using -c with the switch command. Example:
+2026-11-27T11:12:39.3917217Z 
+2026-11-27T11:12:39.3917686Z   git switch -c <new-branch-name>
+2026-11-27T11:12:39.3918445Z 
+2026-11-27T11:12:39.3918882Z Or undo this operation with:
+2026-11-27T11:12:39.3919582Z 
+2026-11-27T11:12:39.3919960Z   git switch -
+2026-11-27T11:12:39.3920473Z 
+2026-11-27T11:12:39.3921447Z Turn off this advice by setting config variable advice.detachedHead to false
+2026-11-27T11:12:39.3922806Z 
+2026-11-27T11:12:39.3924642Z HEAD is now at c062677 Merge c2e84261af7e26823b46fc841fce7a0a2c6d8f1a into a00b9abb3d968e4985a1151f3f2e4f08a0219c17
+2026-11-27T11:12:39.3928964Z ##[endgroup]
+2026-11-27T11:12:39.3960555Z [command]/usr/bin/git log -1 --format=%H
+2026-11-27T11:12:39.3988501Z c0626770924e3bfcce9f1a830d766188a12eb019
+2026-11-27T11:12:39.3998482Z ##[group]Removing auth
+2026-11-27T11:12:39.3999940Z Removing SSH command configuration
+2026-11-27T11:12:39.4002584Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-27T11:12:39.4038408Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-27T11:12:39.4324408Z Removing HTTP extra header
+2026-11-27T11:12:39.4328244Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-27T11:12:39.4363379Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-27T11:12:39.4645010Z Removing includeIf entries pointing to credentials config files
+2026-11-27T11:12:39.4647801Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-27T11:12:39.4677350Z includeif.gitdir:/home/runner/work/hashie/hashie/.git.path
+2026-11-27T11:12:39.4679623Z includeif.gitdir:/home/runner/work/hashie/hashie/.git/worktrees/*.path
+2026-11-27T11:12:39.4681535Z includeif.gitdir:/github/workspace/.git.path
+2026-11-27T11:12:39.4683188Z includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-27T11:12:39.4687658Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/hashie/hashie/.git.path
+2026-11-27T11:12:39.4711863Z /home/runner/work/_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config
+2026-11-27T11:12:39.4723680Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/hashie/hashie/.git.path \/home\/runner\/work\/_temp\/git\-credentials\-13592c6d\-2a6e\-45dd\-8671\-82727a210a4b\.config
+2026-11-27T11:12:39.4767918Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/home/runner/work/hashie/hashie/.git/worktrees/*.path
+2026-11-27T11:12:39.4793017Z /home/runner/work/_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config
+2026-11-27T11:12:39.4803010Z [command]/usr/bin/git config --local --unset includeif.gitdir:/home/runner/work/hashie/hashie/.git/worktrees/*.path \/home\/runner\/work\/_temp\/git\-credentials\-13592c6d\-2a6e\-45dd\-8671\-82727a210a4b\.config
+2026-11-27T11:12:39.4839297Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git.path
+2026-11-27T11:12:39.4864438Z /github/runner_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config
+2026-11-27T11:12:39.4875757Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git.path \/github\/runner_temp\/git\-credentials\-13592c6d\-2a6e\-45dd\-8671\-82727a210a4b\.config
+2026-11-27T11:12:39.4909118Z [command]/usr/bin/git config --local --get-all includeif.gitdir:/github/workspace/.git/worktrees/*.path
+2026-11-27T11:12:39.4934053Z /github/runner_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config
+2026-11-27T11:12:39.4944144Z [command]/usr/bin/git config --local --unset includeif.gitdir:/github/workspace/.git/worktrees/*.path \/github\/runner_temp\/git\-credentials\-13592c6d\-2a6e\-45dd\-8671\-82727a210a4b\.config
+2026-11-27T11:12:39.4979565Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-27T11:12:39.5263856Z Removing credentials config '/home/runner/work/_temp/git-credentials-13592c6d-2a6e-45dd-8671-82727a210a4b.config'
+2026-11-27T11:12:39.5272237Z ##[endgroup]
+2026-11-27T11:12:39.6082918Z ##[group]Run # (In a merge queue, the last pull request queued, which the queue's
+2026-11-27T11:12:39.6085421Z # (In a merge queue, the last pull request queued, which the queue's
+2026-11-27T11:12:39.6087358Z # branch names: gh-readonly-queue/main/pr-123-<sha>.)
+2026-11-27T11:12:39.6088880Z if [ -n "$QUEUED" ]; then
+2026-11-27T11:12:39.6090063Z   PR=${QUEUED##*/pr-}
+2026-11-27T11:12:39.6091161Z   PR=${PR%%-*}
+2026-11-27T11:12:39.6092136Z fi
+2026-11-27T11:12:39.6093005Z if [ -n "$PR" ]; then
+2026-11-27T11:12:39.6094802Z   labels=$(gh api "repos/$GITHUB_REPOSITORY/issues/$PR/labels" --jq '[.[].name]')
+2026-11-27T11:12:39.6096595Z else
+2026-11-27T11:12:39.6098354Z   labels=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq '[.[0].labels[]?.name]')
+2026-11-27T11:12:39.6100425Z fi
+2026-11-27T11:12:39.6101470Z echo "labels=$labels" >> "$GITHUB_OUTPUT"
+2026-11-27T11:12:39.6144881Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-27T11:12:39.6146348Z env:
+2026-11-27T11:12:39.6156809Z   GH_TOKEN: ***
+2026-11-27T11:12:39.6157696Z   PR: 1
+2026-11-27T11:12:39.6158509Z   QUEUED: 
+2026-11-27T11:12:39.6159341Z ##[endgroup]
+2026-11-27T11:12:40.3525829Z ##[group]Run echo "BUNDLE_GEMFILE=$(pwd -W 2> /dev/null || pwd)/$GEMFILE" >> "$GITHUB_ENV"
+2026-11-27T11:12:40.3526458Z echo "BUNDLE_GEMFILE=$(pwd -W 2> /dev/null || pwd)/$GEMFILE" >> "$GITHUB_ENV"
+2026-11-27T11:12:40.3565726Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-27T11:12:40.3566116Z env:
+2026-11-27T11:12:40.3566332Z   GEMFILE: gemfiles/duel.gemfile
+2026-11-27T11:12:40.3566601Z ##[endgroup]
+2026-11-27T11:12:40.3868795Z ##[group]Run case "$JIT" in
+2026-11-27T11:12:40.3869098Z case "$JIT" in
+2026-11-27T11:12:40.3869402Z   yjit) echo "RUBY_YJIT_ENABLE=1" >> "$GITHUB_ENV" ;;
+2026-11-27T11:12:40.3869803Z   zjit) echo "RUBY_ZJIT_ENABLE=1" >> "$GITHUB_ENV" ;;
+2026-11-27T11:12:40.3870221Z   *) echo "::error::jit: $JIT: give none, yjit or zjit" && exit 1 ;;
+2026-11-27T11:12:40.3870760Z esac
+2026-11-27T11:12:40.3906471Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-27T11:12:40.3906833Z env:
+2026-11-27T11:12:40.3907171Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+2026-11-27T11:12:40.3907558Z   JIT: yjit
+2026-11-27T11:12:40.3907766Z ##[endgroup]
+2026-11-27T11:12:40.4457693Z ##[group]Run ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0
+2026-11-27T11:12:40.4458071Z with:
+2026-11-27T11:12:40.4458280Z   working-directory: .
+2026-11-27T11:12:40.4458513Z   ruby-version: 4.0
+2026-11-27T11:12:40.4458729Z   bundler-cache: true
+2026-11-27T11:12:40.4461293Z   token: ***
+2026-11-27T11:12:40.4461499Z env:
+2026-11-27T11:12:40.4461809Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+2026-11-27T11:12:40.4462192Z   RUBY_YJIT_ENABLE: 1
+2026-11-27T11:12:40.4462414Z ##[endgroup]
+2026-11-27T11:12:40.5829123Z ##[group]Modifying PATH
+2026-11-27T11:12:40.5829867Z Entries added to PATH to use selected Ruby:
+2026-11-27T11:12:40.5830941Z   /opt/hostedtoolcache/Ruby/4.0.10/x64/bin
+2026-11-27T11:12:40.5839056Z ##[endgroup]
+2026-11-27T11:12:40.5844961Z ##[group]Downloading Ruby
+2026-11-27T11:12:40.5846669Z https://github.com/ruby/ruby-builder/releases/download/ruby-4.0.10/ruby-4.0.10-ubuntu-26.04-x64.tar.gz
+2026-11-27T11:12:41.1682661Z Took   0.58 seconds
+2026-11-27T11:12:41.1683904Z ##[endgroup]
+2026-11-27T11:12:41.1685060Z ##[group]Extracting  Ruby
+2026-11-27T11:12:41.1711067Z [command]/usr/bin/tar -xz -C /opt/hostedtoolcache/Ruby/4.0.10 -f /home/runner/work/_temp/5775202e-c417-4a7c-b4f7-aa7ed231209b
+2026-11-27T11:12:41.5784088Z Took   0.41 seconds
+2026-11-27T11:12:41.5784959Z ##[endgroup]
+2026-11-27T11:12:41.5785772Z ##[group]Print Ruby version
+2026-11-27T11:12:41.5798389Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/ruby --version
+2026-11-27T11:12:41.5888310Z ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+2026-11-27T11:12:41.5897421Z Took   0.01 seconds
+2026-11-27T11:12:41.5898118Z ##[endgroup]
+2026-11-27T11:12:41.5898811Z ##[group]Installing Bundler
+2026-11-27T11:12:41.5903806Z Using Bundler shipped with ruby-4.0.10
+2026-11-27T11:12:41.5904504Z Took   0.00 seconds
+2026-11-27T11:12:41.5905139Z ##[endgroup]
+2026-11-27T11:12:41.5905742Z > bundle install
+2026-11-27T11:12:41.5915463Z Setting BUNDLER_VERSION=4 for "bundle config|lock" commands below to ensure Bundler 4 is used
+2026-11-27T11:12:41.5927653Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/bundle config set --local path /home/runner/work/hashie/hashie/vendor/bundle
+2026-11-27T11:12:41.7721928Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/bundle lock
+2026-11-27T11:12:42.8544541Z Writing lockfile to /home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock
+2026-11-27T11:12:48.5376119Z Fetching gem metadata from http://rubygems.org/.........
+2026-11-27T11:12:48.7118103Z Resolving dependencies...
+2026-11-27T11:12:49.5383700Z ##[group]Print lockfile
+2026-11-27T11:12:49.5397938Z [command]/usr/bin/cat /home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock
+2026-11-27T11:12:49.5455131Z PATH
+2026-11-27T11:12:49.5455812Z   remote: ..
+2026-11-27T11:12:49.5456132Z   specs:
+2026-11-27T11:12:49.5456441Z     hashie (6.0.1)
+2026-11-27T11:12:49.5456758Z       logger
+2026-11-27T11:12:49.5456930Z 
+2026-11-27T11:12:49.5457092Z GEM
+2026-11-27T11:12:49.5457431Z   remote: http://rubygems.org/
+2026-11-27T11:12:49.5457803Z   specs:
+2026-11-27T11:12:49.5458103Z     activesupport (5.2.8.1)
+2026-11-27T11:12:49.5458463Z       concurrent-ruby (~> 1.0, >= 1.0.2)
+2026-11-27T11:12:49.5458870Z       i18n (>= 0.7, < 2)
+2026-11-27T11:12:49.5459209Z       minitest (~> 5.1)
+2026-11-27T11:12:49.5459543Z       tzinfo (~> 1.1)
+2026-11-27T11:12:49.5459873Z     addressable (2.10.0)
+2026-11-27T11:12:49.5460248Z       public_suffix (>= 2.0.2, < 8.0)
+2026-11-27T11:12:49.5460655Z     asciidoctor (2.0.26)
+2026-11-27T11:12:49.5460985Z     ast (2.4.3)
+2026-11-27T11:12:49.5461286Z     base64 (0.3.0)
+2026-11-27T11:12:49.5462008Z     bigdecimal (4.1.3)
+2026-11-27T11:12:49.5462343Z     canon (0.3.130)
+2026-11-27T11:12:49.5462631Z       diff-lcs
+2026-11-27T11:12:49.5462912Z       json
+2026-11-27T11:12:49.5463193Z       leptris (~> 1.9.446)
+2026-11-27T11:12:49.5463534Z       moxml (~> 0.6.19)
+2026-11-27T11:12:49.5463850Z       paint
+2026-11-27T11:12:49.5464128Z       rainbow
+2026-11-27T11:12:49.5464961Z       table_tennis
+2026-11-27T11:12:49.5465281Z       thor (~> 1.4)
+2026-11-27T11:12:49.5465587Z       unicode-name
+2026-11-27T11:12:49.5465896Z       yeptris (~> 0.6.86)
+2026-11-27T11:12:49.5466237Z     celluloid (0.16.0)
+2026-11-27T11:12:49.5466561Z       timers (~> 4.0.0)
+2026-11-27T11:12:49.5466885Z     claide (1.1.0)
+2026-11-27T11:12:49.5467213Z     claide-plugins (0.9.2)
+2026-11-27T11:12:49.5467533Z       cork
+2026-11-27T11:12:49.5467794Z       nap
+2026-11-27T11:12:49.5468062Z       open4 (~> 1.3)
+2026-11-27T11:12:49.5468361Z     coderay (1.1.3)
+2026-11-27T11:12:49.5468656Z     colored2 (3.1.2)
+2026-11-27T11:12:49.5468988Z     commonmarker (2.10.1-aarch64-linux)
+2026-11-27T11:12:49.5469421Z     commonmarker (2.10.1-aarch64-linux-musl)
+2026-11-27T11:12:49.5469862Z     commonmarker (2.10.1-arm64-darwin)
+2026-11-27T11:12:49.5470290Z     commonmarker (2.10.1-x86_64-darwin)
+2026-11-27T11:12:49.5470700Z     commonmarker (2.10.1-x86_64-linux)
+2026-11-27T11:12:49.5471118Z     commonmarker (2.10.1-x86_64-linux-musl)
+2026-11-27T11:12:49.5471558Z     concurrent-ruby (1.3.8)
+2026-11-27T11:12:49.5471901Z     cork (0.3.0)
+2026-11-27T11:12:49.5472209Z       colored2 (~> 3.1)
+2026-11-27T11:12:49.5472534Z     csv (3.3.7)
+2026-11-27T11:12:49.5472845Z     danger (9.6.2)
+2026-11-27T11:12:49.5473160Z       base64 (~> 0.2)
+2026-11-27T11:12:49.5473462Z       claide (~> 1.0)
+2026-11-27T11:12:49.5473788Z       claide-plugins (>= 0.9.2)
+2026-11-27T11:12:49.5474158Z       colored2 (>= 3.1, < 5)
+2026-11-27T11:12:49.5474700Z       cork (~> 0.1)
+2026-11-27T11:12:49.5475007Z       faraday (>= 0.9.0, < 3.0)
+2026-11-27T11:12:49.5475400Z       faraday-http-cache (>= 2.0, < 4.0)
+2026-11-27T11:12:49.5475819Z       git (>= 1.13)
+2026-11-27T11:12:49.5476152Z       kramdown (>= 2.5.1, < 3.0)
+2026-11-27T11:12:49.5476564Z       kramdown-parser-gfm (~> 1.0)
+2026-11-27T11:12:49.5476981Z       octokit (>= 4.0)
+2026-11-27T11:12:49.5477323Z       pstore (~> 0.1)
+2026-11-27T11:12:49.5477667Z       terminal-table (>= 1, < 5)
+2026-11-27T11:12:49.5478062Z     danger-changelog (0.10.1)
+2026-11-27T11:12:49.5478457Z       danger-plugin-api (~> 1.0)
+2026-11-27T11:12:49.5478859Z     danger-plugin-api (1.0.0)
+2026-11-27T11:12:49.5479238Z       danger (> 2.0)
+2026-11-27T11:12:49.5479575Z     danger-pr-comment (0.3.0)
+2026-11-27T11:12:49.5479931Z       danger (~> 9)
+2026-11-27T11:12:49.5480260Z     danger-toc (0.3.0)
+2026-11-27T11:12:49.5480603Z       activesupport
+2026-11-27T11:12:49.5480951Z       danger-plugin-api (~> 1.0)
+2026-11-27T11:12:49.5481327Z       diff-lcs (~> 1.5)
+2026-11-27T11:12:49.5481647Z       kramdown
+2026-11-27T11:12:49.5481959Z       kramdown-parser-gfm
+2026-11-27T11:12:49.5482332Z     diff-lcs (1.6.2)
+2026-11-27T11:12:49.5482645Z     duel (0.3.1)
+2026-11-27T11:12:49.5482958Z       fiddle (~> 1.1)
+2026-11-27T11:12:49.5483279Z     erb (6.0.7)
+2026-11-27T11:12:49.5483584Z     faraday (2.15.1)
+2026-11-27T11:12:49.5483987Z       faraday-net_http (>= 2.0, < 3.6)
+2026-11-27T11:12:49.5484719Z       json
+2026-11-27T11:12:49.5484983Z       logger
+2026-11-27T11:12:49.5485346Z     faraday-http-cache (3.0.0)
+2026-11-27T11:12:49.5485729Z       faraday (>= 0.8)
+2026-11-27T11:12:49.5486078Z     faraday-net_http (3.5.0)
+2026-11-27T11:12:49.5486450Z       net-http (~> 0.5)
+2026-11-27T11:12:49.5486805Z     ffi (1.17.4-aarch64-linux-gnu)
+2026-11-27T11:12:49.5487213Z     ffi (1.17.4-aarch64-linux-musl)
+2026-11-27T11:12:49.5487625Z     ffi (1.17.4-arm64-darwin)
+2026-11-27T11:12:49.5488000Z     ffi (1.17.4-x86_64-darwin)
+2026-11-27T11:12:49.5488373Z     ffi (1.17.4-x86_64-linux-gnu)
+2026-11-27T11:12:49.5488740Z     ffi (1.17.4-x86_64-linux-musl)
+2026-11-27T11:12:49.5488986Z     fiddle (1.1.8)
+2026-11-27T11:12:49.5489430Z     formatador (1.2.3)
+2026-11-27T11:12:49.5489654Z       reline
+2026-11-27T11:12:49.5489852Z     git (5.7.1)
+2026-11-27T11:12:49.5490064Z       activesupport (>= 5.0)
+2026-11-27T11:12:49.5490313Z       addressable (~> 2.8)
+2026-11-27T11:12:49.5490560Z       process_executer (~> 4.1)
+2026-11-27T11:12:49.5490807Z       rchardet (~> 1.9)
+2026-11-27T11:12:49.5491164Z     guard (2.6.1)
+2026-11-27T11:12:49.5491380Z       formatador (>= 0.2.4)
+2026-11-27T11:12:49.5491616Z       listen (~> 2.7)
+2026-11-27T11:12:49.5491905Z       lumberjack (~> 1.0)
+2026-11-27T11:12:49.5492245Z       pry (>= 0.9.12)
+2026-11-27T11:12:49.5492554Z       thor (>= 0.18.1)
+2026-11-27T11:12:49.5492874Z     guard-compat (1.2.1)
+2026-11-27T11:12:49.5493210Z     guard-rspec (4.3.1)
+2026-11-27T11:12:49.5493534Z       guard (~> 2.1)
+2026-11-27T11:12:49.5493864Z       rspec (>= 2.14, < 4.0)
+2026-11-27T11:12:49.5494496Z     guard-yield (0.1.0)
+2026-11-27T11:12:49.5494856Z       guard-compat (~> 1.0)
+2026-11-27T11:12:49.5495226Z     hitimes (3.2.0)
+2026-11-27T11:12:49.5495545Z     i18n (1.15.2)
+2026-11-27T11:12:49.5495821Z       concurrent-ruby (~> 1.0)
+2026-11-27T11:12:49.5496067Z     io-console (0.9.5)
+2026-11-27T11:12:49.5496281Z     json (3.2.0)
+2026-11-27T11:12:49.5496498Z     kotoshu (1.0.8-aarch64-linux)
+2026-11-27T11:12:49.5496757Z       lutaml-model (~> 0.8)
+2026-11-27T11:12:49.5497004Z       rubyzip (~> 2.3)
+2026-11-27T11:12:49.5497215Z       thor (~> 1.0)
+2026-11-27T11:12:49.5497430Z     kotoshu (1.0.8-arm64-darwin)
+2026-11-27T11:12:49.5497842Z       lutaml-model (~> 0.8)
+2026-11-27T11:12:49.5498179Z       rubyzip (~> 2.3)
+2026-11-27T11:12:49.5498500Z       thor (~> 1.0)
+2026-11-27T11:12:49.5498823Z     kotoshu (1.0.8-x86_64-darwin)
+2026-11-27T11:12:49.5499304Z       lutaml-model (~> 0.8)
+2026-11-27T11:12:49.5499659Z       rubyzip (~> 2.3)
+2026-11-27T11:12:49.5499982Z       thor (~> 1.0)
+2026-11-27T11:12:49.5500304Z     kotoshu (1.0.8-x86_64-linux)
+2026-11-27T11:12:49.5500671Z       lutaml-model (~> 0.8)
+2026-11-27T11:12:49.5501024Z       rubyzip (~> 2.3)
+2026-11-27T11:12:49.5501352Z       thor (~> 1.0)
+2026-11-27T11:12:49.5501668Z     kramdown (2.6.1)
+2026-11-27T11:12:49.5501988Z       rexml (>= 3.4.4)
+2026-11-27T11:12:49.5502343Z     kramdown-parser-gfm (1.1.0)
+2026-11-27T11:12:49.5502706Z       kramdown (~> 2.0)
+2026-11-27T11:12:49.5503074Z     language_server-protocol (3.17.0.6)
+2026-11-27T11:12:49.5503531Z     leptris (1.9.448.0-aarch64-linux)
+2026-11-27T11:12:49.5503930Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5504485Z     leptris (1.9.448.0-aarch64-linux-musl)
+2026-11-27T11:12:49.5504911Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5505226Z     leptris (1.9.448.0-arm64-darwin)
+2026-11-27T11:12:49.5505571Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5505871Z     leptris (1.9.448.0-x86_64-darwin)
+2026-11-27T11:12:49.5506242Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5506564Z     leptris (1.9.448.0-x86_64-linux)
+2026-11-27T11:12:49.5506955Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5507293Z     leptris (1.9.448.0-x86_64-linux-musl)
+2026-11-27T11:12:49.5507725Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5508031Z     lint_roller (1.1.0)
+2026-11-27T11:12:49.5508368Z     liquid (5.14.0)
+2026-11-27T11:12:49.5508685Z       bigdecimal
+2026-11-27T11:12:49.5509017Z       strscan (>= 3.1.1)
+2026-11-27T11:12:49.5509363Z     listen (2.10.1)
+2026-11-27T11:12:49.5509688Z       celluloid (~> 0.16.0)
+2026-11-27T11:12:49.5510074Z       rb-fsevent (>= 0.9.3)
+2026-11-27T11:12:49.5510449Z       rb-inotify (>= 0.9)
+2026-11-27T11:12:49.5510793Z     logger (1.7.0)
+2026-11-27T11:12:49.5511118Z     lumberjack (1.4.2)
+2026-11-27T11:12:49.5511467Z     lutaml-model (0.8.14)
+2026-11-27T11:12:49.5511817Z       base64
+2026-11-27T11:12:49.5512114Z       bigdecimal
+2026-11-27T11:12:49.5512409Z       canon
+2026-11-27T11:12:49.5512787Z       concurrent-ruby
+2026-11-27T11:12:49.5513146Z       liquid (>= 4.0, < 6.0)
+2026-11-27T11:12:49.5513517Z       moxml (>= 0.1.22)
+2026-11-27T11:12:49.5513850Z       ostruct
+2026-11-27T11:12:49.5514169Z       rubyzip (~> 2.3)
+2026-11-27T11:12:49.5515067Z       thor
+2026-11-27T11:12:49.5515375Z     memo_wise (1.13.0)
+2026-11-27T11:12:49.5515719Z     method_source (1.1.0)
+2026-11-27T11:12:49.5516115Z     minitest (5.27.0)
+2026-11-27T11:12:49.5516467Z     moxml (0.6.20)
+2026-11-27T11:12:49.5516790Z     mutex_m (0.3.0)
+2026-11-27T11:12:49.5517108Z     nap (1.2.0)
+2026-11-27T11:12:49.5517430Z     net-http (0.10.0)
+2026-11-27T11:12:49.5518005Z       net-protocol (>= 0.3.0)
+2026-11-27T11:12:49.5518421Z       uri (>= 0.11.1)
+2026-11-27T11:12:49.5518751Z     net-protocol (0.4.0)
+2026-11-27T11:12:49.5519097Z       timeout
+2026-11-27T11:12:49.5519404Z     octokit (10.0.0)
+2026-11-27T11:12:49.5519736Z       faraday (>= 1, < 3)
+2026-11-27T11:12:49.5520081Z       sawyer (~> 0.9)
+2026-11-27T11:12:49.5520436Z     open4 (1.3.4)
+2026-11-27T11:12:49.5520751Z     ostruct (0.6.3)
+2026-11-27T11:12:49.5521067Z     paint (2.3.0)
+2026-11-27T11:12:49.5521393Z     parallel (2.3.0)
+2026-11-27T11:12:49.5521726Z     parser (3.3.14.0)
+2026-11-27T11:12:49.5522064Z       ast (~> 2.4.1)
+2026-11-27T11:12:49.5522364Z       racc
+2026-11-27T11:12:49.5522683Z     prism (2.1.0-aarch64-linux-gnu)
+2026-11-27T11:12:49.5523117Z     prism (2.1.0-aarch64-linux-musl)
+2026-11-27T11:12:49.5523539Z     prism (2.1.0-arm64-darwin)
+2026-11-27T11:12:49.5523921Z     prism (2.1.0-x86_64-darwin)
+2026-11-27T11:12:49.5524511Z     prism (2.1.0-x86_64-linux-gnu)
+2026-11-27T11:12:49.5524928Z     prism (2.1.0-x86_64-linux-musl)
+2026-11-27T11:12:49.5525345Z     process_executer (4.1.3)
+2026-11-27T11:12:49.5525744Z       track_open_instances (~> 0.1)
+2026-11-27T11:12:49.5526151Z     pry (0.16.1)
+2026-11-27T11:12:49.5526479Z       coderay (~> 1.1)
+2026-11-27T11:12:49.5526824Z       method_source (~> 1.0)
+2026-11-27T11:12:49.5527187Z       reline (>= 0.6.0)
+2026-11-27T11:12:49.5527507Z     pstore (0.3.0)
+2026-11-27T11:12:49.5527822Z     public_suffix (7.0.5)
+2026-11-27T11:12:49.5528155Z     racc (1.8.1)
+2026-11-27T11:12:49.5528457Z     rainbow (3.1.1)
+2026-11-27T11:12:49.5528765Z     rake (13.4.2)
+2026-11-27T11:12:49.5529085Z     rb-fsevent (0.11.2)
+2026-11-27T11:12:49.5529414Z     rb-inotify (0.11.1)
+2026-11-27T11:12:49.5529733Z       ffi (~> 1.0)
+2026-11-27T11:12:49.5530041Z     rbs (4.2.0)
+2026-11-27T11:12:49.5530332Z       logger
+2026-11-27T11:12:49.5530622Z       prism (>= 1.6.0)
+2026-11-27T11:12:49.5530937Z       tsort
+2026-11-27T11:12:49.5531231Z     rchardet (1.10.2)
+2026-11-27T11:12:49.5531558Z     rdoc (8.1.0)
+2026-11-27T11:12:49.5531859Z       erb
+2026-11-27T11:12:49.5532137Z       prism (>= 1.6.0)
+2026-11-27T11:12:49.5532449Z       rbs (>= 4.0.0)
+2026-11-27T11:12:49.5532746Z       tsort
+2026-11-27T11:12:49.5533034Z     regexp_parser (2.13.4)
+2026-11-27T11:12:49.5533381Z     reline (0.7.0)
+2026-11-27T11:12:49.5533693Z       io-console (~> 0.5)
+2026-11-27T11:12:49.5534036Z     rexml (3.4.4)
+2026-11-27T11:12:49.5534544Z     rspec (3.13.2)
+2026-11-27T11:12:49.5534866Z       rspec-core (~> 3.13.0)
+2026-11-27T11:12:49.5535253Z       rspec-expectations (~> 3.13.0)
+2026-11-27T11:12:49.5535665Z       rspec-mocks (~> 3.13.0)
+2026-11-27T11:12:49.5536043Z     rspec-core (3.13.7)
+2026-11-27T11:12:49.5536387Z       rspec-support (~> 3.13.0)
+2026-11-27T11:12:49.5536772Z     rspec-expectations (3.13.6)
+2026-11-27T11:12:49.5537147Z       diff-lcs (>= 1.2.0, < 2.0)
+2026-11-27T11:12:49.5537526Z       rspec-support (~> 3.13.0)
+2026-11-27T11:12:49.5537895Z     rspec-mocks (3.13.9)
+2026-11-27T11:12:49.5538259Z       diff-lcs (>= 1.2.0, < 2.0)
+2026-11-27T11:12:49.5538629Z       rspec-support (~> 3.13.0)
+2026-11-27T11:12:49.5539004Z     rspec-pending_for (0.1.29)
+2026-11-27T11:12:49.5539377Z       rspec-core (~> 3.0)
+2026-11-27T11:12:49.5539724Z       ruby_engine (~> 2.0)
+2026-11-27T11:12:49.5540079Z       ruby_version (~> 1.0)
+2026-11-27T11:12:49.5540443Z     rspec-support (3.13.8)
+2026-11-27T11:12:49.5540778Z     rubocop (1.91.0)
+2026-11-27T11:12:49.5541090Z       json (>= 2.3)
+2026-11-27T11:12:49.5541432Z       language_server-protocol (~> 3.17.0.2)
+2026-11-27T11:12:49.5541861Z       lint_roller (~> 1.1.0)
+2026-11-27T11:12:49.5542487Z       parallel (>= 1.10)
+2026-11-27T11:12:49.5542831Z       parser (>= 3.3.0.2)
+2026-11-27T11:12:49.5552765Z       rainbow (>= 2.2.2, < 4.0)
+2026-11-27T11:12:49.5553172Z       regexp_parser (>= 2.9.3, < 3.0)
+2026-11-27T11:12:49.5553464Z       rubocop-ast (>= 1.49.0, < 2.0)
+2026-11-27T11:12:49.5553734Z       ruby-progressbar (~> 1.7)
+2026-11-27T11:12:49.5554464Z       unicode-display_width (>= 2.4.0, < 4.0)
+2026-11-27T11:12:49.5554792Z     rubocop-ast (1.54.0)
+2026-11-27T11:12:49.5555084Z       ast (~> 2.4)
+2026-11-27T11:12:49.5555302Z       parser (>= 3.3.7.2)
+2026-11-27T11:12:49.5555528Z       prism (>= 1.7)
+2026-11-27T11:12:49.5555744Z       racc
+2026-11-27T11:12:49.5555966Z     rubocop-exception_messages (0.2.0)
+2026-11-27T11:12:49.5556241Z       lint_roller (~> 1.1)
+2026-11-27T11:12:49.5556468Z       rubocop (~> 1.72)
+2026-11-27T11:12:49.5556690Z     rubocop-rake (0.7.1)
+2026-11-27T11:12:49.5556913Z       lint_roller (~> 1.1)
+2026-11-27T11:12:49.5557139Z       rubocop (>= 1.72.1)
+2026-11-27T11:12:49.5557378Z     rubocop-rspec (3.10.2)
+2026-11-27T11:12:49.5557600Z       lint_roller (~> 1.1)
+2026-11-27T11:12:49.5557827Z       regexp_parser (>= 2.0)
+2026-11-27T11:12:49.5558080Z       rubocop (~> 1.86, >= 1.86.2)
+2026-11-27T11:12:49.5558335Z     rubocop-spellcheck (0.2.0)
+2026-11-27T11:12:49.5558588Z       asciidoctor (~> 2.0)
+2026-11-27T11:12:49.5558825Z       commonmarker (~> 2.0)
+2026-11-27T11:12:49.5559052Z       kotoshu (~> 1.0.8)
+2026-11-27T11:12:49.5559272Z       lint_roller (~> 1.1)
+2026-11-27T11:12:49.5559490Z       rdoc (~> 8.1)
+2026-11-27T11:12:49.5559697Z       rubocop (~> 1.72, >= 1.72.1)
+2026-11-27T11:12:49.5560071Z     ruby-gem-release (0.6.0)
+2026-11-27T11:12:49.5560446Z       commonmarker (~> 2.10)
+2026-11-27T11:12:49.5560785Z       rake (>= 13)
+2026-11-27T11:12:49.5561117Z     ruby-progressbar (1.13.0)
+2026-11-27T11:12:49.5561491Z     ruby_engine (2.0.3)
+2026-11-27T11:12:49.5561868Z     ruby_version (1.0.3)
+2026-11-27T11:12:49.5562213Z     rubyzip (2.4.1)
+2026-11-27T11:12:49.5562536Z     sawyer (0.9.3)
+2026-11-27T11:12:49.5562860Z       addressable (>= 2.3.5)
+2026-11-27T11:12:49.5563108Z       faraday (>= 0.17.3, < 3)
+2026-11-27T11:12:49.5563348Z     simplecov (1.3.2)
+2026-11-27T11:12:49.5563592Z     simplecov-lcov (0.9.0)
+2026-11-27T11:12:49.5563828Z     stackprof (0.2.28)
+2026-11-27T11:12:49.5564040Z     strscan (3.1.8)
+2026-11-27T11:12:49.5564491Z     table_tennis (1.0.0)
+2026-11-27T11:12:49.5564718Z       csv (~> 3.3)
+2026-11-27T11:12:49.5564922Z       ffi (~> 1.17)
+2026-11-27T11:12:49.5565136Z       memo_wise (~> 1.13)
+2026-11-27T11:12:49.5565363Z       paint (~> 2.3)
+2026-11-27T11:12:49.5565592Z       unicode-display_width (~> 3.2)
+2026-11-27T11:12:49.5565856Z     terminal-table (4.0.0)
+2026-11-27T11:12:49.5566165Z       unicode-display_width (>= 1.1.1, < 4)
+2026-11-27T11:12:49.5566569Z     thor (1.5.0)
+2026-11-27T11:12:49.5566883Z     thread_safe (0.3.6)
+2026-11-27T11:12:49.5567213Z     timeout (0.6.1)
+2026-11-27T11:12:49.5567522Z     timers (4.0.4)
+2026-11-27T11:12:49.5567837Z       hitimes
+2026-11-27T11:12:49.5568162Z     track_open_instances (0.1.15)
+2026-11-27T11:12:49.5568553Z     tsort (0.2.0)
+2026-11-27T11:12:49.5568866Z     tzinfo (1.2.11)
+2026-11-27T11:12:49.5569178Z       thread_safe (~> 0.1)
+2026-11-27T11:12:49.5569538Z     unicode-display_width (3.3.0)
+2026-11-27T11:12:49.5569945Z       unicode-emoji (~> 4.3)
+2026-11-27T11:12:49.5570332Z     unicode-emoji (4.3.0)
+2026-11-27T11:12:49.5570684Z     unicode-name (1.15.1)
+2026-11-27T11:12:49.5571041Z       unicode-types (~> 1.12)
+2026-11-27T11:12:49.5571424Z     unicode-types (1.12.0)
+2026-11-27T11:12:49.5571765Z     uri (1.1.2)
+2026-11-27T11:12:49.5572073Z     yard (0.9.46)
+2026-11-27T11:12:49.5572410Z     yeptris (0.6.91.0-aarch64-linux)
+2026-11-27T11:12:49.5572814Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5573151Z     yeptris (0.6.91.0-aarch64-linux-musl)
+2026-11-27T11:12:49.5573559Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5573885Z     yeptris (0.6.91.0-arm64-darwin)
+2026-11-27T11:12:49.5574492Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5575101Z     yeptris (0.6.91.0-x86_64-darwin)
+2026-11-27T11:12:49.5575488Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5575818Z     yeptris (0.6.91.0-x86_64-linux)
+2026-11-27T11:12:49.5576204Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5576544Z     yeptris (0.6.91.0-x86_64-linux-musl)
+2026-11-27T11:12:49.5576946Z       ffi (~> 1.15)
+2026-11-27T11:12:49.5577146Z 
+2026-11-27T11:12:49.5577471Z PLATFORMS
+2026-11-27T11:12:49.5577782Z   aarch64-linux
+2026-11-27T11:12:49.5578104Z   aarch64-linux-gnu
+2026-11-27T11:12:49.5578439Z   aarch64-linux-musl
+2026-11-27T11:12:49.5578778Z   arm64-darwin
+2026-11-27T11:12:49.5579075Z   x86_64-darwin
+2026-11-27T11:12:49.5579378Z   x86_64-linux-gnu
+2026-11-27T11:12:49.5579688Z   x86_64-linux-musl
+2026-11-27T11:12:49.5579886Z 
+2026-11-27T11:12:49.5580017Z DEPENDENCIES
+2026-11-27T11:12:49.5580349Z   activesupport (~> 5.x)
+2026-11-27T11:12:49.5580706Z   bundler
+2026-11-27T11:12:49.5581012Z   danger-changelog
+2026-11-27T11:12:49.5581333Z   danger-pr-comment
+2026-11-27T11:12:49.5581662Z   danger-toc
+2026-11-27T11:12:49.5581962Z   duel (= 0.3.1)
+2026-11-27T11:12:49.5582274Z   guard (~> 2.6.1)
+2026-11-27T11:12:49.5582602Z   guard-rspec (~> 4.3.1)
+2026-11-27T11:12:49.5582947Z   guard-yield (~> 0.1.0)
+2026-11-27T11:12:49.5583272Z   hashie!
+2026-11-27T11:12:49.5583555Z   mutex_m
+2026-11-27T11:12:49.5583842Z   pry
+2026-11-27T11:12:49.5584128Z   rake
+2026-11-27T11:12:49.5584655Z   rspec (~> 3)
+2026-11-27T11:12:49.5584986Z   rspec-pending_for (~> 0.1)
+2026-11-27T11:12:49.5585369Z   rubocop (= 1.91.0)
+2026-11-27T11:12:49.5585713Z   rubocop-exception_messages
+2026-11-27T11:12:49.5586073Z   rubocop-rake
+2026-11-27T11:12:49.5586386Z   rubocop-rspec
+2026-11-27T11:12:49.5586726Z   rubocop-spellcheck (~> 0.2)
+2026-11-27T11:12:49.5587104Z   ruby-gem-release (= 0.6.0)
+2026-11-27T11:12:49.5587453Z   simplecov
+2026-11-27T11:12:49.5587752Z   simplecov-lcov
+2026-11-27T11:12:49.5588075Z   stackprof
+2026-11-27T11:12:49.5588375Z   yard (~> 0.9.45)
+2026-11-27T11:12:49.5588562Z 
+2026-11-27T11:12:49.5588691Z CHECKSUMS
+2026-11-27T11:12:49.5589289Z   activesupport (5.2.8.1) sha256=f0498c616e1b243c7b56d67920c389f959c186ad7031569e80335b42e1d22564
+2026-11-27T11:12:49.5590218Z   addressable (2.10.0) sha256=5e13b9c001adf01dd65ad6e0d2a91d2bc07885c0ff2b83f48cbcd95e08d9de62
+2026-11-27T11:12:49.5591149Z   asciidoctor (2.0.26) sha256=16e3accf1fc206bbd6335848649d7fd65f31d2daa60d85af13d47a8ee4b071c1
+2026-11-27T11:12:49.5592020Z   ast (2.4.3) sha256=954615157c1d6a382bc27d690d973195e79db7f55e9765ac7c481c60bdb4d383
+2026-11-27T11:12:49.5592852Z   base64 (0.3.0) sha256=27337aeabad6ffae05c265c450490628ef3ebd4b67be58257393227588f5a97b
+2026-11-27T11:12:49.5593772Z   bigdecimal (4.1.3) sha256=61ebe1e5e559bdc3cc6f2c0ee7f427321fc838f59611c294356eb04d6e21cf66
+2026-11-27T11:12:49.5594948Z   canon (0.3.130) sha256=2faf405e2a567b78f480102eb8628d1e8d7a700e85a4155c938b810043372db6
+2026-11-27T11:12:49.5595825Z   celluloid (0.16.0) sha256=63779982ab200d9a67562998f52dcaff685372919faeb3bf53b287783c989d10
+2026-11-27T11:12:49.5596744Z   claide (1.1.0) sha256=6d3c5c089dde904d96aa30e73306d0d4bd444b1accb9b3125ce14a3c0183f82e
+2026-11-27T11:12:49.5597715Z   claide-plugins (0.9.2) sha256=c7ea78bc067ab23bce8515497cdcdcb8f01c86dadfbe13c44644e382922c1c2e
+2026-11-27T11:12:49.5598662Z   coderay (1.1.3) sha256=dc530018a4684512f8f38143cd2a096c9f02a1fc2459edcfe534787a7fc77d4b
+2026-11-27T11:12:49.5599616Z   colored2 (3.1.2) sha256=b13c2bd7eeae2cf7356a62501d398e72fde78780bd26aec6a979578293c28b4a
+2026-11-27T11:12:49.5600692Z   commonmarker (2.10.1-aarch64-linux) sha256=3ab9e7027d2350364bdc541680cc28e21011b2950abf7d08ac29093fa691bdc3
+2026-11-27T11:12:49.5601885Z   commonmarker (2.10.1-aarch64-linux-musl) sha256=98e6d1a03ba708438d804702e3c25f3423bff21a1e9975280eb265d889677dfc
+2026-11-27T11:12:49.5603087Z   commonmarker (2.10.1-arm64-darwin) sha256=f8d9842699c0b2e52d5447ed9cc426bd2803ddaa0460b0a1e1cab9371926c012
+2026-11-27T11:12:49.5604223Z   commonmarker (2.10.1-x86_64-darwin) sha256=22ac1e26059ebf970d6029c9810d5062869b3742c1e827088f38bdb34b75812e
+2026-11-27T11:12:49.5605594Z   commonmarker (2.10.1-x86_64-linux) sha256=4b2c4b9084baca131146c92dde02bcb40ef3d2768a6772648c1970bb51842734
+2026-11-27T11:12:49.5606465Z   commonmarker (2.10.1-x86_64-linux-musl) sha256=afa9e0dc1fef554b7779d815a574d1cb602a9ff9b548dd8be80d66ac69f83866
+2026-11-27T11:12:49.5607271Z   concurrent-ruby (1.3.8) sha256=b2f1be836e968ccc78ccfce277ea79c72a88633f22306782c16ff23fb415d1e1
+2026-11-27T11:12:49.5608083Z   cork (0.3.0) sha256=a0a0ac50e262f8514d1abe0a14e95e71c98b24e3378690e5d044daf0013ad4bc
+2026-11-27T11:12:49.5608623Z   csv (3.3.7) sha256=15a3f16f6628da8664d455eb634e7f22031bcf53044923caf56975109e71b9f8
+2026-11-27T11:12:49.5609197Z   danger (9.6.2) sha256=6c5529f23346ca0c5a24d34c6a9d7705c8bd71ab5cf697f931789792031a6685
+2026-11-27T11:12:49.5609806Z   danger-changelog (0.10.1) sha256=e5b00329a6c88f549a1b06959ae8e2654459b1a7ab9cd157cb40dd0112df887a
+2026-11-27T11:12:49.5610444Z   danger-plugin-api (1.0.0) sha256=a0f3f4f2c19fbdfb41db6015fe8ed5eeb2588dc71f2f78d580294c2b10f83bd3
+2026-11-27T11:12:49.5611093Z   danger-pr-comment (0.3.0) sha256=506bda2e1418bd6981655edd087fb5ca64a267ad1152ad6d225d08f91944d079
+2026-11-27T11:12:49.5611708Z   danger-toc (0.3.0) sha256=996477e25f0131a5aa018a83bd12a4d1cee73092d100fd9bfe3847b3f74ddb39
+2026-11-27T11:12:49.5612294Z   diff-lcs (1.6.2) sha256=9ae0d2cba7d4df3075fe8cd8602a8604993efc0dfa934cff568969efb1909962
+2026-11-27T11:12:49.5612905Z   duel (0.3.1) sha256=6a5363b2ce2dd6c2eaaff99740c5b88ef14cb6dadec06ac71a8dd98563e53355
+2026-11-27T11:12:49.5613442Z   erb (6.0.7) sha256=c5ca6dc25b0ef974a44dc8f59fe847577122483b1968a38dec305c60bf91ee92
+2026-11-27T11:12:49.5613981Z   faraday (2.15.1) sha256=8708154deda739c5e86cc42b74960e23e8491fce0eba9e11639a6a34b1ac288f
+2026-11-27T11:12:49.5614774Z   faraday-http-cache (3.0.0) sha256=44e0b5441825b80aa59446fdb0ceb5a1cf83e9f58fc89752b336d87a991c7994
+2026-11-27T11:12:49.5615394Z   faraday-net_http (3.5.0) sha256=2e7094c34e38754ee048cc3df47376f8657005d9375f8473bce1c3b526a22e36
+2026-11-27T11:12:49.5616034Z   ffi (1.17.4-aarch64-linux-gnu) sha256=b208f06f91ffd8f5e1193da3cae3d2ccfc27fc36fba577baf698d26d91c080df
+2026-11-27T11:12:49.5616708Z   ffi (1.17.4-aarch64-linux-musl) sha256=9286b7a615f2676245283aef0a0a3b475ae3aae2bb5448baace630bb77b91f39
+2026-11-27T11:12:49.5617335Z   ffi (1.17.4-arm64-darwin) sha256=19071aaf1419251b0a46852abf960e77330a3b334d13a4ab51d58b31a937001b
+2026-11-27T11:12:49.5617932Z   ffi (1.17.4-x86_64-darwin) sha256=aa70390523cf3235096cf64962b709b4cfbd5c082a2cb2ae714eb0fe2ccda496
+2026-11-27T11:12:49.5618547Z   ffi (1.17.4-x86_64-linux-gnu) sha256=9d3db14c2eae074b382fa9c083fe95aec6e0a1451da249eab096c34002bc752d
+2026-11-27T11:12:49.5619160Z   ffi (1.17.4-x86_64-linux-musl) sha256=3fdf9888483de005f8ef8d1cf2d3b20d86626af206cbf780f6a6a12439a9c49e
+2026-11-27T11:12:49.5619748Z   fiddle (1.1.8) sha256=7fa8ee3627271497f3add5503acdbc3f40b32f610fc1cf49634f083ef3f32eee
+2026-11-27T11:12:49.5620308Z   formatador (1.2.3) sha256=19fa898133c2c26cdbb5d09f6998c1e137ad9427a046663e55adfe18b950d894
+2026-11-27T11:12:49.5620844Z   git (5.7.1) sha256=fd122920cd611325e8309dd939f2ebb89f5c9d4d83ab423ace04545db136e7f1
+2026-11-27T11:12:49.5621365Z   guard (2.6.1) sha256=dd1947799cc513d25e69d3640aa39ede67e0e429a2099875d640e73a7a726476
+2026-11-27T11:12:49.5621915Z   guard-compat (1.2.1) sha256=3ad21ab0070107f92edfd82610b5cdc2fb8e368851e72362ada9703443d646fe
+2026-11-27T11:12:49.5622499Z   guard-rspec (4.3.1) sha256=fd5aceb4a111538cb3a27bb3c6bbb6b31ccd869233853a08c4df9b52f919c803
+2026-11-27T11:12:49.5623058Z   guard-yield (0.1.0) sha256=1e5621f73634e0392443eda61b626014eb1767ff7eed64a9f58a08c546bf4dbf
+2026-11-27T11:12:49.5623455Z   hashie (6.0.1)
+2026-11-27T11:12:49.5623804Z   hitimes (3.2.0) sha256=949c2b5b60921b648a47a2c373b7b0d01f26c43b588194c9de1f6b73bc7e03e0
+2026-11-27T11:12:49.5624555Z   i18n (1.15.2) sha256=00f9eb62412fe593b2a65a97daa75300d37abb8f7202ec748e94b6d46a9dd1b5
+2026-11-27T11:12:49.5625122Z   io-console (0.9.5) sha256=83dd9bbf4c4680416629245b39cd4212eb5f4d9a4ea91804870c1f6b846414d5
+2026-11-27T11:12:49.5625675Z   json (3.2.0) sha256=4a4e222a9ee6ffb296ab3171b6b39d85fec83afc4e7b57eee17edf68c74aec87
+2026-11-27T11:12:49.5626447Z   kotoshu (1.0.8-aarch64-linux) sha256=0d8d542edec8e9fc5fa0e7089d82bac5c144a6235477e6d64b4858b366e73744
+2026-11-27T11:12:49.5627098Z   kotoshu (1.0.8-arm64-darwin) sha256=4373d75d5ff62f95290dedd6d71cb222d2010a04ab7a061d085ed915442f9928
+2026-11-27T11:12:49.5628319Z   kotoshu (1.0.8-x86_64-darwin) sha256=907a829efe5bd98a80ee3730731c67c667d751b761cd75828b4b299998e83246
+2026-11-27T11:12:49.5629183Z   kotoshu (1.0.8-x86_64-linux) sha256=6ccc1850a98a53bb74a763630e4603546cabf183ad76d1a8bc0692ada1f7465a
+2026-11-27T11:12:49.5629902Z   kramdown (2.6.1) sha256=fbef3479b69c875aacb118dde77a40d6cc3a91e2c1d505a4c3f3f9e92d142641
+2026-11-27T11:12:49.5630508Z   kramdown-parser-gfm (1.1.0) sha256=fb39745516427d2988543bf01fc4cf0ab1149476382393e0e9c48592f6581729
+2026-11-27T11:12:49.5631162Z   language_server-protocol (3.17.0.6) sha256=5ef2c0c138f8267e1bc631d3328347d354f96724b0af22f2c79516120443b7f0
+2026-11-27T11:12:49.5631837Z   leptris (1.9.448.0-aarch64-linux) sha256=32c532cf2d75ad878264b0798d904efc9fad3f08207afff81c0b60a20f3eb406
+2026-11-27T11:12:49.5632528Z   leptris (1.9.448.0-aarch64-linux-musl) sha256=299f42b160c26895af4ab1224d9e517beb9c412a415a1e603d6d51ddf566788f
+2026-11-27T11:12:49.5633223Z   leptris (1.9.448.0-arm64-darwin) sha256=6f72f4e95de6ad331ea00db6aca57bcb39e0a0b7e43b37322c00ee8ea3df5b9f
+2026-11-27T11:12:49.5633879Z   leptris (1.9.448.0-x86_64-darwin) sha256=78e06f1683e61dd785eb5dcbe7b0277d869962c0d3919ab2f5e99e69fa876c40
+2026-11-27T11:12:49.5634726Z   leptris (1.9.448.0-x86_64-linux) sha256=726d2f1cc0b2991781463f90edfacc8fb1e75ef12a65fcc6b6e1ea4d0b357ee0
+2026-11-27T11:12:49.5635398Z   leptris (1.9.448.0-x86_64-linux-musl) sha256=ada923c0604280cfcc1f22618e0712f73d50cae33ab22eb5d6775c6135e35c48
+2026-11-27T11:12:49.5636028Z   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
+2026-11-27T11:12:49.5636600Z   liquid (5.14.0) sha256=e1020c2b2ee58c7a4d3bfdc7a331537bd27a783353748bff0bf27c6ac0c17065
+2026-11-27T11:12:49.5637149Z   listen (2.10.1) sha256=0fc7366e034515b24713cbc529dddf3d5a53a3ec7aae36553fd106d1978deac6
+2026-11-27T11:12:49.5637678Z   logger (1.7.0) sha256=196edec7cc44b66cfb40f9755ce11b392f21f7967696af15d274dde7edff0203
+2026-11-27T11:12:49.5638234Z   lumberjack (1.4.2) sha256=40de5ae46321380c835031bcc1370f13bba304d29f2b5f5bb152061a5a191b95
+2026-11-27T11:12:49.5638804Z   lutaml-model (0.8.14) sha256=3304a55737b7381b724d6308736f7f50c4ebe68ec092dd20ffaa4e99d110bda4
+2026-11-27T11:12:49.5639360Z   memo_wise (1.13.0) sha256=30220c38c4cef410849bc73553c58664dc2c91c6379e4a1df22aea02358b716b
+2026-11-27T11:12:49.5639916Z   method_source (1.1.0) sha256=181301c9c45b731b4769bc81e8860e72f9161ad7d66dd99103c9ab84f560f5c5
+2026-11-27T11:12:49.5640477Z   minitest (5.27.0) sha256=2d3b17f8a36fe7801c1adcffdbc38233b938eb0b4966e97a6739055a45fa77d5
+2026-11-27T11:12:49.5641027Z   moxml (0.6.20) sha256=00d7dee00e9eb04a5756ee7d53634e5ebd8ade2737acc951980242c92c92bf46
+2026-11-27T11:12:49.5641564Z   mutex_m (0.3.0) sha256=cfcb04ac16b69c4813777022fdceda24e9f798e48092a2b817eb4c0a782b0751
+2026-11-27T11:12:49.5642104Z   nap (1.2.0) sha256=fdb4fd0de5509edca600b471570d00ce90745c9c06dc7d877efb513401953051
+2026-11-27T11:12:49.5642641Z   net-http (0.10.0) sha256=1a2ff6e37a05724973c43f2bf7bf105f59c36a4cd0a7e9b1c021a0a566987c27
+2026-11-27T11:12:49.5643210Z   net-protocol (0.4.0) sha256=f9f90c8c6f64794a45160bf422177a336db12809de3beeeaa26b88fcd2e8c853
+2026-11-27T11:12:49.5643779Z   octokit (10.0.0) sha256=82e99a539b7637b7e905e6d277bb0c1a4bed56735935cc33db6da7eae49a24e8
+2026-11-27T11:12:49.5644552Z   open4 (1.3.4) sha256=a1df037310624ecc1ea1d81264b11c83e96d0c3c1c6043108d37d396dcd0f4b1
+2026-11-27T11:12:49.5645109Z   ostruct (0.6.3) sha256=95a2ed4a4bd1d190784e666b47b2d3f078e4a9efda2fccf18f84ddc6538ed912
+2026-11-27T11:12:49.5645646Z   paint (2.3.0) sha256=327d623e4038619d5bd99ae5db07973859cd78400c7f0329eea283cef8e83be5
+2026-11-27T11:12:49.5646186Z   parallel (2.3.0) sha256=f75a3e904101ce6a1ccb6b8dc800cbafd42166d83330192438dcf29395167a6f
+2026-11-27T11:12:49.5646919Z   parser (3.3.14.0) sha256=62f8f76af7b919425ee2d811880e9dcb8011ab40bfd59970dfb583141697e58f
+2026-11-27T11:12:49.5647541Z   prism (2.1.0-aarch64-linux-gnu) sha256=808dddc72def68e1a0463689414c97e0ba211938eddbab05387a4844aa2b3ec2
+2026-11-27T11:12:49.5648219Z   prism (2.1.0-aarch64-linux-musl) sha256=dd1a0732620c1e575dabb07a297a62911fabd72f8e20ce850b522a866f877930
+2026-11-27T11:12:49.5648984Z   prism (2.1.0-arm64-darwin) sha256=2d0c2e3e011cfd89c041940907d3ff3def379d7b0f2ba158d1d42238e8ad8afc
+2026-11-27T11:12:49.5649604Z   prism (2.1.0-x86_64-darwin) sha256=6c645d8e6afc742956c7518220ce5106367727c4d9980ac9ab386d55004ddab4
+2026-11-27T11:12:49.5650222Z   prism (2.1.0-x86_64-linux-gnu) sha256=b2b647afce09551e650b8bb3e2fc91d7d73d392a09534ca307ec0d619c33bfd4
+2026-11-27T11:12:49.5650848Z   prism (2.1.0-x86_64-linux-musl) sha256=249f45981726923e259b927902246219fa25ad10a76f43849c9aee1a3d3ec5b8
+2026-11-27T11:12:49.5651461Z   process_executer (4.1.3) sha256=57f4b179fbb6e947676e179187ea6ec64a35d7125eaa31e2b9a1fe91ff18abf0
+2026-11-27T11:12:49.5652041Z   pry (0.16.1) sha256=d92d82c86e7f2dc34beec6d2892d5cf5ea517eea22eed3ceabb38ee62a98accc
+2026-11-27T11:12:49.5652601Z   pstore (0.3.0) sha256=97888d57cdc8b99b3587dde5e1d01fc5ca4a9124dfeb2afb84e3dd982e78f829
+2026-11-27T11:12:49.5653178Z   public_suffix (7.0.5) sha256=1a8bb08f1bbea19228d3bed6e5ed908d1cb4f7c2726d18bd9cadf60bc676f623
+2026-11-27T11:12:49.5653732Z   racc (1.8.1) sha256=4a7f6929691dbec8b5209a0b373bc2614882b55fc5d2e447a21aaa691303d62f
+2026-11-27T11:12:49.5654450Z   rainbow (3.1.1) sha256=039491aa3a89f42efa1d6dec2fc4e62ede96eb6acd95e52f1ad581182b79bc6a
+2026-11-27T11:12:49.5655002Z   rake (13.4.2) sha256=cb825b2bd5f1f8e91ca37bddb4b9aaf345551b4731da62949be002fa89283701
+2026-11-27T11:12:49.5655551Z   rb-fsevent (0.11.2) sha256=43900b972e7301d6570f64b850a5aa67833ee7d87b458ee92805d56b7318aefe
+2026-11-27T11:12:49.5656124Z   rb-inotify (0.11.1) sha256=a0a700441239b0ff18eb65e3866236cd78613d6b9f78fea1f9ac47a85e47be6e
+2026-11-27T11:12:49.5656663Z   rbs (4.2.0) sha256=51f7b886dcc05bc09e10b901daa6a81829f6adc03101d6ca9ea4aac6103e0674
+2026-11-27T11:12:49.5657227Z   rchardet (1.10.2) sha256=e041cb195f464dc10e49ab130f78c8b5956cd9a4f4f6df84e0c183b87c135f33
+2026-11-27T11:12:49.5657770Z   rdoc (8.1.0) sha256=befc37880a5cfd36dcb176c748b5fd5ee39dd3536a75e81824e4972ce230f60a
+2026-11-27T11:12:49.5658337Z   regexp_parser (2.13.4) sha256=1d0547814f57e6f00946957bd0ca201bc42f42cfb08eee89df60998aedcd8a3b
+2026-11-27T11:12:49.5658906Z   reline (0.7.0) sha256=5b012d8e55dbf9d450f12bde2cf7d15ff546ae80b3f8f3b30e570d431815583d
+2026-11-27T11:12:49.5659441Z   rexml (3.4.4) sha256=19e0a2c3425dfbf2d4fc1189747bdb2f849b6c5e74180401b15734bc97b5d142
+2026-11-27T11:12:49.5659964Z   rspec (3.13.2) sha256=206284a08ad798e61f86d7ca3e376718d52c0bc944626b2349266f239f820587
+2026-11-27T11:12:49.5660499Z   rspec-core (3.13.7) sha256=c64ff16d9788119805cbc6a3f4b6d87cc22417c2d25976a3330de136896b5469
+2026-11-27T11:12:49.5661114Z   rspec-expectations (3.13.6) sha256=bf538ca6d367ff5b0d85a87fdb5c0c6038f2cd1308a0eeba07476caa02d22f35
+2026-11-27T11:12:49.5661735Z   rspec-mocks (3.13.9) sha256=ea5c7ff3054a6098ca6039aacef80aec69d5a8a3ef80be8fc88337359b672a30
+2026-11-27T11:12:49.5662342Z   rspec-pending_for (0.1.29) sha256=11f7b21c87f22ac9a7d1e17ee1dbcdc1b43a0717d733efb0862f3deb39c97a7f
+2026-11-27T11:12:49.5662942Z   rspec-support (3.13.8) sha256=e4160030309b7e3e9d9863dfe720a35dfcc577162f5402cd68fc8c5258a0ffd6
+2026-11-27T11:12:49.5663523Z   rubocop (1.91.0) sha256=9c82b7bf391c5d7e3798c5b9996e22a1fe3bd7468e351dfdeb96140c058296d0
+2026-11-27T11:12:49.5664103Z   rubocop-ast (1.54.0) sha256=11f7cadec54e593e905b1bb78f2b28bdd4b8e13b34cb82fe49c876e3dd5008c1
+2026-11-27T11:12:49.5664917Z   rubocop-exception_messages (0.2.0) sha256=67bf465f442ccea99839875f9d43e40303c8751dcd8e42be199b0ccc1cb605dc
+2026-11-27T11:12:49.5665567Z   rubocop-rake (0.7.1) sha256=3797f2b6810c3e9df7376c26d5f44f3475eda59eb1adc38e6f62ecf027cbae4d
+2026-11-27T11:12:49.5666156Z   rubocop-rspec (3.10.2) sha256=0b3e2ecc592cd10ecbf0095bb58d1e357905276e069643523cc19eb7495f65e2
+2026-11-27T11:12:49.5666929Z   rubocop-spellcheck (0.2.0) sha256=01db98c55c29fa7bb78bfcd7877bb8e533e9f7675578294b6d7bae9e6dc28c68
+2026-11-27T11:12:49.5667589Z   ruby-gem-release (0.6.0) sha256=db9ce8d668a807976c9ba00e51eed97688f67713e8f5eab1576e7dbb905480ed
+2026-11-27T11:12:49.5668225Z   ruby-progressbar (1.13.0) sha256=80fc9c47a9b640d6834e0dc7b3c94c9df37f08cb072b7761e4a71e22cff29b33
+2026-11-27T11:12:49.5668957Z   ruby_engine (2.0.3) sha256=ca2ae7def8cfcdc2bfb6a186d36d5d59c8b403245dc0256c3802b767fa278aaa
+2026-11-27T11:12:49.5669540Z   ruby_version (1.0.3) sha256=5930f9950746b7e6c973184398ee364ee7440b170fef7922b9f5cdf317f1ccb5
+2026-11-27T11:12:49.5670101Z   rubyzip (2.4.1) sha256=8577c88edc1fde8935eb91064c5cb1aef9ad5494b940cf19c775ee833e075615
+2026-11-27T11:12:49.5670638Z   sawyer (0.9.3) sha256=0d0f19298408047037638639fe62f4794483fb04320269169bd41af2bdcf5e41
+2026-11-27T11:12:49.5671194Z   simplecov (1.3.2) sha256=2a22ec1759f1b8db60881a2e038758956fc69ef93ed669be0bde0678de6d0e85
+2026-11-27T11:12:49.5671775Z   simplecov-lcov (0.9.0) sha256=7a77a31e200a595ed4b0249493056efd0c920601f53d2ef135ca34ee796346cd
+2026-11-27T11:12:49.5672360Z   stackprof (0.2.28) sha256=4ec2ace02f386012b40ca20ef80c030ad711831f59511da12e83b34efb0f9a04
+2026-11-27T11:12:49.5672910Z   strscan (3.1.8) sha256=aae2db611a225559f21ffbb71765c9a4e60fd262534a9ea84f4f11c7f32f679e
+2026-11-27T11:12:49.5673468Z   table_tennis (1.0.0) sha256=955f76ca4debd42ee88682af8d4554a74d533c89de4f1581bc37855b15faa956
+2026-11-27T11:12:49.5674039Z   terminal-table (4.0.0) sha256=f504793203f8251b2ea7c7068333053f0beeea26093ec9962e62ea79f94301d2
+2026-11-27T11:12:49.5674756Z   thor (1.5.0) sha256=e3a9e55fe857e44859ce104a84675ab6e8cd59c650a49106a05f55f136425e73
+2026-11-27T11:12:49.5675324Z   thread_safe (0.3.6) sha256=9ed7072821b51c57e8d6b7011a8e282e25aeea3a4065eab326e43f66f063b05a
+2026-11-27T11:12:49.5675878Z   timeout (0.6.1) sha256=78f57368a7e7bbadec56971f78a3f5ecbcfb59b7fcbb0a3ed6ddc08a5094accb
+2026-11-27T11:12:49.5676419Z   timers (4.0.4) sha256=3f6fe726999e59776f2c3cd15b43740a5def3e077f83a4d9aa4fa0d0c1e2a4cb
+2026-11-27T11:12:49.5677018Z   track_open_instances (0.1.15) sha256=7f0e48821e6b4c881daaa40fb1583e308937c22a9c84883c150b399c3b5c3029
+2026-11-27T11:12:49.5677590Z   tsort (0.2.0) sha256=9650a793f6859a43b6641671278f79cfead60ac714148aabe4e3f0060480089f
+2026-11-27T11:12:49.5678104Z   tzinfo (1.2.11) sha256=6501f6a12175ca0243118b83f7c7c2b7978aaec7a0980550a124d007ad6361b6
+2026-11-27T11:12:49.5678700Z   unicode-display_width (3.3.0) sha256=4b7aa66a4b11db50f6f7e98411215cd0dd10eaecb665d36eec5bcacb3fa0b613
+2026-11-27T11:12:49.5679309Z   unicode-emoji (4.3.0) sha256=11c02fa73290378c066bb0562cd4c87d8e1b706fbbe0059ca12746a4244de8ce
+2026-11-27T11:12:49.5679882Z   unicode-name (1.15.1) sha256=b8f2e3ca14bc24799f84a4f74d43a3612d02a051700d88bc6ca8e3bd53cda3f6
+2026-11-27T11:12:49.5680452Z   unicode-types (1.12.0) sha256=7e26a4352cecc2a50325a3793df834b732581ca9f25c5e29f46f3378934363f6
+2026-11-27T11:12:49.5680990Z   uri (1.1.2) sha256=89292e98eabbef6248b0a0ed5e7e398e152f83f17560023a6d94a7f492b169fb
+2026-11-27T11:12:49.5681512Z   yard (0.9.46) sha256=9b1ee37b5da942811dc584d8bb2dfd0efca0a72c44be30bf8282c34955902855
+2026-11-27T11:12:49.5682115Z   yeptris (0.6.91.0-aarch64-linux) sha256=11e805c5a9d0ca4124b18ff4f7c7253c4b1a26e99810ce1edc00e473a1e09bdb
+2026-11-27T11:12:49.5682804Z   yeptris (0.6.91.0-aarch64-linux-musl) sha256=7fd9bd3bdb583a97332e79746e8f170666d27cea2b7046f2c2a50d6395993d6c
+2026-11-27T11:12:49.5683492Z   yeptris (0.6.91.0-arm64-darwin) sha256=91b48beca7ee540da080a8f3b3b21ea6d5207302e8e23d1abfa80ab8cd043f37
+2026-11-27T11:12:49.5684124Z   yeptris (0.6.91.0-x86_64-darwin) sha256=3add961661c8d385884350e3206811df0f417288a526261075e624d88ec73802
+2026-11-27T11:12:49.5684912Z   yeptris (0.6.91.0-x86_64-linux) sha256=3f93b13ef95bd2cb12cb733169366dc7202416a1dcfb759109682563bd107705
+2026-11-27T11:12:49.5685565Z   yeptris (0.6.91.0-x86_64-linux-musl) sha256=36f58b7109f2db3dce013795a5415deb9fcc6b7be2d11e27fbcc1f0d3c0a36c8
+2026-11-27T11:12:49.5685955Z 
+2026-11-27T11:12:49.5686041Z BUNDLED WITH
+2026-11-27T11:12:49.5686387Z   4.0.20
+2026-11-27T11:12:49.5686899Z ##[endgroup]
+2026-11-27T11:12:49.5687848Z Cache key: setup-ruby-bundler-cache-v6-ubuntu-26.04-x64-ruby-4.0.10-wd-/home/runner/work/hashie/hashie-with--without--only--/home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock-bdb590b03a93d99d61e50a5f0a202d79644d52fc53ef63e3ce1aa00be232f574
+2026-11-27T11:12:49.7089530Z Cache hit for: setup-ruby-bundler-cache-v6-ubuntu-26.04-x64-ruby-4.0.10-wd-/home/runner/work/hashie/hashie-with--without--only--/home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock-bdb590b03a93d99d61e50a5f0a202d79644d52fc53ef63e3ce1aa00be232f574
+2026-11-27T11:12:50.9120122Z Received 71303168 of 78470656 (90.9%), 67.9 MBs/sec
+2026-11-27T11:12:50.9719067Z Received 78470656 of 78470656 (100.0%), 70.5 MBs/sec
+2026-11-27T11:12:50.9720029Z Cache Size: ~75 MB (78470656 B)
+2026-11-27T11:12:50.9751836Z [command]/usr/bin/tar -xf /home/runner/work/_temp/f6079052-9f56-4d00-ac47-92602a6a2f94/cache.tzst -P -C /home/runner/work/hashie/hashie --use-compress-program unzstd
+2026-11-27T11:12:51.7702822Z Cache restored successfully
+2026-11-27T11:12:51.7746620Z Found cache for key: setup-ruby-bundler-cache-v6-ubuntu-26.04-x64-ruby-4.0.10-wd-/home/runner/work/hashie/hashie-with--without--only--/home/runner/work/hashie/hashie/gemfiles/duel.gemfile.lock-bdb590b03a93d99d61e50a5f0a202d79644d52fc53ef63e3ce1aa00be232f574
+2026-11-27T11:12:51.7758073Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/bundle install --jobs 4
+2026-11-27T11:12:52.3803206Z Bundle complete! 25 Gemfile dependencies, 119 gems now installed.
+2026-11-27T11:12:52.3805224Z Bundled gems are installed into `./vendor/bundle`
+2026-11-27T11:12:52.3817686Z 1 installed gem you directly depend on is looking for funding.
+2026-11-27T11:12:52.3818137Z   Run `bundle fund` for details
+2026-11-27T11:12:52.4026404Z Took  10.81 seconds
+2026-11-27T11:12:52.4880223Z ##[group]Run bundle exec duel --markdown "$RUNNER_TEMP/duel/duel.md"
+2026-11-27T11:12:52.4880740Z bundle exec duel --markdown "$RUNNER_TEMP/duel/duel.md"
+2026-11-27T11:12:52.4919055Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-27T11:12:52.4919410Z env:
+2026-11-27T11:12:52.4919729Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+2026-11-27T11:12:52.4920118Z   RUBY_YJIT_ENABLE: 1
+2026-11-27T11:12:52.4920343Z   DUEL_FORCE: 
+2026-11-27T11:12:52.4920547Z   DUEL_LABELS: []
+2026-11-27T11:12:52.4920754Z   GH_TOKEN: 
+2026-11-27T11:12:52.4920952Z ##[endgroup]
+2026-11-27T11:14:47.6701192Z Comparing 27 benchmarks, 1 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 24 worker processes of each version)
+2026-11-27T11:14:47.6702719Z   Dash.new: required properties and defaults         5.0s n=990    cpu 0.990 [0.983, 0.997] same  allocations 3
+2026-11-27T11:14:47.6703840Z   Dash: read and write properties                    4.0s n=2475   cpu 1.011 [1.005, 1.016] same  allocations 0
+2026-11-27T11:14:47.6704979Z   Trash.new: renamed and transformed properties      4.0s n=551    cpu 0.991 [0.984, 1.002] same  allocations 4
+2026-11-27T11:14:47.6705719Z   Dash.new: coerced properties                       4.0s n=366    cpu 1.008 [1.000, 1.014] same  allocations 7
+2026-11-27T11:14:47.6706326Z   Dash.new: String keys with IndifferentAccess       4.1s n=187    cpu 0.997 [0.989, 1.006] same  allocations 32
+2026-11-27T11:14:47.6706953Z   Dash.new: coerced nested Dashes                    4.1s n=156    cpu 1.000 [0.996, 1.003] same  allocations 16
+2026-11-27T11:14:47.6707562Z   Mash: read keys given as Symbols as methods        3.9s n=1204   cpu 1.006 [0.999, 1.013] same  allocations 5
+2026-11-27T11:14:47.6708188Z   KeepOriginalKeys: read Symbol keys as methods      3.9s n=1361   cpu 1.010 [1.001, 1.020] same  allocations 5
+2026-11-27T11:14:47.6708817Z   KeepOriginalKeys: read String keys as methods      3.9s n=866    cpu 1.022 [1.016, 1.030] same  allocations 5
+2026-11-27T11:14:47.6709458Z   PermissiveRespondTo: include in a Mash subclass    4.0s n=68     cpu 0.999 [0.994, 1.003] same  allocations 15
+2026-11-27T11:14:47.6710298Z   Mash.new: a flat Hash                              3.9s n=1158   cpu 1.007 [1.000, 1.015] same  allocations 3
+2026-11-27T11:14:47.6710831Z   PermissiveRespondTo: Mash.new                      3.9s n=662    cpu 1.001 [0.987, 1.015] same  allocations 3
+2026-11-27T11:14:47.6711458Z   PermissiveRespondTo: write a new key as a method   4.1s n=548    cpu 1.008 [1.005, 1.010] same  allocations 5
+2026-11-27T11:14:47.6712109Z   PermissiveRespondTo: overwrite a key as a method   3.7s n=468    cpu 1.006 [1.002, 1.011] same  allocations 5
+2026-11-27T11:14:47.6712776Z   IndifferentAccess: new from a nested JSON response   5.1s n=28     cpu 1.004 [1.001, 1.007] same  allocations 252
+2026-11-27T11:14:47.6713456Z   IndifferentAccess: read String and Symbol keys     3.8s n=1052   cpu 1.012 [1.002, 1.020] same  allocations 1
+2026-11-27T11:14:47.6714103Z   IndifferentAccess: write String and Symbol keys    3.8s n=1253   cpu 1.007 [0.997, 1.019] same  allocations 0
+2026-11-27T11:14:47.6715067Z   DeepFind and DeepFetch: nested keys                4.2s n=86     cpu 0.991 [0.986, 0.996] same  allocations 105
+2026-11-27T11:14:47.6715676Z   Mash.new: a nested JSON response                   4.4s n=54     cpu 0.990 [0.985, 0.994] same  allocations 25.33
+2026-11-27T11:14:47.6716243Z   Mash: read keys as methods                         3.9s n=1018   cpu 1.005 [0.996, 1.013] same  allocations 5
+2026-11-27T11:14:47.6716790Z   Mash: read keys with suffixes                      3.9s n=445    cpu 1.006 [1.001, 1.011] same  allocations 16
+2026-11-27T11:14:47.6717324Z   Mash: read keys with [] and dig                    3.9s n=2017   cpu 1.006 [0.999, 1.013] same  allocations 4
+2026-11-27T11:14:47.6718236Z   Mash: write new keys as methods                    4.0s n=886    cpu 0.996 [0.990, 1.003] same  allocations 5
+2026-11-27T11:14:47.6718782Z   Mash: overwrite a key as a method                  3.9s n=742    cpu 1.003 [0.997, 1.008] same  allocations 6
+2026-11-27T11:14:47.6719393Z   Mash: respond_to? a key, a suffix and a missing name   3.8s n=1581   cpu 1.020 [1.014, 1.025] same  allocations 1
+2026-11-27T11:14:47.6728198Z   Mash#deep_merge: a nested update                   4.2s n=46     cpu 0.991 [0.985, 0.996] same  allocations 31.52
+2026-11-27T11:14:47.6728842Z   Mash#to_hash: a nested Mash                        4.0s n=164    cpu 0.993 [0.988, 0.998] same  allocations 10
+2026-11-27T11:14:47.6729183Z 
+2026-11-27T11:14:47.6729393Z across the board: cpu 1.002 [1.001, 1.004] same (limit 1.0125, 27 benchmarks)
+2026-11-27T11:14:47.6729933Z 27 benchmarks in 115s: 0 regressed, 0 errors, 0 with a timing too close to the limit to settle
+2026-11-27T11:14:47.7192362Z ##[group]Run mkdir -p "$RUNNER_TEMP/duel"
+2026-11-27T11:14:47.7192734Z mkdir -p "$RUNNER_TEMP/duel"
+2026-11-27T11:14:47.7193219Z printf 'pr=%s\ncomment=%s\nstatus=%s\n' "$PR" "$COMMENT" "$STATUS" > "$RUNNER_TEMP/duel/comment.env"
+2026-11-27T11:14:47.7228179Z shell: /usr/bin/bash --noprofile --norc -e -o pipefail {0}
+2026-11-27T11:14:47.7228540Z env:
+2026-11-27T11:14:47.7228857Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+2026-11-27T11:14:47.7229238Z   RUBY_YJIT_ENABLE: 1
+2026-11-27T11:14:47.7229457Z   PR: 1
+2026-11-27T11:14:47.7229649Z   COMMENT: change
+2026-11-27T11:14:47.7229860Z   STATUS: passed
+2026-11-27T11:14:47.7230077Z ##[endgroup]
+2026-11-27T11:14:47.7777876Z ##[group]Run actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9
+2026-11-27T11:14:47.7778297Z with:
+2026-11-27T11:14:47.7778503Z   name: duel-report
+2026-11-27T11:14:47.7778735Z   path: /home/runner/work/_temp/duel/
+2026-11-27T11:14:47.7779021Z   if-no-files-found: ignore
+2026-11-27T11:14:47.7779283Z   retention-days: 1
+2026-11-27T11:14:47.7779505Z   compression-level: 6
+2026-11-27T11:14:47.7779730Z   overwrite: false
+2026-11-27T11:14:47.7779956Z   include-hidden-files: false
+2026-11-27T11:14:47.7780202Z   archive: true
+2026-11-27T11:14:47.7780400Z env:
+2026-11-27T11:14:47.7780703Z   BUNDLE_GEMFILE: /home/runner/work/hashie/hashie/gemfiles/duel.gemfile
+2026-11-27T11:14:47.7781352Z   RUBY_YJIT_ENABLE: 1
+2026-11-27T11:14:47.7781572Z ##[endgroup]
+2026-11-27T11:14:47.9230020Z With the provided path, there will be 2 files uploaded
+2026-11-27T11:14:47.9235336Z Artifact name is valid!
+2026-11-27T11:14:47.9235992Z Root directory input is valid!
+2026-11-27T11:14:48.2484643Z Uploading artifact: duel-report.zip
+2026-11-27T11:14:48.2521265Z Beginning upload of artifact content to blob storage
+2026-11-27T11:14:48.4978646Z Uploaded bytes 1273
+2026-11-27T11:14:48.5584476Z Finished uploading artifact content to blob storage!
+2026-11-27T11:14:48.5585409Z SHA256 digest of uploaded artifact is ad4b40813b0f3cfcdfb4878e0dbc19f9eddf232f87cd853544a5e1590dba1351
+2026-11-27T11:14:48.5586174Z Finalizing artifact upload
+2026-11-27T11:14:49.0753131Z Artifact duel-report successfully finalized. Artifact ID 15193635192
+2026-11-27T11:14:49.0754121Z Artifact duel-report has been successfully uploaded! Final size is 1273 bytes. Artifact ID is 15193635192
+2026-11-27T11:14:49.0762927Z Artifact download URL: https://github.com/thomasklemm/hashie/actions/runs/45987708322/artifacts/15193635192
+2026-11-27T11:14:49.1809389Z Post job cleanup.
+2026-11-27T11:14:49.2655524Z [command]/usr/bin/git version
+2026-11-27T11:14:49.2728727Z git version 2.56.1
+2026-11-27T11:14:49.2764496Z Temporarily overriding HOME='/home/runner/work/_temp/b97b8524-0176-4077-8477-dec4c1489c9b' before making global git config changes
+2026-11-27T11:14:49.2765764Z Adding repository directory to the temporary git global config as a safe directory
+2026-11-27T11:14:49.2770140Z [command]/usr/bin/git config --global --add safe.directory /home/runner/work/hashie/hashie
+2026-11-27T11:14:49.2804188Z Removing SSH command configuration
+2026-11-27T11:14:49.2810199Z [command]/usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+2026-11-27T11:14:49.2847086Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+2026-11-27T11:14:49.3139196Z Removing HTTP extra header
+2026-11-27T11:14:49.3144647Z [command]/usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+2026-11-27T11:14:49.3184217Z [command]/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+2026-11-27T11:14:49.3484483Z Removing includeIf entries pointing to credentials config files
+2026-11-27T11:14:49.3485364Z [command]/usr/bin/git config --local --name-only --get-regexp ^includeIf\.gitdir:
+2026-11-27T11:14:49.3520717Z [command]/usr/bin/git submodule foreach --recursive git config --local --show-origin --name-only --get-regexp remote.origin.url
+2026-11-27T11:14:49.3966687Z Evaluate and set job outputs
+2026-11-27T11:14:49.4015260Z Set output 'comment'
+2026-11-27T11:14:49.4016856Z Set output 'status'
+2026-11-27T11:14:49.4017946Z Cleaning up orphan processes

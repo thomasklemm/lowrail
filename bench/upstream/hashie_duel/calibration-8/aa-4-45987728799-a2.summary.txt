@@ -1,0 +1,32 @@
+== aa-4-45987728799-a2 43b2856a08307e1508967b4303ad21cb33b6590d success job 2026-11-27T11:13:10Z -> 2026-11-27T11:15:14Z
+  Dash.new: String keys with IndifferentAccess       4.0s n=250    cpu 1.003 [0.994, 1.016] same  allocations 32
+  Dash.new: coerced nested Dashes                    4.0s n=203    cpu 1.003 [0.996, 1.011] same  allocations 16
+  Dash.new: coerced properties                       3.9s n=457    cpu 1.008 [0.996, 1.019] same  allocations 7
+  Dash.new: required properties and defaults         3.9s n=787    cpu 0.987 [0.978, 0.996] same  allocations 3
+  Dash: read and write properties                    3.9s n=3092   cpu 1.006 [0.997, 1.013] same  allocations 0
+  DeepFind and DeepFetch: nested keys                4.1s n=102    cpu 0.995 [0.990, 1.001] same  allocations 105
+  IndifferentAccess: new from a nested JSON response   4.8s n=32     cpu 1.002 [0.998, 1.008] same  allocations 252
+  IndifferentAccess: read String and Symbol keys     3.8s n=1409   cpu 1.011 [1.002, 1.021] same  allocations 1
+  IndifferentAccess: write String and Symbol keys    3.8s n=1511   cpu 1.004 [0.991, 1.014] same  allocations 0
+  KeepOriginalKeys: read String keys as methods      3.8s n=1105   cpu 1.023 [1.016, 1.032] same  allocations 5
+  KeepOriginalKeys: read Symbol keys as methods      3.9s n=1747   cpu 1.009 [0.999, 1.018] same  allocations 5
+  Mash#deep_merge: a nested update                   3.8s n=48     cpu 0.991 [0.987, 0.995] same  allocations 31.38
+  Mash#to_hash: a nested Mash                        3.9s n=199    cpu 0.990 [0.984, 0.999] same  allocations 10
+  Mash.new: a flat Hash                              3.9s n=1487   cpu 1.003 [0.995, 1.010] same  allocations 3
+  Mash.new: a nested JSON response                   4.1s n=58     cpu 0.991 [0.986, 0.995] same  allocations 25.31
+  Mash: overwrite a key as a method                  3.8s n=948    cpu 1.002 [0.997, 1.006] same  allocations 6
+  Mash: read keys as methods                         3.8s n=1322   cpu 1.007 [0.998, 1.015] same  allocations 5
+  Mash: read keys given as Symbols as methods        3.8s n=1537   cpu 1.006 [1.000, 1.015] same  allocations 5
+  Mash: read keys with [] and dig                    3.9s n=2705   cpu 1.015 [1.007, 1.024] same  allocations 4
+  Mash: read keys with suffixes                      3.9s n=575    cpu 1.002 [0.997, 1.008] same  allocations 16
+  Mash: respond_to? a key, a suffix and a missing name   3.8s n=2043   cpu 1.023 [1.015, 1.029] same  allocations 1
+  Mash: write new keys as methods                    4.0s n=1115   cpu 1.006 [1.000, 1.012] same  allocations 5
+  PermissiveRespondTo: Mash.new                      3.9s n=849    cpu 1.004 [0.994, 1.017] same  allocations 3
+  PermissiveRespondTo: include in a Mash subclass    4.1s n=90     cpu 0.997 [0.990, 1.003] same  allocations 15
+  PermissiveRespondTo: overwrite a key as a method   3.9s n=701    cpu 1.005 [0.997, 1.016] same  allocations 5
+  PermissiveRespondTo: write a new key as a method   4.0s n=706    cpu 1.009 [1.002, 1.017] same  allocations 5
+  Trash.new: renamed and transformed properties      4.0s n=703    cpu 0.990 [0.981, 0.997] same  allocations 4
+27 benchmarks in 111s: 0 regressed, 0 errors, 0 with a timing too close to the limit to settle
+Comparing 27 benchmarks, 1 at a time: baseline /home/runner/work/hashie/.47702 against candidate /home/runner/work/hashie/hashie (slower: a 99.0% interval above 1.02, over 24 worker processes of each version)
+across the board: cpu 1.002 [1.000, 1.005] same (limit 1.0125, 27 benchmarks)
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]

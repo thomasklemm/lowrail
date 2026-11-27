@@ -13,6 +13,6 @@ for b in "${!runs[@]}"; do
   gh api --allow-escape-sequences "repos/thomasklemm/hashie/actions/jobs/$job/logs" | sed 's/\x1b\[[0-9;]*m//g' > "$out/$name.log"
   {
     echo "== $name $(jq -r '.headSha + " " + .jobs[0].conclusion + " job " + .jobs[0].startedAt + " -> " + .jobs[0].completedAt' "$out/$name.json")"
-    grep -a -E "ruby 4|Comparing|REGRESSION|regressed|slower|benchmarks in|across the board|  (Mash|Dash|Trash)" "$out/$name.log" | cut -f3- | sed -E 's/^[^ ]+Z //' | sort -u
+    grep -a -E "ruby 4|Comparing|REGRESSION|regressed|slower|benchmarks in|across the board| n=[0-9]+ " "$out/$name.log" | cut -f3- | sed -E 's/^[^ ]+Z //' | sort -u
   } > "$out/$name.summary.txt"
 done
