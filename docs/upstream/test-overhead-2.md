@@ -141,7 +141,9 @@ subscriber did in one method. Raw: [main vs #59717](../../bench/upstream/test_ov
 it" (sampokuokkanen), and [#59330](https://github.com/rails/rails/pull/59330) "Log at info in the test environment of
 new apps" (namespaceMarcello; generated apps only, existing apps keep debug). Etiquette: no comment on others' PRs
 without Thomas's approval of that comment; our numbers stay here. If Thomas wants it, the one useful data point for
-#59330 is the suite wall-time table above.
+#59330 is the suite wall-time table above. Under the shared-helper rule (2026-11-27), any
+fix of ours here would go into `EventReporter#notify` and the shared `EventReporter::LogSubscriber`, which every
+framework's log subscriber uses, not into Active Record's `sql` handler alone; that is also where the open PRs work.
 
 ## Other parts, with decisions
 
@@ -154,6 +156,8 @@ without Thomas's approval of that comment; our numbers stay here. If Thomas want
   call, 0.14–0.19% of suite CPU in Campfire and Fizzy. **Lead held:** halving it is below 0.1% of a suite, under the
   relevance bar (DECISIONS: a whole test run must move measurably). rack-test 2.3.0 (2026-10-21) is current; the code
   is unchanged on its main.
+  If it is ever revisited, the fix belongs in the shared `Cookie#expires` (parse the attribute once, so `expired?`,
+  `to_h` and every other caller gain), not a shortcut in `expired?` (DECISIONS, "Fix the shared helper", 2026-11-27).
 * **factory_bot (1.4–3.9% own code).** `AttributeAssigner#attribute_names_to_assign` and
   `#attributes_to_set_on_instance` are 1.5% of CASA's CPU. Its maintainer merged three reworks of exactly this path
   today (thoughtbot/factory_bot `4a93822` "Cache a compiled snapshot per factory and traits", `900ab43` "Evaluate
