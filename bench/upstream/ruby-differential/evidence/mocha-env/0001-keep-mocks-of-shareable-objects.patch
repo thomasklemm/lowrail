@@ -1,4 +1,4 @@
-From b5c60e0b12fa6d279268165df3a38c046ff992b2 Mon Sep 17 00:00:00 2001
+From a3134958dc38c52d9c498a09d9bcd269184ee1dd Mon Sep 17 00:00:00 2001
 From: Thomas Klemm <github@tklemm.eu>
 Date: Fri, 27 Nov 2026 12:13:50 +0000
 Subject: [PATCH] Keep mocks of shareable objects such as ENV out of instance
