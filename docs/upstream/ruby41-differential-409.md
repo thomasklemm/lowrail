@@ -1,6 +1,6 @@
 # Ruby 4.1 differential against 4.0.9: census app suites on 4.0.9 and master (2026-11-27)
 
-Ruby 4.1 ships on 2026-12-25. This round runs each census app's own test suite on Ruby 4.0.9 and on Ruby master with the same app, lockfile and Rails, and compares outcomes per test (result and exception class). It reuses `script/ruby-differential` ([round 1](ruby41-differential-1.md)), with the light apps added to its `APPS`, and compares two builds with [`cross.rb`](../../bench/upstream/ruby-differential/cross.rb) and new warning lines with [`warnings.rb`](../../bench/upstream/ruby-differential/warnings.rb). The heavy apps (Discourse, Mastodon, Sure, Loomio, CASA, Lobsters, Chatwoot, Flow, Lago, Docuseal) run in a parallel slice, [ruby41-differential-409-heavy.md](ruby41-differential-409-heavy.md). Nothing was posted, filed or pushed outside Lowrail.
+Ruby 4.1 ships on 2026-12-25. This round runs each census app's own test suite on Ruby 4.0.9 and on Ruby master with the same app, lockfile and Rails, and compares outcomes per test (result and exception class). It reuses `script/ruby-differential` ([round 1](ruby41-differential-1.md)), with the light apps added to its `APPS`, and compares two builds with [`cross.rb`](../../bench/upstream/ruby-differential/cross.rb) and new warning lines with [`warnings.rb`](../../bench/upstream/ruby-differential/warnings.rb). The heavy apps (Discourse, Mastodon, Sure, Loomio, CASA, Lobsters, Chatwoot, Flow, Lago, Docuseal) ran in a parallel slice, [ruby41-differential-409-heavy.md](ruby41-differential-409-heavy.md). Nothing was posted, filed or pushed outside Lowrail.
 
 ## Pins
 
@@ -25,6 +25,19 @@ Ruby 4.1 ships on 2026-12-25. This round runs each census app's own test suite o
 36 of 36 comparisons show 0 differing tests ([`cross-409.json`](../../bench/upstream/ruby-differential/runs/2026-11-27-vs409-master-f3e180b5eb/cross-409.json)). React starter kit and Redprints needed round 1's `rspec_rails_fix.rb` (Rails main's frozen `default_url_options`), on both Rubies. Lobsters stops in `harness prepare` (`User has no attribute prefers_color_scheme`, round 1's known Rails-main error) and runs in the heavy slice on its own Rails. PingCRM has only Selenium system tests and is not in the correctness set.
 
 New warnings on master, every one from a gem and every one a deprecation, not an error: mocha 3.1.0 (`alias` of `method` falling back to Object, Bug #22276; owned by open freerange/mocha#804) and skylight 7.1.1 (the same for `singleton_class`). Both were already in [round 3](ruby-master-round-3.md).
+
+## Heavy slice: four master-only differences, two of them Ruby regressions
+
+Details in [ruby41-differential-409-heavy.md](ruby41-differential-409-heavy.md). Per mode, same counts on both Rubies (interp, yjit, interpW, plus master zjit against 4.0.9 interp): Discourse 22,128, Sure 14,236, Flow 9,714, Mastodon 7,748, Loomio 3,660, CASA 2,992, Lobsters 927, Docuseal 107; Lago interp only, 20,484 common tests, identical. Chatwoot not run (commonmarker 0.23.12 does not build on master; the C-branch port was declined; develop still locks it). Each difference below fails 3/3 alone on master in interp, yjit and zjit and passes 3/3 on 4.0.9; none is JIT-specific.
+
+| Difference | Cause | Verdict |
+| --- | --- | --- |
+| Flow, 1 test: `Time.iso8601` keeps Feb 30 | `77d0d22b59` (time 0.5.0) reaching Bug #21301 | Finding 2, fixed by TN1 (ruby/ruby#20208, ready) |
+| Sure, 2 tests: `Ractor::IsolationError` from Mocha `ENV.stubs` | `73055acd57`, Bug #22291, intentional | Finding 1, MO1 (freerange/mocha#809) |
+| Discourse, 17 tests: `FrozenError` from `sub!` on `Symbol#to_s` | `2c574ca7e2`, Feature #22137, intentional; 4.0.9 `-W:deprecated` warns 17x | App bug, still on Discourse main |
+| CASA, 1 test: child `ruby -rrspec/core` activates master's newer default erb/json before bundler/setup | Default-gem bumps plus the test's load order | Not a Ruby bug |
+
+Flakes that pass alone on both Rubies: Discourse x16, Mastodon `featured_tag` x2 (Redis), Flow `WorkspaceSignupTicketTest` (urlsafe token split on `--`, ~12% on both), Lago `clickhouse_rake_spec` (hour boundary). New warnings on master are deprecations only: alias fallback to Object (Feature #22276) in mocha, Loomio, active_model_serializers, mini_sql and irb 1.18.0 (fixed in 1.19.0), and aliasing a method from a prepended module (Bug #22273) in Discourse's `safe_buffer.rb`.
 
 ## Finding 1: stubbing ENV with Mocha raises on master (MO1)
 
