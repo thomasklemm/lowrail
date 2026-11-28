@@ -515,3 +515,127 @@ The refreshed snapshot at **12:57:05 UTC** still has latest public Slack issue/P
 was found. Hashie, slack-ruby-client and faraday-mashify retain the stars/downloads/latest-release/last-push
 values recorded in the first pass's table; none is archived. Both check-runs and Actions runs on this exact
 fork head are empty. Local approval is not a claim of hosted upstream CI.
+
+## thermos-sol SRC1: changes on 66b1ec68dd3996621d229d3f6d6e53406c37c586
+
+2026-11-28, orb `T-01a2221b-855f-7661-a87e-59f64efb922f`. Second pass, applying both Thermos rubrics directly
+in this thread, without delegation. Reviewed the exact one-commit head against
+`0f1757ebd856c2fea0ba168420fdaddecec8bf5c`, the complete updated SRC1 text, commit message, CHANGELOG and comment.
+The fetched diff and kept patch have stable patch ID `0316aaca03fe2bb76ea98b40845d4f6bde45541d`.
+The first-head pass and its archive above remain historical; this is not an approval of the new head.
+
+### Must-fix: defining a Message subclass inside a Ractor can now raise
+
+**P2, `lib/slack/messages/message.rb:5`:** the unconditional `disable_warnings` call changes Hashie's inheritance
+hook even with the legacy instance-method override retained. On Ruby 3.4.7 with Hashie 3.5.3, and Ruby 4.0.9 with
+Hashie 3.5.3, 3.5.4 and 3.5.5, the following returns `{"size"=>17}` on master but raises `Ractor::RemoteError`
+caused by `Ractor::IsolationError` on this head:
+
+```ruby
+require 'slack-ruby-client'
+ractor = Ractor.new { Class.new(Slack::Messages::Message).new('size' => 17).to_hash }
+ractor.take # Ruby 3.4; use ractor.value on Ruby 4
+```
+
+Hashie's `inherited` sees the newly true flag and calls `subclass.disable_warnings`; that writes a class instance
+variable in the non-main Ractor, raising `can not set instance variables of classes/modules by non-main Ractors`.
+This needs no monkeypatch, private-method override or predeclaration of Slack's class. A caller dynamically defining
+a message subclass inside a worker Ractor can hit it. No downstream app doing so was established, and Ractor remains
+experimental; it is nevertheless a newly failing public subclass operation inside the requested Ruby/Hashie range.
+The new spec and the main-Ractor differential do not exercise it. It is distinct from the first head's fixed
+Ruby 3.0 direct-construction regression.
+
+`bash scripts/ractor_subclass.sh RUBY HASHIE` retains the complete stack and both-tree results. Controls:
+Hashie 3.5.2 succeeds on both trees (Ruby 3.0.7 and 4.0.9); Hashie 3.5.3/3.5.4 already fail on both trees on Ruby
+3.0.7; Hashie 3.6.0 already fails on both on Ruby 3.4.7/4.0.9; Hashie 6 already fails on both on Ruby 4.0.9.
+Where both fail, the flag can change the exception's internal site/message; these are not newly working-to-failing
+paths. The archive records those differences rather than claiming blanket Ractor exactness or support.
+
+**Smallest demonstrated correction:** call the public switch only on Hashie 6+, leaving older releases' working
+hook and class state alone. `scripts/version_gate.rb` tests the one-line load-time condition
+`disable_warnings if Gem::Version.new(Hashie::VERSION) >= Gem::Version.new('6.0.0')` entirely in a scratch preload.
+It restores all four failing subclass cells. Four full variant suites also pass: Ruby 2.7.8/Hashie 3.5.2,
+Ruby 3.0.7/3.5.3, Ruby 3.4.7/3.5.3 and Ruby 4.0.9/6.0.0, including the new warning spec. This does not repair
+pre-existing Ractor failures, nor claim to. The unconditional call's `>= 3.5.2` floor is valid, but a 6+-only call
+no longer needs that floor for API availability; reconsider the constraint and corresponding prose with that fix.
+No fork file was changed. Do not add another `_log_built_in_message` override merely to follow the rename.
+
+### Resolved first-pass findings and remaining behavior
+
+Retaining the original no-op restores the first head's direct `Message.new` Ractor cases on Ruby 3.0.7/Hashie
+3.5.3 and 3.5.4; the new minimum 3.5.2 succeeds too. It also restores all-key silence after public selective `disable_warnings(:zip)` and
+`quiet(:zip)` on Message and its subclasses on Hashie 4 and 5, including a custom logger whose `warn` raises.
+The first-pass body/README selective-warning sentence is therefore no longer needed. The narrowed `impact` fixes
+the universal-key overstatement. The unsupported early predeclaration load-order difference is also gone.
+
+Two demonstrated non-warning improvements remain, not blockers: on Ruby 4.0.9, a frozen Message subclass given
+`'size' => 17` raises `FrozenError` on master but succeeds on head with Hashie 3.5.6 through 6.0.0; on Ruby 3.4.7
+and 4.0.9 with Hashie 3.6.0, direct Message construction inside a Ractor changes from `IsolationError` to success.
+The minimal expressions are `Class.new(Slack::Messages::Message).freeze.new('size' => 17).to_hash` and
+`Ractor.new { Slack::Messages::Message.new('size' => 17).to_hash }` followed by take/value. Real callers can freeze
+subclasses or construct messages in workers, but no actual downstream use was established. `late_cells.sh` records
+both trees. Hashie 3.5.2–3.5.5 frozen-subclass controls already succeed on master.
+
+### Correctness, security, tests and maintainability
+
+`python3 scripts/validate.py` validates **24 passing full head suites and 25 matching extended data comparisons**.
+Every Hashie release from 3.5.2 through 6.0.0 ran on Ruby 4.0.9; Ruby 2.7.8, 3.0.7, 3.1.7, 3.2.9, 3.3.10 and
+3.4.7 ran the full project Gemfile's latest resolution, with minimum/compatibility cells including the new
+3.4.7/3.5.3 cell. Ruby 2.7's latest resolution selects Hashie 5.1.0; both that cell and the pinned 3.5.2 cell pass all 699 examples.
+Ruby 3.0+ resolves Hashie 6.0.0. Head suites have 699 or 702 examples, zero failures. Base, with only the unchanged
+new spec copied over, fails only with Hashie 6, at the forbidden `#size` warning in `_log_built_in_message`.
+Earlier versions pass that spec on both trees. A scratch `disable_warnings(:zip)` mutation with Hashie 6 fails the
+spec as intended. Its nested bracket-value assertion also checks preserved data, and its style matches the suite.
+The test protects the warning fix, not every subclass/Ractor configuration boundary.
+
+The extended probe, original differential and real middleware probe cover the exactness checklist: Hash/Array/String
+subclasses and duck types; singleton conversions, call traces and prepended writers; nested hashes and mixed arrays;
+copy/Marshal bytes/defaults; custom logger identity and unrelated warnings; Fiber mutation, frozen/error cases,
+reload and before/after-load subclasses. The actual Web client's Faraday test response path and the real
+faraday-mashify JSON/mixed-array stack preserve values and classes; the expected Hashie 6 warning disappears.
+All original ordinary-operation rows match before 6, and match after removing warning counts on 6. These comparisons
+do not subsume the separately demonstrated Ractor-subclass regression. Base Mash and unrelated subclasses retain
+their warnings. No added payload call, global warning suppression, security issue or feature-gate leak was found.
+No RealTime client or its models exist at this base: the first pass verified their removal and the retained Web
+`rtm.*` endpoints. No live Slack traffic was sent.
+
+The gemspec correctly expresses the unconditional API requirement: tagged 3.5.1 lacks `disable_warnings`, 3.5.2
+provides it, and the retained hook silences ordinary subclasses even before flag inheritance arrived in 3.5.3.
+This floor still resolves on the declared MRI range and tested CI/Gemfile combinations; no Ruby minimum or upper
+Hashie constraint is needed for this head. It does not prevent the new Ractor failure above.
+The maintainability cold read is “Message sets Hashie's warning policy and keeps its legacy hook for older releases.”
+The public setting belongs on the shared Message class, not in each consumer; following private renames is worse.
+The old hook now has concrete compatibility evidence. One load-time compatibility condition is preferable to new
+hooks or consumer-specific wrappers if correcting the new failure. No structural decomposition, extra helper or
+file split is warranted. Flog's unchanged `to_s` is 8.2; total rises from 9.2 to 10.2 for the added class-body call,
+not new instance complexity. Correct RuboCop Metrics checks pass on both trees; head lint inspects 105 files with
+no offenses. No touched upstream file exceeds 501 lines. The one-line version-boundary comment usefully prevents deleting
+an apparently dead hook when reading Hashie 6; the frozen-string magic comment follows suite style.
+
+### Claims, contribution rules and retained evidence
+
+`claim-checklist.md` maps every title/body/commit/CHANGELOG/comment/impact clause to executed commands or opened
+sources. The literal warning matches the body's nested file example; issue 132 and commit `ffef2a8` establish the
+old fix; Hashie PR 639, its source diff and tag containment establish the rename and first release in 6.0.0.
+Fresh RubyGems data confirms the 2026-11-11 release, Ruby 3.0 minimum and approximately 96M client downloads.
+The comment's literal issue-394 link was opened and documents both the old no-op and the 3.5.2 API introduction.
+No unchecked factual sentence remains. Optional prose nit: cut the body's final spec-status sentence, which is true
+but test narration. If the new Ractor boundary is retained rather than fixed, it needs explicit acceptance/disclosure;
+the existing “override stays” sentence does not disclose it.
+
+Fresh all-state issue/PR searches for Hashie, the private hook, `disable_warnings` and key conflicts found no current
+duplicate report/fix. Latest visible issue/PR is 619, issue 620 returns 404 and no PR is open: **620 remains the
+apparent next number, not reserved or guaranteed**; recheck when opening. CONTRIBUTING, AGENTS, Dangerfile, README,
+UPGRADING, Gemfile and CI requirements were checked. The CHANGELOG Next entry, retained placeholder, credit and
+spellcheck addition follow the project rules. No additional README/UPGRADING change is needed for the now-preserved
+selective-warning policy. There is no hosted Actions/check/status result for the exact fork head; empty statuses
+are not passing CI, and hosted Danger has not run.
+
+Scripts, raw outputs, resolved full-project Gemfiles/locks, source/API snapshots and claim audit are in
+[`thermos-sol-SRC1-66b1ec6.tar.gz`](thermos-sol-SRC1-66b1ec6.tar.gz). Drivers are `review_matrix.sh`,
+`canonical_run.sh`, `extras.sh`, `second_checks.sh`, `ractor_subclass.sh`, `gate_check.sh`, `claims.sh` and
+`validate.py`. Initial symlink-Gemfile duplicate-version warnings, invalid tooling invocations, the Ruby 4 take/value
+harness error and an old-Ruby preload-before-Bundler error are retained under `out/attempts/`, with corrected reruns
+and explanations in `archive-notes.md`; none count as passing checks, and no warning or assertion was suppressed.
+Toolchains reuse the first pass's recorded binaries/pins. JRuby, Ruby master/ZJIT, live Slack, performance and hosted
+CI were not run. No upstream post, fork push or workflow dispatch was made.
