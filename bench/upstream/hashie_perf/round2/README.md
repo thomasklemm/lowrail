@@ -3,7 +3,7 @@
 A deeper look after dblock's four leads ([round 1](../README.md)): which hashie classes the popular dependents use,
 where a realistic API workload spends objects and time, and which exact changes follow. Three candidates were built:
 All three are held after review, each not exact in a case its own differential never recorded (HM5 waits for
-Thomas's decision); the rest are held with their numbers. **No hashie PR was opened in this round.**
+Thomas's decision); the rest are held with their numbers. HM5 opened on 2026-11-28 after Thomas's decision (hashie/hashie#662); HM3 and HM4 stay held.
 `candidates.bundle` holds the three final heads and HM4's two earlier forms (`git fetch candidates.bundle
 'refs/heads/held/*:refs/heads/held/*'` in a hashie clone).
 
@@ -78,7 +78,7 @@ built: it is a fix in another repository; lead for the coordinator.
 |---|---|---|---|---|
 | 1 | HM4: skip the conflict check when a subclass disabled warnings | omniauth, elasticsearch-model, zendesk_api now; restforce and chef-zero once they allow hashie 6 | quiet `Mash.new` CPU 0.46 (YJIT) and 0.66 (ZJIT) in Duel; `[]=`, `dup`, `merge` alike locally; plain Mash 1.01 | **held after review**: a quiet subclass built in a non-main Ractor raises, and an overridden `disabled_warnings` reader is ignored; no measured form is exact ([below](#hm4-skip-the-conflict-check-when-warnings-are-disabled)) |
 | 2 | HM3: `method_missing` without the arguments Array | every Mash, Ruby ≥ 4.0 | 1 object per method-style read; reads CPU 0.91–0.95 in Duel; setters 1.01–1.02 | **held after review**: a forwarded keyword Hash is stored with its keyword flag ([below](#hm3-method_missing-without-the-arguments-array)) |
-| 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.84 (YJIT) and 0.69 (ZJIT) in Duel | unheld 2026-11-28: Thomas accepts the callback case as outside the contract; in review again on `6b6f67b` ([below](#hm5-to_hash-reads-each-value-once)) |
+| 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.84 (YJIT) and 0.69 (ZJIT) in Duel | **open: hashie/hashie#662** (2026-11-28), after Thomas accepted the callback case as outside the contract and both reviewers approved `6b6f67b` ([below](#hm5-to_hash-reads-each-value-once)) |
 | 4 | `Hash#dup` before `self.class.new(val)` in `convert_value` | every nested hash in `Mash.new` | 101 of 774 objects; time not measured | held: a subclass `initialize` would receive the caller's Hash instead of a copy |
 | 5 | Literal suffixes instead of `end_with?(*ALLOWED_SUFFIXES)` | every key written, every suffixed call | helper alone 113 → 61 ns under YJIT, 134 → 121 ns interpreted (`out/suffix-micro.txt`) | held: the win is how JITs compile a splat call, and it duplicates the constant; ZJIT lead |
 | 6 | `initialize` → `deep_update`'s splat Array | every Mash | 131 of 774 objects | held: `deep_update` is public and subclasses call or override it; no exact form found |
@@ -158,7 +158,8 @@ a stored key is read, a setter assigns the value, and the other suffixes act as 
 
 ## HM5: `to_hash` reads each value once
 
-**Unheld (2026-11-28).** Thomas accepts as outside the contract that a value changed by a callback during `to_hash`
+**Opened as hashie/hashie#662 (2026-11-28, ready)** after thermos-sol and Astra approved `6b6f67b` and the unchanged body
+in their second passes (sections at the end). **Unheld (2026-11-28).** Thomas accepts as outside the contract that a value changed by a callback during `to_hash`
 is converted as it was read; the case stays out of the PR body. Head `6b6f67b` and the body are unchanged and went
 back to both reviewers with that case pre-accepted.
 
