@@ -447,3 +447,71 @@ endless definitions, so Ruby 2.7 ran the compatible extended probe instead. A dr
 All final extended probes were rerun after adding nested-copy mutation, logger identity and live Fiber-mutation
 checks. Their comparison reports no non-warning differences, and every original operation row compares equal after
 removing warning counts. JRuby, Ruby master and ZJIT were not run; no performance conclusion is claimed.
+
+## Astra SRC1 second pass: approve on 66b1ec68dd3996621d229d3f6d6e53406c37c586
+
+2026-11-28, thread `T-01a2221b-8e76-742f-8bca-1918a5fb40a4`. Independently fetched the exact fork head,
+checked its single commit against `0f1757ebd856c2fea0ba168420fdaddecec8bf5c`, and reran the probes; no delegation
+or upstream writes. Evidence: [astra-SRC1-66b1ec6.tar.gz](astra-SRC1-66b1ec6.tar.gz), including the reviewed item,
+scripts, locks, raw results, source checks and refreshed GitHub/RubyGems responses.
+
+**R1, R2 and R3 are closed.** On Ruby 3.0.7 with Hashie 3.5.2, 3.5.3 and 3.5.4, the cold minimal
+`Ractor.new { Slack::Messages::Message.new('size' => 7).to_hash }.take` returns `{"size"=>7}` on both trees.
+Selective subclasses and `Message.quiet(:zip)` on Hashie 4.0.0–5.2.0 stay silent for `size`, including with a
+raising warning logger; no selective-warning sentence is needed now. The narrowed impact no longer asserts
+that every method-named key or every response reaches a warning. No new failing operation was found.
+
+**The 3.5.2 floor is appropriate for this shape.** Actual bundles resolve on Ruby 2.7.8, 3.0.7 and 4.0.9
+with Hashie 3.5.2; ordinary subclasses and grandchildren retain the no-op even though the setting itself does
+not propagate in 3.5.2. Direct loading with 3.5.1 works on master but raises `NameError` for `disable_warnings`
+on head, so a lower minimum would permit a broken installation. The 3.5.2 tag contains the method, and the
+3.5.1 tag does not. Existing constraints below 3.5.2 are intentionally no longer compatible; unlike the
+previous head, a 3.5.2 pin is accepted. No extra `_log_built_in_message` override is needed.
+
+**No upstream Ractor spec is required for this correction.** The original implementation of the legacy
+no-op is restored; this evidence retains the exact failing case and its successful rerun. A test that only
+runs under the normal modern Hashie resolution would not catch R1. Useful ongoing coverage would require
+an explicit old-Hashie/Ruby-3.0 dependency cell, not an unexercised conditional test or a mock of private
+implementation. I do not make that matrix expansion a condition of this small fix. The new one-line comment
+is useful: without it, the old override looks redundant beside `disable_warnings` and is easy to remove again.
+
+**Remaining differences are not blanket equivalence.** On Ruby 3.4.7, `Class.new(Message).freeze.new('size'
+=> 7)` stops raising `FrozenError` with Hashie 3.5.6–6.0.0. A Ractor constructing just `size` stops raising
+with Hashie 3.5.6, 3.5.7 and 3.6.0; other keys still encounter existing Ractor limitations. On Hashie 6,
+`Message.new('size' => 7)` no longer raises when `Hashie.logger.warn` raises, because it no longer logs.
+These are reproduced improvements, not regressions to restore. The independent probe also tried creating
+a subclass inside a Ruby 3.0.7 Ractor with Hashie 3.5.3: both trees already raise the same isolation error.
+The earlier record's “same path” wording applies to the retained legacy warning override, not all class
+configuration reads. Also, `quiet(:zip)` was exercised successfully on Hashie 4.0.0, not only 4.1.0 onward.
+
+Correction to my first pass, identified by the concurrent Thermos review and verified against UPGRADING and
+`git tag --contains e5e4983`: the RealTime client was removed in **3.0.0**, not 2.0.0 as README claims.
+Its absence on both reviewed trees and the validation limit are unchanged.
+
+Runs on **this exact head**, using the previous pass's independent harness plus the updated original probe:
+
+* Ruby 3.4.7: every released Hashie version from 3.5.2 through 6.0.0; Ruby 2.7.8: 3.5.2, 3.5.3, 5.1.0;
+  Ruby 3.0.7: 3.5.2, 3.5.3, 3.5.4, 5.1.0, 6.0.0; Ruby 4.0.9: 3.5.2, 5.2.0, 6.0.0.
+* The exact new spec passes on head in every cell, and on master fails only with Hashie 6, on the nested
+  file-size `warn` call. The original differential has zero changed operation rows before 6 and only warning
+  counts changed on 6. The independent harness separately retains the exception differences above.
+* Ruby 3.4.7 / Hashie 6, runtime/test-only bundle: `bundle exec rspec spec` gives 699 examples, 1 failure
+  on master plus the new spec; 699 examples, 0 failures on head. Three conditional release-tool examples
+  remain outside this bundle; no new lint claim. Ruby 3.1–3.3, JRuby and Ruby master/ZJIT were not rerun.
+* Actual Slack/Faraday mashification, RTM Web endpoints, API errors, 429/500 and invalid JSON were exercised
+  through WebMock again, together with subclasses, prepends, conversions, mutation, frozen inputs, threads,
+  fibers and reload. Hashie/Mash-first, logger-before/after and concurrent requires were rerun at 3.5.2 and 6.
+
+Changed-claim checks: the exact diff and `source-checks.txt` verify “also calls”, the retained private no-op,
+absence of an underscore override, the formerly unconstrained gemspec and new `>= 3.5.2` requirement in body,
+commit and CHANGELOG. Executed floor/subclass cases verify the revised minimum argument. Hashie's released
+sources verify the comment's old warning entry point; its original issue-394 URL was opened via GitHub's API
+and redirects to the genuine “Hashie warnings and Rails” issue. This is a necessary compatibility comment,
+not an unnecessary implementation note. The spec executions verify the last body sentence. The historical
+132/639 claims, warning text and project-currency reads were also rechecked; no unchecked changed claim remains.
+
+The refreshed snapshot at **12:57:05 UTC** still has latest public Slack issue/PR **619** and no open PRs:
+**620 is still the apparent next number**, subject to another submission. No existing Hashie-6 report/fix
+was found. Hashie, slack-ruby-client and faraday-mashify retain the stars/downloads/latest-release/last-push
+values recorded in the first pass's table; none is archived. Both check-runs and Actions runs on this exact
+fork head are empty. Local approval is not a claim of hosted upstream CI.
