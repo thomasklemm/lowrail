@@ -36,4 +36,6 @@ if defined?(Ractor)
   puts "ractor size | #{try { r.respond_to?(:value) ? r.value : r.take }}"
   r = Ractor.new { Slack::Messages::Message.new('ok' => true).to_hash }
   puts "ractor ok | #{try { r.respond_to?(:value) ? r.value : r.take }}"
+  r = Ractor.new { Class.new(Slack::Messages::Message).new('size' => 17).to_hash }
+  puts "ractor, subclass defined in it | #{try { r.respond_to?(:value) ? r.value : r.take }}"
 end

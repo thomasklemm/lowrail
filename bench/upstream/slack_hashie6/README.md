@@ -84,8 +84,8 @@ ruby-head. The fork's Actions do not run on a push, so there is no hosted CI res
 ## Differential ([out/diff-summary.txt](out/diff-summary.txt), rows in `out/diff-rows.tar.xz`)
 
 `run_diff.sh RUBY VERSIONS...` runs [message_diff.rb](message_diff.rb) on both trees: five classes (`Message`, a plain
-subclass, a subclass with its own method, a subclass that calls `disable_warnings(:zip)` from hashie 4.0.0, and
-`Message.quiet(:zip)` from 4.1.0), 3 seeds, 16 keys, 10 operations (new, `[]=`, setter, merge, update, dup, read,
+subclass, a subclass with its own method, a subclass that calls `disable_warnings(:zip)` and `Message.quiet(:zip)`,
+both from hashie 4.0.0), 3 seeds, 16 keys, 10 operations (new, `[]=`, setter, merge, update, dup, read,
 `to_s`, `to_hash`, `to_json`), frozen and not. A row is the result, its class, the message afterwards and the warnings
 logged, or the exception.
 
@@ -124,6 +124,39 @@ with 5.2.0 and 6.0.0.
   Ractor with a `size` key raises `Ractor::IsolationError` on master for the same write.
 * **Hashie 6.0.0:** the plain and nested keys stop warning, the frozen subclass stops raising, and a raising logger
   is no longer reached for a plain `Message`.
+
+### After the second passes: a subclass defined in a Ractor (thermos-sol P2), not yet resolved
+
+Astra approved `66b1ec6`; thermos-sol's second pass asks for changes
+([below](#thermos-sol-src1-second-pass-changes-on-66b1ec68dd3996621d229d3f6d6e53406c37c586)). Its finding reproduces
+here with [repro.rb](repro.rb)'s new last case, `Ractor.new { Class.new(Slack::Messages::Message).new('size' => 17).to_hash }`:
+
+| Ruby | hashie | master | head `66b1ec6` |
+| --- | --- | --- | --- |
+| 3.4.7 | 3.5.2 | returns the Hash | returns the Hash |
+| 3.4.7, 4.0.9 | 3.5.3 (and 3.5.5 on 3.4.7) | returns the Hash | **`Ractor::IsolationError`** |
+| 3.4.7 | 3.5.6, 3.6.0, 4.1.0, 5.2.0, 6.0.0 | `Ractor::IsolationError` | `Ractor::IsolationError` |
+| 4.0.9 | 5.2.0, 6.0.0 | `Ractor::IsolationError` | `Ractor::IsolationError` |
+| 3.0.7 | 3.5.3, 6.0.0 | `Ractor::IsolationError` | `Ractor::IsolationError` |
+
+On hashie 3.5.3 to 3.5.5 the inheritance hook copies the setting to the new class when the parent has it, which
+writes class state in the Ractor; 3.5.2 has no hook, and from 3.5.6 master raises there too.
+
+thermos-sol's correction, tried here as a candidate that is **not pushed** ([candidate-gate.patch](candidate-gate.patch)
+on `66b1ec6`): `disable_warnings if Gem::Version.new(Hashie::VERSION) >= Gem::Version.new('6.0.0')`, the old override
+kept, and no gemspec constraint, because nothing calls `disable_warnings` on older Hashie. Raw rows for master, head
+and candidate are in [out/repro-gate-candidate.txt](out/repro-gate-candidate.txt), on Ruby 3.4.7 with hashie 3.5.2,
+3.5.3, 3.5.5, 3.5.6, 3.6.0, 4.1.0, 5.2.0 and 6.0.0, Ruby 4.0.9 with 3.5.3, 5.2.0 and 6.0.0, and Ruby 3.0.7 with 3.5.3
+and 6.0.0:
+
+* Before hashie 6.0.0 the candidate gives master's result in every case of every cell, the frozen subclass and the
+  Ractor cases included; the head differs there in the P2 case and in the two cases where master raises.
+* On hashie 6.0.0 the candidate and the head give the same results.
+* Candidate on Ruby 3.4.7: `rake spec` 702 examples, 0 failures with hashie 5.2.0 and with 6.0.0; `rake lint` clean.
+  Not run on the candidate: the other suite cells and message_diff.rb.
+
+Which way to go is with Thomas: accept the P2 case as outside the contract and keep `66b1ec6`, take the gate, or
+raise the floor to 3.5.6 (not tried).
 
 ## Astra SRC1: changes on dfbf7013bfaf7abf982a09ef29d732e6b452de71
 

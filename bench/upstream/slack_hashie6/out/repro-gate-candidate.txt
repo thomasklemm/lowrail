@@ -1,0 +1,345 @@
+== ruby 3.4.7 hashie 3.5.2 slack-base
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | {"size" => 17} warnings 0
+== ruby 3.4.7 hashie 3.5.2 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | {"size" => 17} warnings 0
+== ruby 3.4.7 hashie 3.5.2 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | {"size" => 17} warnings 0
+== ruby 3.4.7 hashie 3.5.3 slack-base
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | {"size" => 17} warnings 0
+== ruby 3.4.7 hashie 3.5.3 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of
+== ruby 3.4.7 hashie 3.5.3 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | {"size" => 17} warnings 0
+== ruby 3.4.7 hashie 3.5.5 slack-base
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | {"size" => 17} warnings 0
+== ruby 3.4.7 hashie 3.5.5 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of
+== ruby 3.4.7 hashie 3.5.5 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | {"size" => 17} warnings 0
+== ruby 3.4.7 hashie 3.5.6 slack-base
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x00007f5792185830>>: #<
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of classes/modules by
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of
+== ruby 3.4.7 hashie 3.5.6 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of
+== ruby 3.4.7 hashie 3.5.6 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x00007f4425045a18>>: #<
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of classes/modules by
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of
+== ruby 3.4.7 hashie 3.6.0 slack-base
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x00007f5a0f5058c8>>: #<
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of classes/modules by
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of
+== ruby 3.4.7 hashie 3.6.0 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of
+== ruby 3.4.7 hashie 3.6.0 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x00007f127b5f57a0>>: #<
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of classes/modules by
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of
+== ruby 3.4.7 hashie 4.1.0 slack-base
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x00007f1660d25500>>: #<
+subclass zip | {"size" => 7} warnings 0
+quiet zip | {"size" => 7} warnings 0
+subclass zip, raising logger | {"size" => 7} warnings 0
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Has
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 3.4.7 hashie 4.1.0 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+subclass zip | {"size" => 7} warnings 0
+quiet zip | {"size" => 7} warnings 0
+subclass zip, raising logger | {"size" => 7} warnings 0
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Has
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 3.4.7 hashie 4.1.0 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x00007f66ca775500>>: #<
+subclass zip | {"size" => 7} warnings 0
+quiet zip | {"size" => 7} warnings 0
+subclass zip, raising logger | {"size" => 7} warnings 0
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Has
+ractor ok | Ractor::RemoteError: Ractor::IsolationError can not access non-shareable objects in constant Hashi
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 3.4.7 hashie 5.2.0 slack-base
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x00007feb89a25d38>>: #<
+subclass zip | {"size" => 7} warnings 0
+quiet zip | {"size" => 7} warnings 0
+subclass zip, raising logger | {"size" => 7} warnings 0
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 3.4.7 hashie 5.2.0 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+subclass zip | {"size" => 7} warnings 0
+quiet zip | {"size" => 7} warnings 0
+subclass zip, raising logger | {"size" => 7} warnings 0
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 3.4.7 hashie 5.2.0 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x00007f2a335f5d20>>: #<
+subclass zip | {"size" => 7} warnings 0
+quiet zip | {"size" => 7} warnings 0
+subclass zip, raising logger | {"size" => 7} warnings 0
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 3.4.7 hashie 6.0.0 slack-base
+plain size | {"size" => 7} warnings 1
+nested size | {"file" => {"size" => 1}} warnings 1
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x00007f1ae9d35c88>>: #<
+subclass zip | {"size" => 7} warnings 1
+quiet zip | {"size" => 7} warnings 1
+subclass zip, raising logger | IOError: IOError logger failed
+plain, raising logger | IOError: IOError logger failed
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 3.4.7 hashie 6.0.0 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+subclass zip | {"size" => 7} warnings 1
+quiet zip | {"size" => 7} warnings 1
+subclass zip, raising logger | IOError: IOError logger failed
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 3.4.7 hashie 6.0.0 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+subclass zip | {"size" => 7} warnings 1
+quiet zip | {"size" => 7} warnings 1
+subclass zip, raising logger | IOError: IOError logger failed
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 4.0.9 hashie 3.5.3 slack-base
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | {"size" => 17} warnings 0
+== ruby 4.0.9 hashie 3.5.3 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not set instance variables of
+== ruby 4.0.9 hashie 3.5.3 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+ractor size | {"size" => 7} warnings 0
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | {"size" => 17} warnings 0
+== ruby 4.0.9 hashie 5.2.0 slack-base
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen Class: #<Class:0x00007f195f529250>
+subclass zip | {"size" => 7} warnings 0
+quiet zip | {"size" => 7} warnings 0
+subclass zip, raising logger | {"size" => 7} warnings 0
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 4.0.9 hashie 5.2.0 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+subclass zip | {"size" => 7} warnings 0
+quiet zip | {"size" => 7} warnings 0
+subclass zip, raising logger | {"size" => 7} warnings 0
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 4.0.9 hashie 5.2.0 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | FrozenError: FrozenError can't modify frozen Class: #<Class:0x00007f80fb839068>
+subclass zip | {"size" => 7} warnings 0
+quiet zip | {"size" => 7} warnings 0
+subclass zip, raising logger | {"size" => 7} warnings 0
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 4.0.9 hashie 6.0.0 slack-base
+plain size | {"size" => 7} warnings 1
+nested size | {"file" => {"size" => 1}} warnings 1
+frozen subclass size | FrozenError: FrozenError can't modify frozen Class: #<Class:0x00007fb373f78d60>
+subclass zip | {"size" => 7} warnings 1
+quiet zip | {"size" => 7} warnings 1
+subclass zip, raising logger | IOError: IOError logger failed
+plain, raising logger | IOError: IOError logger failed
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 4.0.9 hashie 6.0.0 slack-ruby-client
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+subclass zip | {"size" => 7} warnings 1
+quiet zip | {"size" => 7} warnings 1
+subclass zip, raising logger | IOError: IOError logger failed
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 4.0.9 hashie 6.0.0 slack-cand
+plain size | {"size" => 7} warnings 0
+nested size | {"file" => {"size" => 1}} warnings 0
+frozen subclass size | {"size" => 7} warnings 0
+subclass zip | {"size" => 7} warnings 1
+quiet zip | {"size" => 7} warnings 1
+subclass zip, raising logger | IOError: IOError logger failed
+plain, raising logger | {"size" => 7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values from instance variabl
+ractor ok | {"ok" => true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not get unshareable values fr
+== ruby 3.0.7 hashie 3.5.3 slack-base
+plain size | {"size"=>7} warnings 0
+nested size | {"file"=>{"size"=>1}} warnings 0
+frozen subclass size | {"size"=>7} warnings 0
+ractor size | {"size"=>7} warnings 0
+ractor ok | {"ok"=>true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not access instance variables
+== ruby 3.0.7 hashie 3.5.3 slack-ruby-client
+plain size | {"size"=>7} warnings 0
+nested size | {"file"=>{"size"=>1}} warnings 0
+frozen subclass size | {"size"=>7} warnings 0
+ractor size | {"size"=>7} warnings 0
+ractor ok | {"ok"=>true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not access instance variables
+== ruby 3.0.7 hashie 3.5.3 slack-cand
+plain size | {"size"=>7} warnings 0
+nested size | {"file"=>{"size"=>1}} warnings 0
+frozen subclass size | {"size"=>7} warnings 0
+ractor size | {"size"=>7} warnings 0
+ractor ok | {"ok"=>true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not access instance variables
+== ruby 3.0.7 hashie 6.0.0 slack-base
+plain size | {"size"=>7} warnings 1
+nested size | {"file"=>{"size"=>1}} warnings 1
+frozen subclass size | FrozenError: FrozenError can't modify frozen #<Class:#<Class:0x0000559dd4c2e210>>: #<
+subclass zip | {"size"=>7} warnings 1
+quiet zip | {"size"=>7} warnings 1
+subclass zip, raising logger | IOError: IOError logger failed
+plain, raising logger | IOError: IOError logger failed
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not access instance variables of classes/modules
+ractor ok | {"ok"=>true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not access instance variables
+== ruby 3.0.7 hashie 6.0.0 slack-ruby-client
+plain size | {"size"=>7} warnings 0
+nested size | {"file"=>{"size"=>1}} warnings 0
+frozen subclass size | {"size"=>7} warnings 0
+subclass zip | {"size"=>7} warnings 1
+quiet zip | {"size"=>7} warnings 1
+subclass zip, raising logger | IOError: IOError logger failed
+plain, raising logger | {"size"=>7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not access instance variables of classes/modules
+ractor ok | {"ok"=>true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not access instance variables
+== ruby 3.0.7 hashie 6.0.0 slack-cand
+plain size | {"size"=>7} warnings 0
+nested size | {"file"=>{"size"=>1}} warnings 0
+frozen subclass size | {"size"=>7} warnings 0
+subclass zip | {"size"=>7} warnings 1
+quiet zip | {"size"=>7} warnings 1
+subclass zip, raising logger | IOError: IOError logger failed
+plain, raising logger | {"size"=>7} warnings 0
+ractor size | Ractor::RemoteError: Ractor::IsolationError can not access instance variables of classes/modules
+ractor ok | {"ok"=>true} warnings 0
+ractor, subclass defined in it | Ractor::RemoteError: Ractor::IsolationError can not access instance variables

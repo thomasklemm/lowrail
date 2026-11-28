@@ -1,0 +1,26 @@
+diff --git a/lib/slack/messages/message.rb b/lib/slack/messages/message.rb
+index a70fb80..4a9ef40 100644
+--- a/lib/slack/messages/message.rb
++++ b/lib/slack/messages/message.rb
+@@ -2,7 +2,7 @@
+ module Slack
+   module Messages
+     class Message < Hashie::Mash
+-      disable_warnings
++      disable_warnings if Gem::Version.new(Hashie::VERSION) >= Gem::Version.new('6.0.0')
+ 
+       def to_s
+         keys.sort_by(&:to_s).map do |key|
+diff --git a/slack-ruby-client.gemspec b/slack-ruby-client.gemspec
+index c751ce6..4334a0a 100644
+--- a/slack-ruby-client.gemspec
++++ b/slack-ruby-client.gemspec
+@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
+   s.add_dependency 'faraday', '>= 2.0.1'
+   s.add_dependency 'faraday-mashify'
+   s.add_dependency 'faraday-multipart'
+-  s.add_dependency 'hashie', '>= 3.5.2'
++  s.add_dependency 'hashie'
+   s.add_dependency 'logger'
+   s.metadata['rubygems_mfa_required'] = 'true'
+   s.metadata['changelog_uri'] = 'https://github.com/slack-ruby/slack-ruby-client/blob/master/CHANGELOG.md'
