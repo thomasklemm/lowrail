@@ -12,7 +12,7 @@ built_on: "48cda77031"
 depends_on: []
 stacked_on:
 alternative_of:
-evidence: [bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-timing-body-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/thermos-sol-2026-11-27.tar.gz]
+evidence: [bench/upstream/outside_leads/ur1/body/UR1-d4ce0b0-4010-time, bench/upstream/outside_leads/ur1/body/UR1-d4ce0b0-master-time, bench/upstream/outside_leads/ur1/body/UR1-d09ffb7-4010, bench/upstream/outside_leads/ur1/body/UR1-d09ffb7-master, bench/upstream/outside_leads/ur1/rework, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-timing-body-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/thermos-sol-2026-11-27.tar.gz]
 impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
@@ -294,11 +294,11 @@ The shared helper now yields the checked copy to `CGI.unescape` or `CGI.unescape
 
 | benchmark-ips, Ruby 4.0.10 | Before | After |
 | --- | ---: | ---: |
-| `decode_www_form_component("hello")` | 2.68M i/s | 3.50M i/s |
-| `decode_www_form_component("article%5Btitle%5D")` | 869.5k i/s | 2.54M i/s |
-| `decode_www_form_component("Hello+world+from+Rack")` | 720.2k i/s | 2.82M i/s |
-| `decode_www_form_component` on a 248-byte cookie value | 489.0k i/s | 1.06M i/s |
-| `decode_uri_component("hello")` | 2.73M i/s | 3.39M i/s |
-| `decode_uri_component("user%40example.com")` | 1.13M i/s | 2.82M i/s |
+| `decode_www_form_component("hello")` | 2.84M i/s | 3.43M i/s |
+| `decode_www_form_component("article%5Btitle%5D")` | 880.8k i/s | 2.49M i/s |
+| `decode_www_form_component("Hello+world+from+Rack")` | 739.8k i/s | 2.92M i/s |
+| `decode_www_form_component` on a 248-byte cookie value | 493.9k i/s | 1.08M i/s |
+| `decode_uri_component("hello")` | 2.83M i/s | 3.40M i/s |
+| `decode_uri_component("user%40example.com")` | 1.13M i/s | 2.84M i/s |
 
 With YJIT, and with ZJIT on Ruby master, time per call drops by 23% to 80%. Each call allocates 2 or 3 objects instead of 4 to 8.
