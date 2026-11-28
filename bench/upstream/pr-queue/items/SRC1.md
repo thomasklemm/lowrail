@@ -22,6 +22,7 @@ pr:
 note: "2026-11-28: a clear bugfix PR, no ticket (Thomas). The hashie floor 3.5.3 is the builder's decision (record, Why >= 3.5.3). One behaviour difference on hashie 4.0.0 to 5.2.0 is in the record and not in the body: a subclass of Message that calls disable_warnings with method names warns for other keys, where the dead-on-6 override kept it silent. The problem was introduced by hashie commit 9f7c514 (hashie 6.0.0), which renamed the private method; introduced_by stays empty because it names commits of this repo."
 ownership: {date: 2026-11-28, checked: ["open PRs naming log_built_in_message that change .spellcheck.txt, CHANGELOG.md, lib/slack/messages/message.rb, slack-ruby-client.gemspec"], hits: []}
 passes:
+  - {reviewer: astra, head: "dfbf7013bfaf7abf982a09ef29d732e6b452de71", date: 2026-11-28, orb: T-01a2221b-8e76-742f-8bca-1918a5fb40a4, verdict: changes, open: "R1 Ruby 3.0.7 with Hashie 3.5.3/3.5.4 gains a Ractor::IsolationError; R2 selective-warning subclasses can warn or raise through a logger on Hashie 4-5.2 and need disclosure if retained; R3 impact's universal warning trigger is false. Retaining the original legacy no-op alongside disable_warnings fixed R1/R2 in isolated probes; do not add a new underscore-helper override. See Astra section and astra-SRC1-dfbf701.tar.gz."}
 ---
 
 # Fix Hashie 6 key conflict warnings for Slack::Messages::Message
