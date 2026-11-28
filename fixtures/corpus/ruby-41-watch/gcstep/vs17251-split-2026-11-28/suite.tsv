@@ -1,0 +1,13 @@
+# bench warmups measured: 15 warmups as ruby-bench's default harness; warmups + measured >= 25 iterations and >= 10 s
+# under YJIT on base (pilot.sh), the default harness's MIN_BENCH_ITRS and MIN_BENCH_TIME. shipit runs in its own block.
+activerecord 15 73
+hexapdf 15 10
+liquid-c 15 193
+liquid-compile 15 264
+liquid-render 15 138
+lobsters 15 10
+mail 15 93
+railsbench 15 10
+sequel 15 169
+ruby-lsp 15 74
+gcbench 15 10
