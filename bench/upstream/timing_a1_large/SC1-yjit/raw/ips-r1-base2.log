@@ -1,0 +1,9 @@
+ruby 4.0.10 (2026-11-19 revision a704b7cd95) +YJIT +PRISM [x86_64-linux]
+Warming up --------------------------------------
+       listener poll, idle   455.000 i/100ms
+listener poll, one message   190.000 i/100ms
+Calculating -------------------------------------
+       listener poll, idle      4.304k (±13.4%) i/s  (232.32 μs/i) -     21.840k in   5.073925s
+jit listener poll, idle	compiled_iseq_count=1563>1563 compiled_block_count=20948>20948 invalidation_count=359>359
+listener poll, one message      1.695k (±13.4%) i/s  (589.84 μs/i) -      8.550k in   5.043162s
+jit listener poll, one message	compiled_iseq_count=1567>1567 compiled_block_count=20973>20973 invalidation_count=359>359

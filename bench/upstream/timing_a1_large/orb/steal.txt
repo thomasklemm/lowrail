@@ -1,0 +1,4 @@
+SC1-yjit   n=104 steal all 0.021% (max 0.15%) cpu1 0.057% | busy all 13.1% cpu0 1.2% cpu1 96.6%
+SC1-zjit   n= 88 steal all 0.020% (max 0.12%) cpu1 0.056% | busy all 14.3% cpu0 2.4% cpu1 95.0%
+ASC1-yjit  n= 99 steal all 0.022% (max 0.21%) cpu1 0.067% | busy all 13.4% cpu0 0.9% cpu1 99.0%
+ASC1-zjit  n= 91 steal all 0.012% (max 0.05%) cpu1 0.061% | busy all 13.4% cpu0 1.0% cpu1 98.8%

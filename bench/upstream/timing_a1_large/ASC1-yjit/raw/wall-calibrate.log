@@ -1,0 +1,3 @@
+calibrate belongs_to load	5.393227300000032e-05
+calibrate has_one load	5.758993766666679e-05
+calibrate has_many load	6.700093600000004e-05

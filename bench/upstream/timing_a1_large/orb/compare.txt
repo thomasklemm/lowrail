@@ -1,0 +1,30 @@
+## SC1-yjit: listener poll, idle
+xxlarge   base 204.67 µs change -14.76% [-15.26%, -14.34%] w=0.92pp | A/A -0.86% [-1.49%, +0.13%] w=1.62pp | claim=true flat=90/90 | sd(A/A round)=2.53% sd(change ratio)=1.90% sd(base proc)=1.83% within-proc med/p10=2.65%
+a1.large  base 201.39 µs change -14.93% [-15.25%, -14.34%] w=0.91pp | A/A +0.14% [-0.48%, +0.98%] w=1.46pp | claim=true flat=90/90 | sd(A/A round)=2.68% sd(change ratio)=2.62% sd(base proc)=2.87% within-proc med/p10=2.66% | inside xxl CI: true
+## SC1-yjit: listener poll, one message
+xxlarge   base 476.80 µs change -6.59% [-7.28%, -5.92%] w=1.35pp | A/A -0.33% [-1.82%, +0.49%] w=2.31pp | claim=false flat=47/90 | sd(A/A round)=2.91% sd(change ratio)=2.46% sd(base proc)=2.12% within-proc med/p10=5.86%
+a1.large  base 468.30 µs change -6.75% [-7.50%, -6.24%] w=1.26pp | A/A -0.07% [-0.82%, +1.38%] w=2.19pp | claim=false flat=38/90 | sd(A/A round)=2.77% sd(change ratio)=2.85% sd(base proc)=2.92% within-proc med/p10=4.59% | inside xxl CI: true
+## SC1-zjit: listener poll, idle
+xxlarge   base 215.37 µs change -15.00% [-15.38%, -14.52%] w=0.87pp | A/A -0.15% [-0.89%, +0.88%] w=1.77pp | claim=true flat=90/90 | sd(A/A round)=2.30% sd(change ratio)=1.91% sd(base proc)=1.78% within-proc med/p10=3.48%
+a1.large  base 210.99 µs change -15.96% [-16.66%, -15.41%] w=1.25pp | A/A +0.45% [-0.27%, +1.28%] w=1.56pp | claim=true flat=90/90 | sd(A/A round)=3.04% sd(change ratio)=2.38% sd(base proc)=2.55% within-proc med/p10=2.91% | inside xxl CI: false
+## SC1-zjit: listener poll, one message
+xxlarge   base 503.70 µs change -6.92% [-7.96%, -5.68%] w=2.28pp | A/A +0.25% [-1.02%, +1.22%] w=2.24pp | claim=true flat=90/90 | sd(A/A round)=2.66% sd(change ratio)=2.45% sd(base proc)=1.99% within-proc med/p10=7.84%
+a1.large  base 492.44 µs change -8.03% [-8.93%, -6.96%] w=1.97pp | A/A +0.84% [-0.28%, +2.18%] w=2.46pp | claim=true flat=90/90 | sd(A/A round)=3.15% sd(change ratio)=3.19% sd(base proc)=2.96% within-proc med/p10=6.41% | inside xxl CI: false
+## ASC1-yjit: belongs_to load
+xxlarge   base 26.72 µs change -3.48% [-4.95%, -2.13%] w=2.82pp | A/A -0.34% [-2.83%, +0.91%] w=3.74pp | claim=true flat=90/90 | sd(A/A round)=4.99% sd(change ratio)=4.54% sd(base proc)=4.90% within-proc med/p10=4.81%
+a1.large  base 54.09 µs change -1.68% [-2.16%, -1.17%] w=0.99pp | A/A -0.53% [-1.02%, +0.30%] w=1.32pp | claim=true flat=90/90 | sd(A/A round)=1.90% sd(change ratio)=1.98% sd(base proc)=1.90% within-proc med/p10=1.48% | inside xxl CI: false
+## ASC1-yjit: has_one load
+xxlarge   base 28.86 µs change -2.79% [-4.37%, -1.71%] w=2.67pp | A/A -0.47% [-3.49%, +2.25%] w=5.75pp | claim=true flat=90/90 | sd(A/A round)=5.33% sd(change ratio)=4.91% sd(base proc)=4.51% within-proc med/p10=5.46%
+a1.large  base 59.38 µs change -0.97% [-1.53%, -0.64%] w=0.89pp | A/A -0.40% [-0.93%, +0.22%] w=1.14pp | claim=true flat=90/90 | sd(A/A round)=2.13% sd(change ratio)=1.97% sd(base proc)=2.06% within-proc med/p10=1.51% | inside xxl CI: false
+## ASC1-yjit: has_many load
+xxlarge   base 34.01 µs change -2.20% [-3.38%, -1.01%] w=2.37pp | A/A -0.48% [-3.29%, +1.98%] w=5.28pp | claim=true flat=90/90 | sd(A/A round)=5.77% sd(change ratio)=4.97% sd(base proc)=5.00% within-proc med/p10=5.31%
+a1.large  base 69.06 µs change -1.18% [-1.54%, -0.72%] w=0.82pp | A/A -0.63% [-1.28%, +0.01%] w=1.29pp | claim=true flat=90/90 | sd(A/A round)=2.14% sd(change ratio)=2.22% sd(base proc)=2.37% within-proc med/p10=1.60% | inside xxl CI: true
+## ASC1-zjit: belongs_to load
+xxlarge   base 22.32 µs change -1.94% [-2.68%, -0.47%] w=2.21pp | A/A -0.47% [-2.03%, +1.09%] w=3.11pp | claim=true flat=90/90 | sd(A/A round)=4.23% sd(change ratio)=3.66% sd(base proc)=3.26% within-proc med/p10=6.27%
+a1.large  base 46.98 µs change -1.85% [-2.07%, -1.11%] w=0.97pp | A/A +0.36% [-0.37%, +1.06%] w=1.44pp | claim=true flat=90/90 | sd(A/A round)=3.23% sd(change ratio)=2.97% sd(base proc)=2.73% within-proc med/p10=1.20% | inside xxl CI: true
+## ASC1-zjit: has_one load
+xxlarge   base 24.06 µs change -3.20% [-4.01%, -2.19%] w=1.81pp | A/A +0.15% [-1.36%, +1.00%] w=2.36pp | claim=true flat=90/90 | sd(A/A round)=5.23% sd(change ratio)=3.74% sd(base proc)=3.89% within-proc med/p10=6.54%
+a1.large  base 51.59 µs change -1.96% [-2.55%, -1.06%] w=1.49pp | A/A +0.41% [-0.48%, +1.00%] w=1.48pp | claim=true flat=90/90 | sd(A/A round)=3.14% sd(change ratio)=2.70% sd(base proc)=2.81% within-proc med/p10=1.34% | inside xxl CI: false
+## ASC1-zjit: has_many load
+xxlarge   base 31.65 µs change -1.66% [-2.51%, -0.96%] w=1.56pp | A/A -0.01% [-1.39%, +1.01%] w=2.40pp | claim=true flat=90/90 | sd(A/A round)=4.82% sd(change ratio)=4.03% sd(base proc)=3.78% within-proc med/p10=6.46%
+a1.large  base 68.76 µs change -0.51% [-1.16%, +0.39%] w=1.55pp | A/A +0.59% [-0.51%, +1.66%] w=2.17pp | claim=false flat=90/90 | sd(A/A round)=3.44% sd(change ratio)=3.05% sd(base proc)=3.34% within-proc med/p10=1.57% | inside xxl CI: false

@@ -1,0 +1,78 @@
+START SC1-yjit 2026-11-27T22:31:12Z
+benchmark-ips, Ruby 4.0.10, YJIT, best of 5 on one core
+
+| | main | branch | Change |
+| --- | ---: | ---: | ---: |
+| `listener poll, idle` | 4.5k i/s | 5.3k i/s | +16.7% |
+| `listener poll, one message` | 1.8k i/s | 1.9k i/s | within noise |
+
+Time per call, Ruby 4.0.10, YJIT, 30 rounds of fresh processes on one core
+
+| | main | branch | Change |
+| --- | ---: | ---: | ---: |
+| `listener poll, idle` | 201.39 µs | 172.61 µs | −14.9% |
+| `listener poll, one message` | 468.30 µs | 436.13 µs | not JIT-flat, no claim |
+
+Record (not for the body): Callgrind and benchmark-ips cells take base = mean of two base runs, A/A = their spread. Raw output and commands in /home/user/workspace/repo/bench/upstream/timing_a1_large/SC1-yjit.
+- JIT-flat: compiled_iseq_count, compiled_block_count, invalidation_count unchanged in every measured window (each Callgrind N and N = 0 run; each benchmark-ips report from `running` to its last timed interval; every timed wall window)
+- Wall: thread CPU time with GC off per window, the 10th-percentile window per process; change = median of every round's candidate / base and candidate / base2, A/A = median of base2 / base, 95% bootstrap intervals resampling rounds
+- base: ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux], /home/user/w/sc-base at 40dd29ffdc
+- candidate: ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux], /home/user/w/sc-cand at 2cb1842043
+- ips listener poll, idle: +16.7% with A/A 1.28% (best base 4.6k / 4.5k, candidate 5.3k), JIT-flat in 15 windows
+- ips listener poll, one message: +2.8% with A/A 4.62% (best base 1.9k / 1.8k, candidate 1.9k), JIT-flat in 15 windows: inside the A/A, no claim
+- wall listener poll, idle: −14.9% [−15.3%, −14.3%] with A/A +0.1% [−0.5%, +1.0%] (246 calls × 30 windows per process), JIT-flat in 90 processes
+- wall listener poll, one message: −6.8% [−7.5%, −6.2%] with A/A −0.1% [−0.8%, +1.4%] (104 calls × 30 windows per process): not JIT-flat (r1 candidate compiled_block_count +1, r2 base compiled_block_count +1, r2 base2 compiled_block_count +1, …), no claim
+END SC1-yjit exit=0 secs=1560
+START SC1-zjit 2026-11-27T22:57:12Z
+Time per call, Ruby 4.1.0dev, ZJIT, 30 rounds of fresh processes on one core
+
+| | main | branch | Change |
+| --- | ---: | ---: | ---: |
+| `listener poll, idle` | 210.99 µs | 176.64 µs | −16.0% |
+| `listener poll, one message` | 492.44 µs | 451.84 µs | −8.0% |
+
+Record (not for the body): Callgrind and benchmark-ips cells take base = mean of two base runs, A/A = their spread. Raw output and commands in /home/user/workspace/repo/bench/upstream/timing_a1_large/SC1-zjit.
+- JIT-flat: compiled_iseq_count, failed_iseq_count, compiled_side_exit_count, invalidation_time_ns unchanged in every measured window (each Callgrind N and N = 0 run; each benchmark-ips report from `running` to its last timed interval; every timed wall window)
+- Wall: thread CPU time with GC off per window, the 10th-percentile window per process; change = median of every round's candidate / base and candidate / base2, A/A = median of base2 / base, 95% bootstrap intervals resampling rounds
+- base: ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +PRISM [x86_64-linux], /home/user/w/sc-base at 40dd29ffdc
+- candidate: ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +PRISM [x86_64-linux], /home/user/w/sc-cand at 2cb1842043
+- wall listener poll, idle: −16.0% [−16.7%, −15.4%] with A/A +0.4% [−0.3%, +1.3%] (249 calls × 30 windows per process), JIT-flat in 90 processes
+- wall listener poll, one message: −8.0% [−8.9%, −7.0%] with A/A +0.8% [−0.3%, +2.2%] (103 calls × 30 windows per process), JIT-flat in 90 processes
+END SC1-zjit exit=0 secs=1317
+START ASC1-yjit 2026-11-27T23:19:09Z
+Time per call, Ruby 4.0.10, YJIT, 30 rounds of fresh processes on one core
+
+| | main | branch | Change |
+| --- | ---: | ---: | ---: |
+| `belongs_to load` | 54.09 µs | 53.10 µs | −1.7% |
+| `has_one load` | 59.38 µs | 58.69 µs | −1.0% |
+| `has_many load` | 69.06 µs | 68.31 µs | −1.2% |
+
+Record (not for the body): Callgrind and benchmark-ips cells take base = mean of two base runs, A/A = their spread. Raw output and commands in /home/user/workspace/repo/bench/upstream/timing_a1_large/ASC1-yjit.
+- JIT-flat: compiled_iseq_count, compiled_block_count, invalidation_count unchanged in every measured window (each Callgrind N and N = 0 run; each benchmark-ips report from `running` to its last timed interval; every timed wall window)
+- Wall: thread CPU time with GC off per window, the 10th-percentile window per process; change = median of every round's candidate / base and candidate / base2, A/A = median of base2 / base, 95% bootstrap intervals resampling rounds
+- base: ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux], /home/user/w/rails-main at 2e299253f9
+- candidate: ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux], /home/user/w/rails-asc1 at ed1b28c5b9
+- wall belongs_to load: −1.7% [−2.2%, −1.2%] with A/A −0.5% [−1.0%, +0.3%] (927 calls × 30 windows per process), JIT-flat in 90 processes
+- wall has_one load: −1.0% [−1.5%, −0.6%] with A/A −0.4% [−0.9%, +0.2%] (868 calls × 30 windows per process), JIT-flat in 90 processes
+- wall has_many load: −1.2% [−1.5%, −0.7%] with A/A −0.6% [−1.3%, +0.0%] (746 calls × 30 windows per process), JIT-flat in 90 processes
+END ASC1-yjit exit=0 secs=1481
+START ASC1-zjit 2026-11-27T23:43:50Z
+Time per call, Ruby 4.1.0dev, ZJIT, 30 rounds of fresh processes on one core
+
+| | main | branch | Change |
+| --- | ---: | ---: | ---: |
+| `belongs_to load` | 46.98 µs | 45.97 µs | −1.8% |
+| `has_one load` | 51.59 µs | 50.26 µs | −2.0% |
+| `has_many load` | 68.76 µs | 68.00 µs | within noise |
+
+Record (not for the body): Callgrind and benchmark-ips cells take base = mean of two base runs, A/A = their spread. Raw output and commands in /home/user/workspace/repo/bench/upstream/timing_a1_large/ASC1-zjit.
+- JIT-flat: compiled_iseq_count, failed_iseq_count, compiled_side_exit_count, invalidation_time_ns unchanged in every measured window (each Callgrind N and N = 0 run; each benchmark-ips report from `running` to its last timed interval; every timed wall window)
+- Wall: thread CPU time with GC off per window, the 10th-percentile window per process; change = median of every round's candidate / base and candidate / base2, A/A = median of base2 / base, 95% bootstrap intervals resampling rounds
+- base: ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +PRISM [x86_64-linux], /home/user/w/rails-main at 2e299253f9
+- candidate: ruby 4.1.0dev (2026-11-27T16:40:23Z HEAD 0d399335b7) +PRISM [x86_64-linux], /home/user/w/rails-asc1 at ed1b28c5b9
+- wall belongs_to load: −1.8% [−2.1%, −1.1%] with A/A +0.4% [−0.4%, +1.1%] (1072 calls × 30 windows per process), JIT-flat in 90 processes
+- wall has_one load: −2.0% [−2.5%, −1.1%] with A/A +0.4% [−0.5%, +1.0%] (990 calls × 30 windows per process), JIT-flat in 90 processes
+- wall has_many load: −0.5% [−1.2%, +0.4%] with A/A +0.6% [−0.5%, +1.7%] (727 calls × 30 windows per process), JIT-flat in 90 processes: interval includes 0, no claim
+END ASC1-zjit exit=0 secs=1368
+ALL_DONE

@@ -1,0 +1,12 @@
+Fetching gem metadata from https://rubygems.org/........
+Resolving dependencies...
+Fetching stringio 3.2.0
+Fetching psych 5.5.0
+Fetching date 3.6.0
+Fetching ractor-dispatch 0.3.0
+Installing ractor-dispatch 0.3.0
+Installing stringio 3.2.0 with native extensions
+Installing date 3.6.0 with native extensions
+Installing psych 5.5.0 with native extensions
+Bundle complete! 4 Gemfile dependencies, 21 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
