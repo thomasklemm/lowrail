@@ -96,7 +96,7 @@ Known reds that are not ours (don't report):
 Ours, open (watch CI, comments, state):
 - rails/rails: #60043 (QCK1, head 40e4c9db8f, opened ready 2026-11-28 12:06 UTC), #59565. (#60024 merged 2026-11-28, removed.) (#60020 merged 2026-11-27, removed.)
 - rails/solid_cable#105 (SCB1, head 2cb1842043, opened ready 2026-11-27 22:18 UTC).
-- hashie/hashie#662 (HM5) merged 2026-11-28 13:12 UTC, removed.
+- hashie/hashie#662 (HM5, merged 2026-11-28 13:12 UTC, stays watched): report maintainer replies (michaelherold, dblock) to our answer issuecomment-7241379662 (2026-11-28 15:19 UTC), which offered a `c.comment = :results` change.
 - ruby/uri#276 (UR1, head e2d2e21a57 after Thomas's rework push 2026-11-27 23:45 UTC; opened ready 20:56 UTC at c43954f; CI workflow action_required, waiting for a maintainer).
 - ruby/ruby: #20266 (SHK1, head 2bda3f18fa, prism) and #20267 (URF1, head 151bebd34d, VM), both opened ready
   2026-11-27, no Redmine ticket by Thomas's choice; #20261 (BT1, e75b1f0109), #20208 (TN1, 2e061793aa; khasinski's commit is intended), #20169 (ZSV1,
