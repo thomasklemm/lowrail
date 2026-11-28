@@ -1,4 +1,4 @@
-Draft follow-up on ruby/ruby#17251. **Not posted.** Posting needs Thomas's approval of this exact text. Numbers:
+Follow-up on ruby/ruby#17251, **posted unchanged 2026-11-28** after Thomas approved it: [issuecomment-7238878739](https://github.com/ruby/ruby/pull/17251#issuecomment-7238878739). It corrects our 11-27 Rails ZJIT RSS and YJIT major figures. Numbers:
 [README](README.md), [report.txt](report.txt). Text: Astra's replacement (review on 39377167) with its own gcbench
 correction; thermos-sol approved unchanged (07dcda56).
 

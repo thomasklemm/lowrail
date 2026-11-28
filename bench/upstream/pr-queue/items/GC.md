@@ -16,7 +16,7 @@ rank: 1
 risky: true
 state: held
 pr:
-note: "2026-11-27: rebased #17251 (head 9715d0224e on f6278067b6) no longer lowers shipit majors against its base (6-7 vs 8-9, base all nofree); GC time differs by mode; record bench/upstream/ruby-17251-2026-11-27, follow-up posted (https://github.com/ruby/ruby/pull/17251#issuecomment-7229891094). fallback only (Thomas, 2026-11-14): #17251's head 41c689571a removes the nofree majors itself; reopen only if #17251 stalls or is closed. Numbers for master and #17251 (not ours) added to our comment on #17251: https://github.com/ruby/ruby/pull/17251#issuecomment-6652543942"
+note: "2026-11-28: sequential split of #17251 (base, commit 1, head, head with the 1.25x cadence off): extra shipit majors come with the 1.25x cadence (+2/+3/+2), most RSS gains remain without it, gcbench +40% RSS; record bench/upstream/ruby-17251-split-2026-11-28, follow-up posted (https://github.com/ruby/ruby/pull/17251#issuecomment-7238878739), which corrects our 11-27 Rails ZJIT RSS and YJIT major figures. 2026-11-27: rebased #17251 (head 9715d0224e on f6278067b6) no longer lowers shipit majors against its base (6-7 vs 8-9, base all nofree); GC time differs by mode; record bench/upstream/ruby-17251-2026-11-27, follow-up posted (https://github.com/ruby/ruby/pull/17251#issuecomment-7229891094). fallback only (Thomas, 2026-11-14): #17251's head 41c689571a removes the nofree majors itself; reopen only if #17251 stalls or is closed. Numbers for master and #17251 (not ours) added to our comment on #17251: https://github.com/ruby/ruby/pull/17251#issuecomment-6652543942"
 passes: []
 ---
 

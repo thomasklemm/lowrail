@@ -52,7 +52,7 @@ current master and whether our posted numbers
 * `report.rb` first computed suite GC-time percentages with integer division (−100/0/+100); fixed before this
   revision, report.txt regenerated. No RSS or shipit number changed.
 
-A draft comment for the author is in [comment-draft.md](comment-draft.md). Not posted.
+The comment in [comment-draft.md](comment-draft.md) was approved by Thomas and posted unchanged 2026-11-28 as [issuecomment-7238878739](https://github.com/ruby/ruby/pull/17251#issuecomment-7238878739). It corrects our 11-27 Rails ZJIT RSS and YJIT major figures (the 11-27 comment stays as posted).
 
 ## Key table
 
@@ -219,4 +219,4 @@ equal under the interpreter. GC time and RSS directions are mixed; with two roun
   README wording notes (paired-median scope of +2 / +3 / +2; "observed A/A range") applied.
 
 Both reviews accept the draft as it stands at 07dcda56. Astra wrote that text; the one antecedent fix it got afterwards
-was in the text thermos-sol approved. Posting needs Thomas's approval of the exact text (brief of 2026-11-28).
+was in the text thermos-sol approved. Thomas approved it; posted unchanged 2026-11-28 as [issuecomment-7238878739](https://github.com/ruby/ruby/pull/17251#issuecomment-7238878739).
