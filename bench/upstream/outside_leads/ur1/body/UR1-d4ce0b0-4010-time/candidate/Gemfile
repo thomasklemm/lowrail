@@ -1,0 +1,3 @@
+source "https://rubygems.org"
+gem "uri", path: "/home/user/w/uri-d4ce0b0"
+gem "benchmark-ips"

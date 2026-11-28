@@ -1,0 +1,24 @@
+PATH
+  remote: /home/user/w/uri-d4ce0b0
+  specs:
+    uri (1.1.2)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    benchmark-ips (2.15.1)
+
+PLATFORMS
+  ruby
+  x86_64-linux
+
+DEPENDENCIES
+  benchmark-ips
+  uri!
+
+CHECKSUMS
+  benchmark-ips (2.15.1) sha256=07a1a9f3c6105ecaf68c174fc3fbcddd71a0e9ada6236ae03093a0dcfd812d59
+  uri (1.1.2)
+
+BUNDLED WITH
+  4.0.20
