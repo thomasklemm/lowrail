@@ -464,6 +464,11 @@ history (d25db64).
   deliberately idempotent `ready` path and open solid_queue#833 next to it), SSQ2 (worker re-reads pauses and
   prefix queues every poll; that is how pauses take effect, not exact). Dropped as native or covered: Solid Cache
   inflate/Marshal and SHA-256 keys, cable writer hashes, `escape!`, `URI::GID.build`.
+- **Query cache survey (2026-11-28, [record](uncached-survey.md)):** no other path where `uncached` pays much. Held as
+  a parked idea: the Solid Queue poller wrapped in `uncached` (exact; busy dispatch −2% to −6%, partly not JIT-flat, but idle
+  polls get slower, ZJIT dispatcher +3.1%). Dropped: good_job dequeue (exact, about −1%). Already skipping the cache or
+  without a cached query: batches, Solid Cache, Action Cable PostgreSQL, delayed_job, que, flipper. Lead, not built:
+  `WithCastValue#hash` for `IN` lists is the remaining per-bind miss cost on main (memoizing it may not be exact).
 
 ### Erklärung für Thomas: K1 (2026-11-14, Census 9; gebaut, nicht geöffnet)
 
