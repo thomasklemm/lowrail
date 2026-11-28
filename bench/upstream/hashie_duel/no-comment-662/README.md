@@ -2,7 +2,12 @@
 
 michaelherold merged hashie/hashie#662 (HM5) on 2026-11-28 at 13:12 UTC and asked there why no Duel comment appeared
 next to Danger's ([comment](https://github.com/hashie/hashie/pull/662#issuecomment-7239768173)). This is the cause as
-the runs show it, and the reply drafted for review. Nothing is posted yet.
+the runs show it, and the reply drafted for review.
+
+**Posted 2026-11-28 15:19 UTC:** [reply draft 2](#reply-draft-2-exact-text-replaces-the-draft-above), unchanged, as
+[issuecomment-7241379662](https://github.com/hashie/hashie/pull/662#issuecomment-7241379662), after Astra and thermos-sol
+both approved that exact text (their sections below). The posted body was read back and matches the draft. No fix PR
+is open or built; the reply offers one if the maintainers want comments on passing runs.
 
 ## Cause
 
