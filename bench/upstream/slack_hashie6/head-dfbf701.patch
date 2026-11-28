@@ -1,0 +1,99 @@
+From dfbf7013bfaf7abf982a09ef29d732e6b452de71 Mon Sep 17 00:00:00 2001
+From: Thomas Klemm <github@tklemm.eu>
+Date: Sat, 28 Nov 2026 12:01:57 +0000
+Subject: [PATCH] Disable Hashie key conflict warnings with disable_warnings
+
+`Slack::Messages::Message` silenced Hashie's warning about keys that
+conflict with methods by overriding the private `log_built_in_message`.
+Hashie 6.0.0 renamed that method, so a response with a key such as
+`size` logs the warning again.
+
+Call `disable_warnings` instead, Hashie's own switch for this. Subclasses
+inherit it from Hashie 3.5.3 on, so require that version.
+---
+ .spellcheck.txt                     |  1 +
+ CHANGELOG.md                        |  1 +
+ lib/slack/messages/message.rb       |  7 ++-----
+ slack-ruby-client.gemspec           |  2 +-
+ spec/slack/messages/message_spec.rb | 10 ++++++++++
+ 5 files changed, 15 insertions(+), 6 deletions(-)
+ create mode 100644 spec/slack/messages/message_spec.rb
+
+diff --git a/.spellcheck.txt b/.spellcheck.txt
+index 9375462..0f4f3dd 100644
+--- a/.spellcheck.txt
++++ b/.spellcheck.txt
+@@ -206,6 +206,7 @@ subteam
+ tada
+ TCP
+ TDEADBEEF
++thomasklemm
+ TideLift
+ Tidelift
+ tidelift
+diff --git a/CHANGELOG.md b/CHANGELOG.md
+index 5ee69b3..6f73b10 100644
+--- a/CHANGELOG.md
++++ b/CHANGELOG.md
+@@ -1,5 +1,6 @@
+ ### 3.4.1 (Next)
+ 
++* [#620](https://github.com/slack-ruby/slack-ruby-client/pull/620): Fix Hashie 6 logging key conflict warnings for `Slack::Messages::Message`, require Hashie 3.5.3 or newer - [@thomasklemm](https://github.com/thomasklemm).
+ * Your contribution here.
+ 
+ ### 3.4.0 (2026/11/24)
+diff --git a/lib/slack/messages/message.rb b/lib/slack/messages/message.rb
+index b47d6d4..4b504d2 100644
+--- a/lib/slack/messages/message.rb
++++ b/lib/slack/messages/message.rb
+@@ -2,16 +2,13 @@
+ module Slack
+   module Messages
+     class Message < Hashie::Mash
++      disable_warnings
++
+       def to_s
+         keys.sort_by(&:to_s).map do |key|
+           "#{key}=#{self[key]}"
+         end.join(', ')
+       end
+-
+-      private
+-
+-      # see https://github.com/intridea/hashie/issues/394
+-      def log_built_in_message(*); end
+     end
+   end
+ end
+diff --git a/slack-ruby-client.gemspec b/slack-ruby-client.gemspec
+index 4334a0a..2617ccb 100644
+--- a/slack-ruby-client.gemspec
++++ b/slack-ruby-client.gemspec
+@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
+   s.add_dependency 'faraday', '>= 2.0.1'
+   s.add_dependency 'faraday-mashify'
+   s.add_dependency 'faraday-multipart'
+-  s.add_dependency 'hashie'
++  s.add_dependency 'hashie', '>= 3.5.3'
+   s.add_dependency 'logger'
+   s.metadata['rubygems_mfa_required'] = 'true'
+   s.metadata['changelog_uri'] = 'https://github.com/slack-ruby/slack-ruby-client/blob/master/CHANGELOG.md'
+diff --git a/spec/slack/messages/message_spec.rb b/spec/slack/messages/message_spec.rb
+new file mode 100644
+index 0000000..20027c8
+--- /dev/null
++++ b/spec/slack/messages/message_spec.rb
+@@ -0,0 +1,10 @@
++# frozen_string_literal: true
++require 'spec_helper'
++
++describe Slack::Messages::Message do
++  it 'does not warn about keys that conflict with methods' do
++    expect(Hashie.logger).not_to receive(:warn)
++    message = described_class.new('file' => { 'size' => 1 })
++    expect(message.file['size']).to eq 1
++  end
++end
+-- 
+2.47.3
+
