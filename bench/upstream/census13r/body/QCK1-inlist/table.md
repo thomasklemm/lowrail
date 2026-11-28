@@ -8,7 +8,7 @@ Objects and Callgrind instructions per call, Ruby 4.0.10, no JIT
 | `where(id: 100 ids), hit` | 569 | 569 | 5,281,970 | 4,699,696 | −11.0% |
 
 Record (not for the body): the run was stopped after the interpreter cells (the YJIT Callgrind cells take about
-three minutes per dump on this orb; JIT evidence for these queries is the a1.xxlarge wall cohort), so
+three minutes per dump on this orb; there is no IN-list JIT evidence in this directory), so
 script/upstream-bench wrote no results.json. Instructions per call = (n2000 total − n0 total) / 2000 from each
 dump's `totals:` line in callgrind-dumps.tar.xz; base = mean of base and base2.
 - A/A (|base2 − base| / base): 20 miss 0.008%, 20 hit 0.017%, 100 miss 0.014%, 100 hit 0.014%
