@@ -17,3 +17,4 @@ https://github.com/ruby/ruby/pull/20266
 https://github.com/ruby/ruby/pull/20267
 https://github.com/rails/solid_cable/pull/105
 https://github.com/rails/rails/pull/60043
+https://github.com/hashie/hashie/pull/662
