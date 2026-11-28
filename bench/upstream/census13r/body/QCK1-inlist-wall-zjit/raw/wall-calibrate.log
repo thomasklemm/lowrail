@@ -1,0 +1,4 @@
+calibrate where(id: 20 ids), miss	6.229665600000001e-05
+calibrate where(id: 20 ids), hit	4.018810199999982e-05
+calibrate where(id: 100 ids), miss	0.00024734000000000003
+calibrate where(id: 100 ids), hit	0.00013989234833333342
