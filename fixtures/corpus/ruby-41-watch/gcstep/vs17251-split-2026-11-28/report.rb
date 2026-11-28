@@ -92,7 +92,7 @@ benches.each do |b|
   end
 end
 puts "\nsuite paired by round, ratio first/second build in % (median (min-max)), rounds where the first build is lower; majors as differences"
-pct = ->(k) { ->(a, b) { (a[k] / b[k] - 1) * 100 } }
+pct = ->(k) { ->(a, b) { (a[k].to_f / b[k] - 1) * 100 } }
 SUITE_M = [["itr", pct.(:ms)], ["GC ms", pct.(:gc_ms)], ["VmHWM", pct.(:hwm)], ["steady RSS", pct.(:steady)],
            ["after-GC RSS", pct.(:after_gc)]]
 benches.each do |b|

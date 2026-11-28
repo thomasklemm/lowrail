@@ -1,26 +1,22 @@
 Draft follow-up on ruby/ruby#17251. **Not posted.** Posting needs Thomas's approval of this exact text. Numbers:
-[README](README.md), [report.txt](report.txt).
+[README](README.md), [report.txt](report.txt). Text: Astra's replacement (review on 39377167) with its own gcbench
+correction; thermos-sol pending.
 
 ---
 
-A sequential rerun (one benchmark at a time, nothing else on the machine) of base `f6278067b6` against the head `9715d0224e`. It adds two diagnostic builds: the first commit alone, and the head with `GC_HEAP_OLDOBJECT_RECLAIM_RATIO` set to 2.0, so the 1.25× old-object limit never applies.
+Repeating the comparison of base `f6278067b6` and head `9715d0224e` sequentially, one benchmark at a time. A diagnostic build sets `GC_HEAP_OLDOBJECT_RECLAIM_RATIO` to 2.0, disabling the tighter old-object limit while leaving the rest of the patch unchanged.
 
-One correction to the previous comment first: the Rails ZJIT RSS increase there (+9.8 MiB median against base) did not reproduce sequentially. Over two rounds it came out −2.3 MiB against base and +3.3 MiB against its copy, while the two copies of base differed by 5.6 MiB.
-
-The first commit alone gives the same shipit major counts as the head. The head with the 2× limit runs as many shipit majors as base. On every ruby-bench benchmark in the second table, its RSS changes are within five percentage points of the head's. So the extra shipit majors come from the 1.25× limit, and the RSS changes in that table come from the rest of the patch. On shipit the limit lowers the sampled peak by 2–5 MiB against the 2× build.
-
-Shipit, six rounds, medians, interpreter / YJIT / ZJIT:
+Shipit, six rounds with 15 warmups and 40 measured iterations. Medians, interpreter / YJIT / ZJIT; time and RSS rounded:
 
 | | base | head | head, 2× limit |
 | --- | ---: | ---: | ---: |
-| majors | 6 / 6 / 7 | 8 / 9 / 8 | 6 / 6 / 6 |
-| minors | 196 / 204 / 216 | 160 / 175 / 154 | 180 / 184 / 174 |
+| majors | 6 / 6 / 7 | 8 / 9 / 8 | 6 / 6 / 6.5 |
 | GC time ms | 2,761 / 3,080 / 3,134 | 2,644 / 3,214 / 2,959 | 2,566 / 3,117 / 3,042 |
 | sampled peak RSS MiB | 151 / 200 / 181 | 149 / 195 / 180 | 151 / 201 / 183 |
 
-The GC-time directions from the previous comment hold: higher under YJIT in five of six pairs (median +168 ms), lower under ZJIT in all six (−224 ms). Interpreter differences overlap the A/A range.
+Against the 2× build, the head adds a median 2 / 3 / 2 majors. Its sampled peak RSS is lower by paired medians of 2.4 / 4.5 / 3.3 MiB, lower in 5 / 6 / 5 of the six pairs. Against base, GC time rises under YJIT in five of six pairs (median +168 ms) and falls under ZJIT in all six (−224 ms). Interpreter differences overlap the A/A range.
 
-ruby-bench `73918b2` headline benchmarks, three rounds, RSS after the final full GC (ruby-bench's RSS column), head against base, median of paired rounds, interpreter / YJIT / ZJIT:
+Selected ruby-bench `73918b2` benchmarks, three rounds. RSS after the final full GC, head against base, rounded median percentage change of paired rounds, interpreter / YJIT / ZJIT:
 
 | | RSS |
 | --- | --- |
@@ -34,8 +30,8 @@ ruby-bench `73918b2` headline benchmarks, three rounds, RSS after the final full
 | liquid-compile | +2% / +5% / +5% |
 | gcbench | +40% / +40% / +7% |
 
-liquid-c on the two copies of base ranged from 37 to 67 MiB between runs, while the head stayed at 33–40 MiB. gcbench's peak RSS (VmHWM) is about +30% in all three modes (55 → 72 MiB under YJIT). Under the interpreter and YJIT, the head takes no major GC in the whole gcbench run. Base takes one, a `nofree` major during warmup that drops old objects from about 469k to 150k. hexapdf and ruby-lsp are left out: their RSS differed between the two copies of base by up to 30% and 12%.
+For these rows, the 2× build's median changes are within five percentage points of the head's: most of these RSS changes remain without the tighter limit. liquid-c's base copies span 38–67 MiB, versus 34–40 MiB on the head. hexapdf and ruby-lsp are omitted because their A/A RSS changes reach 35% and 12%.
 
-Iteration times stayed within ±4%, except activerecord under YJIT (+7%, range −4% to +11%) and gcbench under ZJIT (+7%, with +5% between the two copies of base).
+gcbench's peak RSS also rises about 30% in all modes. In the interpreter and YJIT, base takes one `nofree` major during warmup, dropping old objects from about 469k to 150k; the head takes none during warmup or the measured iterations. The higher RSS remains after the final full GC.
 
-On base, `nofree` majors remain on shipit (all of its 6–7), hexapdf (about 20 per run; the head takes 5–12) and gcbench under ZJIT (about 35 per run; the head takes 6). The 35 Rails workloads take at most one per round. Over their two rounds, majors are higher on the head under YJIT (2 against 1) and ZJIT (4 against 2); GC time and RSS directions are mixed.
+Two qualifications to the previous Rails results: over two sequential rounds of the same 35 workloads, the ZJIT RSS increase did not reproduce. RSS summed after each app's last window differs by −2.3 MiB against base and +3.3 MiB against its copy; the copies differ by −5.6 MiB. YJIT majors now rise from 1 to 2 in each round, rather than falling from 1 to 0. These two rounds do not establish a consistent Rails RSS improvement.
