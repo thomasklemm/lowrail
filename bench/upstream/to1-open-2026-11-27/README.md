@@ -266,3 +266,9 @@ hold" on Astra's repro (not rerun independently). Its own checks: its 2,836-case
 main; 752 tag, form and asset tests green on both trees; frozen view and custom elements as on main; every wall and
 page number recomputed exactly; L1, no code-shape blocker. Body: the same article-page and nil-return fixes, and a
 before/after in a benchmark tool's own format instead of a table of percentages only.
+
+## Parked by Thomas (2026-11-28)
+
+Thomas does not accept the invalid-US-ASCII case: it is realistic in containers without a locale. TO1 is parked, with
+the per-call numbers, the body fixes and the f.text_field finding above kept. Revisit with an approach that keeps
+main's UTF-8 result without losing the saved object. Ledger: contributions.md, Held.
