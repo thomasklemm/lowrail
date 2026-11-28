@@ -78,7 +78,7 @@ built: it is a fix in another repository; lead for the coordinator.
 |---|---|---|---|---|
 | 1 | HM4: skip the conflict check when a subclass disabled warnings | omniauth, elasticsearch-model, zendesk_api now; restforce and chef-zero once they allow hashie 6 | quiet `Mash.new` CPU 0.46 (YJIT) and 0.66 (ZJIT) in Duel; `[]=`, `dup`, `merge` alike locally; plain Mash 1.01 | **held after review**: a quiet subclass built in a non-main Ractor raises, and an overridden `disabled_warnings` reader is ignored; no measured form is exact ([below](#hm4-skip-the-conflict-check-when-warnings-are-disabled)) |
 | 2 | HM3: `method_missing` without the arguments Array | every Mash, Ruby ≥ 4.0 | 1 object per method-style read; reads CPU 0.91–0.95 in Duel; setters 1.01–1.02 | **held after review**: a forwarded keyword Hash is stored with its keyword flag ([below](#hm3-method_missing-without-the-arguments-array)) |
-| 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.84 (YJIT) and 0.69 (ZJIT) in Duel | **held after review, needs Thomas**: a callback that changes the receiver during `to_hash` gets a different result ([below](#hm5-to_hash-reads-each-value-once)) |
+| 3 | HM5: `to_hash` reads each value once | every `to_hash` and `to_json` | CPU 0.84 (YJIT) and 0.69 (ZJIT) in Duel | unheld 2026-11-28: Thomas accepts the callback case as outside the contract; in review again on `6b6f67b` ([below](#hm5-to_hash-reads-each-value-once)) |
 | 4 | `Hash#dup` before `self.class.new(val)` in `convert_value` | every nested hash in `Mash.new` | 101 of 774 objects; time not measured | held: a subclass `initialize` would receive the caller's Hash instead of a copy |
 | 5 | Literal suffixes instead of `end_with?(*ALLOWED_SUFFIXES)` | every key written, every suffixed call | helper alone 113 → 61 ns under YJIT, 134 → 121 ns interpreted (`out/suffix-micro.txt`) | held: the win is how JITs compile a splat call, and it duplicates the constant; ZJIT lead |
 | 6 | `initialize` → `deep_update`'s splat Array | every Mash | 131 of 774 objects | held: `deep_update` is public and subclasses call or override it; no exact form found |
@@ -157,6 +157,10 @@ a stored key is read, a setter assigns the value, and the other suffixes act as 
 `method_missing` (limits set to 0 to print them): ABC 12.25 → 11.36, cyclomatic 6 → 6, perceived 4 → 4. L0.
 
 ## HM5: `to_hash` reads each value once
+
+**Unheld (2026-11-28).** Thomas accepts as outside the contract that a value changed by a callback during `to_hash`
+is converted as it was read; the case stays out of the PR body. Head `6b6f67b` and the body are unchanged and went
+back to both reviewers with that case pre-accepted.
 
 **Held after review, needs Thomas (2026-11-27).** Astra and thermos-sol both returned "changes" on `6b6f67b` (their
 sections at the end). Between master's two reads of a value, user code can run: the value's `is_a?`, and, for an
