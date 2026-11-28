@@ -412,7 +412,10 @@ keeps raw output and an A/A. Callgrind finds and attributes; in a body it is one
 when it shows what wall time can't (objects, a JIT-only path). Wall time is measured on orbs.
 Timing that goes into a body or a record runs on an a1.xxlarge orb (Thomas, 2026-11-27): on a1.large
 BT1's `make benchmark` A/A varied too much to show a result, on a1.xxlarge it stayed 1.00x–1.06x. Hand the
-measurement to such an orb when the working orb is smaller.
+measurement to such an orb when the working orb is smaller. A serial wall cohort on a1.large (pinned core, nothing
+else on the orb, A/A and JIT-flat passing) counts for records and triage at effects of 3% or more; it matched xxlarge
+within about 1 pp (bench/upstream/timing_a1_large). Bodies, effects under 3%, benchmark-ips and `make benchmark` stay
+on a1.xxlarge. Timing records name the CPU model from `lscpu`.
 
 ### Realistic sizes upstream (Thomas, 2026-11-14)
 
