@@ -1322,3 +1322,13 @@ still permits Hashie 6 and needs no reach reordering. Hashie remains unarchived 
 2026-11-27. Duel remains unarchived with 21 stars, 8,797 downloads, version 0.3.1 released 2026-11-22 and pushed
 2026-11-25. Existing raw evidence stays in `astra-HM5-6b6f67b.tar.gz`, `duel/` and `wall/HM5-array-*`.
 No candidate edit, fork push or upstream post.
+
+## thermos-sol HM5, second pass: approve on 6b6f67b39c4f839154209f4d94ceadb416f82ddb
+
+2026-11-28, orb `T-01a21f3c-226a-77d4-8978-cd852e1e46ae`. Both Thermos rubrics applied here without delegation. **No remaining demonstrated finding; L0, approve.** R1 is pre-accepted in the note and intentionally absent from the body. R2's impact now limits reach to the inherited path and excludes IndifferentAccess/Dash/Trash.
+
+Verified remote head, sole parent `277e88e6ccc317497e6c20fb8b9e35abebc0fe19`, complete diff/message/CHANGELOG, and byte-identical title/body. The first-pass sentence audit and Duel provenance still apply. Fresh 35,280-row comparisons on 4.0.10 interpreter and pinned master/ZJIT agree with base and retained first-pass data. No new full-suite or timing run is claimed.
+
+Extracted both `wall/HM5-array-*/raw.tar.gz` archives; checked 90 processes/cohort, JIT-flat counters and all four recomputed estimator/bootstrap cells. Huge Array: master/ZJIT −0.1% [−0.5%, +0.3%]; 4.0.10/YJIT **+0.6% [+0.4%, +0.9%]**, A/A +0.1% [−0.3%, +0.3%]. **This may stay in the record, not the body.** It is a statistically resolved local loss, not noise, but the non-xxlarge host does not qualify an effect under 3%. The body claims only the nested-Mash fixture, not universal speed; DECISIONS keeps stress-size rows in the record. No policy-qualified blocker or all-workload no-loss guarantee follows.
+
+Fresh `gh api`: latest visible issue/PR **661**, no open PRs, `issues/662` and `pulls/662` both 404. **662 still appears next**; recheck on opening, since these reads neither reserve the counter nor exclude deleted numbers. No Hashie write or upstream post.
