@@ -19,7 +19,7 @@ only for `script/pr-queue sync`, through the preinstalled `mise exec ruby@4.0.9`
 
 ## Each run
 
-1. `git pull --ff-only` in the Lowrail repo.
+1. `git pull --ff-only` in the Lowrail repo (stash `state.json` first and use `script/git-signed pull --rebase origin main`; check that it printed no error, e.g. "unable to update local ref", and repeat before reading queue items or the ledger).
 2. Count open rails/rails PRs:
    `gh api 'search/issues?q=repo:rails/rails+author:thomasklemm+is:pr+is:open&per_page=1' --jq .total_count`.
    The cap is 15 including drafts. Report the total count when a slot frees.
