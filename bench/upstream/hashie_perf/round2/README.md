@@ -173,6 +173,12 @@ once as outside the contract, and then the body says that a value changed by a c
 converted as it was read. Both also asked to narrow the reach: IndifferentAccess, Dash and Trash have their own
 `to_hash` and don't gain (the item's impact now says so). Nothing was opened or posted.
 
+thermos-sol's slowest input, one key holding a `Hashie::Array` of 131,072 Integers (+1.25% [+0.80, +1.70] under ZJIT
+on master on its 2-CPU orb), repeated here on the 8-CPU orb, 30 rounds each (`to_hash_array_body.rb`,
+`wall/HM5-array-*`): ZJIT on master −0.1% [−0.5, +0.3], no claim; YJIT 4.0.10 **+0.6% [+0.4, +0.9]**, A/A +0.1%
+[−0.3, +0.3]. So the loss is not confirmed under ZJIT and is 0.6% under YJIT for one huge Array; the cause is not
+traced. A Mash with 100 scalar keys is −17.1% [−17.6, −16.7] and −18.3% [−18.5, −17.6]. Neither orb is a1.xxlarge.
+
 Branch `thomasklemm/to-hash-read-once`, head `e10dce0` on `9e313f3`: `value = self[k]` once in
 `Hashie::Hash#to_hash` instead of `self[k]` in the `is_a?(Array)` test and again for the conversion. In a Mash
 every `self[k]` is `custom_reader`: a default-proc check, `convert_key` and the read.
@@ -235,6 +241,11 @@ class goes from FrozenError to a stored key; and merely reading `Mash.disabled_w
 on a 2-CPU orb). An exact form would have to keep class state out of the per-key path or store it shareable, which
 is a design change to `KeyConflictWarning`, not a small performance change. Nothing was opened or posted. The
 record below is as it stood before review; its exactness section missed Ractors and reader overrides.
+
+thermos-sol returned "changes" on the same head with the same two blockers, found independently (its section at the
+end), and measured the inspected-list state: `Mash.new('ready?' => true)` in a mixed process +10.7% under ZJIT on
+master (2-CPU orb, diagnostic). Both reviewers put the next upstream number at 662, not the 663 in the CHANGELOG
+line. The fork branches of HM3 and HM4 are deleted; their heads are in `candidates.bundle`.
 
 Branch `thomasklemm/skip-disabled-conflict-check`, head `10a9303` on `277e88e`, two added lines and one removed:
 `Mash#_log_collision?` asks `self.class.disable_warnings?(method_key)` before `respond_to?` instead of after it, and
