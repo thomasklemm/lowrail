@@ -208,3 +208,17 @@ The original draft above remains unchanged. I approve this replacement, includin
 > Duel stayed quiet because both jobs passed and there was no earlier Duel comment. I left [Duel 0.3.1's default](https://github.com/sferik/duel-ruby/blob/3c0c99d95dc2d5620f59e4bb298179422086adf7/docs/configuration.md#choose-when-to-comment-on-a-pull-request), `:failures`, in place in #659: it comments on failures or comparison errors, and on later status changes after a comment. The [Perf Comment run](https://github.com/hashie/hashie/actions/runs/46143085591) fetched both reports and logged `duel comment: no comment`; #661 stayed quiet for the same reason. The results are in the Duel jobs' logs of the [Perf run](https://github.com/hashie/hashie/actions/runs/46142873379).
 >
 > If you'd prefer reports on passing PR runs too, I can send a PR setting `c.comment = :results`; the YJIT and ZJIT reports would appear together in one comment.
+
+## Reply draft 2 (exact text; replaces the draft above)
+
+Adopted on 2026-11-28 from Astra's replacement, word for word: it names the earlier-comment condition, owns that the
+default was left in place, pins the docs link to the release commit and offers the change instead of describing it.
+The first draft above stays as the reviewers quoted it. Everything between the rules is the comment.
+
+---
+
+Duel stayed quiet because both jobs passed and there was no earlier Duel comment. I left [Duel 0.3.1's default](https://github.com/sferik/duel-ruby/blob/3c0c99d95dc2d5620f59e4bb298179422086adf7/docs/configuration.md#choose-when-to-comment-on-a-pull-request), `:failures`, in place in #659: it comments on failures or comparison errors, and on later status changes after a comment. The [Perf Comment run](https://github.com/hashie/hashie/actions/runs/46143085591) fetched both reports and logged `duel comment: no comment`; #661 stayed quiet for the same reason. The results are in the Duel jobs' logs of the [Perf run](https://github.com/hashie/hashie/actions/runs/46142873379).
+
+If you'd prefer reports on passing PR runs too, I can send a PR setting `c.comment = :results`; the YJIT and ZJIT reports would appear together in one comment.
+
+---
