@@ -23,6 +23,7 @@ note: "2026-11-28: a clear bugfix PR, no ticket (Thomas). New head 66b1ec68dd af
 ownership: {date: 2026-11-28, checked: ["open PRs naming to_s that change .spellcheck.txt, CHANGELOG.md, lib/slack/messages/message.rb, slack-ruby-client.gemspec"], hits: []}
 passes:
   - {reviewer: astra, head: "dfbf7013bfaf7abf982a09ef29d732e6b452de71", date: 2026-11-28, orb: T-01a2221b-8e76-742f-8bca-1918a5fb40a4, verdict: changes, open: "R1 Ruby 3.0.7 with Hashie 3.5.3/3.5.4 gains a Ractor::IsolationError; R2 selective-warning subclasses can warn or raise through a logger on Hashie 4-5.2 and need disclosure if retained; R3 impact's universal warning trigger is false. Retaining the original legacy no-op alongside disable_warnings fixed R1/R2 in isolated probes; do not add a new underscore-helper override. See Astra section and astra-SRC1-dfbf701.tar.gz."}
+  - {reviewer: thermos-sol, head: "dfbf7013bfaf7abf982a09ef29d732e6b452de71", date: 2026-11-28, orb: T-01a2221b-855f-7661-a87e-59f64efb922f, verdict: changes, open: "P2: reproduced Astra's Ruby 3.0/Hashie 3.5.3 Ractor exception; retain the original legacy no-op alongside disable_warnings. P2: selective settings on Hashie 4-5 can now warn or raise through a custom logger; disclose in body/README if retained, or restore the old hook. P3: qualify impact's every-method-key claim. Keep the 3.5.3 floor; no underscore-hook override. Repros and raw runs in the record/archive."}
 ---
 
 # Fix Hashie 6 key conflict warnings for Slack::Messages::Message
