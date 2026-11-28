@@ -1293,3 +1293,32 @@ RuboCop 1.93.0 metrics: `_log_collision?` ABC **14.46 → 13.64**, cyclomatic/pe
 is readable but buys the incorrect abstraction assumption above. Head files are 654, 91 and 112 lines respectively
 for Mash, KeyConflictWarning and the extension benchmarks; no 1,000-line threshold crossing. No added code comments
 or tests to trim. The new benchmark measures a useful public operation, but is not a regression test for R1/R2.
+
+## Astra HM5, second pass: approve on 6b6f67b39c4f839154209f4d94ceadb416f82ddb
+
+2026-11-28, thread `T-01a21f3c-2ef1-726e-be84-05ebf5389576`, reviewed here without delegation.
+**No open finding.** Thomas's accepted boundary covers R1, including first-copy state, value/key callbacks and
+fiber/thread replacement or deletion; its omission from the body is explicitly accepted, not a finding.
+`git ls-remote` confirms the exact fork head; `git show` confirms its sole parent, complete diff, commit message
+and CHANGELOG. Compared the title/body byte-for-byte with the first-pass Lowrail commit: unchanged. The earlier
+sentence audit and eight-cell differential evidence therefore still apply; no new full matrix or timing run is
+claimed. Re-read the conversion and reader bodies and executed `instance_method(:to_hash).owner`: Hash/Mash use
+Hashie::Hash, Dash/Trash use Dash, and IndifferentAccess uses its own module. The narrowed impact is accurate.
+
+Recomputed both huge-Array cohorts from all 90 raw process logs each using `script/upstream-bench`'s `wall_cell`
+and bootstrap estimator; every estimate/interval matches `results.json`, and all recorded JIT deltas are zero.
+For `Hashie::Hash[item: Hashie::Array.new(131_072, 17)].to_hash`, master/ZJIT is −0.1% [−0.5, +0.3], while
+4.0.10/YJIT is +0.6% [+0.4, +0.9], A/A +0.1% [−0.3, +0.3]. **The YJIT loss is detected in that cohort, not
+inside its noise interval. It may remain in the record, without a body sentence.** The body claims only the
+named nested-Mash Duel fixture, not a universal speedup; the size sweep belongs here. Under the current timing
+rule, effects below 3% still require a1.xxlarge, so this eight-CPU result is diagnostic rather than a qualified
+blocking-loss claim. No cause or absence of a worst-case slowdown is asserted. A stronger sub-percent claim
+would require the specified host; this is not an additional opening condition for this narrowly worded body.
+
+Live `gh api` checks still show latest visible issue/PR **661**, and GET 662 returns **404**: 662 remains the next
+visible number, not reserved. Recheck at opening. Refreshed reach: OmniAuth 2.4.2, 235,407,426 downloads, 8,102
+stars, released 2026-11-18, pushed 2026-11-27, released requirement `hashie >= 3.5.2`; the only named downstream
+still permits Hashie 6 and needs no reach reordering. Hashie remains unarchived with 3,035 stars, pushed
+2026-11-27. Duel remains unarchived with 21 stars, 8,797 downloads, version 0.3.1 released 2026-11-22 and pushed
+2026-11-25. Existing raw evidence stays in `astra-HM5-6b6f67b.tar.gz`, `duel/` and `wall/HM5-array-*`.
+No candidate edit, fork push or upstream post.
