@@ -624,3 +624,28 @@ wall −35% to −80%, ZJIT master wall −25% to −79%. Every A/A interval con
 difference is accepted and disclosed: on JRuby 9.4, whose `String#b` keeps a String subclass, a subclass input with
 nothing to decode returns that subclass. `.to_s` was tried (`545506a`) and dropped, because it doesn't help
 SafeBuffer and calls an overridable `to_s`. Waiting for Thomas: ruby/uri is a ruby-org repository and parked.
+
+### UR1 reworked into the shared helper: head `e2d2e21` (2026-11-28)
+
+Thomas found c43954f the wrong shape: it copied the lone-`%` check out of `_decode_uri_component` into the public
+method. The new head improves the helper instead. `_decode_uri_component(str, enc)` keeps the check, the `str.b` copy
+and `force_encoding(enc)` and yields the BINARY copy to a block. One load-time check (`CGI.respond_to?(:unescapeURIComponent)`
+and no `source_location`) picks the decoders: `CGI.unescape` for `decode_www_form_component` and
+`CGI.unescapeURIComponent` (keeps `+`) for `decode_uri_component` where cgi/escape has them in C (cgi 0.3.3+, Ruby
+3.1.3+) or Java (0.4.1+); otherwise both keep the `gsub` (Ruby 2.5 to 3.1.2, TruffleRuby, JRuby 9.4).
+* **Not changed:** `decode_www_form`. It keeps a lone `%` as is, its in-place `gsub!` allocates nothing on plain
+  pairs (19 vs 28 objects with CGI), and neither Rack 3.2.9 nor Rails calls it.
+* **Fable round:** found the form decoder 2x to 15x slower on TruffleRuby when it always used CGI (Ruby code there);
+  the single check fixes it and removes the JRuby 9.4 subclass exception. Polish taken (ASCII_8BIT, comments,
+  `assert_instance_of`, body wording); dropping the GB18030 and `%zz` asserts not taken.
+* **Exactness:** 0 differences in 28 differential logs for both methods (2.5.9, 3.1.2, 3.4.12, 4.0.10, master, pure
+  CGI, JRuby 10.1.3.0, TruffleRuby 40); suite green in 21 runs (native, no C decoder, Ruby decoder) and on JRuby
+  9.4.16.0; 14 wrong implementations each caught by a new assertion ([`ur1/rework/`](../../bench/upstream/outside_leads/ur1/rework/)).
+* **Per call** on tree 3621b78834 (a1.xxlarge, `body/UR1-d4ce0b0-*-time`): interpreter benchmark-ips +20% to +295%
+  (A/A ≤ 7.9%), YJIT wall −29.5% to −80.0%, ZJIT master wall −23.5% to −77.8%, every A/A interval containing 0,
+  JIT-flat in 90 processes per case; objects 4–8 down to 2–3.
+* **Per request** (`req-ur1c-*.txt`, d09ffb7 tree, same MRI code): blog PATCH YJIT −5.95% (A/A 0.11%), ZJIT
+  −5.16% (0.20%); the interpreter −7.97% came with 50 fewer objects than the old head and is unexplained, not used.
+* **Reviews:** thermos-sol and Astra approve e2d2e21 and its body, numbers recomputed from raw logs by both.
+  Force-pushed to ruby/uri#276, body PATCHed and read back, marked ready on Thomas's authorization. ruby/uri's CI
+  awaits first-contributor approval as before; fork CI green on the exact head.

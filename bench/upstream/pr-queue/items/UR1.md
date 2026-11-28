@@ -13,10 +13,10 @@ depends_on: []
 stacked_on:
 alternative_of:
 evidence: [bench/upstream/outside_leads/ur1/body/UR1-d4ce0b0-4010-time, bench/upstream/outside_leads/ur1/body/UR1-d4ce0b0-master-time, bench/upstream/outside_leads/ur1/body/UR1-d09ffb7-4010, bench/upstream/outside_leads/ur1/body/UR1-d09ffb7-master, bench/upstream/outside_leads/ur1/rework, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master-time, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-4010, bench/upstream/outside_leads/ur1/body/UR1-cecaed1-master, bench/upstream/outside_leads/ur1/body/UR1-4010, docs/upstream/data/outside-leads-2026-11-27, bench/upstream/outside_leads/ur1/astra-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-cecaed1-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-final-7da6979-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-545506a-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-c43954f-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/astra-timing-body-2026-11-27.tar.gz, bench/upstream/outside_leads/ur1/thermos-sol-2026-11-27.tar.gz]
-impact: "Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
+impact: "Since e2d2e21 also URI.decode_uri_component (userinfo decoding; not on Rack or Rails request paths). Rework per call on tree 3621b78834 (body/UR1-d4ce0b0-*-time, a1.xxlarge): interpreter ips +20% to +295%, YJIT 4.0.10 wall -29.5% to -80.0%, ZJIT master wall -23.5% to -77.8%, objects 4-8 down to 2-3; blog PATCH (req-ur1c-*.txt, d09ffb7 tree, same MRI code) YJIT -5.95% (A/A 0.11%), ZJIT -5.16% (0.20%); interpreter -7.97% unexplained single run, not used. Earlier: Rack (3.2.9) decodes query strings and cookies, and Rails (8.0+, main) every query parameter and URL-encoded form field key and value, through URI.decode_www_form_component. Per call (body/UR1-cecaed1-*): 4.0.10 interpreter -21% to -70% instructions, YJIT -24% to -75%; master ZJIT -20% to -73%; 4-8 objects down to 2-3. Whole requests, head method body as an overlay on Rails main 2e299253f9 (req-ur1b-*.txt): interpreter -2.9% blog PATCH, -1.0% pingcrm PUT, -0.5% blog GET article; YJIT 4.0.10 -5.6% / -1.0% blog PATCH / GET article (JIT-flat); ZJIT master -4.5% / -0.9% (no ISEQ or side exit compiled in any window; master has no invalidation_count). JSON control within 0.06%. The path runs on Ruby master and Rails main."
 rank: 2
 risky: true
-state: draft
+state: ready
 pr: 276
 ownership: {date: 2026-11-27, checked: ["open ruby/uri PRs touching lib/uri/common.rb decode/encode (none change the method; #253 and #264 only change MailTo callers of it, #269 is URI.for/parse, #274 a WHATWG parser)", "ruby/uri commits on common.rb since 2025 (none on _decode_uri_component)", "rack/rack#2557 (ours) moves Rack off this method; Rails' QueryParser still calls it"], hits: []}
 note: >-
@@ -112,6 +112,23 @@ note: >-
   unescaped, -13.6% instructions. Fork CI green on the exact head. Not opened: ruby/uri is a ruby-org repository
   and parked (DECISIONS, Bets); Thomas decides whether to open it. ZJIT per-call cells on master: the first run (UR1-master-aborted) stopped when one
   ZJIT process wrote an empty log (cause not established; four Valgrind batches ran beside it); rerun as UR1-master.
+  2026-11-27/28 rework (Thomas: the duplicated lone-% check was the wrong shape). Head e2d2e21 (tree 3621b78834),
+  one commit on 48cda77031: _decode_uri_component(str, enc) keeps the check, the b copy and force_encoding and yields
+  the BINARY copy; under one load-time check (CGI.respond_to?(:unescapeURIComponent) and no source_location)
+  decode_www_form_component passes CGI.unescape and decode_uri_component CGI.unescapeURIComponent, otherwise both keep
+  the gsub (cgi < 0.3.3 = Ruby < 3.1.3, TruffleRuby, JRuby 9.4). decode_www_form unchanged (keeps a lone %, gsub!
+  allocates nothing on plain pairs; 19 vs 28 objects), no Rack/Rails caller. Path: d09ffb7 (form always CGI) ->
+  b0f2bb7 (message) -> Fable: form decoder 2x-15x slower on TruffleRuby -> d4ce0b0 single check, which also removes
+  the JRuby 9.4 subclass exception (suite green on 9.4.16.0) -> a04eb03, e2d2e21 message-only (Astra, thermos-sol).
+  Tests: per-method contract asserts (mixed-case hex, BINARY input -> UTF-8, GB18030 with +, empty, subclass class,
+  %zz); base passes all; 14 mutants each caught where their path runs (rework/tests). Differential 0 in 28 logs
+  (rework/diff), suite 21 runs green + JRuby 9.4. Accepted boundaries: overrides/prepends of native CGI methods,
+  overriding CGI.method/respond_to? can break uri load, old 3-arg private-helper prepends, cgi/escape loads with
+  uri. Fable's vendored Gem::URI early-cgi point was read, not run; c43954f already required cgi/escape.
+  2026-11-28 force-pushed e2d2e21 to the PR branch (lease from c43954f), body PATCHed and read back identical
+  (item file unchanged since f2365d60, the text both reviewers approved), marked ready with gh pr ready on Thomas's
+  explicit authorization (coordinator message, 2026-11-27). ruby/uri CI run 46086881026 is action_required
+  (first-time contributor approval, as for c43954f); fork CI on e2d2e21 green, run 46084269325.
 passes:
   - reviewer: astra
     head: "a3b201f05b2efd737af193bc45ebd0534b3b6a5c"
@@ -284,6 +301,55 @@ passes:
       Exact Rack/Rails release permalinks, main callers, relevance/currency/reach checked; Rack-first justified.
       No added comments or structural regression. Report: bench/upstream/outside_leads/ur1/thermos-sol-2026-11-27.md;
       probes and raw measurements in adjacent archive. No upstream action.
+  - reviewer: thermos-sol
+    head: "d09ffb7376d111123e5d217510c150c87c0cdd99"
+    orb: T-01a21efb-a6a1-71b9-bfc9-7140f4b8f209
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      Code/tests approve; commit message "is no faster" unsupported (fixed in b0f2bb7). README object counts corrected. Report thermos-sol-d09ffb7-2026-11-27.md.
+  - reviewer: astra
+    head: "d09ffb7376d111123e5d217510c150c87c0cdd99"
+    orb: T-01a21efb-d5e7-75fa-9191-e49b123b5747
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      Code/tests; boundaries grow only for caller-installed hooks (native CGI overrides, CGI.method/respond_to? overrides, old private signature). Report astra-d09ffb7-2026-11-27.md.
+  - reviewer: fable
+    head: "b0f2bb74984ed7c581020198e57469409cb8881f"
+    orb: T-01a21f2b-ca99-74df-9369-8d7d988256e8
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      Form decoder 2x-15x slower on TruffleRuby; single check (v-native) taken as d4ce0b0, plus ASCII_8BIT, else-comment, helper comment, assert_instance_of, gsub-cost wording, body length and cgi/escape require sentence. Not taken: dropping GB18030 and %zz asserts. Report fable-b0f2bb7-2026-11-27.md.
+  - reviewer: astra
+    head: "d4ce0b0376d0b1bbbf853c87ad0dd506ef6dc70c"
+    orb: T-01a21efb-d5e7-75fa-9191-e49b123b5747
+    date: 2026-11-27
+    verdict: changes
+    open: >-
+      Code/tests/body prose approve; message credited CGI.unescape with keeping the subclass on TruffleRuby (fixed in a04eb03). JRuby 9.4 difference gone. Report astra-d4ce0b0-2026-11-27.md.
+  - reviewer: thermos-sol
+    head: "e2d2e21a570516424a3a935e5ab2a67db0ac53d0"
+    orb: T-01a21efb-a6a1-71b9-bfc9-7140f4b8f209
+    date: 2026-11-27
+    verdict: approve
+    open: >-
+      Code, tests, message, body prose; 8 cohorts plus cgi 0.3.2/0.3.3, 14 mutants caught, 128-row sweep max +6.08% (fallback, 12 bytes). Report thermos-sol-e2d2e21-2026-11-27.md (Lowrail 8156d548).
+  - reviewer: astra
+    head: "e2d2e21a570516424a3a935e5ab2a67db0ac53d0"
+    orb: T-01a21efb-d5e7-75fa-9191-e49b123b5747
+    date: 2026-11-28
+    verdict: approve
+    open: >-
+      Head, message and body numbers at f2365d60 recomputed from raw logs. Receipt astra-e2d2e21-final-2026-11-28.md (Lowrail 12ecde54).
+  - reviewer: thermos-sol
+    head: "e2d2e21a570516424a3a935e5ab2a67db0ac53d0"
+    orb: T-01a21efb-a6a1-71b9-bfc9-7140f4b8f209
+    date: 2026-11-28
+    verdict: approve
+    open: >-
+      Body numbers at f2365d60 recomputed (ips, 24 bootstrap intervals, 32,400 flat windows, objects). Receipt thermos-sol-e2d2e21-numbers-2026-11-28.md (Lowrail 564837a1).
 ---
 
 # Decode URI components with cgi/escape
