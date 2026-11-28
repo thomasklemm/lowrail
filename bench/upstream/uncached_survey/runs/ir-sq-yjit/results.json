@@ -1,0 +1,682 @@
+{
+  "script": "/home/user/workspace/repo/bench/upstream/uncached_survey/sq_body.rb",
+  "at": "2026-11-28T01:38:05Z",
+  "n": 200,
+  "warmup": 200,
+  "preload": null,
+  "heap": {
+    "RUBY_GC_HEAP_0_INIT_SLOTS": "1000000",
+    "RUBY_GC_HEAP_1_INIT_SLOTS": "250000",
+    "RUBY_GC_HEAP_2_INIT_SLOTS": "100000",
+    "RUBY_GC_HEAP_3_INIT_SLOTS": "20000",
+    "RUBY_GC_HEAP_4_INIT_SLOTS": "10000"
+  },
+  "sides": {
+    "base": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/main/solid_queue",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "b9c646a8486ef3e76f70919568cac070276da0e1",
+      "dirty": false
+    },
+    "candidate": {
+      "ruby": "/home/user/.local/share/mise/installs/ruby/4.0.10/bin/ruby",
+      "tree": "/home/user/w/cand/solid_queue",
+      "description": "ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]",
+      "zjit": false,
+      "head": "b9c646a8486ef3e76f70919568cac070276da0e1",
+      "dirty": true
+    }
+  },
+  "objects": {
+    "yjit worker poll, idle": {
+      "base": 296.998,
+      "base1": 296.998,
+      "base2": 296.998,
+      "candidate": 294.998,
+      "change": -0.006734052081158848,
+      "aa": 0.0,
+      "claim": true
+    },
+    "yjit dispatcher poll, idle": {
+      "base": 302.964,
+      "base1": 302.928,
+      "base2": 303.0,
+      "candidate": 302.964,
+      "change": 0.0,
+      "aa": 0.00023765199825722769,
+      "claim": false
+    },
+    "yjit dispatcher poll, 10 due jobs": {
+      "base": 5492.018,
+      "base1": 5491.796,
+      "base2": 5492.24,
+      "candidate": 5476.966,
+      "change": -0.0027407047828320596,
+      "aa": 0.00008084460029073197,
+      "claim": true
+    },
+    "yjit dispatcher poll, 100 due jobs": {
+      "base": 34020.8225,
+      "base1": 34020.41,
+      "base2": 34021.235,
+      "candidate": 34004.509,
+      "change": -0.00047951515575506143,
+      "aa": 0.00002424985462938439,
+      "claim": true
+    },
+    "yjit worker claim, 3 jobs": {
+      "base": 2683.9935,
+      "base1": 2683.964,
+      "base2": 2684.023,
+      "candidate": 2679.048,
+      "change": -0.0018425901553040802,
+      "aa": 0.00002198216947999183,
+      "claim": true
+    }
+  },
+  "instructions": {
+    "yjit worker poll, idle": {
+      "base": 600289.735,
+      "base1": 599990.135,
+      "base2": 600589.335,
+      "candidate": 603850.85,
+      "change": 0.005932326995396586,
+      "aa": 0.0009981846516165288,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1643,
+                1643
+              ],
+              "compiled_block_count": [
+                23736,
+                23736
+              ],
+              "invalidation_count": [
+                579,
+                579
+              ]
+            }
+          },
+          {
+            "window": "base n200",
+            "counters": {
+              "compiled_iseq_count": [
+                1643,
+                1643
+              ],
+              "compiled_block_count": [
+                23733,
+                23733
+              ],
+              "invalidation_count": [
+                579,
+                579
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1639,
+                1639
+              ],
+              "compiled_block_count": [
+                23674,
+                23674
+              ],
+              "invalidation_count": [
+                579,
+                579
+              ]
+            }
+          },
+          {
+            "window": "candidate n200",
+            "counters": {
+              "compiled_iseq_count": [
+                1639,
+                1639
+              ],
+              "compiled_block_count": [
+                23674,
+                23674
+              ],
+              "invalidation_count": [
+                579,
+                579
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1643,
+                1643
+              ],
+              "compiled_block_count": [
+                23734,
+                23734
+              ],
+              "invalidation_count": [
+                579,
+                579
+              ]
+            }
+          },
+          {
+            "window": "base2 n200",
+            "counters": {
+              "compiled_iseq_count": [
+                1643,
+                1643
+              ],
+              "compiled_block_count": [
+                23734,
+                23734
+              ],
+              "invalidation_count": [
+                579,
+                579
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit dispatcher poll, idle": {
+      "base": 640864.9675,
+      "base1": 641061.84,
+      "base2": 640668.095,
+      "candidate": 649977.66,
+      "change": 0.0142193643936388,
+      "aa": 0.0006143961988373086,
+      "claim": true,
+      "jit": {
+        "flat": true,
+        "moved": [],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1722,
+                1722
+              ],
+              "compiled_block_count": [
+                24842,
+                24842
+              ],
+              "invalidation_count": [
+                593,
+                593
+              ]
+            }
+          },
+          {
+            "window": "base n200",
+            "counters": {
+              "compiled_iseq_count": [
+                1722,
+                1722
+              ],
+              "compiled_block_count": [
+                24845,
+                24845
+              ],
+              "invalidation_count": [
+                593,
+                593
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1729,
+                1729
+              ],
+              "compiled_block_count": [
+                24926,
+                24926
+              ],
+              "invalidation_count": [
+                593,
+                593
+              ]
+            }
+          },
+          {
+            "window": "candidate n200",
+            "counters": {
+              "compiled_iseq_count": [
+                1729,
+                1729
+              ],
+              "compiled_block_count": [
+                24926,
+                24926
+              ],
+              "invalidation_count": [
+                593,
+                593
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                1722,
+                1722
+              ],
+              "compiled_block_count": [
+                24843,
+                24843
+              ],
+              "invalidation_count": [
+                593,
+                593
+              ]
+            }
+          },
+          {
+            "window": "base2 n200",
+            "counters": {
+              "compiled_iseq_count": [
+                1722,
+                1722
+              ],
+              "compiled_block_count": [
+                24842,
+                24842
+              ],
+              "invalidation_count": [
+                593,
+                593
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit dispatcher poll, 10 due jobs": {
+      "base": 16454372.335,
+      "base1": 16453149.625,
+      "base2": 16455595.045,
+      "candidate": 15927858.665,
+      "change": -0.03199840500023554,
+      "aa": 0.00014861824870695837,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "candidate n200 compiled_block_count +5",
+          "base2 n200 compiled_block_count +5"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                2187,
+                2187
+              ],
+              "compiled_block_count": [
+                32568,
+                32568
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          },
+          {
+            "window": "base n200",
+            "counters": {
+              "compiled_iseq_count": [
+                2187,
+                2187
+              ],
+              "compiled_block_count": [
+                32568,
+                32568
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                2182,
+                2182
+              ],
+              "compiled_block_count": [
+                32499,
+                32499
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          },
+          {
+            "window": "candidate n200",
+            "counters": {
+              "compiled_iseq_count": [
+                2182,
+                2182
+              ],
+              "compiled_block_count": [
+                32499,
+                32504
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                2187,
+                2187
+              ],
+              "compiled_block_count": [
+                32568,
+                32568
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          },
+          {
+            "window": "base2 n200",
+            "counters": {
+              "compiled_iseq_count": [
+                2187,
+                2187
+              ],
+              "compiled_block_count": [
+                32568,
+                32573
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit dispatcher poll, 100 due jobs": {
+      "base": 119854306.59,
+      "base1": 119878753.31,
+      "base2": 119829859.87,
+      "candidate": 114952310.075,
+      "change": -0.0408996276768665,
+      "aa": 0.0004079406188319396,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n200 compiled_iseq_count +2",
+          "base n200 compiled_block_count +15",
+          "candidate n200 compiled_iseq_count +2",
+          "candidate n200 compiled_block_count +10",
+          "base2 n200 compiled_iseq_count +2",
+          "base2 n200 compiled_block_count +13"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                2191,
+                2191
+              ],
+              "compiled_block_count": [
+                32527,
+                32527
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          },
+          {
+            "window": "base n200",
+            "counters": {
+              "compiled_iseq_count": [
+                2191,
+                2193
+              ],
+              "compiled_block_count": [
+                32522,
+                32537
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                2186,
+                2186
+              ],
+              "compiled_block_count": [
+                32461,
+                32461
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          },
+          {
+            "window": "candidate n200",
+            "counters": {
+              "compiled_iseq_count": [
+                2186,
+                2188
+              ],
+              "compiled_block_count": [
+                32478,
+                32488
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                2191,
+                2191
+              ],
+              "compiled_block_count": [
+                32590,
+                32590
+              ],
+              "invalidation_count": [
+                672,
+                672
+              ]
+            }
+          },
+          {
+            "window": "base2 n200",
+            "counters": {
+              "compiled_iseq_count": [
+                2191,
+                2193
+              ],
+              "compiled_block_count": [
+                32522,
+                32535
+              ],
+              "invalidation_count": [
+                679,
+                679
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "yjit worker claim, 3 jobs": {
+      "base": 6930654.4425,
+      "base1": 6932810.71,
+      "base2": 6928498.175,
+      "candidate": 6886538.5,
+      "change": -0.006365335750903034,
+      "aa": 0.0006222406607888168,
+      "claim": false,
+      "jit": {
+        "flat": false,
+        "moved": [
+          "base n200 compiled_block_count +2",
+          "candidate n200 compiled_block_count +2",
+          "base2 n200 compiled_block_count +2"
+        ],
+        "windows": [
+          {
+            "window": "base n0",
+            "counters": {
+              "compiled_iseq_count": [
+                2164,
+                2164
+              ],
+              "compiled_block_count": [
+                32474,
+                32474
+              ],
+              "invalidation_count": [
+                677,
+                677
+              ]
+            }
+          },
+          {
+            "window": "base n200",
+            "counters": {
+              "compiled_iseq_count": [
+                2164,
+                2164
+              ],
+              "compiled_block_count": [
+                32474,
+                32476
+              ],
+              "invalidation_count": [
+                677,
+                677
+              ]
+            }
+          },
+          {
+            "window": "candidate n0",
+            "counters": {
+              "compiled_iseq_count": [
+                2158,
+                2158
+              ],
+              "compiled_block_count": [
+                32354,
+                32354
+              ],
+              "invalidation_count": [
+                677,
+                677
+              ]
+            }
+          },
+          {
+            "window": "candidate n200",
+            "counters": {
+              "compiled_iseq_count": [
+                2158,
+                2158
+              ],
+              "compiled_block_count": [
+                32354,
+                32356
+              ],
+              "invalidation_count": [
+                677,
+                677
+              ]
+            }
+          },
+          {
+            "window": "base2 n0",
+            "counters": {
+              "compiled_iseq_count": [
+                2164,
+                2164
+              ],
+              "compiled_block_count": [
+                32474,
+                32474
+              ],
+              "invalidation_count": [
+                677,
+                677
+              ]
+            }
+          },
+          {
+            "window": "base2 n200",
+            "counters": {
+              "compiled_iseq_count": [
+                2164,
+                2164
+              ],
+              "compiled_block_count": [
+                32472,
+                32474
+              ],
+              "invalidation_count": [
+                677,
+                677
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  "ips": {},
+  "wall": {}
+}
