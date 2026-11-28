@@ -1,0 +1,120 @@
+==191887== Callgrind, a call-graph generating cache profiler
+==191887== Copyright (C) 2002-2017, and GNU GPL'd, by Josef Weidendorfer et al.
+==191887== Using Valgrind-3.19.0-8d3c8034b8-20220411 and LibVEX; rerun with -h for copyright info
+==191887== Command: /home/user/rubies/master-0d399335b7/bin/ruby --zjit -rbundler/setup /home/user/workspace/repo/script/upstream-bench --worker ir /home/user/workspace/repo/bench/upstream/uncached_survey/sq_body.rb worker\ claim,\ 3\ jobs 200
+==191887== Parent PID: 58594
+==191887== 
+--191887-- 
+--191887-- Valgrind options:
+--191887--    --verbose
+--191887--    --tool=callgrind
+--191887--    --collect-atstart=no
+--191887--    --toggle-collect=rb_ary_cycle
+--191887--    --smc-check=all
+--191887--    --callgrind-out-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-sq-zjit/raw/ir-zjit-5-worker_claim_3_jobs-base-n200.callgrind
+--191887--    --log-file=/home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-sq-zjit/raw/ir-zjit-5-worker_claim_3_jobs-base-n200.valgrind.log
+--191887-- Contents of /proc/version:
+--191887--   Linux version 6.1.189+ (root@ip-172-31-73-130) (gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0, GNU ld (GNU Binutils for Ubuntu) 2.42) #1 SMP PREEMPT_DYNAMIC Mon Nov  2 21:08:28 UTC 2026
+--191887-- 
+--191887-- Arch and hwcaps: AMD64, LittleEndian, amd64-cx16-lzcnt-rdtscp-sse3-ssse3-avx-avx2-bmi-f16c-rdrand-rdseed
+--191887-- Page sizes: currently 4096, max supported 4096
+--191887-- Valgrind library directory: /home/user/w/valgrind-brk512/libexec/valgrind
+==191887== For interactive control, run 'callgrind_control -h'.
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/bin/ruby
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2
+--191887--   Considering /usr/lib/debug/.build-id/f8/cba873b4b012040a77161991425f66a8b2e700.debug ..
+--191887--   .. build-id is valid
+--191887-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/callgrind-amd64-linux
+--191887--    object doesn't have a dynamic symbol table
+--191887-- Scheduler: using generic scheduler lock implementation.
+==191887== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-191887-by-user-on-???
+==191887== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-191887-by-user-on-???
+==191887== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-191887-by-user-on-???
+==191887== 
+==191887== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==191887== don't want to do, unless you know exactly what you're doing,
+==191887== or are doing some strange experiment):
+==191887==   /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=191887 ...command...
+==191887== 
+==191887== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==191887==   /path/to/gdb /home/user/rubies/master-0d399335b7/bin/ruby
+==191887== and then give GDB the following command
+==191887==   target remote | /home/user/w/valgrind-brk512/libexec/valgrind/../../bin/vgdb --pid=191887
+==191887== --pid is optional if only one valgrind process is running
+==191887== 
+--191887-- Reading syms from /home/user/w/valgrind-brk512/libexec/valgrind/vgpreload_core-amd64-linux.so
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libz.so.1.3.1
+--191887--    object doesn't have a symbol table
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libgmp.so.10.5.0
+--191887--    object doesn't have a symbol table
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypt.so.1.1.0
+--191887--    object doesn't have a symbol table
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libm.so.6
+--191887--   Considering /usr/lib/debug/.build-id/be/fc0308f899f79b901d4e738992787368cf70f7.debug ..
+--191887--   .. build-id is valid
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libgcc_s.so.1
+--191887--    object doesn't have a symbol table
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libc.so.6
+--191887--   Considering /usr/lib/debug/.build-id/93/f70d1a8ae34f8e63c223f1500327fbd717f871.debug ..
+--191887--   .. build-id is valid
+--191887-- Symbol match: found runtime_resolve: ld-linux-x86-64.so.2 +0x13340=0x4013340
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/encdb.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/transdb.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/date-3.6.0/lib/date_core.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/psych.so
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libyaml-0.so.2.0.9
+--191887--    object doesn't have a symbol table
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_16le.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/trans/utf_16_32.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_16be.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_32le.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/enc/utf_32be.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/openssl.so
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libssl.so.3
+--191887--    object doesn't have a symbol table
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libcrypto.so.3
+--191887--    object doesn't have a symbol table
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/libzstd.so.1.5.7
+--191887--    object doesn't have a symbol table
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/digest.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/socket.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/etc.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/json-3.2.0/lib/json/ext/parser.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/json-3.2.0/lib/json/ext/generator.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/extensions/x86_64-linux/4.1.0+7-static/bigdecimal-4.1.3/bigdecimal.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/strscan.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/cgi/escape.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/zlib.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/erb/escape.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/stringio.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/extensions/x86_64-linux/4.1.0+7-static/prism-2.1.0/prism/prism.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/io-console-0.9.5/lib/io/console.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/4.1.0+7/x86_64-linux/digest/sha2.so
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/nokogiri-1.19.7/lib/nokogiri/nokogiri.so
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/liblzma.so.5.8.1
+--191887--    object doesn't have a symbol table
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/extensions/x86_64-linux/4.1.0+7-static/racc-1.8.1/racc/cparse.so
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/ISO-2022-JP.so
+--191887--   Considering /usr/lib/debug/.build-id/45/3ef331672041300a39bfbcbe40f0792bb9aa77.debug ..
+--191887--   .. build-id is valid
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/libJIS.so
+--191887--   Considering /usr/lib/debug/.build-id/b2/92785807b77c552bb94c07b0034fdb082a6148.debug ..
+--191887--   .. build-id is valid
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/libGB.so
+--191887--   Considering /usr/lib/debug/.build-id/6d/6c7b4897e4e1d5d9f8a46d445e7d1c6d974694.debug ..
+--191887--   .. build-id is valid
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/libKSC.so
+--191887--   Considering /usr/lib/debug/.build-id/7f/86d4e84def1b162b120db3bf66149d066d6057.debug ..
+--191887--   .. build-id is valid
+--191887-- Reading syms from /usr/lib/x86_64-linux-gnu/gconv/CP932.so
+--191887--   Considering /usr/lib/debug/.build-id/08/ce31a7642d677969b12ae749624ac4269d2021.debug ..
+--191887--   .. build-id is valid
+--191887-- Reading syms from /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/gems/sqlite3-2.10.2/lib/sqlite3/sqlite3_native.so
+==191887== 
+--191887-- Start dumping at BB 2485588129 (Prg.Term.)...
+--191887-- Dump to /home/user/workspace/repo/bench/upstream/uncached_survey/runs/ir-sq-zjit/raw/ir-zjit-5-worker_claim_3_jobs-base-n200.callgrind
+--191887-- Dumping done.
+==191887== Events    : Ir
+==191887== Collected : 1400808766
+==191887== 
+==191887== I   refs:      1,400,808,766

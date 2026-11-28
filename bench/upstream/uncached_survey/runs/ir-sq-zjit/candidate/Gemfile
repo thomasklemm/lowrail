@@ -1,0 +1,4 @@
+source "https://rubygems.org"
+gem "solid_queue", path: "/home/user/w/cand/solid_queue"
+gem "rails"
+gem "sqlite3"

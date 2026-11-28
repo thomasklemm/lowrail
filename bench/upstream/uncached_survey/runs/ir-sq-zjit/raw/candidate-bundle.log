@@ -1,0 +1,8 @@
+Waiting for another process to let go of lock: /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/bundler.lock
+Waiting for another process to let go of lock: /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/bundler.lock
+Waiting for another process to let go of lock: /home/user/rubies/master-0d399335b7/lib/ruby/gems/4.1.0+7/bundler.lock
+Fetching gem metadata from https://rubygems.org/..........
+Resolving dependencies...
+erb-6.1.0 is built in to Ruby, and can't be cached because your Gemfile doesn't have any sources that contain it.
+Bundle complete! 3 Gemfile dependencies, 71 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.

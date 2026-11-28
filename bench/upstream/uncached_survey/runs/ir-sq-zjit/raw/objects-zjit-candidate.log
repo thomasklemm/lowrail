@@ -1,0 +1,5 @@
+objects worker poll, idle	287.999
+objects dispatcher poll, idle	294.036
+objects dispatcher poll, 10 due jobs	5376.916
+objects dispatcher poll, 100 due jobs	33635.526
+objects worker claim, 3 jobs	2606.922
