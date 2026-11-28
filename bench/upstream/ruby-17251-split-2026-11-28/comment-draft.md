@@ -1,6 +1,6 @@
 Draft follow-up on ruby/ruby#17251. **Not posted.** Posting needs Thomas's approval of this exact text. Numbers:
 [README](README.md), [report.txt](report.txt). Text: Astra's replacement (review on 39377167) with its own gcbench
-correction; thermos-sol pending.
+correction; thermos-sol approved unchanged (07dcda56).
 
 ---
 

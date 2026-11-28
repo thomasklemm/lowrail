@@ -13,7 +13,7 @@ current master and whether our posted numbers
   separate the cadence, the extra build **nocad** is the head with the cadence switched off.
 * **The hypothesis does not hold.** Commit 1 alone does not cut shipit to 1–2 majors: 8.5 / 8.5 / 8.5 (interp / YJIT /
   ZJIT) against base's 6 / 6 / 7. Without the cadence (nocad) the head runs 6 / 6 / 6.5, all `nofree`. The extra
-  shipit majors come with the 1.25× cadence: head − nocad +2 / +3 / +2 per run, in every pair. No measured cost of
+  shipit majors come with the 1.25× cadence: head − nocad paired medians +2 / +3 / +2 (ranges +1…+3 / +2…+3 / +1…+2), higher in every pair. No measured cost of
   commit 2 was found; the runs do not prove it is zero.
 * **Most RSS changes remain without the cadence.** For the nine ruby-bench rows in the comment draft, nocad's paired
   median after-GC RSS change is within 5 percentage points of the head's (largest gap 4.9 pp, liquid-render interp).
@@ -21,7 +21,7 @@ current master and whether our posted numbers
   interp / YJIT / ZJIT): liquid-c −42 / −42 / −38%, liquid-render −19 / −20 / −16%, mail −14 / −21 / −10%, sequel
   −11 / −11 / −9%, lobsters −6 / −6 / −3%, activerecord −5 / −8 / 0%. Worse: gcbench +40 / +40 / +7% (VmHWM about
   +30% in every mode), liquid-compile +2 / +5 / +5%, railsbench +1 / +1 / +2%. On shipit the cadence lowers the sampled
-  peak against nocad by paired medians of 2.4 / 4.5 / 3.3 MiB (lower in 5/6, 6/6, 5/6), and costs +2 to +3 majors.
+  peak against nocad by paired medians of 2.4 / 4.5 / 3.3 MiB (lower in 5/6, 6/6, 5/6), and costs paired medians of +2 / +3 / +2 majors.
 * **The 11-27 GC-time signs repeat in a sequential run.** Shipit head − base: YJIT +168 ms (higher in 5/6; 11-27:
   +139, 6/6), ZJIT −224 ms (lower in 6/6; 11-27: −166, 6/6), interp −65 ms (overlaps the A/A). Concurrent lanes alone
   don't explain them; this does not exclude every contention effect. Under ZJIT most of the decrease appears without
@@ -48,7 +48,7 @@ current master and whether our posted numbers
   here on liquid-render (−41 / −20%) and sequel (−26 / −11%). gcbench steady RSS is reversed (−9% there; here steady
   +37% and after-GC +40% under YJIT), while its warmup peak (56 → 73 MiB there) matches our VmHWM (55 → 72). On shipit
   (+7% there) our sampled peak, a different measure, is −4.2 MiB (about −2%). hexapdf (+16% there) is inconclusive
-  here: YJIT after-GC −25% lies outside its A/A median interval, but three noisy rounds overlap.
+  here: YJIT after-GC −25% lies outside its observed A/A range (−19.7% to +2.7%), but the three-round head − base and A/A ranges overlap.
 * `report.rb` first computed suite GC-time percentages with integer division (−100/0/+100); fixed before this
   revision, report.txt regenerated. No RSS or shipit number changed.
 
@@ -213,5 +213,10 @@ equal under the interpreter. GC time and RSS directions are mixed; with two roun
   for byte. Findings: half medians hidden by rounding (c1 8.5, nocad ZJIT 6.5), hexapdf A/A 35% not 30%, head hexapdf
   nofree up to 26, iteration-time and causality claims overstated, two more posted numbers reversed in sign, the
   report.rb integer-division bug. I rechecked the medians, hexapdf counts and A/A figures from the receipts.
-* **thermos-sol** (`openai/gpt-6.1-sol`, xhigh, thread T-01a22130-6014-7780-afc1-9d29239fdd53): pending, asked to
-  review the revised text.
+* **thermos-sol** (`openai/gpt-6.1-sol`, xhigh, thread T-01a22130-6014-7780-afc1-9d29239fdd53) on 07dcda56: the exact
+  text after `---` approved unchanged. Re-ran report.rb and suite.rb on the archive (byte-identical), recomputed all 27
+  RSS cells and the previous archive's Rails ZJIT pairs (+9.81 / +17.70 MiB then, −2.28 / +3.29 now, A/A −5.56). Two
+  README wording notes (paired-median scope of +2 / +3 / +2; "observed A/A range") applied.
+
+Both reviews accept the draft as it stands at 07dcda56. Astra wrote that text; the one antecedent fix it got afterwards
+was in the text thermos-sol approved. Posting needs Thomas's approval of the exact text (brief of 2026-11-28).
