@@ -16,3 +16,11 @@ casa-interpreter               workloads 10 median  -0.48% min  -0.71% max  -0.0
 react-starter-kit-interpreter  workloads  8 median  -0.09% min  -0.41% max  +0.07%
 redprints-cfp-interpreter      workloads  8 median  -0.15% min  -0.56% max  +0.04%
 ALL interpreter workloads  36 median  -0.27% |d| p90  0.58% lower by >= 1%:   0 higher by >= 1%:   0
+
+# r13qck4: Rails main with QCK1 head 40e4c9db8f, run alone (r13qck3 ran beside Callgrind benches and was discarded)
+== r13qck4 vs r13m
+blog-interpreter               workloads 10 median  -0.07% min  -0.37% max  +0.29%
+casa-interpreter               workloads 10 median  -0.39% min  -0.76% max  -0.00%
+react-starter-kit-interpreter  workloads  8 median  -0.10% min  -0.56% max  +0.10%
+redprints-cfp-interpreter      workloads  8 median  -0.29% min  -0.72% max  +0.07%
+ALL interpreter workloads  36 median  -0.26% |d| p90  0.62% lower by >= 1%:   0 higher by >= 1%:   0

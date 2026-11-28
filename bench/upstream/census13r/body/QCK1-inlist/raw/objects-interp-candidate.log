@@ -1,0 +1,4 @@
+objects where(id: 20 ids), miss	265.999
+objects where(id: 20 ids), hit	169.0
+objects where(id: 100 ids), miss	986.0
+objects where(id: 100 ids), hit	569.0
