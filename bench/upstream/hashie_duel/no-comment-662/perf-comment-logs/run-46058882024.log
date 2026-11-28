@@ -1,0 +1,101 @@
+﻿2026-11-27T19:45:15.2162018Z Current runner version: '2.338.2'
+2026-11-27T19:45:15.2189897Z ##[group]Runner Image Provisioner
+2026-11-27T19:45:15.2190920Z Hosted Compute Agent
+2026-11-27T19:45:15.2191734Z Version: 20261111.635
+2026-11-27T19:45:15.2192531Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-27T19:45:15.2193300Z Build Date: 2026-11-11T01:49:01Z
+2026-11-27T19:45:15.2194074Z Worker ID: {6a7a681b-dfd8-4a2d-8ba3-4e571c8751a4}
+2026-11-27T19:45:15.2194926Z Region: northcentralus
+2026-11-27T19:45:15.2195575Z Cloud: Azure
+2026-11-27T19:45:15.2196220Z ##[endgroup]
+2026-11-27T19:45:15.2197766Z ##[group]Operating System
+2026-11-27T19:45:15.2198419Z Ubuntu
+2026-11-27T19:45:15.2199066Z 26.04.1
+2026-11-27T19:45:15.2200026Z LTS
+2026-11-27T19:45:15.2200655Z ##[endgroup]
+2026-11-27T19:45:15.2201260Z ##[group]Runner Image
+2026-11-27T19:45:15.2201895Z Image: ubuntu-26.04
+2026-11-27T19:45:15.2202544Z Version: 20261122.9.1
+2026-11-27T19:45:15.2203864Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261122.9/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-27T19:45:15.2205563Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261122.9
+2026-11-27T19:45:15.2206547Z ##[endgroup]
+2026-11-27T19:45:15.2207881Z ##[group]GITHUB_TOKEN Permissions
+2026-11-27T19:45:15.2210621Z Actions: read
+2026-11-27T19:45:15.2211360Z Metadata: read
+2026-11-27T19:45:15.2211969Z PullRequests: write
+2026-11-27T19:45:15.2212615Z ##[endgroup]
+2026-11-27T19:45:15.2214829Z Secret source: Actions
+2026-11-27T19:45:15.2215916Z Cache mode: read
+2026-11-27T19:45:15.2217018Z Prepare workflow directory
+2026-11-27T19:45:15.2569854Z Prepare all required actions
+2026-11-27T19:45:15.2670541Z Getting action download info
+2026-11-27T19:45:15.5313967Z Download action repository 'actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333' (SHA:9000827ccba6bdab643e8b6fd33ac0654aef8333)
+2026-11-27T19:45:15.8569545Z Download action repository 'ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0' (SHA:f9c4492e86def3e644ab32a0ef185eda5b0c20d0)
+2026-11-27T19:45:16.2120244Z Uses: sferik/duel-ruby/.github/workflows/duel-comment.yml@3c0c99d95dc2d5620f59e4bb298179422086adf7
+2026-11-27T19:45:16.2125694Z ##[group] Inputs
+2026-11-27T19:45:16.2126380Z   accept-label: duel: accept
+2026-11-27T19:45:16.2127117Z   perf-workflow: Perf
+2026-11-27T19:45:16.2127731Z   marker: duel
+2026-11-27T19:45:16.2128260Z ##[endgroup]
+2026-11-27T19:45:16.2128833Z Complete job name: comment / Comment
+2026-11-27T19:45:16.3034235Z ##[group]Run actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333
+2026-11-27T19:45:16.3035840Z with:
+2026-11-27T19:45:16.3036352Z   pattern: duel-report*
+2026-11-27T19:45:16.3037022Z   path: /home/runner/work/_temp/report
+2026-11-27T19:45:16.3037783Z   run-id: 46058787439
+2026-11-27T19:45:16.3046748Z   github-token: ***
+2026-11-27T19:45:16.3047350Z   merge-multiple: false
+2026-11-27T19:45:16.3047992Z   repository: hashie/hashie
+2026-11-27T19:45:16.3048669Z   skip-decompress: false
+2026-11-27T19:45:16.3049426Z   digest-mismatch: error
+2026-11-27T19:45:16.3050308Z ##[endgroup]
+2026-11-27T19:45:16.5653813Z Fetching artifact list for workflow run 46058787439 in repository hashie/hashie
+2026-11-27T19:45:16.8563602Z Found 2 artifact(s)
+2026-11-27T19:45:16.8566101Z Filtering artifacts by pattern 'duel-report*'
+2026-11-27T19:45:16.8589694Z Preparing to download the following artifacts:
+2026-11-27T19:45:16.8593135Z - duel-report-yjit (ID: 15227706991, Size: 405, Expected Digest: sha256:69c64110aa3bfafe77093616da7bbdec365633838c47624fc589e8764fb31766)
+2026-11-27T19:45:16.8597350Z - duel-report-zjit (ID: 15227568518, Size: 405, Expected Digest: sha256:d8bd09dfcdf1615cde10726bbf501b1145651a2153e4a2cdf1491a5c64103d8f)
+2026-11-27T19:45:16.8612453Z Downloading artifact '15227706991' from 'hashie/hashie'
+2026-11-27T19:45:16.8627498Z Downloading artifact '15227568518' from 'hashie/hashie'
+2026-11-27T19:45:17.1910381Z Starting download of artifact to: /home/runner/work/_temp/report/duel-report-yjit
+2026-11-27T19:45:17.1919786Z Starting download of artifact to: /home/runner/work/_temp/report/duel-report-zjit
+2026-11-27T19:45:17.2663943Z (node:2302) [DEP0005] DeprecationWarning: Buffer() is deprecated due to security and usability issues. Please use the Buffer.alloc(), Buffer.allocUnsafe(), or Buffer.from() methods instead.
+2026-11-27T19:45:17.2667306Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-27T19:45:17.2746280Z SHA256 digest of downloaded artifact is 69c64110aa3bfafe77093616da7bbdec365633838c47624fc589e8764fb31766
+2026-11-27T19:45:17.2749910Z Artifact download completed successfully.
+2026-11-27T19:45:17.2820827Z SHA256 digest of downloaded artifact is d8bd09dfcdf1615cde10726bbf501b1145651a2153e4a2cdf1491a5c64103d8f
+2026-11-27T19:45:17.2824167Z Artifact download completed successfully.
+2026-11-27T19:45:17.2826589Z Total of 2 artifact(s) downloaded
+2026-11-27T19:45:17.2828701Z Download artifact has finished successfully
+2026-11-27T19:45:17.3245559Z ##[group]Run ruby/setup-ruby@f9c4492e86def3e644ab32a0ef185eda5b0c20d0
+2026-11-27T19:45:17.3247045Z with:
+2026-11-27T19:45:17.3247927Z   ruby-version: ruby
+2026-11-27T19:45:17.3248896Z   bundler-cache: false
+2026-11-27T19:45:17.3257183Z   token: ***
+2026-11-27T19:45:17.3258075Z ##[endgroup]
+2026-11-27T19:45:17.5368069Z ##[group]Modifying PATH
+2026-11-27T19:45:17.5369924Z Entries added to PATH to use selected Ruby:
+2026-11-27T19:45:17.5371292Z   /opt/hostedtoolcache/Ruby/4.0.10/x64/bin
+2026-11-27T19:45:17.5373908Z ##[endgroup]
+2026-11-27T19:45:17.5376027Z ##[group]Print Ruby version
+2026-11-27T19:45:17.5571039Z [command]/opt/hostedtoolcache/Ruby/4.0.10/x64/bin/ruby --version
+2026-11-27T19:45:18.8160094Z ruby 4.0.10 (2026-11-19 revision a704b7cd95) +PRISM [x86_64-linux]
+2026-11-27T19:45:18.8357287Z Took   1.30 seconds
+2026-11-27T19:45:18.8358198Z ##[endgroup]
+2026-11-27T19:45:18.8359115Z ##[group]Installing Bundler
+2026-11-27T19:45:18.8369981Z Using Bundler shipped with ruby-4.0.10
+2026-11-27T19:45:18.8370367Z Took   0.00 seconds
+2026-11-27T19:45:18.8370980Z ##[endgroup]
+2026-11-27T19:45:18.8509057Z ##[group]Run gem install duel --version '0.3.1' --no-document
+2026-11-27T19:45:18.8509925Z gem install duel --version '0.3.1' --no-document
+2026-11-27T19:45:18.8510462Z duel comment --report "$RUNNER_TEMP/report" --head "$HEAD_SHA" --marker "$MARKER"
+2026-11-27T19:45:18.8553318Z shell: /usr/bin/bash -e {0}
+2026-11-27T19:45:18.8553600Z env:
+2026-11-27T19:45:18.8556164Z   GH_TOKEN: ***
+2026-11-27T19:45:18.8556467Z   HEAD_SHA: f6545d1dd34c3905fb4c8fa25764f209cb65274f
+2026-11-27T19:45:18.8556817Z   MARKER: duel
+2026-11-27T19:45:18.8557061Z ##[endgroup]
+2026-11-27T19:45:23.3008087Z Successfully installed duel-0.3.1
+2026-11-27T19:45:23.3008610Z 1 gem installed
+2026-11-27T19:45:25.1083478Z duel comment: no comment (the last comment says neutral already)
+2026-11-27T19:45:25.1199324Z Cleaning up orphan processes
