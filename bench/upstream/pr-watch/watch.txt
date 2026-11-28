@@ -12,8 +12,6 @@ https://github.com/inertiajs/inertia-rails/pull/449
 https://github.com/freerange/mocha/pull/809
 https://github.com/sferik/duel-ruby/pull/9
 https://github.com/ruby/ruby/pull/20261
-https://github.com/hashie/hashie/pull/660
-https://github.com/hashie/hashie/pull/661
 https://github.com/ruby/uri/pull/276
 https://github.com/rails/rails/pull/60024
 https://github.com/ruby/ruby/pull/20266

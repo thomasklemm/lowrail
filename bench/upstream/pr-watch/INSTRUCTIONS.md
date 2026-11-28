@@ -96,17 +96,13 @@ Known reds that are not ours (don't report):
 Ours, open (watch CI, comments, state):
 - rails/rails: #60024 (ASC1, head ed1b28c5b9, opened ready 2026-11-27 21:38 UTC), #59565. (#60020 merged 2026-11-27, removed.)
 - rails/solid_cable#105 (SCB1, head 2cb1842043, opened ready 2026-11-27 22:18 UTC).
-- ruby/uri#276 (UR1, head c43954f, opened ready 2026-11-27 20:56 UTC).
+- ruby/uri#276 (UR1, head e2d2e21a57 after Thomas's rework push 2026-11-27 23:45 UTC; opened ready 20:56 UTC at c43954f; CI workflow action_required, waiting for a maintainer).
 - ruby/ruby: #20266 (SHK1, head 2bda3f18fa, prism) and #20267 (URF1, head 151bebd34d, VM), both opened ready
   2026-11-27, no Redmine ticket by Thomas's choice; #20261 (BT1, e75b1f0109), #20208 (TN1, 2e061793aa; khasinski's commit is intended), #20169 (ZSV1,
   d0f0dc2da5), #19912 (ZS1; Rafael França's ported commit is intended).
 - rack/rack#2557 (e3d53cfdb2; our reply to jeremyevans posted), hashie/hashie#659 (the hashie thread
   T-01a2179d-be22-73a3-8fe1-b196f9746e8c applies dblock's nits and replies; its head change is expected),
-  hashie/hashie#660 (our ZJIT Duel follow-up, opened 2026-11-27; the Amp GitHub App can't access hashie, so gh
-  polling is the only signal; also watch any further hashie PR that the hashie thread
-  T-01a21e85-395a-745d-91c1-87edf5e6c7a1 opens for dblock's candidates and add it to `watch.txt`; report new replies
-  by dblock in the #659 comment thread, including answers to our reply issuecomment-7227673119, posted 2026-11-27 20:36 UTC),
-  hashie/hashie#661 (HM2, head 1af7ad9, opened ready 2026-11-27; gh polling only), coorasse/cancancan#941, freerange/mocha#809, sferik/duel-ruby#9, rmosolgo/graphql-ruby#5908,
+  hashie/hashie#660 and #661 (merged 2026-11-27 21:35 and 21:34 UTC, removed; the Amp GitHub App can't access hashie, so gh polling is the only signal; also watch any further hashie PR that the hashie thread T-01a21e85-395a-745d-91c1-87edf5e6c7a1 opens for dblock's candidates and add it to `watch.txt`; report new replies by dblock in the #659 comment thread, including answers to our reply issuecomment-7227673119, posted 2026-11-27 20:36 UTC), coorasse/cancancan#941, freerange/mocha#809, sferik/duel-ruby#9, rmosolgo/graphql-ruby#5908,
   inertiajs/inertia-rails#449, PostHog/posthog-ruby#395, rails/importmap-rails#336, plus every other open PR of ours
   the search finds.
 
