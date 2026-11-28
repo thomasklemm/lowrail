@@ -1,0 +1,10 @@
+# Mime::Type.parse(Chrome header), Rails main 2e299253f9, Ruby 4.0.10 interpreter, 500 calls after 3000 warm-up (bench/upstream/census13r/mime.rb with ir.sh's window); one exploratory run, no A/A: inclusive Ir for the whole window, divide by 500
+total window Ir: 108,937,205 (about 218k per parse)
+ 29,105,233 (26.72%)  re.c:rb_reg_search_set_match
+ 19,133,982 (17.56%)  string.c:rb_str_scan
+ 13,711,597 (12.59%)  string.c:rb_str_split_m
+ 10,173,917 ( 9.34%)  array.c:rb_ary_sort_bang
+  9,396,443 ( 8.63%)  array.c:rb_ary_uniq_bang
+  6,181,535 ( 5.67%)  re.c:rb_reg_match
+  4,816,725 ( 4.42%)  array.c:rb_ary_index
+  3,905,000 ( 3.58%)  re.c:rb_reg_match_m_p
