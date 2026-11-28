@@ -128,7 +128,7 @@ with 5.2.0 and 6.0.0.
 ### After the second passes: a subclass defined in a Ractor (thermos-sol P2), not yet resolved
 
 Astra approved `66b1ec6`; thermos-sol's second pass asks for changes
-([below](#thermos-sol-src1-second-pass-changes-on-66b1ec68dd3996621d229d3f6d6e53406c37c586)). Its finding reproduces
+([below](#thermos-sol-src1-changes-on-66b1ec68dd3996621d229d3f6d6e53406c37c586)). Its finding reproduces
 here with [repro.rb](repro.rb)'s new last case, `Ractor.new { Class.new(Slack::Messages::Message).new('size' => 17).to_hash }`:
 
 | Ruby | hashie | master | head `66b1ec6` |
