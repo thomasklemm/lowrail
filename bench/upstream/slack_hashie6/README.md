@@ -33,74 +33,97 @@ The gemspec has `s.add_dependency 'hashie'` without a constraint, and faraday-ma
 ## The fix
 
 Branch `thomasklemm/message-disable-warnings` on thomasklemm/slack-ruby-client, head
-`dfbf7013bfaf7abf982a09ef29d732e6b452de71`, one commit on master `0f1757e` ([patch](head-dfbf701.patch)):
+`66b1ec68dd3996621d229d3f6d6e53406c37c586`, one commit on master `0f1757e` ([patch](head-66b1ec6.patch)):
 
-* `Message` calls `disable_warnings`, Hashie's public switch, and the private override and its comment go.
-* The gemspec requires `hashie >= 3.5.3`.
+* `Message` calls `disable_warnings`, Hashie's public switch. The private `log_built_in_message` override stays, with
+  a comment that says Hashie before 6.0.0 warns through it.
+* The gemspec requires `hashie >= 3.5.2`.
 * `spec/slack/messages/message_spec.rb` expects no `Hashie.logger.warn` when a `Message` is built with a `size` key.
 * A CHANGELOG line for #620, and `thomasklemm` in `.spellcheck.txt` (the lint task spell-checks contributor handles).
 
-### Why `>= 3.5.3` (my decision)
+### Heads
 
-| hashie | what `disable_warnings` does |
-| --- | --- |
-| before 3.5.2 | does not exist (`NameError` on 3.5.0 and 3.5.1; 3.4.6 has no `Hashie.logger` either) |
-| 3.5.2 | exists, but subclasses do not inherit it: a subclass of `Message` warns (1,528 of 2,880 rows differ) |
-| 3.5.3 (2017-02-11) | subclasses inherit it (hashie commit `9636f68`): no row differs |
-| 4.0.0 | takes method names (`disable_warnings(:zip)`) |
+| head | shape | why it was replaced |
+| --- | --- | --- |
+| `54c6b98` (not pushed) | `disable_warnings`, override removed, hashie `>= 3.5.2` | on hashie 3.5.2 a subclass of `Message` warned: subclasses inherit the setting only from 3.5.3 |
+| `dfbf701` | same, hashie `>= 3.5.3` | Astra, verdict changes ([below](#astra-src1-changes-on-dfbf7013bfaf7abf982a09ef29d732e6b452de71)): R1, on Ruby 3.0.7 with hashie 3.5.3 or 3.5.4 a `Message` with a conflicting key built in a Ractor raised where master worked; R2, on hashie 4.0.0 to 5.2.0 a subclass with `disable_warnings(:zip)` or `Message.quiet(:zip)` warned for other keys, and raised when the logger raised. Both reproduced here before the head changed. |
+| `66b1ec6` | `disable_warnings` added, override kept, hashie `>= 3.5.2` | current |
 
-An earlier head (`54c6b98`) required 3.5.2, the floor omniauth and zendesk_api use; the differential on 3.5.2 showed
-the subclass difference, so the floor moved to 3.5.3.
+### Why the override stays and the floor is `>= 3.5.2` (my decisions)
+
+With the old no-op kept, Hashie before 6.0.0 takes the same path as on master, so R1 and R2 are gone and no sentence
+about them is needed in the body; Hashie 6.0.0 never calls the old method and is silenced by `disable_warnings`. The
+head does not override the renamed `_log_built_in_message`.
+
+`disable_warnings` does not exist before hashie 3.5.2 (`NameError` on 3.5.0 and 3.5.1), so that is the lowest floor
+that loads. Subclasses inherit the setting only from 3.5.3 (hashie commit `9636f68`), which is why `dfbf701` required
+3.5.3; with the override kept, a subclass on 3.5.2 is silent through the override, as on master (0 of 2,880 rows
+differ). 3.5.2 rejects fewer setups that resolve today than 3.5.3 does. Both reviewers judged 3.5.3 right for
+`dfbf701`; whether 3.5.2 is right for this head is theirs to judge again.
 
 ## Suites ([out/matrix.txt](out/matrix.txt))
 
 `matrix.sh RUBY [full] -- VERSIONS...` pins hashie through a Gemfile that evaluates the tree's own, and runs the new
-spec and, with `full`, `rake spec`, on master `0f1757e` with the new spec copied in ("slack-base") and on the head.
+spec and, with `full`, `rake spec`, on master `0f1757e` with the new spec copied in ("slack-base") and on the head
+`66b1ec6`.
 
 | Ruby | hashie | master + new spec | head |
 | --- | --- | --- | --- |
-| 3.4.7 | 3.5.3, 3.6.0, 4.1.0, 5.0.0, 5.1.0, 5.2.0 | 702 examples, 0 failures | 702, 0 |
+| 3.4.7 | 3.5.2, 3.5.3, 3.6.0, 4.1.0, 5.0.0, 5.1.0, 5.2.0 | 702 examples, 0 failures | 702, 0 |
 | 3.4.7 | 6.0.0 | 702, **1 failure** (the new spec) | 702, 0 |
-| 3.0.7 | 5.1.0 | 699, 0 | 699, 0 |
+| 3.0.7 | 3.5.3, 5.1.0 | 699, 0 | 699, 0 |
 | 3.0.7 | 6.0.0 | 699, **1 failure** (the new spec) | 699, 0 |
 | 4.0.9 | 6.0.0 | 702, **1 failure** (the new spec) | 702, 0 |
-| 3.4.7 | 3.5.0, 3.5.1, 3.5.2 | new spec passes | bundler refuses (below the floor) |
+| 3.4.7 | 3.5.0, 3.5.1 | new spec passes | bundler refuses (below the floor) |
 | 3.4.7 | 3.4.6 | new spec errors (`Hashie.logger` is missing) | bundler refuses |
 
 `bundle exec rake lint` on the head (Ruby 3.4.7, hashie 6.0.0): 105 files inspected, no offenses.
-Not run: Ruby 2.7 (slack-ruby-client's CI runs it; hashie 6 needs Ruby 3.0, so 2.7 resolves hashie 5), JRuby,
-ruby-head.
+Not run here: Ruby 2.7 (Astra ran 2.7.8 on `dfbf701`; hashie 6 needs Ruby 3.0, so 2.7 resolves hashie 5), JRuby,
+ruby-head. The fork's Actions do not run on a push, so there is no hosted CI result for this head.
 
 ## Differential ([out/diff-summary.txt](out/diff-summary.txt), rows in `out/diff-rows.tar.xz`)
 
-`run_diff.sh RUBY VERSIONS...` runs [message_diff.rb](message_diff.rb) on both trees: four classes (`Message`, a plain
-subclass, a subclass with its own method, a subclass that calls `disable_warnings(:zip)`; the last only from hashie
-4.0.0), 3 seeds, 16 keys, 10 operations (new, `[]=`, setter, merge, update, dup, read, `to_s`, `to_hash`, `to_json`),
-frozen and not. A row is the result, its class, the message afterwards and the warnings logged, or the exception.
+`run_diff.sh RUBY VERSIONS...` runs [message_diff.rb](message_diff.rb) on both trees: five classes (`Message`, a plain
+subclass, a subclass with its own method, a subclass that calls `disable_warnings(:zip)` from hashie 4.0.0, and
+`Message.quiet(:zip)` from 4.1.0), 3 seeds, 16 keys, 10 operations (new, `[]=`, setter, merge, update, dup, read,
+`to_s`, `to_hash`, `to_json`), frozen and not. A row is the result, its class, the message afterwards and the warnings
+logged, or the exception.
 
 | Ruby | hashie | rows | rows that differ | which |
 | --- | --- | ---: | ---: | --- |
-| 3.4.7 | 3.5.3, 3.6.0 | 2,880 | 0 | |
-| 3.4.7 | 4.1.0, 5.0.0, 5.1.0, 5.2.0 | 3,840 | 726 | only the `disable_warnings(:zip)` subclass |
-| 3.0.7 | 5.1.0 | 3,840 | 726 | only the `disable_warnings(:zip)` subclass |
-| 3.4.7, 3.0.7, 4.0.9 | 6.0.0 | 3,840 | 2,316 | `Message` 764, subclass 764, subclass with own method 788 |
+| 3.4.7 | 3.5.2, 3.5.3, 3.6.0 | 2,880 | 0 | |
+| 3.4.7 | 4.1.0, 5.0.0, 5.1.0, 5.2.0 | 4,800 | 0 | |
+| 3.0.7 | 3.5.3, 3.5.4 | 2,880 | 0 | |
+| 3.0.7 | 5.1.0 | 4,800 | 0 | |
+| 3.4.7, 3.0.7, 4.0.9 | 6.0.0 | 4,800 | 2,316 | `Message` 764, subclass 764, subclass with own method 788 |
 
-In every cell the rows differ only in the warning count: results, classes, the message afterwards and exceptions are
-the same.
-
-* **Hashie 6.0.0:** master warns and the head does not, which is the fix. The `disable_warnings(:zip)` subclass is the
-  same on both (it warns for keys other than `zip`), because the override is dead on master.
-* **Hashie 4.0.0 to 5.2.0, one behaviour difference:** a subclass of `Message` that itself calls
-  `disable_warnings(:zip)` replaces the inherited "all keys" with its own list, so on the head it warns for other
-  conflicting keys; on master the override kept it silent whatever the subclass declared. Nothing in the gem does
-  this; an application's own subclass could.
+* **Hashie before 6.0.0:** no row differs, the selective subclass and `quiet(:zip)` included (R2).
+* **Hashie 6.0.0:** the rows differ only in the warning count: master warns and the head does not, which is the fix.
+  The `disable_warnings(:zip)` subclass and `quiet(:zip)` are the same on both; they warn for keys other than `zip`,
+  as Hashie 6 has them do on master already.
 * **A subclass that overrides `log_built_in_message` and calls `super`:** on hashie 6.0.0 master warns once and the
-  head does not; on hashie 3.5.3 to 5.2.0 neither warns.
-* **Reflection differs as intended:** `disable_warnings?` is true on the head, and the private
-  `log_built_in_message` is no longer defined on `Message`.
-* **Ractor:** building a `Message` in a non-main Ractor gives the same result on master and head in every cell: it
-  works on hashie 3.5.3, raises `Ractor::IsolationError` with or without a conflicting key on 3.6.0 and 4.1.0, and
-  raises it only for a conflicting key on 5.2.0 and 6.0.0, with warnings disabled or not.
+  head does not; before 6.0.0 neither warns.
+* **Reflection differs as intended:** `disable_warnings?` is true on the head. `log_built_in_message` is still a
+  private method of `Message`.
+
+### The reviewers' cases ([out/repro-summary.txt](out/repro-summary.txt), raw in `out/repro.txt`)
+
+`repro.sh RUBY VERSIONS...` runs [repro.rb](repro.rb) on both trees: a plain and a nested `size` key, a frozen
+subclass, a `disable_warnings(:zip)` subclass and `quiet(:zip)` with a normal and with a raising logger, and a
+`Message` built in a Ractor with and without a conflicting key. Cells: Ruby 3.4.7 with hashie 3.5.2, 3.5.3, 3.5.4,
+3.6.0, 4.0.0, 4.1.0, 5.0.0, 5.1.0, 5.2.0 and 6.0.0; Ruby 3.0.7 with 3.5.2, 3.5.3, 3.5.4, 5.1.0 and 6.0.0; Ruby 4.0.9
+with 5.2.0 and 6.0.0.
+
+* **R1 is gone:** Ruby 3.0.7 with hashie 3.5.2, 3.5.3 and 3.5.4: 0 of 5 cases differ; the Ractor with a `size` key
+  returns `{"size"=>7}` on both.
+* **R2 is gone:** on hashie 4.0.0 to 5.2.0 the selective subclass, `quiet(:zip)` and the raising logger give the same
+  result on both.
+* **What still differs before 6.0.0, both where master raises and the head does not:** a frozen subclass of `Message`
+  given a `size` key raises `FrozenError` on master from hashie 3.6.0 to 5.2.0, because Hashie memoizes the
+  subclass's setting on first use, and the head inherits it at definition; and on Ruby 3.4.7 with hashie 3.6.0 a
+  Ractor with a `size` key raises `Ractor::IsolationError` on master for the same write.
+* **Hashie 6.0.0:** the plain and nested keys stop warning, the frozen subclass stops raising, and a raising logger
+  is no longer reached for a plain `Message`.
 
 ## Astra SRC1: changes on dfbf7013bfaf7abf982a09ef29d732e6b452de71
 

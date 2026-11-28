@@ -37,6 +37,7 @@ klasses = {
 unless Hashie::Mash.method(:disable_warnings).arity.zero?
   klasses['subclass disable_warnings(:zip)'] = Class.new(message) { disable_warnings(:zip) }
 end
+klasses['quiet(:zip)'] = message.quiet(:zip) if message.respond_to?(:quiet)
 keys = ['size', :size, 'key', 'zip', 'min', 'count', 'default', 'class', 'channel', 'ok', 'to_s', 'size=', 'ok?', '', 1, nil]
 seeds = [{}, { 'ok' => true, 'file' => { 'size' => 1, 'name' => 'a' } },
          { 'messages' => [{ 'count' => 2, 'files' => [{ 'size' => 3, 'zip' => 4 }] }], size: 5 }]

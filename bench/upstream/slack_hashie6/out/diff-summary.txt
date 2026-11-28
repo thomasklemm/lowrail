@@ -1,10 +1,15 @@
+ruby 3.4.7 hashie 3.5.2: 2880 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
+    1c1
+    < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
+    ---
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
 ruby 3.4.7 hashie 3.5.3: 2880 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
     1,3c1,3
     < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
 ruby 3.4.7 hashie 3.6.0: 2880 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
@@ -13,90 +18,108 @@ ruby 3.4.7 hashie 3.6.0: 2880 rows, 0 differ, 0 differ apart from the warning co
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
-ruby 3.4.7 hashie 4.1.0: 3840 rows, 726 differ, 0 differ apart from the warning count; head rows with warnings: 726
+ruby 3.4.7 hashie 4.1.0: 4800 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
     1,3c1,3
     < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
-ruby 3.4.7 hashie 5.0.0: 3840 rows, 726 differ, 0 differ apart from the warning count; head rows with warnings: 726
+ruby 3.4.7 hashie 5.0.0: 4800 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
     1,3c1,3
     < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
-ruby 3.4.7 hashie 5.1.0: 3840 rows, 726 differ, 0 differ apart from the warning count; head rows with warnings: 726
+ruby 3.4.7 hashie 5.1.0: 4800 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
     1,3c1,3
     < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
-ruby 3.4.7 hashie 5.2.0: 3840 rows, 726 differ, 0 differ apart from the warning count; head rows with warnings: 726
+ruby 3.4.7 hashie 5.2.0: 4800 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
     1,3c1,3
     < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
-ruby 3.4.7 hashie 6.0.0: 3840 rows, 2316 differ, 0 differ apart from the warning count; head rows with warnings: 726
+ruby 3.4.7 hashie 6.0.0: 4800 rows, 2316 differ, 0 differ apart from the warning count; head rows with warnings: 1452
     1,3c1,3
     < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
-    7c7
+    8c8
     < class subclass whose log_built_in_message calls super | ok, warnings 1
     ---
     > class subclass whose log_built_in_message calls super | ok, warnings 0
-ruby 3.0.7 hashie 5.1.0: 3840 rows, 726 differ, 0 differ apart from the warning count; head rows with warnings: 726
+ruby 3.0.7 hashie 3.5.3: 2880 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
     1,3c1,3
     < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
-ruby 3.0.7 hashie 6.0.0: 3840 rows, 2316 differ, 0 differ apart from the warning count; head rows with warnings: 726
+ruby 3.0.7 hashie 3.5.4: 2880 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
     1,3c1,3
     < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
-    7c7
+ruby 3.0.7 hashie 5.1.0: 4800 rows, 0 differ, 0 differ apart from the warning count; head rows with warnings: 0
+    1,3c1,3
+    < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
+    < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
+    < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
+    ---
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
+    > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
+    > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
+ruby 3.0.7 hashie 6.0.0: 4800 rows, 2316 differ, 0 differ apart from the warning count; head rows with warnings: 1452
+    1,3c1,3
+    < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
+    < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
+    < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
+    ---
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
+    > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
+    > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
+    8c8
     < class subclass whose log_built_in_message calls super | ok, warnings 1
     ---
     > class subclass whose log_built_in_message calls super | ok, warnings 0
-ruby 4.0.9 hashie 6.0.0: 3840 rows, 2316 differ, 0 differ apart from the warning count; head rows with warnings: 726
+ruby 4.0.9 hashie 6.0.0: 4800 rows, 2316 differ, 0 differ apart from the warning count; head rows with warnings: 1452
     1,3c1,3
     < class Message | disable_warnings? [false, false, false] | own private methods [:log_built_in_message] | ancestors 1
     < class subclass | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     < class subclass with own method | disable_warnings? [false, false, false] | own private methods [] | ancestors 2
     ---
-    > class Message | disable_warnings? [true, true, true] | own private methods [] | ancestors 1
+    > class Message | disable_warnings? [true, true, true] | own private methods [:log_built_in_message] | ancestors 1
     > class subclass | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
     > class subclass with own method | disable_warnings? [true, true, true] | own private methods [] | ancestors 2
-    7c7
+    8c8
     < class subclass whose log_built_in_message calls super | ok, warnings 1
     ---
     > class subclass whose log_built_in_message calls super | ok, warnings 0

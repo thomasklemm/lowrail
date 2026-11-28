@@ -1,0 +1,80 @@
+ruby 3.4.7 hashie 3.5.2: 5 cases, 0 differ
+ruby 3.4.7 hashie 3.5.3: 5 cases, 0 differ
+ruby 3.4.7 hashie 3.5.4: 5 cases, 0 differ
+ruby 3.4.7 hashie 3.6.0: 5 cases, 2 differ
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen #<Class:#<Class:X>>: #<
+    head   {"size" => 7} warnings 0
+  ractor size
+    master Ractor::RemoteError: Ractor::IsolationError can not set instance variables of classes/modules by non-mai
+    head   {"size" => 7} warnings 0
+ruby 3.4.7 hashie 4.0.0: 9 cases, 1 differ
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen #<Class:#<Class:X>>: #<
+    head   {"size" => 7} warnings 0
+ruby 3.4.7 hashie 4.1.0: 9 cases, 1 differ
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen #<Class:#<Class:X>>: #<
+    head   {"size" => 7} warnings 0
+ruby 3.4.7 hashie 5.0.0: 9 cases, 1 differ
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen #<Class:#<Class:X>>: #<
+    head   {"size" => 7} warnings 0
+ruby 3.4.7 hashie 5.1.0: 9 cases, 1 differ
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen #<Class:#<Class:X>>: #<
+    head   {"size" => 7} warnings 0
+ruby 3.4.7 hashie 5.2.0: 9 cases, 1 differ
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen #<Class:#<Class:X>>: #<
+    head   {"size" => 7} warnings 0
+ruby 3.4.7 hashie 6.0.0: 9 cases, 4 differ
+  plain size
+    master {"size" => 7} warnings 1
+    head   {"size" => 7} warnings 0
+  nested size
+    master {"file" => {"size" => 1}} warnings 1
+    head   {"file" => {"size" => 1}} warnings 0
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen #<Class:#<Class:X>>: #<
+    head   {"size" => 7} warnings 0
+  plain, raising logger
+    master IOError: IOError logger failed
+    head   {"size" => 7} warnings 0
+ruby 3.0.7 hashie 3.5.2: 5 cases, 0 differ
+ruby 3.0.7 hashie 3.5.3: 5 cases, 0 differ
+ruby 3.0.7 hashie 3.5.4: 5 cases, 0 differ
+ruby 3.0.7 hashie 5.1.0: 9 cases, 1 differ
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen #<Class:#<Class:X>>: #<
+    head   {"size"=>7} warnings 0
+ruby 3.0.7 hashie 6.0.0: 9 cases, 4 differ
+  plain size
+    master {"size"=>7} warnings 1
+    head   {"size"=>7} warnings 0
+  nested size
+    master {"file"=>{"size"=>1}} warnings 1
+    head   {"file"=>{"size"=>1}} warnings 0
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen #<Class:#<Class:X>>: #<
+    head   {"size"=>7} warnings 0
+  plain, raising logger
+    master IOError: IOError logger failed
+    head   {"size"=>7} warnings 0
+ruby 4.0.9 hashie 5.2.0: 9 cases, 1 differ
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen Class: #<Class:X>
+    head   {"size" => 7} warnings 0
+ruby 4.0.9 hashie 6.0.0: 9 cases, 4 differ
+  plain size
+    master {"size" => 7} warnings 1
+    head   {"size" => 7} warnings 0
+  nested size
+    master {"file" => {"size" => 1}} warnings 1
+    head   {"file" => {"size" => 1}} warnings 0
+  frozen subclass size
+    master FrozenError: FrozenError can't modify frozen Class: #<Class:X>
+    head   {"size" => 7} warnings 0
+  plain, raising logger
+    master IOError: IOError logger failed
+    head   {"size" => 7} warnings 0
