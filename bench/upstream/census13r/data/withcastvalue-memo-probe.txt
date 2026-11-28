@@ -1,0 +1,2 @@
+main: a==b true, a.hash==b.hash true
+memoized: a==b true, a.hash==b.hash false
